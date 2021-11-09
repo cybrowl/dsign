@@ -1,10 +1,10 @@
 {
   "private": true,
+  "name": "dsign",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "export": "npm run build && next export"
+    "build": "next build && next export",
+    "start": "next start"
   },
   "dependencies": {
     "next": "latest",

@@ -1,7 +1,7 @@
 {
   "canisters": {
     "dsign": {
-      "main": "contracts/main.mo",
+      "main": "service/main.mo",
       "type": "motoko"
     },
     "dsign_assets": {
