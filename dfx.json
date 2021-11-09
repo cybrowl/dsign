@@ -1,0 +1,34 @@
+{
+  "canisters": {
+    "dsign": {
+      "main": "contracts/main.mo",
+      "type": "motoko"
+    },
+    "dsign_assets": {
+      "dependencies": [
+        "dsign"
+      ],
+      "frontend": {
+        "entrypoint": "out/index.html"
+      },
+      "source": [
+        "out"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "dfx": "0.8.3",
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    }
+  },
+  "version": 1
+}
