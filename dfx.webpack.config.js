@@ -31,7 +31,11 @@ function initCanisterIds() {
   canisters = network === "local" ? localCanisters : prodCanisters
 
   for (const canister in canisters) {
-    process.env[`NEXT_PUBLIC_${canister.toUpperCase()}_CANISTER_ID`] =
+    console.log('------------------------------------');
+    console.log(`canister.toUpperCase():`, canister.toUpperCase());
+    console.log('------------------------------------');
+
+    process.env[`${canister.toUpperCase()}_CANISTER_ID`] =
       canisters[canister][network]
   }
 }
