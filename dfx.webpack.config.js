@@ -11,7 +11,7 @@ function initCanisterIds() {
     ))
   } catch (error) {
     console.log('------------------------------------');
-    console.log("No local canister_ids.json found. Continuing production", error);
+    console.log("No local canister_ids.json found. Continuing production");
     console.log('------------------------------------');
   }
   try {
@@ -31,10 +31,6 @@ function initCanisterIds() {
   canisters = network === "local" ? localCanisters : prodCanisters
 
   for (const canister in canisters) {
-    console.log('------------------------------------');
-    console.log(`canister.toUpperCase():`, canister.toUpperCase());
-    console.log('------------------------------------');
-
     process.env[`${canister.toUpperCase()}_CANISTER_ID`] =
       canisters[canister][network]
   }
