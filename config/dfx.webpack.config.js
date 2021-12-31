@@ -7,6 +7,7 @@ function generateCanisterAliases() {
     const networkName = process.env["DFX_NETWORK"] || "local";
     const outputRoot = path.join(
       __dirname,
+      "..",
       ".dfx",
       networkName,
       "canisters",
@@ -15,7 +16,17 @@ function generateCanisterAliases() {
 
     return {
       ...acc,
-      ["ic-canisters/" + name]: path.join(__dirname, "/utils/" + name + ".js"),
+      ["ic-canisters/" + name]: path.join(
+        __dirname,
+        "/canisters/" + name + ".js"
+      ),
+      ["ic-local-canister-ids"]: path.join(
+        __dirname,
+        "..",
+        ".dfx",
+        networkName,
+        "canister_ids.json"
+      ),
       ["ic-idl/" + name]: path.join(outputRoot, name + ".did.js"),
     };
   }, {});
