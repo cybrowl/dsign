@@ -8,6 +8,9 @@
 # dfx
 .dfx
 
+# vessel
+.vessel
+
 # testing
 /coverage
 

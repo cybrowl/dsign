@@ -1,6 +1,27 @@
-const path = require("path")
+const path = require("path");
+const dfxJson = require("./dfx.json");
 
-let localCanisters, prodCanisters, canisters
+let localCanisters, prodCanisters, canisters;
+
+// List of all aliases for canisters. This creates the module alias for
+// the `import ... from "ic:canisters/xyz"` where xyz is the name of a canister.
+const aliases = Object.entries(dfxJson.canisters).reduce((acc, [name]) => {
+  // Get the network name, or `local` by default.
+  const networkName = process.env["DFX_NETWORK"] || "local";
+  const outputRoot = path.join(
+    __dirname,
+    ".dfx",
+    networkName,
+    "canisters",
+    name
+  );
+
+  return {
+    ...acc,
+    ["ic-canisters/" + name]: path.join(__dirname, "/utils/" + name + ".js"),
+    ["ic-idl/" + name]: path.join(outputRoot, name + ".did.js"),
+  };
+}, {});
 
 function initCanisterIds() {
   try {
@@ -8,37 +29,34 @@ function initCanisterIds() {
       ".dfx",
       "local",
       "canister_ids.json"
-    ))
+    ));
   } catch (error) {
-    console.log('------------------------------------');
+    console.log("------------------------------------");
     console.log("No local canister_ids.json found. Continuing production");
-    console.log('------------------------------------');
+    console.log("------------------------------------");
   }
 
   try {
-    prodCanisters = require(path.resolve("canister_ids.json"))
+    prodCanisters = require(path.resolve("canister_ids.json"));
   } catch (error) {
-    console.log('------------------------------------');
+    console.log("------------------------------------");
     console.log("No production canister_ids.json found. Continuing with local");
-    console.log('------------------------------------');
+    console.log("------------------------------------");
   }
-
-  console.log('------------------------------------');
-  console.log("process.env.DFX_NETWORK: ", process.env.DFX_NETWORK);
-  console.log('------------------------------------');
 
   const network =
     process.env.DFX_NETWORK ||
     (process.env.NODE_ENV === "production" ? "ic" : "local");
 
-  canisters = network === "local" ? localCanisters : prodCanisters
+  canisters = network === "local" ? localCanisters : prodCanisters;
 
   for (const canister in canisters) {
     process.env[`${canister.toUpperCase()}_CANISTER_ID`] =
-      canisters[canister][network]
+      canisters[canister][network];
   }
 }
 
 module.exports = {
   initCanisterIds: initCanisterIds,
-}
+  aliases: aliases,
+};

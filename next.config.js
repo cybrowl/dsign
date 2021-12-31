@@ -14,6 +14,14 @@ module.exports = {
     // Plugin
     config.plugins.push(EnvPlugin)
 
+    // Alias
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      ...DFXWebPackConfig.aliases
+    }
+
+    console.log("alias: ", config.resolve.alias);
+    
     // Important: return the modified config
     return config
   },
