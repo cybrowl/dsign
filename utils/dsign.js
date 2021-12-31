@@ -9,6 +9,12 @@ export const canisterId = "rrkah-fqaaa-aaaaa-aaaaq-cai";
 
 console.log("ENV", process.env);
 
+if (typeof window == "undefined") {
+  console.log("server");
+} else {
+  console.log("client");
+}
+
 export const createActor = (canisterId, options) => {
   let agent = null;
 

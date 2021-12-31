@@ -53,6 +53,9 @@ function initCanisterIds() {
   for (const canister in canisters) {
     process.env[`${canister.toUpperCase()}_CANISTER_ID`] =
       canisters[canister][network];
+
+      process.env[`NEXT_PUBLIC_${canister.toUpperCase()}_CANISTER_ID`] =
+      canisters[canister][network];
   }
 }
 

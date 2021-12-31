@@ -1,7 +1,6 @@
 import 'tailwindcss/tailwind.css'
 
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
-}
+import dynamic from 'next/dynamic'
+const App = dynamic(() => import('./index.js'), { ssr: false })
 
-export default MyApp
+export default () => <App />
