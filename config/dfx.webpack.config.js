@@ -1,29 +1,31 @@
 const path = require("path");
-const dfxJson = require("./dfx.json");
+const dfxJson = require("../dfx.json");
 
-let localCanisters, prodCanisters, canisters;
+function generateCanisterAliases() {
+  const aliases = Object.entries(dfxJson.canisters).reduce((acc, [name]) => {
+    // Get the network name, or `local` by default.
+    const networkName = process.env["DFX_NETWORK"] || "local";
+    const outputRoot = path.join(
+      __dirname,
+      ".dfx",
+      networkName,
+      "canisters",
+      name
+    );
 
-// List of all aliases for canisters. This creates the module alias for
-// the `import ... from "ic:canisters/xyz"` where xyz is the name of a canister.
-const aliases = Object.entries(dfxJson.canisters).reduce((acc, [name]) => {
-  // Get the network name, or `local` by default.
-  const networkName = process.env["DFX_NETWORK"] || "local";
-  const outputRoot = path.join(
-    __dirname,
-    ".dfx",
-    networkName,
-    "canisters",
-    name
-  );
+    return {
+      ...acc,
+      ["ic-canisters/" + name]: path.join(__dirname, "/utils/" + name + ".js"),
+      ["ic-idl/" + name]: path.join(outputRoot, name + ".did.js"),
+    };
+  }, {});
 
-  return {
-    ...acc,
-    ["ic-canisters/" + name]: path.join(__dirname, "/utils/" + name + ".js"),
-    ["ic-idl/" + name]: path.join(outputRoot, name + ".did.js"),
-  };
-}, {});
+  return aliases;
+}
 
-function initCanisterIds() {
+function generateCanisterIds() {
+  let localCanisters, prodCanisters, canisters;
+
   try {
     localCanisters = require(path.resolve(
       ".dfx",
@@ -54,12 +56,12 @@ function initCanisterIds() {
     process.env[`${canister.toUpperCase()}_CANISTER_ID`] =
       canisters[canister][network];
 
-      process.env[`NEXT_PUBLIC_${canister.toUpperCase()}_CANISTER_ID`] =
+    process.env[`NEXT_PUBLIC_${canister.toUpperCase()}_CANISTER_ID`] =
       canisters[canister][network];
   }
 }
 
 module.exports = {
-  initCanisterIds: initCanisterIds,
-  aliases: aliases,
+  generateCanisterIds,
+  generateCanisterAliases,
 };
