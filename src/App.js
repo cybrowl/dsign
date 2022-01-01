@@ -3,10 +3,10 @@ import "./tailwind.css";
 import { dsign } from "ic-canisters/dsign";
 
 const App = () => {
-  function greetActor() {
+  async function greetActor() {
     try {
-      // const gretting = await dsign.greet("hello");
-      console.log("dsign: ", dsign);
+      const gretting = await dsign.greet("hello");
+      console.log("gretting: ", gretting);
     } catch (err) {
       console.error(err);
     }

@@ -58,7 +58,7 @@ module.exports = {
           options: {
             presets: [
               // https://babeljs.io/docs/en/babel-preset-env
-              "@babel/preset-env",
+              ["@babel/preset-env",{ "targets": {"node": "current"}}],
               // https://babeljs.io/docs/en/babel-preset-react
               ["@babel/preset-react", { development: isDevelopment }],
             ],

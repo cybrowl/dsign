@@ -9,7 +9,10 @@ const config = globals();
 
 console.log("config: ", config);
 
-export const canisterId = config.canisterIds.dsign;
+//TODO: this is undefined
+export const canisterId = config.canisterIds.dsign[config["DFX_NETWORK"]];
+
+console.log("canisterId: ", canisterId);
 
 export const createActor = (canisterId, options) => {
   const agent = new HttpAgent({ ...options?.agentOptions });
