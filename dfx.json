@@ -9,10 +9,10 @@
         "dsign"
       ],
       "frontend": {
-        "entrypoint": "dist/index.html"
+        "entrypoint": "build/index.html"
       },
       "source": [
-        "dist"
+        "build"
       ],
       "type": "assets"
     }

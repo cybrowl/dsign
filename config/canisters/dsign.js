@@ -7,15 +7,15 @@ import globals from "globals";
 
 const config = globals();
 
-export const canisterId = config.canisterIds.dsign;
-
 console.log("config: ", config);
+
+export const canisterId = config.canisterIds.dsign;
 
 export const createActor = (canisterId, options) => {
   const agent = new HttpAgent({ ...options?.agentOptions });
 
   // Fetch root key for certificate validation during development
-  if (config.NODE_ENV !== "production") {
+  if (config.DFX_NETWORK !== "production") {
     agent.fetchRootKey().catch((err) => {
       console.warn(
         "Unable to fetch root key. Check to ensure that your local replica is running"

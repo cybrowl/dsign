@@ -7,16 +7,17 @@ const path = require("path"),
     require("webpack-bundle-analyzer").BundleAnalyzerPlugin,
   ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin"),
   HtmlWebPackPlugin = require("html-webpack-plugin");
-
 const DFXWebPackConfig = require("./dfx.webpack.config");
+
 DFXWebPackConfig.generateCanisterIds();
 
 const canisterAliases = DFXWebPackConfig.generateCanisterAliases();
 
 const packageFolder = path.resolve(__dirname, "..", "build");
-const isDevelopment = process.env.NODE_ENV !== "production";
 
-console.log("canisterAliases: ", canisterAliases);
+const isDevelopment = process.env.DFX_NETWORK !== "ic";
+
+console.log("isDevelopment: ", isDevelopment);
 
 module.exports = {
   mode: isDevelopment ? "development" : "production",

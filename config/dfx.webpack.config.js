@@ -50,7 +50,7 @@ function generateCanisterIds() {
   }
 
   try {
-    prodCanisters = require(path.resolve("canister_ids.json"));
+    prodCanisters = require(path.resolve(__dirname, "canister_ids.json"));
   } catch (error) {
     console.log("------------------------------------");
     console.log("No production canister_ids.json found. Continuing with local");
@@ -65,9 +65,6 @@ function generateCanisterIds() {
 
   for (const canister in canisters) {
     process.env[`${canister.toUpperCase()}_CANISTER_ID`] =
-      canisters[canister][network];
-
-    process.env[`NEXT_PUBLIC_${canister.toUpperCase()}_CANISTER_ID`] =
       canisters[canister][network];
   }
 }
