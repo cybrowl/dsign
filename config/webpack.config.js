@@ -17,8 +17,6 @@ const packageFolder = path.resolve(__dirname, "..", "build");
 
 const isDevelopment = process.env.DFX_NETWORK !== "ic";
 
-console.log("isDevelopment: ", isDevelopment);
-
 module.exports = {
   mode: isDevelopment ? "development" : "production",
   devtool: isDevelopment ? "source-map" : false,
