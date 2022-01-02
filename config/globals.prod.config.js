@@ -1,4 +1,4 @@
-import canisterIds from "./canister_ids.json";
+import canisterIds from "../canister_ids.json";
 
 export default function globals() {
   return {
