@@ -7,6 +7,9 @@ const App = () => {
     try {
       const gretting = await dsign.greet("hello");
       console.log("gretting: ", gretting);
+
+      const hello = await dsign.hello();
+      console.log("hello: ", hello);
     } catch (err) {
       console.error(err);
     }

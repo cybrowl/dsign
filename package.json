@@ -6,7 +6,7 @@
     "dev-ui": "webpack serve --config config/webpack.config.js --hot",
     "build": "webpack --config config/webpack.config.js",
     "start-ui": "webpack serve --config config/webpack.config.js --hot",
-    "start-canisters": "bash ./scripts/build.sh"
+    "dev": "bash ./scripts/build.sh"
   },
   "dependencies": {
     "react": "^17.0.2",

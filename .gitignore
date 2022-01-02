@@ -11,6 +11,9 @@
 # vessel
 .vessel
 
+#locks
+package-lock.json
+
 # testing
 /coverage
 

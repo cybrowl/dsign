@@ -1,5 +1,11 @@
 #!/bin/bash
 
+## stop
+dfx stop
+
+## start clean
+dfx start --clean --background
+
 ## register canister identifiers
 dfx canister create --all
 
