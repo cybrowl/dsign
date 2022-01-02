@@ -1,8 +1,5 @@
 #!/bin/bash
 
-## start clean local execution env 
-dfx start --clean --background
-
 ## register canister identifiers
 dfx canister create --all
 
