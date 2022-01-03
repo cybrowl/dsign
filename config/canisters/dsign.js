@@ -15,7 +15,7 @@ export const createActor = (canisterId, options) => {
   const agent = new HttpAgent({ ...options?.agentOptions });
 
   // Fetch root key for certificate validation during development
-  if (config.DFX_NETWORK !== "production") {
+  if (config.DFX_NETWORK !== "ic") {
     agent.fetchRootKey().catch((err) => {
       console.warn(
         "Unable to fetch root key. Check to ensure that your local replica is running"

@@ -1,20 +1,7 @@
 import "./tailwind.css";
-
-import { dsign } from "ic-canisters/dsign";
+import {greetActor} from "./api/main";
 
 const App = () => {
-  async function greetActor() {
-    try {
-      const gretting = await dsign.greet("hello");
-      console.log("gretting: ", gretting);
-
-      const hello = await dsign.hello();
-      console.log("hello: ", hello);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
   return (
     <div className="App bg-[#eee] h-[100vh] flex items-center justify-center flex-col">
       <h1 className="font-bold text-4xl text-[#333]">Hi 👋, Tailwind test.</h1>
