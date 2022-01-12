@@ -1,15 +1,15 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
 
 // Imports and re-exports candid interface
-import { idlFactory } from "ic-idl/dsign";
-export { idlFactory } from "ic-idl/dsign";
+import { idlFactory } from "ic-idl/profile";
+export { idlFactory } from "ic-idl/profile";
 import globals from "globals";
 
 const config = globals();
 
-console.log("config: ", config);
+console.log("profile config: ", config);
 
-export const canisterId = config.canisterIds.dsign[config["DFX_NETWORK"]];
+export const canisterId = config.canisterIds.profile[config["DFX_NETWORK"]];
 
 export const createActor = (canisterId, options) => {
   const agent = new HttpAgent({ ...options?.agentOptions });
@@ -32,4 +32,4 @@ export const createActor = (canisterId, options) => {
   });
 };
 
-export const dsign = createActor(canisterId);
+export const profile = createActor(canisterId);

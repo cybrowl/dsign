@@ -4,8 +4,13 @@ let Package =
 
 let
   -- This is where you can add your own packages to the package-set
-  additions =
-    [] : List Package
+  additions = [
+      { name = "base"
+      , repo = "https://github.com/dfinity/motoko-base"
+      , version = "master"
+      , dependencies = [] : List Text
+      }
+    ]
 
 let
   {- This is where you can override existing packages in the package-set
