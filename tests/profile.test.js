@@ -1,6 +1,7 @@
 const test = require("tape");
 const fetch = require("node-fetch");
 const { Ed25519KeyIdentity } = require("@dfinity/identity");
+const {idlFactory} = require("../.dfx/local/canisters/profile/profile.did.test");
 
 // Actor/Canister Testing
 
@@ -9,19 +10,11 @@ global.fetch = fetch;
 const { HttpAgent, Actor } = require("@dfinity/agent");
 
 const HOST = "http://127.0.0.1:8000/";
-const canisterId = "rrkah-fqaaa-aaaaa-aaaaq-cai";
-
-const idlFactory = ({ IDL }) => {
-  return IDL.Service({
-    greet: IDL.Func([IDL.Text], [IDL.Text], []),
-    hello: IDL.Func([], [IDL.Text], ["query"]),
-    hey: IDL.Func([IDL.Text], [IDL.Text], []),
-  });
-};
+const canisterId = "ryjl3-tyaaa-aaaaa-aaaba-cai";
 
 const getActor = async (canisterId) => {
   const identity = Ed25519KeyIdentity.generate();
-
+  
   const agent = new HttpAgent({
     host: HOST,
     identity,
@@ -42,23 +35,10 @@ const getActor = async (canisterId) => {
   return actor;
 };
 
-test("Main: hello()", async function (t) {
-  const dsign = await getActor(canisterId);
-  const response = await dsign.hello();
-
-  t.equal(typeof response, "string");
-});
-
-test("Main: greet()", async function (t) {
+test("Profile: greet()", async function (t) {
   const dsign = await getActor(canisterId);
   const response = await dsign.greet("Jack");
 
-  t.equal(typeof response, "string");
-});
-
-test("Main: hey()", async function (t) {
-  const dsign = await getActor(canisterId);
-  const response = await dsign.hey("Jane");
-
+  console.log("response=> ", response);
   t.equal(typeof response, "string");
 });

@@ -1,12 +1,12 @@
 {
   "canisters": {
-    "dsign": {
-      "main": "service/main.mo",
+    "profile": {
+      "main": "service/profile.mo",
       "type": "motoko"
     },
     "dsign_assets": {
       "dependencies": [
-        "dsign"
+        "profile"
       ],
       "frontend": {
         "entrypoint": "build/index.html"

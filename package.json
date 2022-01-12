@@ -7,7 +7,7 @@
     "build": "webpack --config config/webpack.config.js",
     "start-ui": "webpack serve --config config/webpack.config.js --hot",
     "dev": "bash ./scripts/build.sh",
-    "test": "tape tests/main.test.js"
+    "test": "tape tests/profile.test.js"
   },
   "dependencies": {
     "@dfinity/agent": "0.10.2",
