@@ -1,9 +1,13 @@
 <script>
-  import {profile} from "canister/profile";
-
+  // import {profile} from "./utils/profile";
+  
   function handleClick() {
     alert("clicked");
-    console.log("profile:", profile);
+    
+    console.log(process.env.DFX_NETWORK);
+    // const ping = await profile.ping();
+
+    // console.log("ping:",  ping);
   }
 </script>
 

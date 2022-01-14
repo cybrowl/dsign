@@ -8,7 +8,7 @@ import livereload from "rollup-plugin-livereload";
 import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
 import svelte from "rollup-plugin-svelte";
-const {generateCanisterIds, generateCanisterAliases} = require("./dfx.config");
+const { generateCanisterIds, generateCanisterAliases } = require("./dfx.config");
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -36,9 +36,12 @@ function serve() {
   };
 }
 
+console.log("-------------------");
 console.log("canisterIds: ", canisterIds);
+console.log("network: ", network);
+console.log("-------------------");
 
-export default {
+const frontend = {
   input: "src/dsign_assets/main.js",
   output: {
     sourcemap: true,
@@ -77,7 +80,7 @@ export default {
     replace(
       Object.assign(
         {
-          preventAssignment: true,
+          preventAssignment: false,
           "process.env.DFX_NETWORK": JSON.stringify(network),
           "process.env.NODE_ENV": JSON.stringify(production ? "production" : "development"),
         },
@@ -113,3 +116,5 @@ export default {
     clearScreen: false,
   },
 };
+
+export default [frontend];

@@ -9,10 +9,10 @@
         "profile"
       ],
       "frontend": {
-        "entrypoint": "build/index.html"
+        "entrypoint": "public/index.html"
       },
       "source": [
-        "build"
+        "public"
       ],
       "type": "assets"
     }
