@@ -3,11 +3,12 @@ const { generateCanisterIds, generateCanisterAliases } = require("../config/dfx.
 
 test("dfxConfig: generateCanisterAliases()", async function (t) {
   const aliases = generateCanisterAliases();
+
   const expected = {
     "local-canister-ids": "/Users/cyberowl/Projects/dsign/.dfx/local/canister_ids.json",
-    "canister/profile": "/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile/index.js",
+    "canister/profile": "/Users/cyberowl/Projects/dsign/config/declarations/profile.js",
     "idl/profile": "/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile/profile.did.js",
-    "canister/dsign_assets": "/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/index.js",
+    "canister/dsign_assets": "/Users/cyberowl/Projects/dsign/config/declarations/dsign_assets.js",
     "idl/dsign_assets": "/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/dsign_assets.did.js",
   };
 
@@ -15,15 +16,12 @@ test("dfxConfig: generateCanisterAliases()", async function (t) {
 });
 
 test("dfxConfig: generateCanisterIds()", async function (t) {
-  const canisterIds = generateCanisterIds();
+  const { canisterIds, network } = generateCanisterIds();
 
   const expected = {
-    canisterIds: {
-      __Candid_UI: { local: "r7inp-6aaaa-aaaaa-aaabq-cai" },
-      dsign_assets: { local: "rrkah-fqaaa-aaaaa-aaaaq-cai" },
-      profile: { local: "ryjl3-tyaaa-aaaaa-aaaba-cai" },
-    },
-    network: "local",
+    __Candid_UI: { local: "r7inp-6aaaa-aaaaa-aaabq-cai" },
+    dsign_assets: { local: "rrkah-fqaaa-aaaaa-aaaaq-cai" },
+    profile: { local: "ryjl3-tyaaa-aaaaa-aaaba-cai" },
   };
 
   t.deepEqual(canisterIds, expected);

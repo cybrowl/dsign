@@ -1,13 +1,14 @@
 <script>
-  // import {profile} from "./utils/profile";
-  
-  function handleClick() {
-    alert("clicked");
-    
-    console.log(process.env.DFX_NETWORK);
-    // const ping = await profile.ping();
+  import { ping } from "./api/profile";
 
-    // console.log("ping:",  ping);
+  async function handleClick() {
+    alert("clicked");
+
+    const pingResponse = await ping();
+
+    alert(pingResponse);
+    
+    console.log("pingResponse:",  pingResponse);
   }
 </script>
 

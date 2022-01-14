@@ -5,15 +5,15 @@ import css from "rollup-plugin-css-only";
 import inject from "rollup-plugin-inject";
 import json from "@rollup/plugin-json";
 import livereload from "rollup-plugin-livereload";
-import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
 import svelte from "rollup-plugin-svelte";
-const { generateCanisterIds, generateCanisterAliases } = require("./dfx.config");
+const { generateCanisterAliases, getEnvironmentVars } = require("./dfx.config");
 
 const production = !process.env.ROLLUP_WATCH;
+const isDevelopment = process.env.DFX_NETWORK !== "ic";
 
-const { canisterIds, network } = generateCanisterIds();
 const aliases = generateCanisterAliases();
+const environment = getEnvironmentVars(isDevelopment);
 
 function serve() {
   let server;
@@ -36,11 +36,6 @@ function serve() {
   };
 }
 
-console.log("-------------------");
-console.log("canisterIds: ", canisterIds);
-console.log("network: ", network);
-console.log("-------------------");
-
 const frontend = {
   input: "src/dsign_assets/main.js",
   output: {
@@ -53,6 +48,7 @@ const frontend = {
     alias({
       entries: {
         ...aliases,
+        environment,
       },
     }),
 
@@ -76,27 +72,9 @@ const frontend = {
       browser: true,
       dedupe: ["svelte"],
     }),
-    // Add canister ID's & network to the environment
-    replace(
-      Object.assign(
-        {
-          preventAssignment: false,
-          "process.env.DFX_NETWORK": JSON.stringify(network),
-          "process.env.NODE_ENV": JSON.stringify(production ? "production" : "development"),
-        },
-        ...Object.keys(canisterIds)
-          .filter((canisterName) => canisterName !== "__Candid_UI")
-          .map((canisterName) => ({
-            ["process.env." + canisterName.toUpperCase() + "_CANISTER_ID"]: JSON.stringify(
-              canisterIds[canisterName][network]
-            ),
-          }))
-      )
-    ),
     commonjs(),
     inject({
       Buffer: ["buffer", "Buffer"],
-      process: "process/browser",
     }),
     json(),
 

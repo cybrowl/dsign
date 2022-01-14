@@ -16,7 +16,7 @@ function generateCanisterAliases() {
 
       return {
         ...acc,
-        ["canister/" + name]: path.join(outputRoot + "/index.js"),
+        ["canister/" + name]: path.join(__dirname, "/declarations/" + name + ".js"),
         ["idl/" + name]: path.join(outputRoot + "/" + name + ".did.js"),
       };
     }, aliases);
@@ -48,12 +48,19 @@ function generateCanisterIds() {
 
   canisterIds = network === "local" ? localCanisters : prodCanisters;
 
-  console.log("canisterIds:", canisterIds);
-
   return { canisterIds, network };
+}
+
+function getEnvironmentVars(isDevelopment) {
+  if (isDevelopment) {
+    return path.resolve(__dirname, "env.dev.config.js");
+  } else {
+    return path.resolve(__dirname, "env.prod.config.js");
+  }
 }
 
 module.exports = {
   generateCanisterIds,
   generateCanisterAliases,
+  getEnvironmentVars,
 };

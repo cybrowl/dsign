@@ -11,7 +11,6 @@
     "test": "tape tests/**.test.js"
   },
   "dependencies": {
-    "@dfinity/agent": "0.10.2",
     "@dfinity/auth-client": "^0.10.2",
     "@dfinity/candid": "0.10.2",
     "@dfinity/identity": "^0.10.2",
@@ -19,6 +18,7 @@
     "sirv-cli": "^1.0.0"
   },
   "devDependencies": {
+    "@dfinity/agent": "0.10.2",
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-json": "^4.1.0",
