@@ -1,16 +1,14 @@
 <script>
-	function handleClick() {
-		alert('clicked')
-	}
+  import {profile} from "canister/profile";
+
+  function handleClick() {
+    alert("clicked");
+    console.log("profile:", profile);
+  }
 </script>
 
 <main>
-  <a
-    href="https://dfinity.org"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="logo"
-  >
+  <a href="https://dfinity.org" target="_blank" rel="noopener noreferrer" class="logo">
     <img src="images/dfinity.svg" alt="DFINITY logo" />
   </a>
   <h1 on:click={handleClick}>MishiCat</h1>

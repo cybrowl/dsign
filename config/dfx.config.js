@@ -3,6 +3,7 @@ const dfxConfig = require("../dfx.json");
 
 function generateCanisterAliases() {
   const dfxNetwork = process.env["DFX_NETWORK"] || "local";
+
   let aliases = {
     ["local-canister-ids"]: path.join(__dirname, "..", ".dfx", dfxNetwork, "canister_ids.json"),
   };
@@ -47,7 +48,9 @@ function generateCanisterIds() {
 
   canisterIds = network === "local" ? localCanisters : prodCanisters;
 
-  return { ...canisterIds, network };
+  console.log("canisterIds:", canisterIds);
+
+  return { canisterIds, network };
 }
 
 module.exports = {

@@ -18,9 +18,11 @@ test("dfxConfig: generateCanisterIds()", async function (t) {
   const canisterIds = generateCanisterIds();
 
   const expected = {
-    __Candid_UI: { local: "r7inp-6aaaa-aaaaa-aaabq-cai" },
-    dsign_assets: { local: "rrkah-fqaaa-aaaaa-aaaaq-cai" },
-    profile: { local: "ryjl3-tyaaa-aaaaa-aaaba-cai" },
+    canisterIds: {
+      __Candid_UI: { local: "r7inp-6aaaa-aaaaa-aaabq-cai" },
+      dsign_assets: { local: "rrkah-fqaaa-aaaaa-aaaaq-cai" },
+      profile: { local: "ryjl3-tyaaa-aaaaa-aaaba-cai" },
+    },
     network: "local",
   };
 

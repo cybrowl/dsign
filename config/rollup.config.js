@@ -8,11 +8,12 @@ import livereload from "rollup-plugin-livereload";
 import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
 import svelte from "rollup-plugin-svelte";
-import dfxConfig from "./dfx.config";
+const {generateCanisterIds, generateCanisterAliases} = require("./dfx.config");
 
 const production = !process.env.ROLLUP_WATCH;
 
-const { canisterIds, network } = dfxConfig.generateCanisterIds();
+const { canisterIds, network } = generateCanisterIds();
+const aliases = generateCanisterAliases();
 
 function serve() {
   let server;
@@ -35,6 +36,8 @@ function serve() {
   };
 }
 
+console.log("canisterIds: ", canisterIds);
+
 export default {
   input: "src/dsign_assets/main.js",
   output: {
@@ -46,8 +49,7 @@ export default {
   plugins: [
     alias({
       entries: {
-        utils: "../../../utils",
-        "batman-1.0.0": "./joker-1.5.0",
+        ...aliases,
       },
     }),
 
