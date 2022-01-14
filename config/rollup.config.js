@@ -1,65 +1,18 @@
-import svelte from "rollup-plugin-svelte";
-import commonjs from "@rollup/plugin-commonjs";
-import resolve from "@rollup/plugin-node-resolve";
-import livereload from "rollup-plugin-livereload";
 import { terser } from "rollup-plugin-terser";
+import alias from "@rollup/plugin-alias";
+import commonjs from "@rollup/plugin-commonjs";
 import css from "rollup-plugin-css-only";
-import replace from "@rollup/plugin-replace";
 import inject from "rollup-plugin-inject";
 import json from "@rollup/plugin-json";
+import livereload from "rollup-plugin-livereload";
+import replace from "@rollup/plugin-replace";
+import resolve from "@rollup/plugin-node-resolve";
+import svelte from "rollup-plugin-svelte";
+import dfxConfig from "./dfx.config";
 
 const production = !process.env.ROLLUP_WATCH;
 
-const path = require("path");
-
-function initCanisterIds() {
-  let localCanisters, localIiCanister, prodCanisters, canisters;
-  try {
-    localCanisters = require(path.resolve(
-      "..",
-      "..",
-      ".dfx",
-      "local",
-      "canister_ids.json"
-    ));
-  } catch (error) {
-    console.log("No local canister_ids.json found. Continuing production");
-  }
-  try {
-    localIiCanister = require(path.resolve(
-      "..",
-      "..",
-      "internet-identity",
-      ".dfx",
-      "local",
-      "canister_ids.json"
-    ));
-  } catch (error) {
-    console.log(
-      "No local internet-identity canister_ids.json found. Continuing production"
-    );
-  }
-  try {
-    prodCanisters = require(path.resolve("..", "..", "canister_ids.json"));
-  } catch (error) {
-    console.log("No production canister_ids.json found. Continuing with local");
-  }
-
-  const network =
-    process.env.DFX_NETWORK ||
-    (process.env.NODE_ENV === "production" ? "ic" : "local");
-
-  console.log(network);
-
-  const canisterIds =
-    network === "local"
-      ? { ...(localCanisters || {}), ...(localIiCanister || {}) }
-      : prodCanisters;
-
-  return { canisterIds, network };
-}
-
-const { canisterIds, network } = initCanisterIds();
+const { canisterIds, network } = dfxConfig.generateCanisterIds();
 
 function serve() {
   let server;
@@ -71,14 +24,10 @@ function serve() {
   return {
     writeBundle() {
       if (server) return;
-      server = require("child_process").spawn(
-        "npm",
-        ["run", "start", "--", "--dev"],
-        {
-          stdio: ["ignore", "inherit", "inherit"],
-          shell: true,
-        }
-      );
+      server = require("child_process").spawn("npm", ["run", "start", "--", "--dev"], {
+        stdio: ["ignore", "inherit", "inherit"],
+        shell: true,
+      });
 
       process.on("SIGTERM", toExit);
       process.on("exit", toExit);
@@ -95,6 +44,13 @@ export default {
     file: "public/build/bundle.js",
   },
   plugins: [
+    alias({
+      entries: {
+        utils: "../../../utils",
+        "batman-1.0.0": "./joker-1.5.0",
+      },
+    }),
+
     svelte({
       compilerOptions: {
         // enable run-time checks when not in production
@@ -121,15 +77,14 @@ export default {
         {
           preventAssignment: true,
           "process.env.DFX_NETWORK": JSON.stringify(network),
-          "process.env.NODE_ENV": JSON.stringify(
-            production ? "production" : "development"
-          ),
+          "process.env.NODE_ENV": JSON.stringify(production ? "production" : "development"),
         },
         ...Object.keys(canisterIds)
           .filter((canisterName) => canisterName !== "__Candid_UI")
           .map((canisterName) => ({
-            ["process.env." + canisterName.toUpperCase() + "_CANISTER_ID"]:
-              JSON.stringify(canisterIds[canisterName][network]),
+            ["process.env." + canisterName.toUpperCase() + "_CANISTER_ID"]: JSON.stringify(
+              canisterIds[canisterName][network]
+            ),
           }))
       )
     ),

@@ -7,6 +7,7 @@ import globals from "globals";
 
 const config = globals();
 
+console.log("ENV: ", process.env)
 console.log("profile config: ", config);
 
 export const canisterId = config.canisterIds.profile[config["DFX_NETWORK"]];

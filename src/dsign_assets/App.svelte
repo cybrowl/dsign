@@ -1,4 +1,7 @@
 <script>
+	function handleClick() {
+		alert('clicked')
+	}
 </script>
 
 <main>
@@ -10,7 +13,7 @@
   >
     <img src="images/dfinity.svg" alt="DFINITY logo" />
   </a>
-  <h1>MishiCat</h1>
+  <h1 on:click={handleClick}>MishiCat</h1>
 </main>
 
 <style>

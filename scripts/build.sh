@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# DFX BUILD #
 ## stop
 dfx stop
 
@@ -15,6 +16,7 @@ dfx build
 ## install 
 dfx canister install --all
 
+# TESTING #
 ## make `did` file compatible 
 cp .dfx/local/canisters/profile/profile.did.js .dfx/local/canisters/profile/profile.did.test.js
 
