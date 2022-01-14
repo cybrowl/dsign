@@ -1,12 +1,13 @@
 {
   "private": true,
   "name": "dsign",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
-    "dev-ui": "webpack serve --config config/webpack.config.js --hot",
-    "build": "webpack --config config/webpack.config.js",
-    "start-ui": "webpack serve --config config/webpack.config.js --hot",
+    "dev-ui": "rollup --config config/rollup.config.js -w",
+    "dev-start": "sirv public --no-clear",
     "dev": "bash ./scripts/build.sh",
+    "build": "rollup --config config/rollup.config.js",
+    "start": "sirv public --no-clear",
     "test": "tape tests/profile.test.js"
   },
   "dependencies": {
@@ -15,36 +16,23 @@
     "@dfinity/candid": "0.10.2",
     "@dfinity/principal": "0.10.2",
     "@dfinity/identity": "^0.10.2",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "sirv-cli": "^1.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.15.7",
-    "@babel/core": "^7.15.8",
-    "@babel/preset-env": "^7.15.8",
-    "@babel/preset-react": "^7.14.5",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.4",
-    "@tailwindcss/jit": "^0.1.18",
-    "@types/react": "17.0.27",
-    "@types/react-dom": "17.0.9",
-    "@types/tailwindcss": "2.2.1",
-    "autoprefixer": "^10.2.6",
-    "babel-loader": "^8.2.2",
-    "css-loader": "^6.4.0",
-    "css-minimizer-webpack-plugin": "^3.3.1",
-    "file-loader": "^6.2.0",
-    "html-loader": "^2.1.2",
-    "html-webpack-plugin": "^5.3.2",
-    "mini-css-extract-plugin": "^2.4.5",
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^11.2.1",
+    "@rollup/plugin-replace": "^3.0.0",
+    "rollup": "^2.6.3",
+    "rollup-plugin-css-only": "^3.1.0",
+    "rollup-plugin-inject": "^3.0.2",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-polyfill-node": "^0.7.0",
+    "rollup-plugin-svelte": "^7.0.0",
+    "rollup-plugin-terser": "^7.0.0",
+    "svelte": "^3.0.0",
     "node-fetch": "^2.6.0",
-    "postcss": "^8.3.9",
-    "postcss-loader": "^6.1.1",
-    "style-loader": "^3.3.0",
     "tailwindcss": "^2.2.4",
-    "tape": "^5.4.0",
-    "webpack": "^5.65.0",
-    "webpack-bundle-analyzer": "^4.4.2",
-    "webpack-cli": "^4.9.0",
-    "webpack-dev-server": "^4.3.1"
+    "tape": "^5.4.0"
   }
 }

@@ -22,7 +22,7 @@ package-lock.json
 /out/
 
 # production
-/build
+/public/build
 
 # misc
 .DS_Store

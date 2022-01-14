@@ -1,7 +1,7 @@
 {
   "canisters": {
     "profile": {
-      "main": "service/profile.mo",
+      "main": "src/profile_service/profile.mo",
       "type": "motoko"
     },
     "dsign_assets": {
