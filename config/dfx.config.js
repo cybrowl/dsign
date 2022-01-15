@@ -25,32 +25,6 @@ function generateCanisterAliases() {
   return aliases;
 }
 
-function generateCanisterIds() {
-  let localCanisters, prodCanisters, canisterIds;
-
-  try {
-    localCanisters = require(path.resolve(".dfx", "local", "canister_ids.json"));
-  } catch (error) {
-    console.log("------------------------------------");
-    console.log("No local canister_ids.json found. Continuing production");
-    console.log("------------------------------------");
-  }
-
-  try {
-    prodCanisters = require(path.resolve(__dirname, "..", "canister_ids.json"));
-  } catch (error) {
-    console.log("------------------------------------");
-    console.log("No production canister_ids.json found. Continuing with local");
-    console.log("------------------------------------");
-  }
-
-  const network = process.env.DFX_NETWORK || (process.env.NODE_ENV === "production" ? "ic" : "local");
-
-  canisterIds = network === "local" ? localCanisters : prodCanisters;
-
-  return { canisterIds, network };
-}
-
 function getEnvironmentVars(isDevelopment) {
   if (isDevelopment) {
     return path.resolve(__dirname, "env.dev.config.js");
@@ -60,7 +34,6 @@ function getEnvironmentVars(isDevelopment) {
 }
 
 module.exports = {
-  generateCanisterIds,
   generateCanisterAliases,
   getEnvironmentVars,
 };

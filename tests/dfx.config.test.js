@@ -1,7 +1,9 @@
 const test = require("tape");
-const { generateCanisterIds, generateCanisterAliases } = require("../config/dfx.config");
+const { generateCanisterAliases, getEnvironmentVars } = require("../config/dfx.config");
 
-test("dfxConfig: generateCanisterAliases()", async function (t) {
+const filename = "dfx.Config";
+
+test(`${filename}: generateCanisterAliases()`, async function (t) {
   const aliases = generateCanisterAliases();
 
   const expected = {
@@ -15,9 +17,11 @@ test("dfxConfig: generateCanisterAliases()", async function (t) {
   t.deepEqual(aliases, expected);
 });
 
-test("dfxConfig: generateCanisterIds()", async function (t) {
-  const { canisterIds, network } = generateCanisterIds();
+test(`${filename}: getEnvironmentVars()`, async function (t) {
+  const environment = getEnvironmentVars();
+  console.log('%c%s', 'color: #eeff00', environment);
 
+  
   const expected = {
     __Candid_UI: { local: "r7inp-6aaaa-aaaaa-aaabq-cai" },
     dsign_assets: { local: "rrkah-fqaaa-aaaaa-aaaaq-cai" },
