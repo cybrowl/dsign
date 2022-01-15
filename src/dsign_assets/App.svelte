@@ -1,12 +1,11 @@
 <script>
-  import { ping, health } from "./api/profile";
+  import { ping } from "./api/profile";
+
+  let responses = [];
 
   async function handleClick() {
-    const healthResponse = await health();
-    console.info(healthResponse);
-
     const pingResponse = await ping();
-    console.info(pingResponse);
+    responses = [...responses, pingResponse];
   }
 </script>
 
@@ -16,10 +15,20 @@
   </a>
 
   <div>
-    <img src="images/mishicat.png" alt="MishiCat" />
+    <img src="images/mishicat.png" alt="MishiCat" on:click={handleClick} />
   </div>
 
-  <h1 on:click={handleClick}>MishiCat</h1>
+  <h1>MishiCat</h1>
+
+  <div>
+    <ul>
+      {#each responses as response}
+        <li>
+          {response}
+        </li>
+      {/each}
+    </ul>
+  </div>
 </main>
 
 <style>

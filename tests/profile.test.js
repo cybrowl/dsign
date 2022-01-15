@@ -13,15 +13,5 @@ test("Profile: ping()", async function (t) {
   const response = await profile.ping();
 
   t.equal(typeof response, "string");
-  t.equal(response, "pong");
-});
-
-test("Profile: health()", async function (t) {
-  const canisterId = canisterIds.profile.local;
-
-  const profile = await getActor(canisterId, idlFactory);
-  const response = await profile.health();
-
-  t.equal(typeof response, "string");
-  t.equal(response, "good");
+  t.equal(response, "meow");
 });
