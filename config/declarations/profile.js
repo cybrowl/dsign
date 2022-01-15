@@ -6,10 +6,10 @@ export { idlFactory } from "idl/profile";
 import environment from "environment";
 
 const env = environment();
-
-console.log("profile env: ", env);
+console.log('%c%s', 'color: #00e600', env);
 
 const canisterId = env.canisterIds.profile[env["DFX_NETWORK"]];
+console.log('%c%s', 'color: #00a3cc', canisterId);
 
 const createActor = (canisterId, options) => {
   const agent = new HttpAgent({ ...options?.agentOptions });
@@ -17,9 +17,7 @@ const createActor = (canisterId, options) => {
   // Fetch root key for certificate validation during development
   if (env.DFX_NETWORK !== "ic") {
     agent.fetchRootKey().catch((err) => {
-      console.warn(
-        "Unable to fetch root key. Check to ensure that your local replica is running"
-      );
+      console.warn("Unable to fetch root key. Check to ensure that your local replica is running");
       console.error(err);
     });
   }
@@ -28,7 +26,7 @@ const createActor = (canisterId, options) => {
   return Actor.createActor(idlFactory, {
     agent,
     canisterId,
-    ...options?.actorOptions,
+    ...options?.actorOptions
   });
 };
 

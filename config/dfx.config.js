@@ -5,7 +5,7 @@ function generateCanisterAliases() {
   const dfxNetwork = process.env["DFX_NETWORK"] || "local";
 
   let aliases = {
-    ["local-canister-ids"]: path.join(__dirname, "..", ".dfx", dfxNetwork, "canister_ids.json"),
+    ["local-canister-ids"]: path.join(__dirname, "..", ".dfx", dfxNetwork, "canister_ids.json")
   };
 
   if (dfxConfig.canisters) {
@@ -17,7 +17,7 @@ function generateCanisterAliases() {
       return {
         ...acc,
         ["canister/" + name]: path.join(__dirname, "/declarations/" + name + ".js"),
-        ["idl/" + name]: path.join(outputRoot + "/" + name + ".did.js"),
+        ["idl/" + name]: path.join(outputRoot + "/" + name + ".did.js")
       };
     }, aliases);
   }
@@ -25,7 +25,9 @@ function generateCanisterAliases() {
   return aliases;
 }
 
-function getEnvironmentVars(isDevelopment) {
+function getEnvironmentPath(isDevelopment) {
+  console.log('%c%s', 'color: #aa00ff', isDevelopment);
+  
   if (isDevelopment) {
     return path.resolve(__dirname, "env.dev.config.js");
   } else {
@@ -35,5 +37,5 @@ function getEnvironmentVars(isDevelopment) {
 
 module.exports = {
   generateCanisterAliases,
-  getEnvironmentVars,
+  getEnvironmentPath
 };

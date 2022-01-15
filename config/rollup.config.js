@@ -7,13 +7,13 @@ import json from "@rollup/plugin-json";
 import livereload from "rollup-plugin-livereload";
 import resolve from "@rollup/plugin-node-resolve";
 import svelte from "rollup-plugin-svelte";
-const { generateCanisterAliases, getEnvironmentVars } = require("./dfx.config");
+const { generateCanisterAliases, getEnvironmentPath } = require("./dfx.config");
 
 const production = !process.env.ROLLUP_WATCH;
 const isDevelopment = process.env.DFX_NETWORK !== "ic";
 
 const aliases = generateCanisterAliases();
-const environment = getEnvironmentVars(isDevelopment);
+const environment = getEnvironmentPath(isDevelopment);
 
 function serve() {
   let server;
