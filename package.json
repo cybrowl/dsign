@@ -8,7 +8,8 @@
     "dev": "bash ./scripts/build.sh",
     "build": "rollup --config config/rollup.config.js",
     "start": "sirv public --no-clear",
-    "test": "tape tests/**.test.js | tnyan"
+    "test": "tape tests/**.test.js | tnyan",
+    "test-d": "tape tests/**.test.js"
   },
   "dependencies": {
     "@dfinity/auth-client": "^0.10.2",

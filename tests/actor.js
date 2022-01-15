@@ -1,11 +1,9 @@
 const { Ed25519KeyIdentity } = require("@dfinity/identity");
-const { idlFactory } = require("../.dfx/local/canisters/profile/profile.did.test");
-
 const { HttpAgent, Actor } = require("@dfinity/agent");
 
 const HOST = "http://127.0.0.1:8000/";
 
-const getActor = async (canisterId) => {
+const getActor = async (canisterId, idlFactory) => {
   const identity = Ed25519KeyIdentity.generate();
 
   const agent = new HttpAgent({
