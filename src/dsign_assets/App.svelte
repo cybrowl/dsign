@@ -1,17 +1,17 @@
 <script>
-  import { ping } from "./api/profile";
+  import { ping, health } from "./api/profile";
 
   async function handleClick() {
-    alert("clicked");
+    const healthResponse = await health();
+    console.info(healthResponse);
 
     const pingResponse = await ping();
-
-    alert(pingResponse);
+    console.info(pingResponse);
   }
 </script>
 
 <main>
-  <a href="https://dfinity.org" target="_blank" rel="noopener noreferrer" class="logo">
+  <a href="https://dsign.ic" target="_blank" rel="noopener noreferrer" class="logo">
     <img src="images/dfinity.svg" alt="DFINITY logo" />
   </a>
 

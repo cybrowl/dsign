@@ -5,7 +5,7 @@ actor Profile {
         return "pong";
     };
 
-    // public shared func canisterSize() : async Nat64 {
-    //     return StableMemory.size();
-    // }
+    public query func health() : async Text {
+        return "good";
+    };
 };
