@@ -2,8 +2,6 @@
 
 # dependencies
 /node_modules
-/.pnp
-.pnp.js
 
 # dfx
 .dfx
@@ -14,13 +12,6 @@
 #locks
 package-lock.json
 
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
 # production
 /public/build
 
@@ -30,10 +21,4 @@ package-lock.json
 
 # debug
 npm-debug.log*
-
-# local env files
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
