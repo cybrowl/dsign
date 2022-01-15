@@ -9,8 +9,8 @@ global.fetch = fetch;
 test("Profile Manager: ping()", async function (t) {
   const canisterId = canisterIds.profile_manager.local;
 
-  const profile = await getActor(canisterId, idlFactory);
-  const response = await profile.ping();
+  const profileManager = await getActor(canisterId, idlFactory);
+  const response = await profileManager.ping();
 
   t.equal(typeof response, "string");
   t.equal(response, "meow");
