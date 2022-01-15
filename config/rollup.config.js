@@ -4,6 +4,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import css from "rollup-plugin-css-only";
 import inject from "rollup-plugin-inject";
 import json from "@rollup/plugin-json";
+import sveltePreprocess from "svelte-preprocess";
 import livereload from "rollup-plugin-livereload";
 import resolve from "@rollup/plugin-node-resolve";
 import svelte from "rollup-plugin-svelte";
@@ -27,12 +28,12 @@ function serve() {
       if (server) return;
       server = require("child_process").spawn("npm", ["run", "start", "--", "--dev"], {
         stdio: ["ignore", "inherit", "inherit"],
-        shell: true,
+        shell: true
       });
 
       process.on("SIGTERM", toExit);
       process.on("exit", toExit);
-    },
+    }
   };
 }
 
@@ -42,21 +43,27 @@ const frontend = {
     sourcemap: true,
     format: "iife",
     name: "dsign",
-    file: "public/build/bundle.js",
+    file: "public/build/bundle.js"
   },
   plugins: [
     alias({
       entries: {
         ...aliases,
-        environment,
-      },
+        environment
+      }
     }),
 
     svelte({
       compilerOptions: {
         // enable run-time checks when not in production
-        dev: !production,
+        dev: !production
       },
+      preprocess: sveltePreprocess({
+        sourceMap: !production,
+        postcss: {
+          plugins: [require("tailwindcss")(), require("autoprefixer")()]
+        }
+      })
     }),
     // we'll extract any component CSS out into
     // a separate file - better for performance
@@ -70,11 +77,11 @@ const frontend = {
     resolve({
       preferBuiltins: false,
       browser: true,
-      dedupe: ["svelte"],
+      dedupe: ["svelte"]
     }),
     commonjs(),
     inject({
-      Buffer: ["buffer", "Buffer"],
+      Buffer: ["buffer", "Buffer"]
     }),
     json(),
 
@@ -88,11 +95,11 @@ const frontend = {
 
     // If we're building for production (npm run build
     // instead of npm run dev), minify
-    production && terser(),
+    production && terser()
   ],
   watch: {
-    clearScreen: false,
-  },
+    clearScreen: false
+  }
 };
 
 export default [frontend];

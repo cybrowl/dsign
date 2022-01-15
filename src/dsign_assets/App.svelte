@@ -20,6 +20,8 @@
 
   <h1>MishiCat</h1>
 
+  <h1 class="text-3xl font-bold underline">Tailwind CSS</h1>
+
   <div>
     <ul>
       {#each responses as response}
@@ -31,7 +33,11 @@
   </div>
 </main>
 
-<style>
+<style lang="postcss" global>
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+
   img {
     height: 22px;
   }
