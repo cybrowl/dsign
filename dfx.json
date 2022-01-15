@@ -4,9 +4,14 @@
       "main": "src/profile_service/profile.mo",
       "type": "motoko"
     },
+    "profile_manager": {
+      "main": "src/profile_service/profile_manager.mo",
+      "type": "motoko"
+    },
     "dsign_assets": {
       "dependencies": [
-        "profile"
+        "profile",
+        "profile_manager"
       ],
       "frontend": {
         "entrypoint": "public/index.html"

@@ -10,6 +10,8 @@ test(`${filename}: generateCanisterAliases()`, async function (t) {
     "local-canister-ids": "/Users/cyberowl/Projects/dsign/.dfx/local/canister_ids.json",
     "canister/profile": "/Users/cyberowl/Projects/dsign/config/declarations/profile.js",
     "idl/profile": "/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile/profile.did.js",
+    "canister/profile_manager": "/Users/cyberowl/Projects/dsign/config/declarations/profile_manager.js",
+    "idl/profile_manager": "/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile_manager/profile_manager.did.js",
     "canister/dsign_assets": "/Users/cyberowl/Projects/dsign/config/declarations/dsign_assets.js",
     "idl/dsign_assets": "/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/dsign_assets.did.js"
   };

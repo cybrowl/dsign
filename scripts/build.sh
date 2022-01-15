@@ -17,9 +17,14 @@ dfx build
 dfx canister install --all
 
 # TESTING #
-## make `did` file compatible 
-cp .dfx/local/canisters/profile/profile.did.js .dfx/local/canisters/profile/profile.did.test.js
+# NOTE: update file OSX ONLY (Linux remove '')
 
-## update file OSX ONLY (Linux remove '')
+# profile
+cp .dfx/local/canisters/profile/profile.did.js .dfx/local/canisters/profile/profile.did.test.js
 sed -i '' 's/export//g' .dfx/local/canisters/profile/profile.did.test.js
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/profile/profile.did.test.js
+
+# profile_manager
+cp .dfx/local/canisters/profile_manager/profile_manager.did.js .dfx/local/canisters/profile_manager/profile_manager.did.test.js
+sed -i '' 's/export//g' .dfx/local/canisters/profile_manager/profile_manager.did.test.js
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/profile_manager/profile_manager.did.test.js
