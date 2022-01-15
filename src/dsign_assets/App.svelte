@@ -18,7 +18,7 @@
     <img src="images/mishicat.png" alt="MishiCat" on:click={handleClick} />
   </div>
 
-  <h1>cat3</h1>
+  <h1>Mishicat</h1>
 
   <h1 class="text-3xl font-bold underline">Tailwind CSS</h1>
 
