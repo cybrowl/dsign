@@ -25,9 +25,7 @@ function generateCanisterAliases() {
   return aliases;
 }
 
-function getEnvironmentPath(isDevelopment) {
-  console.log('%c%s', 'color: #aa00ff', isDevelopment);
-  
+function getEnvironmentPath(isDevelopment) {  
   if (isDevelopment) {
     return path.resolve(__dirname, "env.dev.config.js");
   } else {

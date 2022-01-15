@@ -7,8 +7,6 @@
     const pingResponse = await ping();
 
     alert(pingResponse);
-    
-    console.log("pingResponse:",  pingResponse);
   }
 </script>
 

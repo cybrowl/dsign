@@ -6,10 +6,9 @@ export { idlFactory } from "idl/profile";
 import environment from "environment";
 
 const env = environment();
-console.log('%c%s', 'color: #00e600', env);
+console.info(env);
 
 const canisterId = env.canisterIds.profile[env["DFX_NETWORK"]];
-console.log('%c%s', 'color: #00a3cc', canisterId);
 
 const createActor = (canisterId, options) => {
   const agent = new HttpAgent({ ...options?.agentOptions });
