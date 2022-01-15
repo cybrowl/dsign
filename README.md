@@ -1,6 +1,6 @@
 # dsign
 
-A place designers/arists can come and work together in the crypto marketplace.
+A place designers/artists can come and work together in the crypto marketplace.
 
 
 ## Getting Started
