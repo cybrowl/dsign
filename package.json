@@ -3,8 +3,8 @@
   "name": "dsign",
   "version": "0.2.0",
   "scripts": {
-    "dev-ui": "rollup --config config/rollup.config.js -w",
     "dev": "bash ./scripts/build.sh",
+    "dev-ui": "rollup --config config/rollup.config.js -w",
     "build": "rollup --config config/rollup.config.js",
     "start": "sirv public --no-clear",
     "test": "tape tests/**.test.js | tnyan",
