@@ -5,6 +5,8 @@ import { idlFactory } from "idl/profile";
 export { idlFactory } from "idl/profile";
 import environment from "environment";
 
+// NOTE: this is needed to link canister/ imports. Used by dfx.config - generateCanisterAliases
+
 const env = environment();
 console.info(env);
 
