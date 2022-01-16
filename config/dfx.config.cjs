@@ -16,8 +16,8 @@ function generateCanisterAliases() {
 
       return {
         ...acc,
-        ["canister/" + name]: path.join(__dirname, "/declarations/" + name + ".js"),
-        ["idl/" + name]: path.join(outputRoot + "/" + name + ".did.js")
+        ["$IC" + name]: path.join(__dirname, "/declarations/" + name + ".js"),
+        ["$IDL" + name]: path.join(outputRoot + "/" + name + ".did.js")
       };
     }, aliases);
   }

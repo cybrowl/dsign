@@ -1,11 +1,11 @@
 <script>
-	// import { ping } from "../api/profile";
+	import { ping } from '../api/profile';
 
 	let responses = [];
 
 	async function handleClick() {
-		//   const pingResponse = await ping();
-		//   responses = [...responses, pingResponse];
+		const pingResponse = await ping();
+		responses = [...responses, pingResponse];
 	}
 </script>
 

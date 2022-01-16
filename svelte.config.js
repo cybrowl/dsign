@@ -1,8 +1,6 @@
 import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
-import svelte from 'rollup-plugin-svelte';
 import { generateCanisterAliases, getEnvironmentPath } from './config/dfx.config.cjs';
-import { defineConfig } from 'vite';
 import adapter from '@sveltejs/adapter-static';
 
 const isDevelopment = process.env.DFX_NETWORK !== 'ic';
@@ -42,14 +40,14 @@ const config = {
 		adapter: adapter({ pages: 'build', assets: 'build' }),
 
 		// hydrate the <div id="dsign-root"> element in src/app.html
-		target: '#dsign-root'
+		target: '#dsign-root',
+		vite: viteConfig(envOptions, preprocessOptions)
 	},
-	preprocess: sveltePreprocess(preprocessOptions, preprocessOptions),
-	vite: viteConfig(envOptions, preprocessOptions)
+	preprocess: sveltePreprocess(preprocessOptions, preprocessOptions)
 };
 
 function viteConfig(envOptions, preprocessOptions) {
-	const config = defineConfig({
+	const config = {
 		resolve: {
 			alias: {
 				...envOptions.aliases,
@@ -57,28 +55,8 @@ function viteConfig(envOptions, preprocessOptions) {
 			},
 			dedupe: ['svelte']
 		},
-		plugins: [
-			// alias({
-			// 	entries: {
-			// 		...envOptions.aliases,
-			// 		environment: envOptions.environment
-			// 	}
-			// }),
-			// commonjs(),
-			svelte({
-				compilerOptions: {
-					dev: envOptions.isDevelopment
-				},
-				preprocess: sveltePreprocess({
-					...preprocessOptions,
-					sourceMap: envOptions.isDevelopment
-				})
-			}),
-			envOptions.isProduction && terser()
-		]
-	});
-
-	console.log('config: ', config);
+		plugins: [envOptions.isProduction && terser()]
+	};
 
 	return config;
 }
