@@ -1,7 +1,6 @@
 import { terser } from 'rollup-plugin-terser';
-import sveltePreprocess from 'svelte-preprocess';
-import { generateCanisterAliases, getEnvironmentPath } from './config/dfx.config.cjs';
 import adapter from '@sveltejs/adapter-static';
+import { generateCanisterAliases, getEnvironmentPath } from './config/dfx.config.cjs';
 
 const isDevelopment = process.env.DFX_NETWORK !== 'ic';
 const isProduction = process.env.DFX_NETWORK === 'ic';
@@ -14,14 +13,6 @@ const envOptions = {
 	isProduction,
 	aliases,
 	environment
-};
-
-const preprocessOptions = {
-	sourceMap: true,
-	defaults: {
-		script: 'javascript',
-		style: 'postcss'
-	}
 };
 
 const config = {
@@ -39,8 +30,7 @@ const config = {
 		// hydrate the <div id="dsign-root"> element in src/app.html
 		target: '#dsign-root',
 		vite: viteConfig(envOptions)
-	},
-	preprocess: sveltePreprocess(preprocessOptions)
+	}
 };
 
 function viteConfig(envOptions) {
