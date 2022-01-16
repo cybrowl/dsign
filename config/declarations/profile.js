@@ -10,10 +10,13 @@ import environment from 'environment';
 const env = environment();
 console.info(env);
 
+const isProd = env['DFX_NETWORK'] === 'ic';
+const host = isProd ? 'https://' + canisterId : 'http://127.0.0.1:8000/';
+
 const canisterId = env.canisterIds.profile[env['DFX_NETWORK']];
 
 const createActor = (canisterId, options) => {
-	const agent = new HttpAgent({ host: 'http://127.0.0.1:8000/' });
+	const agent = new HttpAgent({ host });
 
 	// Fetch root key for certificate validation during development
 	if (env.DFX_NETWORK !== 'ic') {
@@ -27,7 +30,7 @@ const createActor = (canisterId, options) => {
 	return Actor.createActor(idlFactory, {
 		agent,
 		canisterId,
-		...options?.actorOptions
+		...options
 	});
 };
 

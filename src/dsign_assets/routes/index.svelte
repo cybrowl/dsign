@@ -20,7 +20,7 @@
 
 	<h1>Mishicat</h1>
 
-	<h1 class="text-3xl text-red font-bold underline">Map</h1>
+	<h1 class="text-3xl text-red-700 font-bold underline">Map</h1>
 
 	<div>
 		<ul>

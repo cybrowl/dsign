@@ -26,9 +26,6 @@ const preprocessOptions = {
 
 const config = {
 	kit: {
-		package: {
-			dir: 'public'
-		},
 		files: {
 			assets: 'src/dsign_assets/assets',
 			hooks: 'src/dsign_assets/hooks',
@@ -48,6 +45,11 @@ const config = {
 
 function viteConfig(envOptions) {
 	const config = {
+		server: {
+			fs: {
+				allow: ['config', '.dfx/local']
+			}
+		},
 		resolve: {
 			alias: {
 				...envOptions.aliases,
