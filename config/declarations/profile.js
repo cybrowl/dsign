@@ -11,11 +11,12 @@ const env = environment();
 console.info(env);
 
 const isProd = env['DFX_NETWORK'] === 'ic';
-const host = isProd ? 'https://' + canisterId : 'http://127.0.0.1:8000/';
-
 const canisterId = env.canisterIds.profile[env['DFX_NETWORK']];
+const canisterIdAssets = env.canisterIds.dsign_assets[env['DFX_NETWORK']];
 
-const createActor = (canisterId, options) => {
+const host = isProd ? `https://${canisterIdAssets}.raw.ic0.app/` : 'http://127.0.0.1:8000/';
+
+const createActor = (canisterId) => {
 	const agent = new HttpAgent({ host });
 
 	// Fetch root key for certificate validation during development
@@ -30,7 +31,7 @@ const createActor = (canisterId, options) => {
 	return Actor.createActor(idlFactory, {
 		agent,
 		canisterId,
-		...options
+		host
 	});
 };
 
