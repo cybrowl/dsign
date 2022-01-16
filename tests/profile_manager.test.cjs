@@ -1,8 +1,8 @@
 const test = require("tape");
 const fetch = require("node-fetch");
-const { getActor } = require("./actor");
+const { getActor } = require("./actor.cjs");
 const canisterIds = require("../.dfx/local/canister_ids.json");
-const { idlFactory } = require("../.dfx/local/canisters/profile_manager/profile_manager.did.test");
+const { idlFactory } = require("../.dfx/local/canisters/profile_manager/profile_manager.did.test.cjs");
 
 global.fetch = fetch;
 

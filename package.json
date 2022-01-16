@@ -10,8 +10,8 @@
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
     "build": "svelte-kit build",
-    "test": "tape tests/**.test.js | tnyan",
-    "test-d": "tape tests/**.test.js"
+    "test": "tape tests/**.test.cjs | tnyan",
+    "test-d": "tape tests/**.test.cjs"
   },
   "dependencies": {
     "@dfinity/auth-client": "^0.10.2",

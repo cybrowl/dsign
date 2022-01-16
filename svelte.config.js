@@ -41,12 +41,12 @@ const config = {
 
 		// hydrate the <div id="dsign-root"> element in src/app.html
 		target: '#dsign-root',
-		vite: viteConfig(envOptions, preprocessOptions)
+		vite: viteConfig(envOptions)
 	},
-	preprocess: sveltePreprocess(preprocessOptions, preprocessOptions)
+	preprocess: sveltePreprocess(preprocessOptions)
 };
 
-function viteConfig(envOptions, preprocessOptions) {
+function viteConfig(envOptions) {
 	const config = {
 		resolve: {
 			alias: {
