@@ -6,6 +6,9 @@
 # dfx
 .dfx
 
+# svelte
+.svelte-kit
+
 # vessel
 .vessel
 
@@ -13,7 +16,7 @@
 package-lock.json
 
 # production
-/public/build
+/build
 
 # misc
 .DS_Store

@@ -14,10 +14,10 @@
         "profile_manager"
       ],
       "frontend": {
-        "entrypoint": "public/index.html"
+        "entrypoint": "build/index.html"
       },
       "source": [
-        "public"
+        "build"
       ],
       "type": "assets"
     }
