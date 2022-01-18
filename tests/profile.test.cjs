@@ -15,3 +15,12 @@ test("Profile: ping()", async function (t) {
   t.equal(typeof response, "string");
   t.equal(response, "meow");
 });
+
+test("Profile: get_canister_caller_principal()", async function (t) {
+  const canisterId = canisterIds.profile.local;
+
+  const profile = await getActor(canisterId, idlFactory);
+  const response = await profile.get_canister_caller_principal();
+
+  t.equal(typeof response, "string");
+});

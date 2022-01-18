@@ -1,11 +1,8 @@
 module {
     public type Profile = {
-        name: Text;
+        username: Text;
         specialtyFields: Tags;
         created: Time;
-        isTeam: Bool;
-        isDesigner: Bool;
-        teams: Tags;
         website: Text;
     };
 

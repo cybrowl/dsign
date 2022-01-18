@@ -1,35 +1,50 @@
 <script>
-	import { ping } from '../api/profile';
+	import { ping, get_canister_caller_principal } from '../api/profile';
+	import { amp, browser, dev, mode, prerendering } from '$app/env';
 
-	let responses = [];
+	let responses = ['first'];
 
-	async function handleClick() {
-		const pingResponse = await ping();
-		responses = [...responses, pingResponse];
+	if (browser) {
+		Promise.all([ping(), get_canister_caller_principal()]).then((values) => {
+			responses = [...responses, values];
+		});
 	}
+
+	async function onLogin() {}
 </script>
 
+<svelte:head>
+	<title>Welcome</title>
+</svelte:head>
+
 <main>
-	<a href="https://dsign.ic" target="_blank" rel="noopener noreferrer" class="logo">
-		<img src="/dfinity.svg" alt="DFINITY logo" />
-	</a>
+	<div class="grid grid-cols-2 gap-2">
+		<div>
+			<h1>MishiCat</h1>
+		</div>
 
-	<div>
-		<img src="/mishicat.png" alt="MishiCat" on:click={handleClick} />
-	</div>
+		<div>
+			<img src="/mishi-octopus.png" alt="MishiCat" class="w-80" />
+		</div>
 
-	<h1>Mishicat</h1>
+		<div>
+			<button
+				class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+				on:click={onLogin}
+			>
+				Login
+			</button>
+		</div>
 
-	<h1 class="text-3xl text-red-700 font-bold underline">Map</h1>
-
-	<div>
-		<ul>
-			{#each responses as response}
-				<li>
-					{response}
-				</li>
-			{/each}
-		</ul>
+		<div>
+			<ul>
+				{#each responses as response}
+					<li>
+						{response}
+					</li>
+				{/each}
+			</ul>
+		</div>
 	</div>
 </main>
 
