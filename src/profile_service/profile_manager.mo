@@ -1,11 +1,10 @@
-import Debug "mo:base/Debug";
-import Principal "mo:base/Principal";
-import Option "mo:base/Option";
 import HashMap "mo:base/HashMap";
+import Option "mo:base/Option";
+import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
-import Logger "canister:logger";
 
+import Logger "canister:logger";
 import Types "./types";
 
 actor ProfileManager {

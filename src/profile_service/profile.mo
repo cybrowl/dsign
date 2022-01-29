@@ -1,6 +1,7 @@
-import Debug "mo:base/Debug";
+import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
-import Hash "mo:base/Hash";
+import Text "mo:base/Text";
+
 import Types "./types";
 
 actor Profile = {
@@ -13,7 +14,7 @@ actor Profile = {
         return "meow";
     };
 
-    public shared (msg) func create() : async Hash.Hash {
+    public shared (msg) func create() : async () {
         //TODO: create
     };
 };
