@@ -3,17 +3,16 @@ import Principal "mo:base/Principal";
 import Option "mo:base/Option";
 import HashMap "mo:base/HashMap";
 import Text "mo:base/Text";
+import Time "mo:base/Time";
 import Logger "canister:logger";
 
 import Types "./types";
-import TypesLog "../logger/types"
 
 actor ProfileManager {
     type CanisterID = Types.CanisterID;
     type Canister = Types.Canister;
     type UserID = Types.UserID;
     type Username = Types.Username;
-    type Log = TypesLog.Log;
 
     // User Data Management
     var usernames : HashMap.HashMap<Username, UserID> = HashMap.HashMap(1, Text.equal, Text.hash);
@@ -21,12 +20,9 @@ actor ProfileManager {
 
     // Canister Management
     // var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
+    var anchorTime = Time.now();
 
     public func ping() : async Text {
-        let log : Log = { time = 234234234231; tags = ["method", "ping"]; payload = "works!" };
-
-        await Logger.log_event(log);
-
         return "meow";
     };
 
@@ -56,13 +52,26 @@ actor ProfileManager {
         return canisterId;
     };
 
-    //TODO: get profile
+    system func heartbeat() : async () {
+        let tags = ["ProfileManager", "heartbeat"];
 
+        let SECONDS_TO_CHECK_CANISTER_FILLED = 60;
+        let now = Time.now();
+        let elapsedSeconds = (now - anchorTime) / 1000_000_000;
+
+        if (elapsedSeconds > SECONDS_TO_CHECK_CANISTER_FILLED) {
+            anchorTime := now;
+
+            await Logger.log_event(tags, debug_show(elapsedSeconds));
+            await Logger.log_event(tags, "hello");
+            await Logger.log_event(tags, "");
+        }
+    };
+
+    //TODO: get profile
     //TODO: create profile
     //TODO: update profile
     //TODO: remove profile
     //TODO: update username
         // if update username -> check if username exists, remove username from usernames, add new username
-
-    //TODO: 
 };
