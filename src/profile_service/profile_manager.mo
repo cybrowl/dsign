@@ -5,6 +5,7 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import Logger "canister:logger";
+import Profile "profile";
 import Types "./types";
 
 actor ProfileManager {
@@ -58,26 +59,34 @@ actor ProfileManager {
     system func heartbeat() : async () {
         let tags = ["ProfileManager", "heartbeat"];
 
-        let SECONDS_TO_CHECK_CANISTER_FILLED = 60;
+        let SECONDS_TO_CHECK_CANISTER_FILLED = 30;
         let now = Time.now();
         let elapsedSeconds = (now - anchorTime) / 1000_000_000;
 
         if (elapsedSeconds > SECONDS_TO_CHECK_CANISTER_FILLED) {
             anchorTime := now;
 
-            // if currentEmptyCanisterID is empty (only once for genesis)
-            // create new canister 
-            // add to canisterCache
-            // update currentEmptyCanisterID
+            if (currentEmptyCanisterID.size() < 1) {
+                await Logger.log_event(tags, "genesis of currentEmptyCanisterID assignment");
 
+                // create canister
+                let profileActor = await Profile.Profile();
+                let principal = Principal.fromActor(profileActor);
+                let canisterID = Principal.toText(principal);
+
+                await Logger.log_event(tags, debug_show(canisterID));
+
+                // add to canister cache
+
+                // update current empty canister ID
+                currentEmptyCanisterID := canisterID;
+            };
+
+            await Logger.log_event(tags, "continue to check is canister filled");
             // if currentEmptyCanisterID is full
             // create new canister
             // add to canisterCache
             // update currentEmptyCanisterID
-
-            await Logger.log_event(tags, debug_show(elapsedSeconds));
-            await Logger.log_event(tags, "hello");
-            await Logger.log_event(tags, "");
         }
     };
 };

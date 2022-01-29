@@ -4,7 +4,7 @@ import Text "mo:base/Text";
 
 import Types "./types";
 
-actor Profile = {
+actor class Profile() = {
     type UserID = Types.UserID;
     type Profile = Types.Profile;
 
