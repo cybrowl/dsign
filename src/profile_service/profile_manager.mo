@@ -3,14 +3,17 @@ import Principal "mo:base/Principal";
 import Option "mo:base/Option";
 import HashMap "mo:base/HashMap";
 import Text "mo:base/Text";
+import Logger "canister:logger";
 
 import Types "./types";
+import TypesLog "../logger/types"
 
 actor ProfileManager {
     type CanisterID = Types.CanisterID;
     type Canister = Types.Canister;
     type UserID = Types.UserID;
     type Username = Types.Username;
+    type Log = TypesLog.Log;
 
     // User Data Management
     var usernames : HashMap.HashMap<Username, UserID> = HashMap.HashMap(1, Text.equal, Text.hash);
@@ -19,7 +22,11 @@ actor ProfileManager {
     // Canister Management
     // var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
 
-    public query func ping() : async Text {
+    public func ping() : async Text {
+        let log : Log = { time = 234234234231; tags = ["method", "ping"]; payload = "works!" };
+
+        await Logger.log_event(log);
+
         return "meow";
     };
 

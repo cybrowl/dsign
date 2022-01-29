@@ -6,15 +6,17 @@ const { idlFactory } = require("../.dfx/local/canisters/profile_manager/profile_
 
 global.fetch = fetch;
 
-// test("Profile Manager: ping()", async function (t) {
-//   const canisterId = canisterIds.profile_manager.local;
+test("Profile Manager: ping()", async function (t) {
+  const canisterId = canisterIds.profile_manager.local;
 
-//   const profileManager = await getActor(canisterId, idlFactory);
-//   const response = await profileManager.ping();
+  const profileManager = await getActor(canisterId, idlFactory);
+  const response = await profileManager.ping();
 
-//   t.equal(typeof response, "string");
-//   t.equal(response, "meow");
-// });
+  console.log("logs: ", response);
+  
+  t.equal(typeof response, "string");
+  t.equal(response, "meow");
+});
 
 // test("Profile Manager: set_name() and get_name()", async function (t) {
 //   const canisterId = canisterIds.profile_manager.local;
