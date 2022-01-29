@@ -6,21 +6,24 @@ const { idlFactory } = require("../.dfx/local/canisters/profile/profile.did.test
 
 global.fetch = fetch;
 
-test("Profile: ping()", async function (t) {
-  const canisterId = canisterIds.profile.local;
+// test("Profile: ping()", async function (t) {
+//   const canisterId = canisterIds.profile.local;
 
-  const profile = await getActor(canisterId, idlFactory);
-  const response = await profile.ping();
+//   const profile = await getActor(canisterId, idlFactory);
+//   const response = await profile.ping();
 
-  t.equal(typeof response, "string");
-  t.equal(response, "meow");
-});
+//   t.equal(typeof response, "string");
+//   t.equal(response, "meow");
+// });
 
-test("Profile: get_canister_caller_principal()", async function (t) {
-  const canisterId = canisterIds.profile.local;
+// test("Profile: get_canister_caller_principal()", async function (t) {
+//   const canisterId = canisterIds.profile.local;
 
-  const profile = await getActor(canisterId, idlFactory);
-  const response = await profile.get_canister_caller_principal();
+//   const profile = await getActor(canisterId, idlFactory);
+//   const response = await profile.get_canister_caller_principal();
+//   const response2 = await profile.get_canister_caller_principal();
+//   console.log("response: ", response);
+//   console.log("response2: ", response2);
 
-  t.equal(typeof response, "string");
-});
+//   t.equal(typeof response, "string");
+// });

@@ -1,13 +1,5 @@
 {
   "canisters": {
-    "profile": {
-      "main": "src/profile_service/profile.mo",
-      "type": "motoko"
-    },
-    "profile_manager": {
-      "main": "src/profile_service/profile_manager.mo",
-      "type": "motoko"
-    },
     "dsign_assets": {
       "dependencies": [
         "profile",
@@ -20,6 +12,18 @@
         "build"
       ],
       "type": "assets"
+    },
+    "profile": {
+      "main": "src/profile_service/profile.mo",
+      "type": "motoko"
+    },
+    "profile_manager": {
+      "main": "src/profile_service/profile_manager.mo",
+      "type": "motoko"
+    },
+    "logger": {
+      "main": "src/logger/logger.mo",
+      "type": "motoko"
     }
   },
   "defaults": {

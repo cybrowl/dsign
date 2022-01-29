@@ -8,9 +8,6 @@
 
 	let client;
 
-	let profileIdentity = $authProfile.actor.get_canister_caller_principal();
-	let profileManagerIdentity = $authProfileManager.actor.get_canister_caller_principal();
-
 	onMount(async () => {
 		client = await AuthClient.create();
 
@@ -37,9 +34,6 @@
 				}
 			})
 		}));
-
-		profileIdentity = $authProfile.actor.get_canister_caller_principal();
-		profileManagerIdentity = $authProfileManager.actor.get_canister_caller_principal();
 	}
 
 	function login() {
@@ -69,9 +63,6 @@
 				}
 			})
 		}));
-
-		profileIdentity = $authProfile.actor.get_canister_caller_principal();
-		profileManagerIdentity = $authProfileManager.actor.get_canister_caller_principal();
 	}
 </script>
 
@@ -87,15 +78,6 @@
 		>
 	{/if}
 
-	<div class="principal-info-profileIdentity">
-		{#await profileIdentity}
-			Querying caller identity...
-		{:then principal}
-			profileIdentity
-			<code>{principal}</code>
-		{/await}
-	</div>
-
 	{#if $authProfileManager.loggedIn}
 		<div>
 			<button on:click={logout}> profileManagerIdentity Log out</button>
@@ -106,15 +88,6 @@
 			on:click={login}>Login</button
 		>
 	{/if}
-
-	<div class="principal-info-profileManagerIdentity">
-		{#await profileManagerIdentity}
-			Querying caller identity...
-		{:then principal}
-			profileManagerIdentity
-			<code>{principal}</code>
-		{/await}
-	</div>
 </div>
 
 <style>

@@ -28,3 +28,8 @@ echo "module.exports = { idlFactory };" >> .dfx/local/canisters/profile/profile.
 cp .dfx/local/canisters/profile_manager/profile_manager.did.js .dfx/local/canisters/profile_manager/profile_manager.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/profile_manager/profile_manager.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/profile_manager/profile_manager.did.test.cjs
+
+# logger
+cp .dfx/local/canisters/logger/logger.did.js .dfx/local/canisters/logger/logger.did.test.cjs
+sed -i '' 's/export//g' .dfx/local/canisters/logger/logger.did.test.cjs
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/logger/logger.did.test.cjs

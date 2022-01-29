@@ -1,12 +1,12 @@
 <script>
-	import { ping, get_canister_caller_principal } from '../api/profile';
+	import { ping } from '../api/profile';
 	import { amp, browser, dev, mode, prerendering } from '$app/env';
 	import Auth from '../components/Auth.svelte';
 
 	let responses = [];
 
 	if (browser) {
-		Promise.all([ping(), get_canister_caller_principal()]).then((values) => {
+		Promise.all([ping()]).then((values) => {
 			responses = [...responses, ...values];
 		});
 	}
