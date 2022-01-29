@@ -13,43 +13,47 @@ actor ProfileManager {
     type Canister = Types.Canister;
     type UserID = Types.UserID;
     type Username = Types.Username;
+    type Profile = Types.Profile;
 
     // User Data Management
     var usernames : HashMap.HashMap<Username, UserID> = HashMap.HashMap(1, Text.equal, Text.hash);
     var canisterIDs : HashMap.HashMap<UserID, CanisterID> = HashMap.HashMap(1, Text.equal, Text.hash);
 
     // Canister Management
-    // var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
     var anchorTime = Time.now();
+    var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
+    var currentEmptyCanisterID : Text = "";
 
     public func ping() : async Text {
         return "meow";
     };
 
-    public shared (msg) func set_username(username: Username) : async () {
-        let canisterId : CanisterID = "canister-id";
+    public shared (msg) func create_profile(username: Username) : async () {
+        // NOTE: this should only be executed once by user
+        let tags = ["ProfileManager", "create_profile"];
         let userId : UserID = Principal.toText(msg.caller);
 
-        usernames.put(username, userId);
-        canisterIDs.put(userId, canisterId);
-    };
+        // TODO: return success/fail messages
 
-    // Get Canister
-    public shared (msg) func get_canister(username: Username) : async CanisterID {
-        var userId : UserID = "";
-        var canisterId : CanisterID = "";
-
-        switch (usernames.get(username)) {
-            case (null) { Debug.print("error") };
-            case (?id) { userId := id };
-        };
-
+        // check user doesn't have an account
         switch (canisterIDs.get(userId)) {
-            case (null) { Debug.print("error") };
-            case (?id) { canisterId := id };
+            case (?id) { await Logger.log_event(tags, "Warning: UserID exists"); };
+            case (null) { await Logger.log_event(tags, "UserID Null");};
         };
 
-        return canisterId;
+        // check username available
+        switch (usernames.get(username)) {
+            case (?id) { await Logger.log_event(tags, "Warning: username taken"); };
+            case (null) {
+                usernames.put(username, userId);
+                canisterIDs.put(userId, currentEmptyCanisterID);
+
+                // check if added properly
+
+                // call profile.create(UserID) & check
+            };
+        };
+
     };
 
     system func heartbeat() : async () {
@@ -62,16 +66,19 @@ actor ProfileManager {
         if (elapsedSeconds > SECONDS_TO_CHECK_CANISTER_FILLED) {
             anchorTime := now;
 
+            // if currentEmptyCanisterID is empty (only once for genesis)
+            // create new canister 
+            // add to canisterCache
+            // update currentEmptyCanisterID
+
+            // if currentEmptyCanisterID is full
+            // create new canister
+            // add to canisterCache
+            // update currentEmptyCanisterID
+
             await Logger.log_event(tags, debug_show(elapsedSeconds));
             await Logger.log_event(tags, "hello");
             await Logger.log_event(tags, "");
         }
     };
-
-    //TODO: get profile
-    //TODO: create profile
-    //TODO: update profile
-    //TODO: remove profile
-    //TODO: update username
-        // if update username -> check if username exists, remove username from usernames, add new username
 };

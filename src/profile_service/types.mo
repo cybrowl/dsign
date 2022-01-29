@@ -1,5 +1,6 @@
 import Int "mo:base/Int";
 import Text "mo:base/Text";
+import Nat8 "mo:base/Nat8";
 
 module {
     public type Time = Int;
@@ -19,7 +20,7 @@ module {
 
     public type Profile = {
         username: Username;
-        specialtyFields: ?Tags;
+        specialtyFields: [Tags];
         created: Time;
         website: ?Text;
     };
