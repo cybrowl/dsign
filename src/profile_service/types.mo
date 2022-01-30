@@ -31,7 +31,7 @@ module {
         #UsernameTaken;
     };
 
-    public type ProfileError = { #NotFound; };
+    public type ProfileError = { #ProfileNotFound; };
 
     public type ProfileActor = actor {
         ping : query () -> async Text;

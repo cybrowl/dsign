@@ -80,7 +80,7 @@ actor ProfileManager {
                 let profile = actor (canisterID) : ProfileActor;
 
                 switch (await profile.get_profile(userId)) {
-                    case (#err(#NotFound)) {
+                    case (#err(#ProfileNotFound)) {
                         #err(#FailedGetProfile);
                     };
                     case (#ok(profile)) {
