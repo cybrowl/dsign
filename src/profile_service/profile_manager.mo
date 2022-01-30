@@ -18,6 +18,8 @@ actor ProfileManager {
     type Profile = Types.Profile;
     type ProfileActor = Types.ProfileActor;
 
+    let ACTOR_NAME : Text = "ProfileManager";
+
     // User Data Management
     var usernames : HashMap.HashMap<Username, UserID> = HashMap.HashMap(1, Text.equal, Text.hash);
     var canisterIDs : HashMap.HashMap<UserID, CanisterID> = HashMap.HashMap(1, Text.equal, Text.hash);
@@ -58,13 +60,36 @@ actor ProfileManager {
         };
     };
 
+    private func create_canister() : async () {
+        let tags = [ACTOR_NAME, "create_canister"];
+
+        // create canister
+        let profileActor = await Profile.Profile();
+        let principal = Principal.fromActor(profileActor);
+        let canisterID = Principal.toText(principal);
+
+        // add to canister cache
+        let canister : Canister = {
+            ID = canisterID;
+            creation = Time.now();
+            isFull = false;
+        };
+
+        canisterCache.put(canisterID, canister);
+
+        // update current empty canister ID
+        currentEmptyCanisterID := canisterID;
+
+        await Logger.log_event(tags, "created!");
+    };
+
     system func heartbeat() : async () {
         let SECONDS_TO_CHECK_CANISTER_FILLED = 10;
         let now = Time.now();
         let elapsedSeconds = (now - anchorTime) / 1000_000_000;
 
         if (elapsedSeconds > SECONDS_TO_CHECK_CANISTER_FILLED) {
-            let tags = ["ProfileManager", "heartbeat"];
+            let tags = [ACTOR_NAME, "heartbeat"];
 
             anchorTime := now;
 
@@ -72,53 +97,18 @@ actor ProfileManager {
             if (currentEmptyCanisterID.size() < 1) {
                 await Logger.log_event(tags, "genesis of currentEmptyCanisterID assignment");
 
-                // create canister
-                let profileActor = await Profile.Profile();
-                let principal = Principal.fromActor(profileActor);
-                let canisterID = Principal.toText(principal);
-
-                // add to canister cache
-                let canister : Canister = {
-                    ID = canisterID;
-                    creation = Time.now();
-                    fillRatio = 95;
-                    isFull = false;
-                };
-
-                canisterCache.put(canisterID, canister);
-
-                // update current empty canister ID
-                currentEmptyCanisterID := canisterID;
+                await create_canister();
             };
 
             // check if current canister is full
             let profile = actor (currentEmptyCanisterID) : ProfileActor;
             let isFull = await profile.is_full();
 
-            await Logger.log_event(tags, "continue to check is canister filled");
-            await Logger.log_event(tags, debug_show(("[isFull]", isFull)));
+            if (isFull) {
+                await create_canister();
+            };
 
-            //TODO: find more info on rts_total_allocation and  rts_reclaimed
-            //TODO: refactor into Util
-            // let rts_version = Prim.rts_version();
-            // let heap_size = Prim.rts_heap_size();
-            // let rts_memory_size = Prim.rts_memory_size();
-            // let rts_total_allocation = Prim.rts_total_allocation();
-            // let rts_reclaimed = Prim.rts_reclaimed();
-            // let rts_max_live_size = Prim.rts_max_live_size();
-
-            // await Logger.log_event(tags, debug_show((
-            //     "[rts_version]", rts_version,
-            //     "[heap_size]", heap_size,
-            //     "[rts_memory_size]", rts_memory_size,
-            //     "[rts_total_allocation]", rts_total_allocation,
-            //     "[rts_reclaimed]", rts_reclaimed,
-            //     "[rts_max_live_size]", rts_max_live_size
-            //     )));
-
-            // create new canister
-            // add to canisterCache
-            // update currentEmptyCanisterID
+            await Logger.log_event(tags, "end of heartbeat");
         }
     };
 };
