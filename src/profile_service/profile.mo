@@ -2,7 +2,9 @@ import HashMap "mo:base/HashMap";
 import Prim "mo:⛔";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
+import Float "mo:base/Float";
 
+import Logger "canister:logger";
 import Types "./types";
 
 actor class Profile() = {
@@ -23,5 +25,22 @@ actor class Profile() = {
         };
 
         return healthStats;
+    };
+
+    public func is_full() : async Bool {
+        let tags = ["Profile", "is_full"];
+
+        let rtsMemorySize : Nat = Prim.rts_memory_size();
+        
+        let memsizeFloat = Float.fromInt(rtsMemorySize);
+        let memoryInMegabytes =  Float.abs(memsizeFloat * 0.000001);
+
+        await Logger.log_event(tags, debug_show(("[memoryInMegabytes]", memoryInMegabytes)));
+
+        if (memoryInMegabytes > 3500) {
+            return true;
+        } else {
+            return false;
+        }
     };
 };

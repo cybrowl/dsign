@@ -3,6 +3,7 @@ import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import Prim "mo:⛔";
 import Text "mo:base/Text";
+import Int "mo:base/Int";
 import Time "mo:base/Time";
 
 import Logger "canister:logger";
@@ -92,10 +93,10 @@ actor ProfileManager {
 
             // check if current canister is full
             let profile = actor (currentEmptyCanisterID) : ProfileActor;
-            let healthStats = await profile.get_health_stats();
+            let isFull = await profile.is_full();
 
             await Logger.log_event(tags, "continue to check is canister filled");
-            await Logger.log_event(tags, debug_show(("[profile: healthStats]", healthStats)));
+            await Logger.log_event(tags, debug_show(("[profile: profile.is_full]", isFull)));
 
             //TODO: find more info on rts_total_allocation and  rts_reclaimed
             //TODO: refactor into Util

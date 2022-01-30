@@ -1,6 +1,6 @@
 import Int "mo:base/Int";
 import Text "mo:base/Text";
-import Nat8 "mo:base/Nat8";
+import Nat "mo:base/Nat";
 
 module {
     public type Time = Int;
@@ -14,7 +14,6 @@ module {
     public type Canister = {
         ID: CanisterID;
         creation: Time;
-        fillRatio: Nat8;
         isFull: Bool
     };
 
@@ -26,13 +25,13 @@ module {
     };
 
     public type HealthStats = {
-        rtsMemorySize: Int;
-        profileActorMapSize: Int;
+        rtsMemorySize: Nat;
+        profileActorMapSize: Nat;
     };
 
     public type ProfileActor = actor {
         ping : query() -> async Text;
-        get_health_stats : query() -> async HealthStats;
+        is_full : query() -> async Bool;
     };
 };
 
