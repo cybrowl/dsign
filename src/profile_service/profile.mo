@@ -50,9 +50,7 @@ actor class Profile() = {
         profiles.put(userId, profile);
     };
 
-    public func get_data(userId : UserID) : async Result.Result<Profile, ProfileError> {
-        let tags = [ACTOR_NAME, "get"];
-
+    public query func get_profile(userId : UserID) : async Result.Result<Profile, ProfileError> {
         switch (profiles.get(userId)) {
             case (null) {
                 #err(#notFound)

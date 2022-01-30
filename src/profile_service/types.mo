@@ -31,7 +31,7 @@ module {
         ping : query () -> async Text;
         is_full : query () -> async Bool;
         create : shared (Text, Text) -> async ();
-        get_data : shared (UserID) -> async Result.Result<Profile, ProfileError>;
+        get_profile : query (UserID) -> async Result.Result<Profile, ProfileError>;
     };
 };
 
