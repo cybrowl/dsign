@@ -28,15 +28,13 @@ actor class Profile() = {
     };
 
     public func is_full() : async Bool {
-        let tags = ["Profile", "is_full"];
+        let MAX_SIZE_THRESHOLD_MB : Float = 3500;
 
         let rtsMemorySize : Nat = Prim.rts_memory_size();
         let memSize : Float = Float.fromInt(rtsMemorySize);
         let memoryInMegabytes =  Float.abs(memSize * 0.000001);
 
-        await Logger.log_event(tags, debug_show(("[memoryInMegabytes]", memoryInMegabytes)));
-
-        if (memoryInMegabytes > 3500) {
+        if (memoryInMegabytes > MAX_SIZE_THRESHOLD_MB) {
             return true;
         } else {
             return false;

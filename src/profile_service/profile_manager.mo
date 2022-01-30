@@ -96,7 +96,7 @@ actor ProfileManager {
             let isFull = await profile.is_full();
 
             await Logger.log_event(tags, "continue to check is canister filled");
-            await Logger.log_event(tags, debug_show(("[profile: profile.is_full]", isFull)));
+            await Logger.log_event(tags, debug_show(("[isFull]", isFull)));
 
             //TODO: find more info on rts_total_allocation and  rts_reclaimed
             //TODO: refactor into Util
