@@ -1,6 +1,7 @@
 import Int "mo:base/Int";
-import Text "mo:base/Text";
 import Nat "mo:base/Nat";
+import Result "mo:base/Result";
+import Text "mo:base/Text";
 
 module {
     public type Time = Int;
@@ -30,7 +31,7 @@ module {
         ping : query () -> async Text;
         is_full : query () -> async Bool;
         create : shared (Text, Text) -> async ();
-        get_data : shared (UserID) -> async Profile;
+        get_data : shared (UserID) -> async Result.Result<Profile, ProfileError>;
     };
 };
 

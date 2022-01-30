@@ -86,13 +86,13 @@ actor ProfileManager {
                 let profile = actor (canisterID) : ProfileActor;
 
                 switch (await profile.get_data(userId)) {
+                    case (#err(#notFound)) {
+                        #err(#notFound);
+                    };
                     case (#ok(profile)) {
                         await Logger.log_event(tags, debug_show(("profile", profile)));
 
-                        profile;
-                    };
-                    case (#err(#notFound)) {
-                        // #err(#notFound);
+                        #ok(profile);
                     };
                 };
             };

@@ -50,7 +50,7 @@ actor class Profile() = {
         profiles.put(userId, profile);
     };
 
-    public query func get_data(userId : UserID) : async Result.Result<Profile, ProfileError> {
+    public func get_data(userId : UserID) : async Result.Result<Profile, ProfileError> {
         let tags = [ACTOR_NAME, "get"];
 
         switch (profiles.get(userId)) {
