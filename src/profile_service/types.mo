@@ -24,5 +24,15 @@ module {
         created: Time;
         website: ?Text;
     };
+
+    public type HealthStats = {
+        rtsMemorySize: Int;
+        profileActorMapSize: Int;
+    };
+
+    public type ProfileActor = actor {
+        ping : query() -> async Text;
+        get_health_stats : query() -> async HealthStats;
+    };
 };
 
