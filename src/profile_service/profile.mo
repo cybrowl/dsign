@@ -31,9 +31,8 @@ actor class Profile() = {
         let tags = ["Profile", "is_full"];
 
         let rtsMemorySize : Nat = Prim.rts_memory_size();
-        
-        let memsizeFloat = Float.fromInt(rtsMemorySize);
-        let memoryInMegabytes =  Float.abs(memsizeFloat * 0.000001);
+        let memSize : Float = Float.fromInt(rtsMemorySize);
+        let memoryInMegabytes =  Float.abs(memSize * 0.000001);
 
         await Logger.log_event(tags, debug_show(("[memoryInMegabytes]", memoryInMegabytes)));
 
