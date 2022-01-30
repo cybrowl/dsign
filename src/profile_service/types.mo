@@ -24,8 +24,8 @@ module {
         website: Text;
     };
 
-    public type ProfileManagerError = { #notFound; #usernameTaken; };
-    public type ProfileError = { #notFound; };
+    public type ProfileManagerError = { #CanisterIdNotFound; #UsernameTaken; #UsernameExists; #FailedGetProfile; };
+    public type ProfileError = { #NotFound; };
 
     public type ProfileActor = actor {
         ping : query () -> async Text;

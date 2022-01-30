@@ -44,32 +44,32 @@ actor ProfileManager {
 
         // check user doesn't have an account
         switch (canisterIDs.get(userId)) {
-            case (?id) { await Logger.log_event(tags, "UserID Exists"); };
-            case (null) { await Logger.log_event(tags, "UserID Not Found");};
-        };
-
-        // check username available
-        switch (usernames.get(username)) {
-            case (?id) {
-                await Logger.log_event(tags, "Username Taken");
-                #err(#usernameTaken)
-            };
+            case (?id) { #err(#UsernameExists) };
             case (null) {
-                await Logger.log_event(tags, debug_show(("userId", userId)));
+                // check username available
+                switch (usernames.get(username)) {
+                    case (?id) {
+                        await Logger.log_event(tags, "Username Taken");
+                        #err(#UsernameTaken)
+                    };
+                    case (null) {
+                        await Logger.log_event(tags, debug_show(("userId", userId)));
 
-                // add username
-                usernames.put(username, userId);
+                        // add username
+                        usernames.put(username, userId);
 
-                // link username + userID to canisterID
-                canisterIDs.put(userId, currentEmptyCanisterID);
+                        // link username + userID to canisterID
+                        canisterIDs.put(userId, currentEmptyCanisterID);
 
-                // call profile.create(UserID)
-                let profile = actor (currentEmptyCanisterID) : ProfileActor;
+                        // call profile.create(UserID)
+                        let profile = actor (currentEmptyCanisterID) : ProfileActor;
 
-                await profile.create(userId, username);
+                        await profile.create(userId, username);
 
-                await Logger.log_event(tags, "created!");
-                #ok("created!");
+                        await Logger.log_event(tags, "created!");
+                        #ok("created!");
+                    };
+                };
             };
         };
     };
@@ -80,14 +80,14 @@ actor ProfileManager {
 
         switch (canisterIDs.get(userId)) {
             case (null) {
-                #err(#notFound)
+                #err(#CanisterIdNotFound)
             };
             case (?canisterID) {
                 let profile = actor (canisterID) : ProfileActor;
 
                 switch (await profile.get_profile(userId)) {
-                    case (#err(#notFound)) {
-                        #err(#notFound);
+                    case (#err(#NotFound)) {
+                        #err(#FailedGetProfile);
                     };
                     case (#ok(profile)) {
                         await Logger.log_event(tags, debug_show(("profile", profile)));

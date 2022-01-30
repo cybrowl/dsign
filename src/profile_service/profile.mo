@@ -53,7 +53,7 @@ actor class Profile() = {
     public query func get_profile(userId : UserID) : async Result.Result<Profile, ProfileError> {
         switch (profiles.get(userId)) {
             case (null) {
-                #err(#notFound)
+                #err(#NotFound)
             };
             case (?profile) {
                 return #ok(profile);

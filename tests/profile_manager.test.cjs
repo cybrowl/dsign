@@ -5,7 +5,7 @@ const canisterIds = require('../.dfx/local/canister_ids.json');
 const {
 	idlFactory
 } = require('../.dfx/local/canisters/profile_manager/profile_manager.did.test.cjs');
-const { Ed25519KeyIdentity } = require("@dfinity/identity");
+const { Ed25519KeyIdentity } = require('@dfinity/identity');
 
 global.fetch = fetch;
 
@@ -23,15 +23,15 @@ test('Profile Manager: ping()', async function (t) {
 });
 
 test('Profile Manager: create_profile()', async function (t) {
-	const username = "Mishi";
-	await profileManager.create_profile(username);
-
+	const username = 'Mishi';
+	const response = await profileManager.create_profile(username);
+	console.log('response: ', response);
 });
 
 test('Profile Manager: get_profile()', async function (t) {
-	setTimeout(function(){}, 8000);
+	setTimeout(function () {}, 8000);
 
 	const response = await profileManager.get_profile();
 
-	console.log("response: ", response);
+	console.log('response: ', response);
 });
