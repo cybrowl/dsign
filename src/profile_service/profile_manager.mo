@@ -1,9 +1,10 @@
 import HashMap "mo:base/HashMap";
-import Option "mo:base/Option";
-import Principal "mo:base/Principal";
-import Prim "mo:⛔";
-import Text "mo:base/Text";
 import Int "mo:base/Int";
+import Option "mo:base/Option";
+import Prim "mo:⛔";
+import Principal "mo:base/Principal";
+import Result "mo:base/Result";
+import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import Logger "canister:logger";
@@ -17,6 +18,7 @@ actor ProfileManager {
     type Username = Types.Username;
     type Profile = Types.Profile;
     type ProfileActor = Types.ProfileActor;
+    type ProfileManagerError = Types.ProfileManagerError;
 
     let ACTOR_NAME : Text = "ProfileManager";
 
@@ -33,23 +35,28 @@ actor ProfileManager {
         return "meow";
     };
 
-    public shared (msg) func create_profile(username: Username) : async () {
+    public shared (msg) func create_profile(username: Username) : async Result.Result<Text, ProfileManagerError> {
         // NOTE: this should only be executed once by user
-        let tags = ["ProfileManager", "create_profile"];
+        let tags = [ACTOR_NAME, "create_profile"];
         let userId : UserID = Principal.toText(msg.caller);
 
         // TODO: return success/fail messages
 
         // check user doesn't have an account
         switch (canisterIDs.get(userId)) {
-            case (?id) { await Logger.log_event(tags, "Warning: UserID exists"); };
-            case (null) { await Logger.log_event(tags, "UserID Null");};
+            case (?id) { await Logger.log_event(tags, "UserID Exists"); };
+            case (null) { await Logger.log_event(tags, "UserID Not Found");};
         };
 
         // check username available
         switch (usernames.get(username)) {
-            case (?id) { await Logger.log_event(tags, "Warning: username taken"); };
+            case (?id) {
+                await Logger.log_event(tags, "Username Taken");
+                #err(#usernameTaken)
+            };
             case (null) {
+                await Logger.log_event(tags, debug_show(("userId", userId)));
+
                 // add username
                 usernames.put(username, userId);
 
@@ -62,6 +69,32 @@ actor ProfileManager {
                 await profile.create(userId, username);
 
                 await Logger.log_event(tags, "created!");
+                #ok("created!");
+            };
+        };
+    };
+
+    public shared (msg) func get_profile() : async Result.Result<Profile, ProfileManagerError> {
+        let tags = [ACTOR_NAME, "get_profile"];
+        let userId : UserID = Principal.toText(msg.caller);
+
+        switch (canisterIDs.get(userId)) {
+            case (null) {
+                #err(#notFound)
+            };
+            case (?canisterID) {
+                let profile = actor (canisterID) : ProfileActor;
+
+                switch (await profile.get_data(userId)) {
+                    case (#ok(profile)) {
+                        await Logger.log_event(tags, debug_show(("profile", profile)));
+
+                        profile;
+                    };
+                    case (#err(#notFound)) {
+                        // #err(#notFound);
+                    };
+                };
             };
         };
     };

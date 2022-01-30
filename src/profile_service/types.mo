@@ -19,15 +19,18 @@ module {
 
     public type Profile = {
         username: Username;
-        specialtyFields: [Tags];
         created: Time;
         website: Text;
     };
+
+    public type ProfileManagerError = { #notFound; #usernameTaken; };
+    public type ProfileError = { #notFound; };
 
     public type ProfileActor = actor {
         ping : query () -> async Text;
         is_full : query () -> async Bool;
         create : shared (Text, Text) -> async ();
+        get_data : shared (UserID) -> async Profile;
     };
 };
 

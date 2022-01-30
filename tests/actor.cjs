@@ -3,12 +3,16 @@ const { HttpAgent, Actor } = require("@dfinity/agent");
 
 const HOST = "http://127.0.0.1:8000/";
 
-const getActor = async (canisterId, idlFactory) => {
-  const identity = Ed25519KeyIdentity.generate();
+const getActor = async (canisterId, idlFactory, identity) => {
+  let mutableIdentity = identity;
+
+  if (identity) {
+    mutableIdentity = Ed25519KeyIdentity.generate();
+  }
 
   const agent = new HttpAgent({
     host: HOST,
-    identity
+    identity: mutableIdentity
   });
 
   agent.fetchRootKey().catch((err) => {

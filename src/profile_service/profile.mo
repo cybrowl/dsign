@@ -1,8 +1,9 @@
+import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
 import Prim "mo:⛔";
 import Principal "mo:base/Principal";
+import Result "mo:base/Result";
 import Text "mo:base/Text";
-import Float "mo:base/Float";
 import Time "mo:base/Time";
 
 import Logger "canister:logger";
@@ -12,7 +13,10 @@ actor class Profile() = {
     type UserID = Types.UserID;
     type Username = Types.Username;
     type Profile = Types.Profile;
+    type ProfileError = Types.ProfileError;
     type Tags = Types.Tags;
+
+    let ACTOR_NAME : Text = "Profile";
 
     var profiles : HashMap.HashMap<UserID, Profile> = HashMap.HashMap(1, Text.equal, Text.hash);
 
@@ -35,15 +39,27 @@ actor class Profile() = {
     };
 
     public func create(userId : UserID, username : Username) : async () {
-        let specialtyFields : [Tags] = [["designer"]];
+        // let specialtyFields : [Tags] = [["designer"]];
 
         let profile : Profile = {
             username = username;
-            specialtyFields = specialtyFields;
             created = Time.now();
             website = "";
         };
 
         profiles.put(userId, profile);
+    };
+
+    public query func get_data(userId : UserID) : async Result.Result<Profile, ProfileError> {
+        let tags = [ACTOR_NAME, "get"];
+
+        switch (profiles.get(userId)) {
+            case (null) {
+                #err(#notFound)
+            };
+            case (?profile) {
+                return #ok(profile);
+            };
+        };
     };
 };
