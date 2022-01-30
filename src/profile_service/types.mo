@@ -24,7 +24,13 @@ module {
         website: Text;
     };
 
-    public type ProfileManagerError = { #CanisterIdNotFound; #UsernameTaken; #UsernameExists; #FailedGetProfile; };
+    public type ProfileManagerError = {
+        #CanisterIdNotFound;
+        #FailedGetProfile;
+        #UserIDExists;
+        #UsernameTaken;
+    };
+
     public type ProfileError = { #NotFound; };
 
     public type ProfileActor = actor {

@@ -40,11 +40,9 @@ actor ProfileManager {
         let tags = [ACTOR_NAME, "create_profile"];
         let userId : UserID = Principal.toText(msg.caller);
 
-        // TODO: return success/fail messages
-
-        // check user doesn't have an account
         switch (canisterIDs.get(userId)) {
-            case (?id) { #err(#UsernameExists) };
+            // check user exists
+            case (?id) { #err(#UserIDExists) };
             case (null) {
                 // check username available
                 switch (usernames.get(username)) {
@@ -53,21 +51,17 @@ actor ProfileManager {
                         #err(#UsernameTaken)
                     };
                     case (null) {
-                        await Logger.log_event(tags, debug_show(("userId", userId)));
-
-                        // add username
+                        // add username and assign canister id
                         usernames.put(username, userId);
-
-                        // link username + userID to canisterID
                         canisterIDs.put(userId, currentEmptyCanisterID);
 
-                        // call profile.create(UserID)
+                        // create account in profile
                         let profile = actor (currentEmptyCanisterID) : ProfileActor;
-
                         await profile.create(userId, username);
 
-                        await Logger.log_event(tags, "created!");
-                        #ok("created!");
+                        await Logger.log_event(tags, debug_show(("userId", userId)));
+
+                        #ok("created_profile");
                     };
                 };
             };
