@@ -21,17 +21,13 @@ module {
         username: Username;
         specialtyFields: [Tags];
         created: Time;
-        website: ?Text;
-    };
-
-    public type HealthStats = {
-        rtsMemorySize: Nat;
-        profileActorMapSize: Nat;
+        website: Text;
     };
 
     public type ProfileActor = actor {
-        ping : query() -> async Text;
-        is_full : query() -> async Bool;
+        ping : query () -> async Text;
+        is_full : query () -> async Bool;
+        create : shared (Text, Text) -> async ();
     };
 };
 

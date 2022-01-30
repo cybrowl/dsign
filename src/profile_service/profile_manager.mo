@@ -50,12 +50,18 @@ actor ProfileManager {
         switch (usernames.get(username)) {
             case (?id) { await Logger.log_event(tags, "Warning: username taken"); };
             case (null) {
+                // add username
                 usernames.put(username, userId);
+
+                // link username + userID to canisterID
                 canisterIDs.put(userId, currentEmptyCanisterID);
 
-                // check if added properly
+                // call profile.create(UserID)
+                let profile = actor (currentEmptyCanisterID) : ProfileActor;
 
-                // call profile.create(UserID) & check
+                await profile.create(userId, username);
+
+                await Logger.log_event(tags, "created!");
             };
         };
     };
@@ -108,7 +114,7 @@ actor ProfileManager {
                 await create_canister();
             };
 
-            await Logger.log_event(tags, "end of heartbeat");
+            await Logger.log_event(tags, "the end!");
         }
     };
 };
