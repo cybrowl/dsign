@@ -42,11 +42,11 @@ actor ProfileManager {
 
         switch (canisterIDs.get(userId)) {
             // check user exists
-            case (?id) { #err(#UserIDExists) };
+            case (?canisterID) { #err(#UserIDExists) };
             case (null) {
                 // check username available
                 switch (usernames.get(username)) {
-                    case (?id) {
+                    case (?userId) {
                         await Logger.log_event(tags, "Username Taken");
                         #err(#UsernameTaken)
                     };

@@ -1,13 +1,13 @@
-<!-- <script>
+<script>
 	import { AuthClient } from '@dfinity/auth-client';
 	import { onMount } from 'svelte';
-	import { createActor as createActorProfile } from '$ICprofile';
 	import { createActor as createActorProfileManager } from '$ICprofile_manager';
 	import { auth as authProfileManager } from '../store/profile_manager';
 
 	let client;
 
 	onMount(async () => {
+		// on component load check if user logged in
 		client = await AuthClient.create();
 
 		if (await client.isAuthenticated()) {
@@ -32,56 +32,18 @@
 			onSuccess: handleAuth
 		});
 	}
-
-	async function logout() {
-		await client.logout();
-
-		authProfile.update(() => ({
-			loggedIn: false,
-			actor: createActorProfile({
-				agentOptions: {
-					identity: client.getIdentity()
-				}
-			})
-		}));
-
-		authProfileManager.update(() => ({
-			loggedIn: false,
-			actor: createActorProfileManager({
-				agentOptions: {
-					identity: client.getIdentity()
-				}
-			})
-		}));
-	}
 </script>
 
-<div class="container">
-	{#if $authProfile.loggedIn}
-		<div>
-			<button on:click={logout}>Log out</button>
-		</div>
-	{:else}
-		<button
-			class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-			on:click={login}>Login</button
-		>
-	{/if}
-
+<span class="logout">
 	{#if $authProfileManager.loggedIn}
-		<div>
-			<button on:click={logout}> profileManagerIdentity Log out</button>
-		</div>
+		<span />
 	{:else}
 		<button
 			class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
 			on:click={login}>Login</button
 		>
 	{/if}
-</div>
+</span>
 
 <style>
-	.container {
-		margin: 64px 0;
-	}
-</style> -->
+</style>

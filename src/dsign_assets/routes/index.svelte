@@ -1,44 +1,18 @@
 <script>
-	import { ping } from '../api/profile';
-	import { amp, browser, dev, mode, prerendering } from '$app/env';
-	import Auth from '../components/Auth.svelte';
-
-	let responses = [];
-
-	if (browser) {
-		Promise.all([ping()]).then((values) => {
-			responses = [...responses, ...values];
-		});
-	}
-
-	async function onLogin() {}
+	// import { amp, browser, dev, mode, prerendering } from '$app/env';
+	import Header from '../components/Header.svelte';
 </script>
 
 <svelte:head>
-	<title>Welcome</title>
+	<title>DSign</title>
 </svelte:head>
 
 <main>
-	<Auth />
-	<div class="grid grid-cols-2 gap-2">
-		<div>
-			<h1>MishiCat</h1>
-		</div>
-
-		<div>
-			<img src="/mishi-octopus.png" alt="MishiCat" class="w-80" />
-		</div>
-
-		<div>
-			<ul>
-				{#each responses as response}
-					<li>
-						{response}
-					</li>
-				{/each}
-			</ul>
-		</div>
-	</div>
+	<html lang="en" class="dark">
+		<body class="dark:bg-gray-800 dark:text-gray-200">
+			<Header />
+		</body>
+	</html>
 </main>
 
 <style>
