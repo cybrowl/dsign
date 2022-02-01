@@ -7,11 +7,9 @@
 	}
 </script>
 
-<div class="fade fixed top-0 left-0 w-full h-full">
-	<div class="justify-center m-32">
-		<!-- Modal content -->
-		<div class="bg-white rounded-lg shadow dark:bg-gray-700 h-96">
-			<!-- Modal header -->
+<div class="fade fixed top-0 left-0 right-0">
+	<div class="justify-center bg-white rounded-lg shadow dark:bg-gray-700 m-32">
+		<div class="">
 			<div class="flex justify-between items-start p-5 rounded-t">
 				<button
 					type="button"
@@ -31,8 +29,9 @@
 					>
 				</button>
 			</div>
-			<!-- Modal footer -->
-			<div class="static bottom-0 right-0">
+		</div>
+		<div class="relative h-80">
+			<div class="absolute bottom-0 right-0 m-5">
 				<Logout />
 			</div>
 		</div>
