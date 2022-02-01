@@ -8,10 +8,9 @@
 
 <div
 	id="settingModal"
-	aria-hidden="true"
-	class="overflow-y-auto overflow-x-hidden fixed right-0 left-0 top-4 z-50 justify-center items-center h-modal md:h-full md:inset-0"
+	class="backdrop-blur-xl bg-white/30 overflow-y-auto overflow-x-hidden fixed right-0 left-0 top-4 z-50 justify-center items-center h-modal md:h-full md:inset-0"
 >
-	<div class="relative px-4 w-full max-w-2xl h-full md:h-auto">
+	<div class="blur-sm relative px-4 w-full max-w-2xl h-full md:h-auto">
 		<!-- Modal content -->
 		<div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
 			<!-- Modal header -->

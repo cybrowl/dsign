@@ -6,10 +6,12 @@
 	}
 </script>
 
-<!-- svelte-ignore a11y-missing-attribute -->
-<a on:click={handleSettingsModal}>
-	<img alt="avatar" class="rounded-full w-20" src="/mishi-octopus.png" />
-</a>
+<img
+	alt="avatar"
+	class="rounded-full w-20"
+	src="/mishi-octopus.png"
+	on:click={handleSettingsModal}
+/>
 
 <style>
 </style>

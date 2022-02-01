@@ -40,7 +40,7 @@
 		<Avatar />
 	{:else}
 		<button
-			class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+			class="bg-indigo-800 hover:bg-indigo-900 text-white font-bold py-2 px-4 rounded"
 			on:click={login}>Log In</button
 		>
 	{/if}
