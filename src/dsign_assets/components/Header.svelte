@@ -2,9 +2,7 @@
 	import Login from './Login.svelte';
 </script>
 
-<header
-	class="dark:bg-gray-800 dark:text-gray-200 w-full mt-5 text-gray-700 shadow-sm body-font"
->
+<header class="dark:bg-gray-800 dark:text-gray-200 w-full mt-5 body-font">
 	<div class="container flex flex-col items-start justify-between p-6 mx-auto md:flex-row">
 		<!-- svelte-ignore a11y-missing-attribute -->
 		<a
@@ -18,9 +16,7 @@
 			<a href="#_" class="mr-5 font-medium hover:text-gray-900">Projects</a>
 			<a href="#_" class="font-medium hover:text-gray-900">Favorites</a>
 		</nav>
-		<div class="items-center h-full">
-			<Login />
-		</div>
+		<Login />
 	</div>
 </header>
 

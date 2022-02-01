@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { createActor as createActorProfileManager } from '$ICprofile_manager';
 	import { auth as authProfileManager } from '../store/profile_manager';
+	import Avatar from './Avatar.svelte';
 
 	let client;
 
@@ -36,7 +37,7 @@
 
 <span class="logout">
 	{#if $authProfileManager.loggedIn}
-		<span />
+		<Avatar />
 	{:else}
 		<button
 			class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
