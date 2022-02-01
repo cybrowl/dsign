@@ -18,7 +18,7 @@
 	}
 </script>
 
-<div class="logout">
+<div>
 	{#if $authProfileManager.loggedIn}
 		<div>
 			<button on:click={logout}>Log out</button>
