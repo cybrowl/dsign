@@ -1,8 +1,13 @@
 <script>
+	import { isSettingsActive } from '../store/modal';
+
+	function handleSettingsModal() {
+		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
+	}
 </script>
 
 <div
-	id="defaultModal"
+	id="settingModal"
 	aria-hidden="true"
 	class="overflow-y-auto overflow-x-hidden fixed right-0 left-0 top-4 z-50 justify-center items-center h-modal md:h-full md:inset-0"
 >
@@ -17,7 +22,7 @@
 				<button
 					type="button"
 					class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-					data-modal-toggle="defaultModal"
+					on:click={handleSettingsModal}
 				>
 					<svg
 						class="w-5 h-5"

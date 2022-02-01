@@ -1,5 +1,3 @@
 import { writable } from 'svelte/store';
 
-export const modal = writable({
-	isSettingsActive: false,
-});
+export const isSettingsActive = writable(false);

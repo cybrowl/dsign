@@ -1,10 +1,8 @@
 <script>
-	import { modal } from '../store/modal';
+	import { isSettingsActive } from '../store/modal';
 
 	function handleSettingsModal() {
-		modal.update(() => ({
-			isSettingsActive: true
-		}));
+		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
 	}
 </script>
 
