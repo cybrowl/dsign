@@ -10,3 +10,13 @@ export async function ping() {
 		console.error(err);
 	}
 }
+
+export async function create_profile(username) {
+	try {
+		const response = await profileManager.create_profile(username);
+
+		return response;
+	} catch (err) {
+		console.error(err);
+	}
+}

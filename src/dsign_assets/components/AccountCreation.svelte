@@ -1,16 +1,16 @@
 <script>
 	import { isAccountCreationActive } from '../store/modal';
-	import { ping } from '../api/profile_manager';
+	import { create_profile } from '../api/profile_manager';
 
 	let username = '';
-	let pingPromise = '';
+	let createProfilePromise = '';
 
 	function handleAccountCreation() {
 		isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
 	}
 
-	function handlePing() {
-		pingPromise = ping();
+	function handleCreateProfile() {
+		createProfilePromise = create_profile(username);
 	}
 </script>
 
@@ -44,7 +44,7 @@
 					<h1>Create an account</h1>
 					<input class="text-xl font-medium text-black" bind:value={username} />
 					<a href="#_">Privacy Policy</a>
-					{#await pingPromise}
+					{#await createProfilePromise}
 						<p>...waiting</p>
 					{:then val}
 						<p>{val}</p>
@@ -57,7 +57,7 @@
 			<div
 				class="absolute bottom-0 right-0 m-5 bg-indigo-800 hover:bg-indigo-900 text-white py-2 px-4 rounded"
 			>
-				<button on:click={handlePing}>Create Account</button>
+				<button on:click={handleCreateProfile}>Create Account</button>
 			</div>
 		</div>
 	</div>
