@@ -1,8 +1,9 @@
 <script>
-	import { isSettingsActive } from '../store/modal';
+	import { isSettingsActive, isAccountCreationActive } from '../store/modal';
 
 	function handleSettingsModal() {
 		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
+		isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
 	}
 </script>
 

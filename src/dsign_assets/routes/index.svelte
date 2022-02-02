@@ -3,7 +3,7 @@
 	import AccountCreation from '../components/AccountCreation.svelte';
 	import Header from '../components/Header.svelte';
 	import Settings from '../components/Settings.svelte';
-	import { isSettingsActive } from '../store/modal';
+	import { isSettingsActive, isAccountCreationActive } from '../store/modal';
 </script>
 
 <svelte:head>
@@ -15,10 +15,10 @@
 		<body class="dark:bg-gray-900 dark:text-gray-200">
 			<div class="grid grid-cols-12 gap-2 h-screen">
 				<Header />
-				{#if $isSettingsActive}
+				<!-- {#if $isSettingsActive}
 					<Settings />
-				{/if}
-				{#if $isSettingsActive}
+				{/if} -->
+				{#if $isAccountCreationActive}
 					<AccountCreation />
 				{/if}
 			</div>
