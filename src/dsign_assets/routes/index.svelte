@@ -1,5 +1,6 @@
 <script>
 	// import { amp, browser, dev, mode, prerendering } from '$app/env';
+	import AccountCreation from '../components/AccountCreation.svelte';
 	import Header from '../components/Header.svelte';
 	import Settings from '../components/Settings.svelte';
 	import { isSettingsActive } from '../store/modal';
@@ -16,6 +17,9 @@
 				<Header />
 				{#if $isSettingsActive}
 					<Settings />
+				{/if}
+				{#if $isSettingsActive}
+					<AccountCreation />
 				{/if}
 			</div>
 		</body>

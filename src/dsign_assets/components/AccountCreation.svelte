@@ -1,10 +1,11 @@
 <script>
-	import { isSettingsActive } from '../store/modal';
-	import Logout from './Logout.svelte';
+	import { isAccountCreationActive } from '../store/modal';
 
-	function handleSettingsModal() {
-		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
+	function handleAccountCreation() {
+		isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
 	}
+
+	let username = '';
 </script>
 
 <div class="fade fixed top-40 left-80 right-80">
@@ -14,7 +15,7 @@
 				<button
 					type="button"
 					class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-					on:click={handleSettingsModal}
+					on:click={handleAccountCreation}
 				>
 					<svg
 						class="w-5 h-5"
@@ -31,8 +32,17 @@
 			</div>
 		</div>
 		<div class="relative h-96">
-			<div class="absolute bottom-0 right-0 m-5">
-				<Logout />
+			<div class="grid grid-cols-3">
+				<div />
+				<div class="flex flex-col gap-y-20">
+					<h1>Create an account</h1>
+					<input class="text-xl font-medium text-black" bind:value={username} />
+					<a href="#_">Privacy Policy</a>
+				</div>
+				<div />
+			</div>
+			<div class="absolute bottom-0 right-0 m-5 bg-indigo-800 hover:bg-indigo-900 text-white py-2 px-4 rounded">
+				<button>Create Account</button>
 			</div>
 		</div>
 	</div>
