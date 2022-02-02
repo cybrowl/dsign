@@ -2,6 +2,7 @@
 	import { AuthClient } from '@dfinity/auth-client';
 	import { onMount } from 'svelte';
 	import { auth as authProfileManager } from '../store/profile_manager';
+	import { isSettingsActive } from '../store/modal';
 
 	let client;
 
@@ -15,6 +16,8 @@
 		authProfileManager.update(() => ({
 			loggedIn: false
 		}));
+
+		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
 	}
 </script>
 
