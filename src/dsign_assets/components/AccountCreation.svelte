@@ -48,7 +48,7 @@
 						{#await createProfilePromise}
 						  creating account
 						{:then response}
-						  <code>{response}</code>
+						  <code>{JSON.stringify(response)}</code>
 						{/await}
 					  </div>
 				</div>

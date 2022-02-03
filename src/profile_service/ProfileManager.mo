@@ -30,7 +30,7 @@ actor ProfileManager {
     // Canister Management
     var anchorTime = Time.now();
     var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
-    var currentEmptyCanisterID : Text = "";
+    var currentEmptyCanisterID : Text = "kxkd5-7qaaa-aaaag-aaawa-cai";
 
     public func ping() : async Text {
         return "meow";
