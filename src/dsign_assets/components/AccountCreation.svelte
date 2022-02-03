@@ -1,16 +1,16 @@
 <script>
 	import { isAccountCreationActive } from '../store/modal';
-	import { create_profile } from '../api/profile_manager';
+	import { profileManager } from '../store/profile_manager';
 
 	let username = '';
-	let createProfilePromise = '';
+	let createProfilePromise = null;
 
 	function handleAccountCreation() {
 		isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
 	}
 
 	function handleCreateProfile() {
-		createProfilePromise = create_profile(username);
+		createProfilePromise = $profileManager.actor.create_profile(username);
 	}
 </script>
 
@@ -44,14 +44,13 @@
 					<h1>Create an account</h1>
 					<input class="text-xl font-medium text-black" bind:value={username} />
 					<a href="#_">Privacy Policy</a>
-					{#await createProfilePromise}
-						<p>...waiting</p>
-					{:then val}
-						<p>{val.ok}</p>
-						<p>{console.info(val)}</p>
-					{:catch error}
-						<p style="color: red">{error.message}</p>
-					{/await}
+					<div class="create account">
+						{#await createProfilePromise}
+						  creating account
+						{:then response}
+						  <code>{response}</code>
+						{/await}
+					  </div>
 				</div>
 				<div />
 			</div>

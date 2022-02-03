@@ -59,8 +59,10 @@ actor ProfileManager {
                         canisterIDs.put(userId, currentEmptyCanisterID);
 
                         // create account in profile
+                        await Logger.log_event(tags, debug_show(("before creating profile")));
                         let profile = actor (currentEmptyCanisterID) : ProfileActor;
                         await profile.create(userId, username);
+                        await Logger.log_event(tags, debug_show(("after creating profile")));
 
                         // await Logger.log_event(tags, debug_show(("userId", userId)));
 

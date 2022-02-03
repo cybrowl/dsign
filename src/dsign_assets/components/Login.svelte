@@ -2,14 +2,14 @@
 	import { AuthClient } from '@dfinity/auth-client';
 	import { onMount } from 'svelte';
 	import { createActor as createActorProfileManager } from '$ICprofile_manager';
-	import { auth as authProfileManager } from '../store/profile_manager';
+	import { profileManager } from '../store/profile_manager';
 	import Avatar from './Avatar.svelte';
 	import environment from 'environment';
 
 	let client;
 
 	const env = environment();
-	const isProd = env['DFX_NETWORK'] === 'ic' || true;
+	const isProd = env['DFX_NETWORK'] === 'ic' || false;
 
 	onMount(async () => {
 		// on component load check if user logged in
@@ -21,7 +21,7 @@
 	});
 
 	function handleAuth() {
-		authProfileManager.update(() => ({
+		profileManager.update(() => ({
 			loggedIn: true,
 			actor: createActorProfileManager({
 				agentOptions: {
@@ -35,14 +35,14 @@
 		client.login({
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'
-				: 'http://rwlgt-iiaaa-aaaaa-aaaaa-cai.localhost:8000/',
+				: 'http://rwlgt-iiaaa-aaaaa-aaaaa-cai.localhost:8000/#authorize',
 			onSuccess: handleAuth
 		});
 	}
 </script>
 
 <span class="logout">
-	{#if $authProfileManager.loggedIn}
+	{#if $profileManager.loggedIn}
 		<Avatar />
 	{:else}
 		<button
