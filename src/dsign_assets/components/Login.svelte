@@ -9,7 +9,7 @@
 	let client;
 
 	const env = environment();
-	const isProd = env['DFX_NETWORK'] === 'ic';
+	const isProd = env['DFX_NETWORK'] === 'ic' || true;
 
 	onMount(async () => {
 		// on component load check if user logged in

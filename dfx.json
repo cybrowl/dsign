@@ -2,7 +2,7 @@
   "canisters": {
     "dsign_assets": {
       "dependencies": [
-        "profile",
+        "logger",
         "profile_manager"
       ],
       "frontend": {
@@ -13,13 +13,12 @@
       ],
       "type": "assets"
     },
-    "profile": {
-      "main": "src/profile_service/profile.mo",
-      "type": "motoko"
-    },
     "profile_manager": {
-      "main": "src/profile_service/profile_manager.mo",
-      "type": "motoko"
+      "main": "src/profile_service/ProfileManager.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger"
+      ]
     },
     "logger": {
       "main": "src/logger_service/logger.mo",
