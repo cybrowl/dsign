@@ -47,7 +47,8 @@
 					{#await createProfilePromise}
 						<p>...waiting</p>
 					{:then val}
-						<p>{val}</p>
+						<p>{val.ok}</p>
+						<p>{console.info(val)}</p>
 					{:catch error}
 						<p style="color: red">{error.message}</p>
 					{/await}

@@ -6,7 +6,7 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
-import Logger "canister:logger";
+// import Logger "canister:logger";
 import Types "./types";
 
 actor class Profile() = {

@@ -13,7 +13,9 @@ console.info(env);
 const isProd = env['DFX_NETWORK'] === 'ic';
 const canisterId = env.canisterIds.profile_manager[env['DFX_NETWORK']];
 
-const host = isProd ? `https://${canisterId}.ic0.app/` : 'http://127.0.0.1:8000/';
+const host = isProd
+	? `https://${canisterId}.ic0.app/`
+	: `http://127.0.0.1:8080/?canisterId=${canisterId}`;
 
 export const createActor = (options) => {
 	const agentOptions = { host };

@@ -4,8 +4,12 @@
 	import { createActor as createActorProfileManager } from '$ICprofile_manager';
 	import { auth as authProfileManager } from '../store/profile_manager';
 	import Avatar from './Avatar.svelte';
+	import environment from 'environment';
 
 	let client;
+
+	const env = environment();
+	const isProd = env['DFX_NETWORK'] === 'ic';
 
 	onMount(async () => {
 		// on component load check if user logged in
@@ -29,7 +33,9 @@
 
 	function login() {
 		client.login({
-			identityProvider: 'https://identity.ic0.app/#authorize',
+			identityProvider: isProd
+				? 'https://identity.ic0.app/#authorize'
+				: 'http://rwlgt-iiaaa-aaaaa-aaaaa-cai.localhost:8000/',
 			onSuccess: handleAuth
 		});
 	}
