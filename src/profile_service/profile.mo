@@ -1,3 +1,4 @@
+import Cycles "mo:base/ExperimentalCycles";
 import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
 import Prim "mo:⛔";
@@ -6,7 +7,7 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
-// import Logger "canister:logger";
+import Logger "canister:logger";
 import Types "./types";
 
 actor class Profile() = {
@@ -40,6 +41,13 @@ actor class Profile() = {
 
     public func create(userId : UserID, username : Username) : async () {
         // let specialtyFields : [Tags] = [["designer"]];
+        let tags = [ACTOR_NAME, "create"];
+
+        let amount = Cycles.available();
+        let balance = Cycles.balance();
+
+        await Logger.log_event(tags, debug_show(("cycles_available", amount)));
+        await Logger.log_event(tags, debug_show(("cycles_balance", balance)));
 
         let profile : Profile = {
             username = username;

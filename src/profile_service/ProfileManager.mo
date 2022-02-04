@@ -1,3 +1,4 @@
+import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Int "mo:base/Int";
 import Option "mo:base/Option";
@@ -6,7 +7,6 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
-import Cycles "mo:base/ExperimentalCycles";
 
 import Logger "canister:logger";
 import Profile "Profile";
@@ -30,7 +30,7 @@ actor ProfileManager {
     // Canister Management
     var anchorTime = Time.now();
     var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
-    var currentEmptyCanisterID : Text = "kxkd5-7qaaa-aaaag-aaawa-cai";
+    var currentEmptyCanisterID : Text = "";
 
     public func ping() : async Text {
         return "meow";
@@ -102,16 +102,18 @@ actor ProfileManager {
         let tags = [ACTOR_NAME, "create_canister"];
 
         let amount = Cycles.available();
-        await Logger.log_event(tags, "Cycles");
-        await Logger.log_event(tags, debug_show(amount));
+        let balance = Cycles.balance();
+        await Logger.log_event(tags, debug_show(("cycles_available", amount)));
+        await Logger.log_event(tags, debug_show(("cycles_balance", balance)));
 
         // create canister
         // FIX: failing to create canister
+        Cycles.add(1000000000000);
         let profileActor = await Profile.Profile();
-        await Logger.log_event(tags, "profileActor");
+        await Logger.log_event(tags, "created profile actor");
 
         let principal = Principal.fromActor(profileActor);
-        await Logger.log_event(tags, "principal");
+        await Logger.log_event(tags, debug_show(("actor_principal", principal)));
 
         let canisterID = Principal.toText(principal);
 
@@ -143,8 +145,7 @@ actor ProfileManager {
 
             // initialize first canister
             if (currentEmptyCanisterID.size() < 1) {
-                await Logger.log_event(tags, currentEmptyCanisterID);
-                await Logger.log_event(tags, "genesis of currentEmptyCanisterID assignment");
+                await Logger.log_event(tags, debug_show(("currentEmptyCanisterID", currentEmptyCanisterID)));
 
                 await create_canister();
             };
@@ -157,7 +158,7 @@ actor ProfileManager {
                 await create_canister();
             };
 
-            await Logger.log_event(tags, "the end!");
+            await Logger.log_event(tags, "End of Heartbeat");
         }
     };
 };
