@@ -30,7 +30,7 @@ actor ProfileManager {
     // Canister Management
     var anchorTime = Time.now();
     var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
-    var currentEmptyCanisterID : Text = "";
+    stable var currentEmptyCanisterID : Text = "";
 
     public func ping() : async Text {
         return "meow";
@@ -41,16 +41,17 @@ actor ProfileManager {
         let tags = [ACTOR_NAME, "create_profile"];
         let userId : UserID = Principal.toText(msg.caller);
 
-        await Logger.log_event(tags, debug_show(("userId", userId)));
-
         switch (canisterIDs.get(userId)) {
             // check user exists
-            case (?canisterID) { #err(#UserIDExists) };
+            case (?canisterID) {
+                await Logger.log_event(tags, "userId_exists");
+                #err(#UserIDExists)
+            };
             case (null) {
                 // check username available
                 switch (usernames.get(username)) {
                     case (?userId) {
-                        // await Logger.log_event(tags, "Username Taken");
+                        await Logger.log_event(tags, "username_taken");
                         #err(#UsernameTaken)
                     };
                     case (null) {
@@ -59,14 +60,11 @@ actor ProfileManager {
                         canisterIDs.put(userId, currentEmptyCanisterID);
 
                         // create account in profile
-                        await Logger.log_event(tags, debug_show(("before creating profile")));
                         let profile = actor (currentEmptyCanisterID) : ProfileActor;
                         await profile.create(userId, username);
-                        await Logger.log_event(tags, debug_show(("after creating profile")));
 
-                        // await Logger.log_event(tags, debug_show(("userId", userId)));
-
-                        #ok("created_profile");
+                        await Logger.log_event(tags, "profile_created");
+                        #ok("profile_created");
                     };
                 };
             };
@@ -79,6 +77,7 @@ actor ProfileManager {
 
         switch (canisterIDs.get(userId)) {
             case (null) {
+                await Logger.log_event(tags, debug_show(("canisterId_not_found", userId)));
                 #err(#CanisterIdNotFound)
             };
             case (?canisterID) {
@@ -86,11 +85,11 @@ actor ProfileManager {
 
                 switch (await profile.get_profile(userId)) {
                     case (#err(#ProfileNotFound)) {
+                        await Logger.log_event(tags, "profile_not_found");
                         #err(#FailedGetProfile);
                     };
                     case (#ok(profile)) {
-                        // await Logger.log_event(tags, debug_show(("profile", profile)));
-
+                        await Logger.log_event(tags, "profile_returned");
                         #ok(profile);
                     };
                 };
@@ -101,20 +100,10 @@ actor ProfileManager {
     private func create_canister() : async () {
         let tags = [ACTOR_NAME, "create_canister"];
 
-        let amount = Cycles.available();
-        let balance = Cycles.balance();
-        await Logger.log_event(tags, debug_show(("cycles_available", amount)));
-        await Logger.log_event(tags, debug_show(("cycles_balance", balance)));
-
         // create canister
-        // FIX: failing to create canister
         Cycles.add(1000000000000);
         let profileActor = await Profile.Profile();
-        await Logger.log_event(tags, "created profile actor");
-
         let principal = Principal.fromActor(profileActor);
-        await Logger.log_event(tags, debug_show(("actor_principal", principal)));
-
         let canisterID = Principal.toText(principal);
 
         // add to canister cache
@@ -129,12 +118,11 @@ actor ProfileManager {
         // update current empty canister ID
         currentEmptyCanisterID := canisterID;
 
-        await Logger.log_event(tags, "created!");
-        await Logger.log_event(tags, currentEmptyCanisterID);
+        await Logger.log_event(tags, debug_show(("canister_created", canisterID)));
     };
 
     system func heartbeat() : async () {
-        let SECONDS_TO_CHECK_CANISTER_FILLED = 10;
+        let SECONDS_TO_CHECK_CANISTER_FILLED = 60;
         let now = Time.now();
         let elapsedSeconds = (now - anchorTime) / 1000_000_000;
 
@@ -145,20 +133,21 @@ actor ProfileManager {
 
             // initialize first canister
             if (currentEmptyCanisterID.size() < 1) {
+                await Logger.log_event(tags, debug_show(("first_canister_created")));
                 await Logger.log_event(tags, debug_show(("currentEmptyCanisterID", currentEmptyCanisterID)));
 
                 await create_canister();
             };
 
             // check if current canister is full
+            //TODO: test in Prod
             let profile = actor (currentEmptyCanisterID) : ProfileActor;
             let isFull = await profile.is_full();
 
             if (isFull) {
+                await Logger.log_event(tags, "currentEmptyCanisterID_isFull");
                 await create_canister();
             };
-
-            await Logger.log_event(tags, "End of Heartbeat");
         }
     };
 };

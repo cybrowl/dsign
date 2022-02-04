@@ -25,6 +25,10 @@ actor class Profile() = {
         return "meow";
     };
 
+    public query func get_cycles_balance() : async Nat {
+        return Cycles.balance();
+    };
+
     public func is_full() : async Bool {
         let MAX_SIZE_THRESHOLD_MB : Float = 3500;
 
@@ -41,13 +45,6 @@ actor class Profile() = {
 
     public func create(userId : UserID, username : Username) : async () {
         // let specialtyFields : [Tags] = [["designer"]];
-        let tags = [ACTOR_NAME, "create"];
-
-        let amount = Cycles.available();
-        let balance = Cycles.balance();
-
-        await Logger.log_event(tags, debug_show(("cycles_available", amount)));
-        await Logger.log_event(tags, debug_show(("cycles_balance", balance)));
 
         let profile : Profile = {
             username = username;
