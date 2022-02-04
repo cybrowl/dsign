@@ -1,6 +1,7 @@
 import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Int "mo:base/Int";
+import Iter "mo:base/Iter";
 import Option "mo:base/Option";
 import Prim "mo:⛔";
 import Principal "mo:base/Principal";
@@ -28,9 +29,10 @@ actor ProfileManager {
     var canisterIDs : HashMap.HashMap<UserID, CanisterID> = HashMap.HashMap(1, Text.equal, Text.hash);
 
     // Canister Management
-    var anchorTime = Time.now();
-    var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
+    stable var anchorTime = Time.now();
     stable var currentEmptyCanisterID : Text = "";
+    var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
+    stable var entries : [(CanisterID, Canister)] = [];
 
     public func ping() : async Text {
         return "meow";
@@ -128,6 +130,8 @@ actor ProfileManager {
 
         if (elapsedSeconds > SECONDS_TO_CHECK_CANISTER_FILLED) {
             let tags = [ACTOR_NAME, "heartbeat"];
+            
+            await Logger.log_event(tags, debug_show(("anchorTime", anchorTime)));
 
             anchorTime := now;
 
@@ -149,5 +153,14 @@ actor ProfileManager {
                 await create_canister();
             };
         }
+    };
+
+    system func preupgrade() {
+        entries := Iter.toArray(canisterCache.entries());
+    };
+
+    system func postupgrade() {
+        canisterCache := HashMap.fromIter<CanisterID, Canister>(entries.vals(), 1, Text.equal, Text.hash);
+        entries := [];
     };
 };
