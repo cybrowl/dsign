@@ -1,6 +1,9 @@
 <script>
 	import { isSettingsActive } from '../store/modal';
+	import { profileManager } from '../store/profile_manager';
 	import Logout from './Logout.svelte';
+
+	let profilePromise = $profileManager.actor.get_profile();
 
 	function handleSettingsModal() {
 		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
@@ -31,6 +34,16 @@
 			</div>
 		</div>
 		<div class="relative h-96">
+			<div>
+				{#await profilePromise}
+					<p>...getting profile</p>
+				{:then { ok: { username } }}
+					<h4>Username</h4>
+					<p>{username}</p>
+				{:catch error}
+					<p style="color: red">{error.message}</p>
+				{/await}
+			</div>
 			<div class="absolute bottom-0 right-0 m-5">
 				<Logout />
 			</div>

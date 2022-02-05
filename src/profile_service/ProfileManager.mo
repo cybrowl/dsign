@@ -142,8 +142,6 @@ actor ProfileManager {
 
         if (elapsedSeconds > SECONDS_TO_CHECK_CANISTER_FILLED) {
             let tags = [ACTOR_NAME, "heartbeat"];
-            
-            await Logger.log_event(tags, debug_show(("anchorTime", anchorTime)));
 
             anchorTime := now;
 
