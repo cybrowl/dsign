@@ -2,6 +2,7 @@
 	import { isSettingsActive } from '../store/modal';
 	import { profileManager } from '../store/profile_manager';
 	import Logout from './Logout.svelte';
+	import { fade, fly } from 'svelte/transition';
 
 	let profilePromise = $profileManager.actor.get_profile();
 
@@ -10,9 +11,10 @@
 	}
 </script>
 
-<div class="fade fixed top-40 left-80 right-80">
+<div class="fixed top-0 left-0 right-0 h-full w-full bg-dark-stone opacity-90" />
+<div class="fade fixed top-40 left-1/4 right-1/4" in:fly="{{ y: 200, duration: 2000 }}" out:fade>
 	<div class="bg-white rounded-lg shadow dark:bg-gray-700">
-		<div class="">
+		<div class="z-0">
 			<div class="flex justify-between items-start p-5 rounded-t">
 				<button
 					type="button"
@@ -34,7 +36,7 @@
 			</div>
 		</div>
 		<div class="relative h-96">
-			<div>
+			<div class="m-10">
 				{#await profilePromise}
 					<p>...getting profile</p>
 				{:then { ok: { username } }}
