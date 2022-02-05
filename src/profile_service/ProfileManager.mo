@@ -30,12 +30,24 @@ actor ProfileManager {
 
     // Canister Management
     stable var anchorTime = Time.now();
-    stable var currentEmptyCanisterID : Text = "";
+    stable var currentEmptyCanisterID : Text = "kxkd5-7qaaa-aaaag-aaawa-cai";
     var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
     stable var entries : [(CanisterID, Canister)] = [];
 
     public func ping() : async Text {
         return "meow";
+    };
+
+    public query (msg) func has_account() : async Bool  {
+        let userId : UserID = Principal.toText(msg.caller);
+
+        switch (canisterIDs.get(userId)) {
+            // check user exists
+            case (?canisterID) {
+                return true;
+            };
+            case(_) { return false };
+        };
     };
 
     public shared (msg) func create_profile(username: Username) : async Result.Result<Text, ProfileManagerError> {
@@ -103,7 +115,7 @@ actor ProfileManager {
         let tags = [ACTOR_NAME, "create_canister"];
 
         // create canister
-        Cycles.add(1000000000000);
+        // Cycles.add(1000000000000);
         let profileActor = await Profile.Profile();
         let principal = Principal.fromActor(profileActor);
         let canisterID = Principal.toText(principal);

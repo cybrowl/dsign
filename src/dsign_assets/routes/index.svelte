@@ -15,9 +15,9 @@
 		<body class="dark:bg-gray-900 dark:text-gray-200">
 			<div class="grid grid-cols-12 gap-2 h-screen">
 				<Header />
-				<!-- {#if $isSettingsActive}
+				{#if $isSettingsActive}
 					<Settings />
-				{/if} -->
+				{/if}
 				{#if $isAccountCreationActive}
 					<AccountCreation />
 				{/if}
