@@ -2,12 +2,17 @@
 	import { isSettingsActive, isAccountCreationActive } from '../store/modal';
 	import { profileManager } from '../store/profile_manager';
 
+	let hasAccountPromise = $profileManager.actor.has_account();
+	let hasAccount = false;
+
+	(async () => {
+		hasAccount = await hasAccountPromise;
+	})();
+
+	console.log('hasAccount: ', hasAccount);
+
 	async function handleSettingsModal() {
-		let hasAccountPromise = $profileManager.actor.has_account();
-		let hasAccount = await hasAccountPromise;
-
 		//TODO: add local storage cache instead of making call
-
 		if (hasAccount) {
 			isSettingsActive.update((isSettingsActive) => !isSettingsActive);
 		} else {
