@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { createActor as createActorProfileManager } from '$ICprofile_manager';
 	import { profileManager } from '../store/profile_manager';
+	import { removeFromStorage } from '../store/local_storage';
 	import Avatar from './Avatar.svelte';
 	import environment from 'environment';
 
@@ -21,6 +22,8 @@
 			profileManager.update(() => ({
 				loggedIn: false
 			}));
+
+			removeFromStorage("profile");
 		}
 	});
 

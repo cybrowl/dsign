@@ -37,10 +37,10 @@
 	on:click={handleSettingsModal}
 /> -->
 <div
-	class="m-2 mr-2 w-16 h-16 flex justify-center items-center rounded-full bg-indigo-800 text-xl text-white uppercase"
+	class="m-2 mr-2 w-16 h-16 flex justify-center items-center rounded-full bg-indigo-800 text-xl text-white uppercase cursor-pointer"
 	on:click={handleSettingsModal}
 >
-	<p>
+	<p class="cursor-pointer">
 		{$profileStorage.username.charAt(0)}
 		{$profileStorage.username.charAt($profileStorage.username.length - 1)}
 	</p>

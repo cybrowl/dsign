@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { profileManager } from '../store/profile_manager';
 	import { isSettingsActive } from '../store/modal';
+	import { removeFromStorage } from '../store/local_storage';
 
 	let client;
 
@@ -16,6 +17,8 @@
 		profileManager.update(() => ({
 			loggedIn: false
 		}));
+
+		removeFromStorage("profile");
 
 		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
 	}
