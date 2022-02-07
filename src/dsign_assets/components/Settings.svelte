@@ -1,8 +1,9 @@
 <script>
+	import { fade, fly } from 'svelte/transition';
 	import { isSettingsActive } from '../store/modal';
+	import { profileStorage } from '../store/local_storage';
 	import { profileManager } from '../store/profile_manager';
 	import Logout from './Logout.svelte';
-	import { fade, fly } from 'svelte/transition';
 
 	let profilePromise = $profileManager.actor.get_profile();
 

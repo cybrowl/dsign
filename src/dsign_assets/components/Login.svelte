@@ -17,6 +17,10 @@
 
 		if (await client.isAuthenticated()) {
 			handleAuth();
+		} else {
+			profileManager.update(() => ({
+				loggedIn: false
+			}));
 		}
 	});
 
@@ -41,7 +45,7 @@
 	}
 </script>
 
-<span class="logout">
+<span>
 	{#if $profileManager.loggedIn}
 		<Avatar />
 	{:else}
