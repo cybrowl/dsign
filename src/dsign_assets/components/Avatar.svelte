@@ -4,7 +4,7 @@
 	import { profileStorage } from '../store/local_storage';
 
 	let hasAccount = false;
-	let username = $profileStorage.username;
+	let hasUsername = $profileStorage.username.length > 0 || false;
 
 	let hasAccountPromise = $profileManager.actor.has_account();
 	let profilePromise = $profileManager.actor.get_profile();
@@ -12,7 +12,7 @@
 	(async () => {
 		hasAccount = await hasAccountPromise;
 
-		if (!username) {
+		if (!hasUsername) {
 			let profileRes = await profilePromise;
 			let username = profileRes.ok.username;
 
@@ -41,8 +41,8 @@
 	on:click={handleSettingsModal}
 >
 	<p>
-		{username.charAt(0)}
-		{username.charAt(username.length - 1)}
+		{$profileStorage.username.charAt(0)}
+		{$profileStorage.username.charAt($profileStorage.username.length - 1)}
 	</p>
 </div>
 

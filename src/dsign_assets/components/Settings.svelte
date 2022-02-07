@@ -6,6 +6,7 @@
 	import Logout from './Logout.svelte';
 
 	let profilePromise = $profileManager.actor.get_profile();
+	let username = $profileStorage.username;
 
 	function handleSettingsModal() {
 		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
@@ -41,14 +42,19 @@
 		</div>
 		<div class="relative h-96">
 			<div class="m-10">
-				{#await profilePromise}
-					<p>...getting profile</p>
-				{:then { ok: { username } }}
+				{#if username}
 					<h4>Username</h4>
 					<p>{username}</p>
-				{:catch error}
-					<p style="color: red">{error.message}</p>
-				{/await}
+				{:else}
+					{#await profilePromise}
+						<p>...getting profile</p>
+					{:then { ok: { username } }}
+						<h4>Username</h4>
+						<p>{username}</p>
+					{:catch error}
+						<p style="color: red">{error.message}</p>
+					{/await}
+				{/if}
 			</div>
 			<div class="absolute bottom-0 right-0 m-5">
 				<Logout />
