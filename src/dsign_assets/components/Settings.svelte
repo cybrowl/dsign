@@ -12,7 +12,7 @@
 </script>
 
 <div class="fixed top-0 left-0 right-0 h-full w-full bg-dark-stone opacity-90" />
-<div class="fade fixed top-40 left-1/4 right-1/4" in:fly="{{ y: 200, duration: 2000 }}" out:fade>
+<div class="fade fixed top-40 left-1/4 right-1/4" in:fly="{{ y: 200, duration: 500 }}" out:fade>
 	<div class="bg-white rounded-lg shadow dark:bg-gray-700">
 		<div class="z-0">
 			<div class="flex justify-between items-start p-5 rounded-t">
