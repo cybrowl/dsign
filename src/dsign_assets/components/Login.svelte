@@ -20,10 +20,11 @@
 			handleAuth();
 		} else {
 			profileManager.update(() => ({
-				loggedIn: false
+				loggedIn: false,
+				actor: createActorProfileManager()
 			}));
 
-			removeFromStorage("profile");
+			removeFromStorage('profile');
 		}
 	});
 

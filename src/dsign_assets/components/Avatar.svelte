@@ -21,7 +21,6 @@
 	})();
 
 	async function handleSettingsModal() {
-		//TODO: add local storage cache instead of making call
 		if (hasAccount) {
 			isSettingsActive.update((isSettingsActive) => !isSettingsActive);
 		} else {

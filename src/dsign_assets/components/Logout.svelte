@@ -4,6 +4,7 @@
 	import { profileManager } from '../store/profile_manager';
 	import { isSettingsActive } from '../store/modal';
 	import { removeFromStorage } from '../store/local_storage';
+	import { createActor as createActorProfileManager } from '$ICprofile_manager';
 
 	let client;
 
@@ -15,10 +16,11 @@
 		await client.logout();
 
 		profileManager.update(() => ({
-			loggedIn: false
+			loggedIn: false,
+			actor: createActorProfileManager()
 		}));
 
-		removeFromStorage("profile");
+		removeFromStorage('profile');
 
 		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
 	}
