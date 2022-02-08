@@ -4,6 +4,7 @@
 	import { profileStorage } from '../store/local_storage';
 	import { profileManager } from '../store/profile_manager';
 	import Logout from './Logout.svelte';
+	import Avatar from './Avatar.svelte';
 
 	let profilePromise = $profileManager.actor.get_profile();
 	let username = $profileStorage.username;
@@ -41,6 +42,15 @@
 			</div>
 		</div>
 		<div class="relative h-96">
+			<div
+				class="m-2 ml-8 mr-2 w-16 h-16 flex justify-center items-center rounded-full bg-indigo-800 text-xl text-white uppercase cursor-pointer"
+				on:click={() => {}}
+			>
+				<p class="cursor-pointer">
+					{$profileStorage.username.charAt(0)}
+					{$profileStorage.username.charAt($profileStorage.username.length - 1)}
+				</p>
+			</div>
 			<div class="m-10">
 				{#if username}
 					<h4>Username</h4>

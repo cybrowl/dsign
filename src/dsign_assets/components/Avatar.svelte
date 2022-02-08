@@ -25,7 +25,9 @@
 		if (hasAccount) {
 			isSettingsActive.update((isSettingsActive) => !isSettingsActive);
 		} else {
-			isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
+			let accountExists = await hasAccountPromise;
+			!accountExists &&
+				isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
 		}
 	}
 </script>
