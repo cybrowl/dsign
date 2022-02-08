@@ -30,7 +30,7 @@ actor ProfileManager {
 
     // Canister Management
     stable var anchorTime = Time.now();
-    stable var currentEmptyCanisterID : Text = "kxkd5-7qaaa-aaaag-aaawa-cai";
+    stable var currentEmptyCanisterID : Text = "";
     var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
     stable var entries : [(CanisterID, Canister)] = [];
 
