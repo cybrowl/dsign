@@ -16,6 +16,7 @@
 			let profileRes = await profilePromise;
 			let username = profileRes.ok.username;
 
+			//TODO: set when logout/login
 			profileStorage.set({ username });
 		}
 	})();

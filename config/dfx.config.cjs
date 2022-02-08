@@ -20,7 +20,7 @@ function generateCanisterAliases() {
       };
     }, aliases);
   }
-
+  
   return aliases;
 }
 
