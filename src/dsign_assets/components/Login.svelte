@@ -2,8 +2,9 @@
 	import { AuthClient } from '@dfinity/auth-client';
 	import { onMount } from 'svelte';
 	import { createActor as createActorProfileManager } from '../store/profile_manager';
-	import { client } from "../store/client";
+	import { client } from '../store/client';
 	import { profileManager } from '../store/profile_manager';
+	import { removeFromStorage } from '../store/local_storage';
 	import Avatar from './Avatar.svelte';
 	import environment from 'environment';
 
@@ -20,6 +21,13 @@
 
 		if (isAuthenticated) {
 			handleAuth();
+		} else {
+			profileManager.update(() => ({
+				loggedIn: false,
+				actor: createActorProfileManager()
+			}));
+
+			removeFromStorage('profile');
 		}
 	});
 
@@ -44,7 +52,7 @@
 	}
 </script>
 
-<span class="logout">
+<span>
 	{#if $profileManager.loggedIn}
 		<Avatar />
 	{:else}

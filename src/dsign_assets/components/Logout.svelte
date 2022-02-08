@@ -1,7 +1,7 @@
 <script>
-	import { createActor as createActorProfileManager } from '../store/profile_manager';
+	import { createActor, profileManager } from '../store/profile_manager';
 	import { isSettingsActive } from '../store/modal';
-	import { profileManager } from '../store/profile_manager';
+	import { removeFromStorage } from '../store/local_storage';
 	import { client } from '../store/client';
 
 	async function logout() {
@@ -9,12 +9,14 @@
 
 		profileManager.update(() => ({
 			loggedIn: false,
-			actor: createActorProfileManager({
+			actor: createActor({
 				agentOptions: {
 					identity: $client.getIdentity()
 				}
 			})
 		}));
+
+		removeFromStorage('profile');
 
 		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
 	}
