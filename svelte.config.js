@@ -28,7 +28,7 @@ const config = {
 		adapter: adapter({ pages: 'build' }),
 
 		// hydrate the <div id="dsign-root"> element in src/app.html
-		target: '#dsign-root',
+		// target: '#dsign-root',
 		vite: viteConfig(envOptions)
 	}
 };
