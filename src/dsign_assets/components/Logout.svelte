@@ -1,23 +1,19 @@
 <script>
-	import { AuthClient } from '@dfinity/auth-client';
-	import { onMount } from 'svelte';
-	import { profileManager } from '../store/profile_manager';
+	import { createActor, profileManager } from '../store/profile_manager';
 	import { isSettingsActive } from '../store/modal';
 	import { removeFromStorage } from '../store/local_storage';
-	import { createActor as createActorProfileManager } from '$ICprofile_manager';
-
-	let client;
-
-	onMount(async () => {
-		client = await AuthClient.create();
-	});
+	import { client } from '../store/client';
 
 	async function logout() {
-		await client.logout();
+		await $client.logout();
 
 		profileManager.update(() => ({
 			loggedIn: false,
-			actor: createActorProfileManager()
+			actor: createActor({
+				agentOptions: {
+					identity: $client.getIdentity()
+				}
+			})
 		}));
 
 		removeFromStorage('profile');
