@@ -16,12 +16,9 @@ const host = isProd
 export function createActor(options) {
 	const agentOptions = { host };
 
-	console.log("options: ", options);
 	if (options && options.agentOptions) {
 		agentOptions.identity = options.agentOptions.identity;
 	}
-
-	console.log("agentOptions: ", agentOptions);
 
 	const agent = new HttpAgent({ ...agentOptions });
 

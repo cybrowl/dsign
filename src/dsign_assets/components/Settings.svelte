@@ -4,10 +4,10 @@
 	import { profileStorage } from '../store/local_storage';
 	import { profileManager } from '../store/profile_manager';
 	import Logout from './Logout.svelte';
-	import Avatar from './Avatar.svelte';
 
 	let profilePromise = $profileManager.actor.get_profile();
 	let username = $profileStorage.username;
+	let files;
 
 	function handleSettingsModal() {
 		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
@@ -51,6 +51,8 @@
 					{$profileStorage.username.charAt($profileStorage.username.length - 1)}
 				</p>
 			</div>
+			<input type="file" bind:files />
+			{console.info('files: ', files)}
 			<div class="m-10">
 				{#if username}
 					<h4>Username</h4>
