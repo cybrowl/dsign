@@ -14,13 +14,13 @@ import Profile "Profile";
 import Types "./types";
 
 actor ProfileManager {
-    type CanisterID = Types.CanisterID;
     type Canister = Types.Canister;
-    type UserID = Types.UserID;
-    type Username = Types.Username;
+    type CanisterID = Types.CanisterID;
     type Profile = Types.Profile;
     type ProfileActor = Types.ProfileActor;
     type ProfileManagerError = Types.ProfileManagerError;
+    type UserID = Types.UserID;
+    type Username = Types.Username;
 
     let ACTOR_NAME : Text = "ProfileManager";
 

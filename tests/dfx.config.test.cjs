@@ -8,11 +8,10 @@ test(`${filename}: generateCanisterAliases()`, async function (t) {
 
 	const expected = {
 		'local-canister-ids': '/Users/cyberowl/Projects/dsign/.dfx/local/canister_ids.json',
-		$IDLdsign_assets:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/dsign_assets.did.js',
-		$IDLprofile_manager:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile_manager/profile_manager.did.js',
-		$IDLlogger: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/logger/logger.did.js'
+		'$IDLdsign_assets': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/dsign_assets.did.js',
+		'$IDLprofile_avatar': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile_avatar/profile_avatar.did.js',
+		'$IDLprofile_manager': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile_manager/profile_manager.did.js',
+		'$IDLlogger': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/logger/logger.did.js'
 	};
 
 	t.deepEqual(aliases, expected);
