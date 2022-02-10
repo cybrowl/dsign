@@ -26,13 +26,17 @@ actor ProfileManager {
 
     // User Data Management
     var usernames : HashMap.HashMap<Username, UserID> = HashMap.HashMap(1, Text.equal, Text.hash);
+    stable var usernamesEntries : [(Username, UserID)] = [];
+
     var canisterIDs : HashMap.HashMap<UserID, CanisterID> = HashMap.HashMap(1, Text.equal, Text.hash);
+    stable var canisterIDsEntries : [(UserID, CanisterID)] = [];
 
     // Canister Management
     stable var anchorTime = Time.now();
     stable var currentEmptyCanisterID : Text = "";
+
     var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
-    stable var entries : [(CanisterID, Canister)] = [];
+    stable var canisterCacheEntries : [(CanisterID, Canister)] = [];
 
     public func ping() : async Text {
         return "meow";
@@ -166,11 +170,20 @@ actor ProfileManager {
     };
 
     system func preupgrade() {
-        entries := Iter.toArray(canisterCache.entries());
+        usernamesEntries := Iter.toArray(usernames.entries());
+        canisterIDsEntries := Iter.toArray(canisterIDs.entries());
+        canisterCacheEntries := Iter.toArray(canisterCache.entries());
+
     };
 
     system func postupgrade() {
-        canisterCache := HashMap.fromIter<CanisterID, Canister>(entries.vals(), 1, Text.equal, Text.hash);
-        entries := [];
+        usernames := HashMap.fromIter<Username, UserID>(usernamesEntries.vals(), 1, Text.equal, Text.hash);
+        usernamesEntries := [];
+
+        canisterIDs := HashMap.fromIter<UserID, CanisterID>(canisterIDsEntries.vals(), 1, Text.equal, Text.hash);
+        canisterIDsEntries := [];
+
+        canisterCache := HashMap.fromIter<CanisterID, Canister>(canisterCacheEntries.vals(), 1, Text.equal, Text.hash);
+        canisterCacheEntries := [];
     };
 };
