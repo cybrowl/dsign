@@ -24,7 +24,7 @@ test('Profile Manager: ping()', async function (t) {
 });
 
 test('Profile Manager: create_profile()', async function (t) {
-	const username = 'mishicat';
+	const username = 'mouse3';
 	const response = await profileManager.create_profile(username);
 });
 
@@ -32,6 +32,9 @@ test('Profile Manager: get_profile()', async function (t) {
 	setTimeout(function () {}, 8000);
 
 	const response = await profileManager.get_profile();
+
+	console.log("profile: ", response);
+
 });
 
 test('Profile Manager: set_avatar()', async function (t) {
@@ -48,4 +51,13 @@ test('Profile Manager: set_avatar()', async function (t) {
 	} catch (err) {
 		console.error(err);
 	}
+});
+
+test('Profile Manager: get_profile()', async function (t) {
+	setTimeout(function () {}, 8000);
+
+	const response = await profileManager.get_profile();
+
+	console.log("profile: ", response);
+
 });

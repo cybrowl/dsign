@@ -19,8 +19,9 @@ module {
     };
 
     public type Profile = {
-        username: Username;
+        avatar: Text;
         created: Time;
+        username: Username;
         website: Text;
     };
 
