@@ -27,18 +27,6 @@ actor ProfileAvatar = {
 
     };
 
-    private func removeQuery(str: Text): Text {
-        switch (Text.split(str, #char '&').next()) {
-            // check user exists
-            case (?string) {
-                string
-            };
-            case (null) {
-                return ""
-            };
-        };
-    };
-
     public shared query func http_request(req : Types.HttpRequest) : async Types.HttpResponse {
         Debug.print(debug_show(("url", req.url)));
         Debug.print(debug_show(("method", req.method)));
