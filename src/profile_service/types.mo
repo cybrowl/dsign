@@ -12,11 +12,6 @@ module {
 
     public type Tags = [Text];
 
-    public type User = {
-        ID: UserID;
-        username: Username;
-    };
-
     public type Canister = {
         ID: CanisterID;
         creation: Time;
@@ -29,14 +24,9 @@ module {
         website: Text;
     };
 
-    public type ProfileManagerError = {
-        #CanisterIdNotFound;
-        #FailedGetProfile;
-        #UserIDExists;
-        #UsernameTaken;
+    public type Image = {
+        content: Blob
     };
-
-    public type ProfileError = { #ProfileNotFound; };
 
     public type HeaderField = (Text, Text);
 
@@ -51,6 +41,25 @@ module {
         body : Blob;
         headers : [HeaderField];
         status_code : Nat16;
+    };
+
+    public type AvatarError = {
+        #UsernameNotFound
+    };
+
+    public type ProfileManagerError = {
+        #CanisterIdNotFound;
+        #FailedGetProfile;
+        #UserIDExists;
+        #UsernameTaken;
+    };
+
+    public type ProfileError = { #ProfileNotFound; };
+
+    public type AvatarActor = actor {
+        ping : query () -> async Text;
+        set : shared (Image, Username) -> async ();
+        http_request : shared query HttpRequest -> async HttpResponse;
     };
 
     public type ProfileActor = actor {

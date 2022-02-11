@@ -6,6 +6,7 @@ const {
 	idlFactory
 } = require('../.dfx/local/canisters/profile_manager/profile_manager.did.test.cjs');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
+const fs = require('fs');
 
 global.fetch = fetch;
 
@@ -23,7 +24,7 @@ test('Profile Manager: ping()', async function (t) {
 });
 
 test('Profile Manager: create_profile()', async function (t) {
-	const username = 'Mishi';
+	const username = 'mishicat';
 	const response = await profileManager.create_profile(username);
 });
 
@@ -33,10 +34,18 @@ test('Profile Manager: get_profile()', async function (t) {
 	const response = await profileManager.get_profile();
 });
 
-test('Profile Manager: get_username()', async function (t) {
-	setTimeout(function () {}, 8000);
+test('Profile Manager: set_avatar()', async function (t) {
+	try {
+		const imageAsBuffer = fs.readFileSync('tests/images/motoko.png');
 
-	const response = await profileManager.get_username();
+		// covert to unit 8 array
+		const imageAsUnit8ArrayBuffer = new Uint8Array(imageAsBuffer);
+		const avatar = {
+			content: [...imageAsUnit8ArrayBuffer]
+		};
 
-	console.log('response: ', response);
+		const response = await profileManager.set_avatar(avatar);
+	} catch (err) {
+		console.error(err);
+	}
 });

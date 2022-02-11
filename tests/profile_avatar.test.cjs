@@ -49,7 +49,7 @@ test('Profile Avatar: ping()', async function (t) {
 	t.equal(response, 'meow');
 });
 
-test('Profile Avatar: save()', async function (t) {
+test('Profile Avatar: set()', async function (t) {
 	try {
 		const imageAsBuffer = fs.readFileSync('tests/images/motoko.png');
 

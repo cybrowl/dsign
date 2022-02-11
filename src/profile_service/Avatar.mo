@@ -6,15 +6,14 @@ import Logger "canister:logger";
 import Utils "./utils";
 import Types "./types";
 
-actor ProfileAvatar = {
-    let ACTOR_NAME : Text = "ProfileAvatar";
-    let MAX_BYTES = 2_000_000;
-
-    type Image = {
-        content: Blob
-    };
-
+actor Avatar = {
+    type HttpRequest = Types.HttpRequest;
+    type HttpResponse = Types.HttpResponse;
+    type Image = Types.Image;
     type Username = Text;
+
+    let ACTOR_NAME : Text = "Avatar";
+    let MAX_BYTES = 2_000_000;
 
     var avatars : HashMap.HashMap<Username, Image> = HashMap.HashMap(1, Text.equal, Text.hash);
 
@@ -22,15 +21,15 @@ actor ProfileAvatar = {
         return "meow";
     };
 
-    public shared func set(image: Image, username: Username) : async () {
-        if (image.content.size() > MAX_BYTES) {
+    public shared func set(avatar: Image, username: Username) : async () {
+        if (avatar.content.size() > MAX_BYTES) {
             return ();
         };
 
-        avatars.put(username, image);
+        avatars.put(username, avatar);
     };
 
-    public shared query func http_request(req : Types.HttpRequest) : async Types.HttpResponse {
+    public shared query func http_request(req : HttpRequest) : async HttpResponse {
         let username : Text = Utils.get_username(req.url);
         let NOT_FOUND : Blob = "Not Found";
 
