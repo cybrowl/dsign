@@ -15,6 +15,32 @@ let Mishi = Ed25519KeyIdentity.generate();
 const canisterId = canisterIds.profile_avatar.local;
 let profileAvatar = null;
 
+
+
+function callImageCanister(path) {
+	const options = {
+		hostname: '127.0.0.1',
+		port: 8000,
+		secure: false,
+		path: path,
+		method: 'GET',
+		headers: {
+			'Content-Type': 'image/png'
+		}
+	};
+
+	return new Promise(function (resolve, reject) {
+		const req = http.request(options, (res) => {
+			resolve(res);
+		});
+
+		req.on('error', (error) => {
+			reject(error);
+		});
+		req.end();
+	});
+}
+
 test('Profile Avatar: ping()', async function (t) {
 	profileAvatar = await getActor(canisterId, idlFactory, Mishi);
 
@@ -40,32 +66,9 @@ test('Profile Avatar: save()', async function (t) {
 	}
 });
 
-function callImageCanister() {
-	const options = {
-		hostname: '127.0.0.1',
-		port: 8000,
-		secure: false,
-		path: '/avatar/mishi?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai',
-		method: 'GET',
-		headers: {
-			'Content-Type': 'image/png'
-		}
-	};
-
-	return new Promise(function (resolve, reject) {
-		const req = http.request(options, (res) => {
-			resolve(res);
-		});
-
-		req.on('error', (error) => {
-			reject(error);
-		});
-		req.end();
-	});
-}
-
 test('Profile Avatar: http_request()', async function (t) {
-	let response = await callImageCanister();
+	const path = '/avatar/mishi?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai';
+	let response = await callImageCanister(path);
 
 	t.strictEqual(response.statusCode, 200);
 });
