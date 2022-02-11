@@ -60,7 +60,7 @@ test('Profile Avatar: save()', async function (t) {
 			content: [...imageAsUnit8ArrayBuffer]
 		};
 
-		const response = await profileAvatar.save(image, 'mishi');
+		const response = await profileAvatar.set(image, 'mishi');
 	} catch (err) {
 		console.error(err);
 	}
@@ -91,7 +91,7 @@ test('Profile Avatar: save over 2MB()', async function (t) {
 			content: [...imageAsUnit8ArrayBuffer]
 		};
 
-		const response = await profileAvatar.save(image, 'mishito');
+		const response = await profileAvatar.set(image, 'mishito');
 	} catch (err) {
 		console.error(err);
 	}

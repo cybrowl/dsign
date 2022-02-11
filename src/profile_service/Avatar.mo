@@ -22,7 +22,7 @@ actor ProfileAvatar = {
         return "meow";
     };
 
-    public shared func save(image: Image, username: Username) : async () {
+    public shared func set(image: Image, username: Username) : async () {
         if (image.content.size() > MAX_BYTES) {
             return ();
         };
