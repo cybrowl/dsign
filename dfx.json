@@ -14,7 +14,7 @@
       "type": "assets"
     },
     "profile_avatar": {
-      "main": "src/profile_avatar_service/ProfileAvatar.mo",
+      "main": "src/profile_service/Avatar.mo",
       "type": "motoko",
       "dependencies": [
         "logger"

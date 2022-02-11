@@ -8,7 +8,6 @@ const {
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
 const http = require('http');
 const fs = require('fs');
-const { Blob, Buffer } = require('buffer');
 
 global.fetch = fetch;
 
@@ -31,50 +30,42 @@ test('Profile Avatar: save()', async function (t) {
 
 		// covert to unit 8 array
 		const imageAsUnit8ArrayBuffer = new Uint8Array(imageAsBuffer);
-		console.log("imageAsUnit8ArrayBuffer: ", imageAsUnit8ArrayBuffer);
-
 		const image = {
 			content: [...imageAsUnit8ArrayBuffer]
-		}
+		};
 
-		const response = await profileAvatar.save(image, "mishi");
-
+		const response = await profileAvatar.save(image, 'mishi');
 	} catch (err) {
 		console.error(err);
 	}
-
 });
 
-// test('Profile Avatar: http_request()', async function (t) {
-// 	const data = JSON.stringify({
-// 		todo: 'Buy the milk'
-// 	});
+function callImageCanister() {
+	const options = {
+		hostname: '127.0.0.1',
+		port: 8000,
+		secure: false,
+		path: '/avatar/mishi?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai',
+		method: 'GET',
+		headers: {
+			'Content-Type': 'image/png'
+		}
+	};
 
-// 	const options = {
-// 		hostname: '127.0.0.1',
-// 		port: 8000,
-// 		secure: false,
-// 		path: '/?mishi',
-// 		method: 'GET',
-// 		headers: {
-// 			'Content-Type': 'application/json',
-// 			'Content-Length': data.length
-// 		}
-// 	};
+	return new Promise(function (resolve, reject) {
+		const req = http.request(options, (res) => {
+			resolve(res);
+		});
 
-// 	const req = http.request(options, (res) => {
-// 		console.log(`statusCode: ${res.statusCode}`);
+		req.on('error', (error) => {
+			reject(error);
+		});
+		req.end();
+	});
+}
 
-// 		res.on('data', (d) => {
-// 			console.log('data: ', data);
-// 			process.stdout.write(d);
-// 		});
-// 	});
+test('Profile Avatar: http_request()', async function (t) {
+	let response = await callImageCanister();
 
-// 	req.on('error', (error) => {
-// 		console.error(error);
-// 	});
-
-// 	req.write(data);
-// 	req.end();
-// });
+	t.strictEqual(response.statusCode, 200);
+});

@@ -22,13 +22,9 @@ const config = {
 			hooks: 'src/dsign_assets/hooks',
 			lib: 'src/dsign_assets/lib',
 			routes: 'src/dsign_assets/routes',
-			// serviceWorker: 'src/dsign_assets/service-worker',
 			template: 'src/dsign_assets/app.html'
 		},
 		adapter: adapter({ pages: 'build' }),
-
-		// hydrate the <div id="dsign-root"> element in src/app.html
-		// target: '#dsign-root',
 		vite: viteConfig(envOptions)
 	}
 };
