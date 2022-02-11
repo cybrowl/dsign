@@ -3,6 +3,7 @@ import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
 
 import Logger "canister:logger";
+import Utils "./utils";
 import Types "./types";
 
 actor ProfileAvatar = {
@@ -28,21 +29,8 @@ actor ProfileAvatar = {
     };
 
     public shared query func http_request(req : Types.HttpRequest) : async Types.HttpResponse {
-        Debug.print(debug_show(("url", req.url)));
-        Debug.print(debug_show(("method", req.method)));
-
-        let username : Text = "mishi";
+        let username : Text = Utils.get_username(req.url);
         let NOT_FOUND : Blob = "Not Found";
-
-        let correctPath : Bool = Text.contains(req.url, #text "/avatar/");
-
-        if (correctPath == false) {
-            return {
-                status_code = 404;
-                headers = [ ("content-type", "image/png") ];
-                body = NOT_FOUND;
-            };
-        };
 
         switch (avatars.get(username)) {
             case (?image) {

@@ -67,14 +67,14 @@ test('Profile Avatar: save()', async function (t) {
 });
 
 test('Profile Avatar: should find avatar', async function (t) {
-	const path = '/avatar/mishi?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai';
+	const path = 'https://kqlfj-siaaa-aaaag-aaawq-cai.raw.ic0.app/avatar/mishi?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai';
 	let response = await callImageCanister(path);
 
 	t.strictEqual(response.statusCode, 200);
 });
 
 test('Profile Avatar: should NOT find avatar', async function (t) {
-	const path = '/avatar/mish?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai';
+	const path = 'https://kqlfj-siaaa-aaaag-aaawq-cai.raw.ic0.app/avatar/mish?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai';
 	let response = await callImageCanister(path);
 
 	t.strictEqual(response.statusCode, 404);

@@ -14,12 +14,24 @@ let run = ActorSpec.run;
 
 let success = run([
   describe("Profile Service Avatar Test Suite", [
-    describe("Parse URL", [
-      it("should get username", do {
-        let url = "https://dsign.ic/avatar/heyday";
-        assertTrue(Text.equal(Utils.get_username(url)), "heyday");
-      }),
-    ]),
+    it("should get username when params exist", do {
+      let url = "https://dsign.ic/avatar/heyday?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai";
+      let username = Utils.get_username(url);
+
+      assertTrue(Text.equal(username, "heyday"));
+    }),
+    it("should get username params don't exist", do {
+      let url = "https://dsign.ic/avatar/heyday";
+      let username = Utils.get_username(url);
+
+      assertTrue(Text.equal(username, "heyday"));
+    }),
+    it("should get username with extra /", do {
+      let url = "https://dsign.ic/avatar/heyday/";
+      let username = Utils.get_username(url);
+
+      assertTrue(Text.equal(username, "heyday"));
+    }),
   ]),
 ]);
 
