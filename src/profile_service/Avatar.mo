@@ -8,7 +8,8 @@ import Types "./types";
 
 actor ProfileAvatar = {
     let ACTOR_NAME : Text = "ProfileAvatar";
-    
+    let MAX_BYTES = 2_000_000;
+
     type Image = {
         content: Blob
     };
@@ -22,10 +23,11 @@ actor ProfileAvatar = {
     };
 
     public shared func save(image: Image, username: Username) : async () {
+        if (image.content.size() > MAX_BYTES) {
+            return ();
+        };
+
         avatars.put(username, image);
-
-        Debug.print(debug_show(("added")));
-
     };
 
     public shared query func http_request(req : Types.HttpRequest) : async Types.HttpResponse {

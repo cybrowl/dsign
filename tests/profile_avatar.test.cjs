@@ -79,3 +79,27 @@ test('Profile Avatar: should NOT find avatar', async function (t) {
 
 	t.strictEqual(response.statusCode, 404);
 });
+
+
+test('Profile Avatar: save over 2MB()', async function (t) {
+	try {
+		const imageAsBuffer = fs.readFileSync('tests/images/image_2MB.png');
+
+		// covert to unit 8 array
+		const imageAsUnit8ArrayBuffer = new Uint8Array(imageAsBuffer);
+		const image = {
+			content: [...imageAsUnit8ArrayBuffer]
+		};
+
+		const response = await profileAvatar.save(image, 'mishito');
+	} catch (err) {
+		console.error(err);
+	}
+});
+
+test('Profile Avatar: should NOT find avatar', async function (t) {
+	const path = 'https://kqlfj-siaaa-aaaag-aaawq-cai.raw.ic0.app/avatar/mishito?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai';
+	let response = await callImageCanister(path);
+
+	t.strictEqual(response.statusCode, 404);
+});
