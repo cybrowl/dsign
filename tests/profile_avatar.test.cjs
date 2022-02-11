@@ -14,8 +14,7 @@ global.fetch = fetch;
 let Mishi = Ed25519KeyIdentity.generate();
 const canisterId = canisterIds.profile_avatar.local;
 let profileAvatar = null;
-
-
+let avatarCanister = "rno2w-sqaaa-aaaaa-aaacq-cai";
 
 function callImageCanister(path) {
 	const options = {
@@ -67,14 +66,14 @@ test('Profile Avatar: save()', async function (t) {
 });
 
 test('Profile Avatar: should find avatar', async function (t) {
-	const path = 'https://kqlfj-siaaa-aaaag-aaawq-cai.raw.ic0.app/avatar/mishi?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai';
+	const path = `https://kqlfj-siaaa-aaaag-aaawq-cai.raw.ic0.app/avatar/mishi?canisterId=${avatarCanister}`;
 	let response = await callImageCanister(path);
 
 	t.strictEqual(response.statusCode, 200);
 });
 
 test('Profile Avatar: should NOT find avatar', async function (t) {
-	const path = 'https://kqlfj-siaaa-aaaag-aaawq-cai.raw.ic0.app/avatar/mish?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai';
+	const path = `https://kqlfj-siaaa-aaaag-aaawq-cai.raw.ic0.app/avatar/mish?canisterId=${avatarCanister}`;
 	let response = await callImageCanister(path);
 
 	t.strictEqual(response.statusCode, 404);
@@ -98,7 +97,7 @@ test('Profile Avatar: save over 2MB()', async function (t) {
 });
 
 test('Profile Avatar: should NOT find avatar', async function (t) {
-	const path = 'https://kqlfj-siaaa-aaaag-aaawq-cai.raw.ic0.app/avatar/mishito?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai';
+	const path = `https://kqlfj-siaaa-aaaag-aaawq-cai.raw.ic0.app/avatar/mishito?canisterId=${avatarCanister}`;
 	let response = await callImageCanister(path);
 
 	t.strictEqual(response.statusCode, 404);

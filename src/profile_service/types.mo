@@ -12,19 +12,9 @@ module {
 
     public type Tags = [Text];
 
-    public type HeaderField = (Text, Text);
-
-    public type HttpRequest = {
-        url : Text;
-        method : Text;
-        body : Blob;
-        headers : [HeaderField];
-    };
-
-    public type HttpResponse = {
-        body : Blob;
-        headers : [HeaderField];
-        status_code : Nat16;
+    public type User = {
+        ID: UserID;
+        username: Username;
     };
 
     public type Canister = {
@@ -47,6 +37,21 @@ module {
     };
 
     public type ProfileError = { #ProfileNotFound; };
+
+    public type HeaderField = (Text, Text);
+
+    public type HttpRequest = {
+        url : Text;
+        method : Text;
+        body : Blob;
+        headers : [HeaderField];
+    };
+
+    public type HttpResponse = {
+        body : Blob;
+        headers : [HeaderField];
+        status_code : Nat16;
+    };
 
     public type ProfileActor = actor {
         ping : query () -> async Text;

@@ -19,14 +19,15 @@ actor ProfileManager {
     type Profile = Types.Profile;
     type ProfileActor = Types.ProfileActor;
     type ProfileManagerError = Types.ProfileManagerError;
+    type User = Types.User;
     type UserID = Types.UserID;
     type Username = Types.Username;
 
     let ACTOR_NAME : Text = "ProfileManager";
 
     // User Data Management
-    var usernames : HashMap.HashMap<Username, UserID> = HashMap.HashMap(1, Text.equal, Text.hash);
-    stable var usernamesEntries : [(Username, UserID)] = [];
+    var usernames : HashMap.HashMap<Username, User> = HashMap.HashMap(1, Text.equal, Text.hash);
+    stable var usernamesEntries : [(Username, User)] = [];
 
     var canisterIDs : HashMap.HashMap<UserID, CanisterID> = HashMap.HashMap(1, Text.equal, Text.hash);
     stable var canisterIDsEntries : [(UserID, CanisterID)] = [];
@@ -42,6 +43,7 @@ actor ProfileManager {
         return "meow";
     };
 
+    // User Data Management
     public query (msg) func has_account() : async Bool  {
         let userId : UserID = Principal.toText(msg.caller);
 
@@ -68,13 +70,14 @@ actor ProfileManager {
             case (null) {
                 // check username available
                 switch (usernames.get(username)) {
-                    case (?userId) {
+                    case (?user) {
                         await Logger.log_event(tags, "username_taken");
                         #err(#UsernameTaken)
                     };
                     case (null) {
+                        let user : User = {ID = userId; username = username};
                         // add username and assign canister id
-                        usernames.put(username, userId);
+                        usernames.put(username, user);
                         canisterIDs.put(userId, currentEmptyCanisterID);
 
                         // create account in profile
@@ -115,6 +118,7 @@ actor ProfileManager {
         };
     };
 
+    // Canister Management
     private func create_canister() : async () {
         let tags = [ACTOR_NAME, "create_canister"];
 
@@ -177,7 +181,7 @@ actor ProfileManager {
     };
 
     system func postupgrade() {
-        usernames := HashMap.fromIter<Username, UserID>(usernamesEntries.vals(), 1, Text.equal, Text.hash);
+        usernames := HashMap.fromIter<Username, User>(usernamesEntries.vals(), 1, Text.equal, Text.hash);
         usernamesEntries := [];
 
         canisterIDs := HashMap.fromIter<UserID, CanisterID>(canisterIDsEntries.vals(), 1, Text.equal, Text.hash);
