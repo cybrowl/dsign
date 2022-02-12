@@ -9,6 +9,7 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
+import Avatar "Avatar";
 import Logger "canister:logger";
 import Profile "Profile";
 import Types "./types";
@@ -40,10 +41,10 @@ actor ProfileManager {
     var canisterAvatarIDs : HashMap.HashMap<UserID, CanisterID> = HashMap.HashMap(1, Text.equal, Text.hash);
     stable var canisterAvatarIDsEntries : [(UserID, CanisterID)] = [];
 
-    // Canister Management
+    // Canister Data Management
     stable var anchorTime = Time.now();
+    stable var currentEmptyAvatarCanisterID : Text = "";
     stable var currentEmptyProfileCanisterID : Text = "";
-    stable var currentEmptyAvatarCanisterID : Text = "rno2w-sqaaa-aaaaa-aaacq-cai";
 
     var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
     stable var canisterCacheEntries : [(CanisterID, Canister)] = [];
@@ -52,7 +53,7 @@ actor ProfileManager {
         return "meow";
     };
 
-    // User Data Management
+    // User Logic Management
     public query (msg) func has_account() : async Bool  {
         let userId : UserID = Principal.toText(msg.caller);
 
@@ -158,12 +159,36 @@ actor ProfileManager {
         };
     };
 
-    // Canister Management
-    private func create_canister() : async () {
-        let tags = [ACTOR_NAME, "create_canister"];
+    // Canister Logic Management
+    private func create_avatar_canister() : async () {
+        let tags = [ACTOR_NAME, "create_avatar_canister"];
 
         // create canister
-        // Cycles.add(1000000000000);
+        Cycles.add(1000000000000);
+        let avatarActor = await Avatar.Avatar();
+        let principal = Principal.fromActor(avatarActor);
+        let canisterID = Principal.toText(principal);
+
+        // add to canister cache
+        let canister : Canister = {
+            ID = canisterID;
+            creation = Time.now();
+            isFull = false;
+        };
+
+        canisterCache.put(canisterID, canister);
+
+        // update current empty canister ID
+        currentEmptyAvatarCanisterID := canisterID;
+
+        await Logger.log_event(tags, debug_show(("avatar_canister_created", canisterID)));
+    };
+
+    private func create_profile_canister() : async () {
+        let tags = [ACTOR_NAME, "create_profile_canister"];
+
+        // create canister
+        Cycles.add(1000000000000);
         let profileActor = await Profile.Profile();
         let principal = Principal.fromActor(profileActor);
         let canisterID = Principal.toText(principal);
@@ -180,7 +205,7 @@ actor ProfileManager {
         // update current empty canister ID
         currentEmptyProfileCanisterID := canisterID;
 
-        await Logger.log_event(tags, debug_show(("canister_created", canisterID)));
+        await Logger.log_event(tags, debug_show(("profile_canister_created", canisterID)));
     };
 
     system func heartbeat() : async () {
@@ -193,22 +218,38 @@ actor ProfileManager {
 
             anchorTime := now;
 
-            // initialize first canister
-            if (currentEmptyProfileCanisterID.size() < 1) {
-                await Logger.log_event(tags, debug_show(("first_canister_created")));
-                await Logger.log_event(tags, debug_show(("currentEmptyProfileCanisterID", currentEmptyProfileCanisterID)));
+            // initialize first avatar canister
+            if (currentEmptyAvatarCanisterID.size() < 1) {
+                await Logger.log_event(tags, debug_show(("Initialize: currentEmptyAvatarCanisterID", currentEmptyAvatarCanisterID)));
 
-                await create_canister();
+                await create_avatar_canister();
             };
 
-            // check if current canister is full
-            //TODO: test in Prod
-            let profile = actor (currentEmptyProfileCanisterID) : ProfileActor;
-            let isFull = await profile.is_full();
+            // initialize first profile canister
+            if (currentEmptyProfileCanisterID.size() < 1) {
+                await Logger.log_event(tags, debug_show(("Initialize: currentEmptyProfileCanisterID", currentEmptyProfileCanisterID)));
 
-            if (isFull) {
-                await Logger.log_event(tags, "currentEmptyProfileCanisterID_isFull");
-                await create_canister();
+                await create_profile_canister();
+            };
+
+            // check if avatar canister is full
+            //TODO: test in Prod
+            let avatarActor = actor (currentEmptyAvatarCanisterID) : AvatarActor;
+            let isAvatarCanisterFull = await avatarActor.is_full();
+
+            if (isAvatarCanisterFull) {
+                await Logger.log_event(tags, "avatar_canister_is_full");
+                await create_avatar_canister();
+            };
+
+            // check if profile canister is full
+            //TODO: test in Prod
+            let profileActor = actor (currentEmptyProfileCanisterID) : ProfileActor;
+            let isProfileCanisterFull = await profileActor.is_full();
+
+            if (isProfileCanisterFull) {
+                await Logger.log_event(tags, "profile_canister_is_full");
+                await create_profile_canister();
             };
         }
     };

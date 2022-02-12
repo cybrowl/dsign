@@ -59,6 +59,7 @@ module {
 
     public type AvatarActor = actor {
         ping : query () -> async Text;
+        is_full : query () -> async Bool;
         set : shared (Image, Username) -> async ();
         http_request : shared query HttpRequest -> async HttpResponse;
     };

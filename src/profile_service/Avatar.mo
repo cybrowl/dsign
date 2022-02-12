@@ -1,12 +1,14 @@
-import Text "mo:base/Text";
 import Debug "mo:base/Debug";
+import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
+import Prim "mo:⛔";
+import Text "mo:base/Text";
 
 import Logger "canister:logger";
 import Utils "./utils";
 import Types "./types";
 
-actor Avatar = {
+actor class Avatar() = {
     type HttpRequest = Types.HttpRequest;
     type HttpResponse = Types.HttpResponse;
     type Image = Types.Image;
@@ -19,6 +21,21 @@ actor Avatar = {
 
     public query func ping() : async Text {
         return "meow";
+    };
+
+    public func is_full() : async Bool {
+        // TODO: change to query
+        let MAX_SIZE_THRESHOLD_MB : Float = 3500;
+
+        let rtsMemorySize : Nat = Prim.rts_memory_size();
+        let memSize : Float = Float.fromInt(rtsMemorySize);
+        let memoryInMegabytes =  Float.abs(memSize * 0.000001);
+
+        if (memoryInMegabytes > MAX_SIZE_THRESHOLD_MB) {
+            return true;
+        } else {
+            return false;
+        }
     };
 
     public shared func set(avatar: Image, username: Username) : async () {
