@@ -49,6 +49,7 @@ actor ProfileManager {
     var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
     stable var canisterCacheEntries : [(CanisterID, Canister)] = [];
 
+    // Canister Logic Utils
     public func ping() : async Text {
         return "meow";
     };
