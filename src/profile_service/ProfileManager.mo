@@ -195,7 +195,7 @@ actor ProfileManager {
 
         // create canister
         Cycles.add(1000000000000);
-        let profileActor = await Profile.Profile(profileManagerPrincipal);
+        let profileActor = await Profile.Profile(profileManagerPrincipal, currentEmptyAvatarCanisterID);
         let principal = Principal.fromActor(profileActor);
         let canisterID = Principal.toText(principal);
 

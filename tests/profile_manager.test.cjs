@@ -13,6 +13,7 @@ global.fetch = fetch;
 
 let Mishi = Ed25519KeyIdentity.generate();
 const canisterId = canisterIds.profile_manager.local;
+
 let profileManager = null;
 const username = fake.word();
 
@@ -64,5 +65,5 @@ test('Profile Manager: get_profile()', async function (t) {
 
 	console.log('profile: ', response);
 
-	t.equal(response.ok.avatar, `http://127.0.0.1:8000/avatar/${username}`)
+	t.ok(response.ok.avatar);
 });

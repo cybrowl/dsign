@@ -10,7 +10,7 @@ import Time "mo:base/Time";
 import Logger "canister:logger";
 import Types "./types";
 
-actor class Profile(profileManagerPrincipal : Principal) = {
+actor class Profile(profileManagerPrincipal : Principal, avatarCanisterId : Text) = {
     type UserID = Types.UserID;
     type Username = Types.Username;
     type Profile = Types.Profile;
@@ -22,6 +22,7 @@ actor class Profile(profileManagerPrincipal : Principal) = {
     var profiles : HashMap.HashMap<UserID, Profile> = HashMap.HashMap(1, Text.equal, Text.hash);
     var isProduction : Bool = false;
     var host : Text = "";
+    var canisterId : Text = "";
 
     if (isProduction) {
         host := "https://kqlfj-siaaa-aaaag-aaawq-cai.raw.ic0.app";
@@ -29,6 +30,7 @@ actor class Profile(profileManagerPrincipal : Principal) = {
         host := "http://127.0.0.1:8000";
     };
 
+    // Canister Management
     public query func ping() : async Text {
         return "meow";
     };
@@ -52,6 +54,7 @@ actor class Profile(profileManagerPrincipal : Principal) = {
         }
     };
 
+    // User Logic
     public func create(userId : UserID, username : Username) : async () {
         // let specialtyFields : [Tags] = [["designer"]];
 
@@ -66,10 +69,18 @@ actor class Profile(profileManagerPrincipal : Principal) = {
     };
 
     public func set_avatar(userId : UserID, username : Username) : async () {
+        var profileAvatar : Text = "";
+
+        if (isProduction) {
+            profileAvatar := Text.join("", ([host,"/avatar/",username].vals()));
+        } else {
+            profileAvatar := Text.join("", ([host,"/avatar/",username, "?canisterId=", canisterId].vals()));
+        };
+
         switch (profiles.get(userId)) {
             case (?profile) {
                 let profileUpdated : Profile =  {
-                    avatar = Text.join("", ([host,"/avatar/",username].vals()));
+                    avatar = profileAvatar;
                     username = profile.username;
                     created = profile.created;
                     website = profile.website;
@@ -95,9 +106,13 @@ actor class Profile(profileManagerPrincipal : Principal) = {
     system func heartbeat() : async () {
         let tags = [ACTOR_NAME, "heartbeat"];
 
-        let parentPrincipal : Text = Principal.toText(profileManagerPrincipal);
+        if (canisterId.size() == 0) {
+            canisterId := avatarCanisterId;
+        };
 
         if (isProduction == false) {
+            let parentPrincipal : Text = Principal.toText(profileManagerPrincipal);
+
             if (Text.equal(parentPrincipal, "inwlb-baaaa-aaaag-aaaza-cai")) {
                 isProduction := true;
             };
