@@ -53,6 +53,10 @@ actor ProfileManager {
         return "meow";
     };
 
+    public shared (msg) func whoami() : async Principal {
+        return msg.caller;
+    };
+
     // User Logic Management
     public query (msg) func has_account() : async Bool  {
         let userId : UserID = Principal.toText(msg.caller);
@@ -186,10 +190,11 @@ actor ProfileManager {
 
     private func create_profile_canister() : async () {
         let tags = [ACTOR_NAME, "create_profile_canister"];
+        let profileManagerPrincipal =  await whoami();
 
         // create canister
         Cycles.add(1000000000000);
-        let profileActor = await Profile.Profile();
+        let profileActor = await Profile.Profile(profileManagerPrincipal);
         let principal = Principal.fromActor(profileActor);
         let canisterID = Principal.toText(principal);
 

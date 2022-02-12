@@ -10,7 +10,7 @@ import Time "mo:base/Time";
 import Logger "canister:logger";
 import Types "./types";
 
-actor class Profile() = this {
+actor class Profile(profileManagerPrincipal : Principal) = {
     type UserID = Types.UserID;
     type Username = Types.Username;
     type Profile = Types.Profile;
@@ -95,10 +95,10 @@ actor class Profile() = this {
     system func heartbeat() : async () {
         let tags = [ACTOR_NAME, "heartbeat"];
 
-        let canisterId : Text = Principal.toText(Principal.fromActor(this));
+        let parentPrincipal : Text = Principal.toText(profileManagerPrincipal);
 
         if (isProduction == false) {
-            if (Text.equal(canisterId, "inwlb-baaaa-aaaag-aaaza-cai")) {
+            if (Text.equal(parentPrincipal, "inwlb-baaaa-aaaag-aaaza-cai")) {
                 isProduction := true;
             };
         };
