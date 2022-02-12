@@ -7,12 +7,14 @@ const {
 } = require('../.dfx/local/canisters/profile_manager/profile_manager.did.test.cjs');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
 const fs = require('fs');
+const fake = require('fake-words');
 
 global.fetch = fetch;
 
 let Mishi = Ed25519KeyIdentity.generate();
 const canisterId = canisterIds.profile_manager.local;
 let profileManager = null;
+const username = fake.word();
 
 test('Profile Manager: ping()', async function (t) {
 	profileManager = await getActor(canisterId, idlFactory, Mishi);
@@ -24,8 +26,9 @@ test('Profile Manager: ping()', async function (t) {
 });
 
 test('Profile Manager: create_profile()', async function (t) {
-	const username = 'mouse3';
 	const response = await profileManager.create_profile(username);
+
+	t.strictEqual(response.ok, 'profile_created');
 });
 
 test('Profile Manager: get_profile()', async function (t) {
@@ -33,8 +36,7 @@ test('Profile Manager: get_profile()', async function (t) {
 
 	const response = await profileManager.get_profile();
 
-	console.log("profile: ", response);
-
+	t.equal(response.ok.username, username);
 });
 
 test('Profile Manager: set_avatar()', async function (t) {
@@ -48,6 +50,8 @@ test('Profile Manager: set_avatar()', async function (t) {
 		};
 
 		const response = await profileManager.set_avatar(avatar);
+
+		t.equal(response.ok, 'avatar_created');
 	} catch (err) {
 		console.error(err);
 	}
@@ -58,6 +62,7 @@ test('Profile Manager: get_profile()', async function (t) {
 
 	const response = await profileManager.get_profile();
 
-	console.log("profile: ", response);
+	console.log('profile: ', response);
 
+	t.equal(response.ok.avatar, `http://127.0.0.1:8000/avatar/${username}`)
 });
