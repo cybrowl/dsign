@@ -4,10 +4,12 @@
 	import { profileStorage } from '../store/local_storage';
 	import { profileManager } from '../store/profile_manager';
 	import Logout from './Logout.svelte';
+	import _ from 'lodash';
 
 	let profilePromise = $profileManager.actor.get_profile();
 	let username = $profileStorage.username;
 	let files;
+	let count = 0;
 
 	function handleSettingsModal() {
 		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
@@ -22,6 +24,13 @@
 		};
 
 		await $profileManager.actor.set_avatar(avatar);
+		let { ok: profile } = await $profileManager.actor.get_profile();
+
+		profileStorage.set({
+			avatar: _.get(profile, 'avatar', '') + '&' + count++,
+			username: _.get(profile, 'username', ''),
+			website: ''
+		});
 	}
 </script>
 
@@ -54,7 +63,8 @@
 		</div>
 		<div class="relative h-96">
 			<div
-				class="m-2 ml-8 mr-2 w-16 h-16 flex justify-center items-center rounded-full bg-indigo-800 text-xl text-white uppercase cursor-pointer"
+				class="m-2 ml-8 mr-2 w-16 h-16 flex justify-center items-center rounded-full 
+				bg-indigo-800 text-xl text-white uppercase cursor-pointer"
 				on:click={() => {}}
 			>
 				<p class="cursor-pointer">
