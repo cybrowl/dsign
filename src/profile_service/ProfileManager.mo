@@ -35,11 +35,11 @@ actor ProfileManager {
     var usernames : HashMap.HashMap<UserID, Username> = HashMap.HashMap(1, Text.equal, Text.hash);
     stable var usernamesEntries : [(UserID, Username)] = [];
 
-    var canisterProfileIDs : HashMap.HashMap<UserID, CanisterID> = HashMap.HashMap(1, Text.equal, Text.hash);
-    stable var canisterProfileIDsEntries : [(UserID, CanisterID)] = [];
+    var canisterProfileIds : HashMap.HashMap<UserID, CanisterID> = HashMap.HashMap(1, Text.equal, Text.hash);
+    stable var canisterProfileIdsEntries : [(UserID, CanisterID)] = [];
 
-    var canisterAvatarIDs : HashMap.HashMap<UserID, CanisterID> = HashMap.HashMap(1, Text.equal, Text.hash);
-    stable var canisterAvatarIDsEntries : [(UserID, CanisterID)] = [];
+    var canisterAvatarIds : HashMap.HashMap<UserID, CanisterID> = HashMap.HashMap(1, Text.equal, Text.hash);
+    stable var canisterAvatarIdsEntries : [(UserID, CanisterID)] = [];
 
     // Canister Data Management
     stable var anchorTime = Time.now();
@@ -61,7 +61,7 @@ actor ProfileManager {
     public query (msg) func has_account() : async Bool  {
         let userId : UserID = Principal.toText(msg.caller);
 
-        switch (canisterProfileIDs.get(userId)) {
+        switch (canisterProfileIds.get(userId)) {
             // check user exists
             case (?canisterID) {
                 return true;
@@ -77,7 +77,7 @@ actor ProfileManager {
         switch (usernames.get(userId)) {
             case (?username) {
                 // save to get avatar canister id with userId
-                canisterAvatarIDs.put(userId, currentEmptyAvatarCanisterID);
+                canisterAvatarIds.put(userId, currentEmptyAvatarCanisterID);
 
                 // call avatar canister and set avatar
                 let avatarActor = actor (currentEmptyAvatarCanisterID) : AvatarActor;
@@ -102,7 +102,7 @@ actor ProfileManager {
         let tags = [ACTOR_NAME, "create_profile"];
         let userId : UserID = Principal.toText(msg.caller);
 
-        switch (canisterProfileIDs.get(userId)) {
+        switch (canisterProfileIds.get(userId)) {
             // check user exists
             case (?canisterID) {
                 await Logger.log_event(tags, "userId_exists");
@@ -123,7 +123,7 @@ actor ProfileManager {
                         usernames.put(userId, username);
 
                         // save to get profile canister id with userId
-                        canisterProfileIDs.put(userId, currentEmptyProfileCanisterID);
+                        canisterProfileIds.put(userId, currentEmptyProfileCanisterID);
 
                         // create username in profile
                         let profile = actor (currentEmptyProfileCanisterID) : ProfileActor;
@@ -141,7 +141,7 @@ actor ProfileManager {
         let tags = [ACTOR_NAME, "get_profile"];
         let userId : UserID = Principal.toText(msg.caller);
 
-        switch (canisterProfileIDs.get(userId)) {
+        switch (canisterProfileIds.get(userId)) {
             case (null) {
                 await Logger.log_event(tags, debug_show(("canisterId_not_found", userId)));
                 #err(#CanisterIdNotFound)
@@ -260,19 +260,27 @@ actor ProfileManager {
     };
 
     system func preupgrade() {
-        // usernamesEntries := Iter.toArray(usernames.entries());
-        // canisterProfileIDsEntries := Iter.toArray(canisterProfileIDs.entries());
-        // canisterCacheEntries := Iter.toArray(canisterCache.entries());
+        userIdsEntries := Iter.toArray(userIds.entries());
+        usernamesEntries := Iter.toArray(usernames.entries());
+        canisterProfileIdsEntries := Iter.toArray(canisterProfileIds.entries());
+        canisterAvatarIdsEntries := Iter.toArray(canisterAvatarIds.entries());
+        canisterCacheEntries := Iter.toArray(canisterCache.entries());
     };
 
     system func postupgrade() {
-        // usernames := HashMap.fromIter<Username, UserID>(usernamesEntries.vals(), 1, Text.equal, Text.hash);
-        // usernamesEntries := [];
+        userIds := HashMap.fromIter<Username, UserID>(userIdsEntries.vals(), 1, Text.equal, Text.hash);
+        userIdsEntries := [];
 
-        // canisterProfileIDs := HashMap.fromIter<UserID, CanisterID>(canisterProfileIDsEntries.vals(), 1, Text.equal, Text.hash);
-        // canisterProfileIDsEntries := [];
+        usernames := HashMap.fromIter<UserID, Username>(usernamesEntries.vals(), 1, Text.equal, Text.hash);
+        usernamesEntries := [];
 
-        // canisterCache := HashMap.fromIter<CanisterID, Canister>(canisterCacheEntries.vals(), 1, Text.equal, Text.hash);
-        // canisterCacheEntries := [];
+        canisterAvatarIds := HashMap.fromIter<UserID, CanisterID>(canisterAvatarIdsEntries.vals(), 1, Text.equal, Text.hash);
+        canisterAvatarIdsEntries := [];
+
+        canisterProfileIds := HashMap.fromIter<UserID, CanisterID>(canisterProfileIdsEntries.vals(), 1, Text.equal, Text.hash);
+        canisterProfileIdsEntries := [];
+
+        canisterCache := HashMap.fromIter<CanisterID, Canister>(canisterCacheEntries.vals(), 1, Text.equal, Text.hash);
+        canisterCacheEntries := [];
     };
 };
