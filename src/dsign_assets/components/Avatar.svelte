@@ -3,12 +3,10 @@
 	import { isSettingsActive, isAccountCreationActive } from '../store/modal';
 	import { profileManager } from '../store/profile_manager';
 	import { profileStorage } from '../store/local_storage';
+	import _ from 'lodash';
 
-	let profile = {
-		avatar: 'http://127.0.0.1:8000/avatar/Pacom?canisterId=qoctq-giaaa-aaaaa-aaaea-cai'
-	};
 	let hasAccount = false;
-	let hasAvatar = profile.avatar.length > 3 || false;
+	let hasAvatar = $profileStorage.avatar.length > 3 || false;
 	let hasUsername = $profileStorage.username.length > 0 || false;
 
 	// call profile manager canister
@@ -17,12 +15,15 @@
 
 	onMount(async () => {
 		hasAccount = await hasAccountPromise;
-		({ ok: profile } = await profilePromise);
+		let { ok: profile } = await profilePromise;
 
 		if (!hasUsername) {
 			//TODO: fix bug when user logout
 			//TODO: set when logout/login
-			profileStorage.set({ username: profile.username });
+			profileStorage.set({
+				avatar: _.get(profile, 'avatar', ''),
+				username: _.get(profile, 'username', '')
+			});
 		}
 	});
 
@@ -41,12 +42,13 @@
 	<img
 		alt="avatar"
 		class="rounded-full w-20"
-		src={profile.avatar}
+		src={$profileStorage.avatar}
 		on:click={handleSettingsModal}
 	/>
 {:else}
 	<div
-		class="m-2 mr-2 w-16 h-16 flex justify-center items-center rounded-full bg-indigo-800 text-xl text-white uppercase cursor-pointer"
+		class="m-2 mr-2 w-16 h-16 flex justify-center items-center rounded-full 
+		bg-indigo-800 text-xl text-white uppercase cursor-pointer"
 		on:click={handleSettingsModal}
 	>
 		<p class="cursor-pointer">

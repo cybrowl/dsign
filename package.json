@@ -19,6 +19,7 @@
     "@dfinity/candid": "0.10.2",
     "@dfinity/identity": "^0.10.2",
     "@dfinity/principal": "0.10.2",
+    "lodash": "^4.17.21",
     "svelte-local-storage-store": "^0.2.6"
   },
   "devDependencies": {

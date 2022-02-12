@@ -12,6 +12,17 @@
 	function handleSettingsModal() {
 		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
 	}
+
+	async function handleAvatarChange() {
+		const selectedFile = files[0];
+
+		const imageAsUnit8ArrayBuffer = new Uint8Array(await selectedFile.arrayBuffer());
+		const avatar = {
+			content: [...imageAsUnit8ArrayBuffer]
+		};
+
+		await $profileManager.actor.set_avatar(avatar);
+	}
 </script>
 
 <div
@@ -51,8 +62,7 @@
 					{$profileStorage.username.charAt($profileStorage.username.length - 1)}
 				</p>
 			</div>
-			<input type="file" bind:files />
-			{console.info('files: ', files)}
+			<input type="file" bind:files on:change={handleAvatarChange} />
 			<div class="m-10">
 				{#if username}
 					<h4>Username</h4>
