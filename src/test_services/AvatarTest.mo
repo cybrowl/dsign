@@ -32,6 +32,12 @@ let success = run([
 
       assertTrue(Text.equal(username, "heyday"));
     }),
+    it("should get username with extra /", do {
+      let url = "https://dsign.ic/avatar/heyday&";
+      let username = Utils.get_username(url);
+
+      assertTrue(Text.equal(username, "heyday"));
+    }),
   ]),
 ]);
 

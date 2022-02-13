@@ -13,6 +13,13 @@
       ],
       "type": "assets"
     },
+    "profile": {
+      "main": "src/profile_service/Profile.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger"
+      ]
+    },
     "profile_avatar": {
       "main": "src/profile_service/Avatar.mo",
       "type": "motoko",

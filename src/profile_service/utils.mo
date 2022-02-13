@@ -3,14 +3,15 @@ import Iter "mo:base/Iter";
 
 module {
     public func get_username(url: Text): Text {
-        let urlSplitByParams : [Text] = Iter.toArray(Text.tokens(url, #char '?'));
-        let urlSplitByPath : [Text] = Iter.toArray(Text.tokens(urlSplitByParams[0], #char '/'));
-        let username : Text = urlSplitByPath[urlSplitByPath.size() - 1];
-
-        if (urlSplitByParams.size() == 0) {
+        if (url.size() == 0) {
             return ""
         };
 
-        return username;
+        let urlSplitByPath : [Text] = Iter.toArray(Text.tokens(url, #char '/'));
+        let lastElem : Text = urlSplitByPath[urlSplitByPath.size() - 1];
+        let filterByQueryString : [Text] = Iter.toArray(Text.tokens(lastElem, #char '?'));
+        let filterBySeparator : [Text] = Iter.toArray(Text.tokens(filterByQueryString[0], #char '&'));
+
+        return filterBySeparator[0];
     };
 }

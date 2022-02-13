@@ -43,8 +43,8 @@ actor ProfileManager {
 
     // Canister Data Management
     stable var anchorTime = Time.now();
-    stable var currentEmptyAvatarCanisterID : Text = "";
-    stable var currentEmptyProfileCanisterID : Text = "";
+    stable var currentEmptyAvatarCanisterID : Text = "cljm4-uiaaa-aaaag-aabcq-cai";
+    stable var currentEmptyProfileCanisterID : Text = "kxkd5-7qaaa-aaaag-aaawa-cai";
 
     var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
     stable var canisterCacheEntries : [(CanisterID, Canister)] = [];
@@ -192,10 +192,11 @@ actor ProfileManager {
     private func create_profile_canister() : async () {
         let tags = [ACTOR_NAME, "create_profile_canister"];
         let profileManagerPrincipal =  await whoami();
+        let profileManagerPrincipalText = Principal.toText(profileManagerPrincipal);
 
         // create canister
         Cycles.add(1000000000000);
-        let profileActor = await Profile.Profile(profileManagerPrincipal, currentEmptyAvatarCanisterID);
+        let profileActor = await Profile.Profile(profileManagerPrincipalText, currentEmptyAvatarCanisterID);
         let principal = Principal.fromActor(profileActor);
         let canisterID = Principal.toText(principal);
 

@@ -10,7 +10,7 @@ import Time "mo:base/Time";
 import Logger "canister:logger";
 import Types "./types";
 
-actor class Profile(profileManagerPrincipal : Principal, avatarCanisterId : Text) = {
+actor class Profile(profileManagerPrincipalText : Text, avatarCanisterId : Text) = {
     type UserID = Types.UserID;
     type Username = Types.Username;
     type Profile = Types.Profile;
@@ -22,10 +22,13 @@ actor class Profile(profileManagerPrincipal : Principal, avatarCanisterId : Text
     var profiles : HashMap.HashMap<UserID, Profile> = HashMap.HashMap(1, Text.equal, Text.hash);
     var isProduction : Bool = false;
     var host : Text = "";
-    var canisterId : Text = "";
+
+    if (Text.equal(profileManagerPrincipalText, "inwlb-baaaa-aaaag-aaaza-cai")) {
+        isProduction := true;
+    };
 
     if (isProduction) {
-        host := "https://kqlfj-siaaa-aaaag-aaawq-cai.raw.ic0.app";
+        host := Text.join("", (["https://", avatarCanisterId, ".raw.ic0.app"].vals()));
     } else {
         host := "http://127.0.0.1:8000";
     };
@@ -74,7 +77,7 @@ actor class Profile(profileManagerPrincipal : Principal, avatarCanisterId : Text
         if (isProduction) {
             profileAvatar := Text.join("", ([host,"/avatar/",username].vals()));
         } else {
-            profileAvatar := Text.join("", ([host,"/avatar/",username, "?canisterId=", canisterId].vals()));
+            profileAvatar := Text.join("", ([host,"/avatar/",username, "?canisterId=", avatarCanisterId].vals()));
         };
 
         switch (profiles.get(userId)) {
@@ -99,22 +102,6 @@ actor class Profile(profileManagerPrincipal : Principal, avatarCanisterId : Text
             };
             case (?profile) {
                 return #ok(profile);
-            };
-        };
-    };
-
-    system func heartbeat() : async () {
-        let tags = [ACTOR_NAME, "heartbeat"];
-
-        if (canisterId.size() == 0) {
-            canisterId := avatarCanisterId;
-        };
-
-        if (isProduction == false) {
-            let parentPrincipal : Text = Principal.toText(profileManagerPrincipal);
-
-            if (Text.equal(parentPrincipal, "inwlb-baaaa-aaaag-aaaza-cai")) {
-                isProduction := true;
             };
         };
     };
