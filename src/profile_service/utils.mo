@@ -29,9 +29,11 @@ module {
             compare.add(img[i]);
         };
 
-        let isPNG = Array.equal(png, compare.toArray(), isEq);
-        let isJPEG = Array.equal(jpeg, compare.toArray(), isEq);
-        let isJPEG2 = Array.equal(jpeg2, compare.toArray(), isEq);
+        let compareArr = compare.toArray();
+
+        let isPNG = Array.equal(png, compareArr, isEq);
+        let isJPEG = Array.equal(jpeg, compareArr, isEq);
+        let isJPEG2 = Array.equal(jpeg2, compareArr, isEq);
 
         if (isPNG) {
             return true;
