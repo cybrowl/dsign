@@ -14,7 +14,7 @@ let pending = ActorSpec.pending;
 let run = ActorSpec.run;
 
 let success = run([
-  describe("Profile Service Avatar Test Suite", [
+  describe("Utils: get_username", [
     it("should get username when params exist", do {
       let url = "https://dsign.ic/avatar/heyday?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai";
       let username = Utils.get_username(url);
@@ -40,7 +40,13 @@ let success = run([
       assertTrue(Text.equal(username, "heyday"));
     }),
   ]),
-  describe("Image Validity", [
+  describe("Utils: is_valid_image", [
+    it("should return true for GIF image", do {
+      let gifImage : [Nat8] = [71,  73,  70,  56];
+      let isValid = Utils.is_valid_image(gifImage);
+
+      assertTrue(isValid);
+    }),
     it("should return true for PNG image", do {
       let pngImage : [Nat8] = [137,  80,  78,  71];
       let isValid = Utils.is_valid_image(pngImage);
@@ -48,14 +54,14 @@ let success = run([
       assertTrue(isValid);
     }),
     it("should return true for JPEG image", do {
-      let pngImage : [Nat8] = [255, 216, 255, 224];
-      let isValid = Utils.is_valid_image(pngImage);
+      let jpgImage : [Nat8] = [255, 216, 255, 224];
+      let isValid = Utils.is_valid_image(jpgImage);
 
       assertTrue(isValid);
     }),
     it("should return true for JPEG2 image", do {
-      let pngImage : [Nat8] = [255, 216, 255, 225];
-      let isValid = Utils.is_valid_image(pngImage);
+      let jpg2Image : [Nat8] = [255, 216, 255, 225];
+      let isValid = Utils.is_valid_image(jpg2Image);
 
       assertTrue(isValid);
     }),
@@ -66,8 +72,8 @@ let success = run([
       assertFalse(isValid);
     }),
     it("should return false for wrong JPEG image", do {
-      let pngImage : [Nat8] = [255, 216, 255, 223];
-      let isValid = Utils.is_valid_image(pngImage);
+      let jpgImage : [Nat8] = [255, 216, 255, 223];
+      let isValid = Utils.is_valid_image(jpgImage);
 
       assertFalse(isValid);
     }),
