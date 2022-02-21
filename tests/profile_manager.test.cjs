@@ -50,6 +50,8 @@ test('Profile Manager: set_avatar()', async function (t) {
 			content: [...imageAsUnit8ArrayBuffer]
 		};
 
+		console.log("avatar: ", avatar);
+
 		const response = await profileManager.set_avatar(avatar);
 
 		t.equal(response.ok, 'avatar_created');

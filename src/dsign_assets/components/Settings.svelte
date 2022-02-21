@@ -6,6 +6,7 @@
 	import Logout from './Logout.svelte';
 	import _ from 'lodash';
 
+	let hasAvatar = $profileStorage.avatar.length > 3 || false;
 	let profilePromise = $profileManager.actor.get_profile();
 	let username = $profileStorage.username;
 	let files;
@@ -26,8 +27,10 @@
 		await $profileManager.actor.set_avatar(avatar);
 		let { ok: profile } = await $profileManager.actor.get_profile();
 
+		count++;
+
 		profileStorage.set({
-			avatar: _.get(profile, 'avatar', '') + '&' + count++,
+			avatar: _.get(profile, 'avatar', '') + '&' + count,
 			username: _.get(profile, 'username', ''),
 			website: ''
 		});
@@ -67,10 +70,25 @@
 				bg-indigo-800 text-xl text-white uppercase cursor-pointer"
 				on:click={() => {}}
 			>
-				<p class="cursor-pointer">
-					{$profileStorage.username.charAt(0)}
-					{$profileStorage.username.charAt($profileStorage.username.length - 1)}
-				</p>
+				{#if hasAvatar}
+					<img
+						alt="avatar"
+						class="rounded-full w-20"
+						src={$profileStorage.avatar}
+						on:click={handleSettingsModal}
+					/>
+				{:else}
+					<div
+						class="m-2 mr-2 w-16 h-16 flex justify-center items-center rounded-full 
+				bg-indigo-800 text-xl text-white uppercase cursor-pointer"
+						on:click={handleSettingsModal}
+					>
+						<p class="cursor-pointer">
+							{$profileStorage.username.charAt(0)}
+							{$profileStorage.username.charAt($profileStorage.username.length - 1)}
+						</p>
+					</div>
+				{/if}
 			</div>
 			<input type="file" bind:files on:change={handleAvatarChange} />
 			<div class="m-10">

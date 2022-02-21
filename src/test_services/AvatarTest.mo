@@ -6,6 +6,7 @@ import ActorSpec "./ActorSpec";
 type Group = ActorSpec.Group;
 
 let assertTrue = ActorSpec.assertTrue;
+let assertFalse = ActorSpec.assertFalse;
 let describe = ActorSpec.describe;
 let it = ActorSpec.it;
 let skip = ActorSpec.skip;
@@ -37,6 +38,38 @@ let success = run([
       let username = Utils.get_username(url);
 
       assertTrue(Text.equal(username, "heyday"));
+    }),
+  ]),
+  describe("Image Validity", [
+    it("should return true for PNG image", do {
+      let pngImage : [Nat8] = [137,  80,  78,  71];
+      let isValid = Utils.is_valid_image(pngImage);
+
+      assertTrue(isValid);
+    }),
+    it("should return true for JPEG image", do {
+      let pngImage : [Nat8] = [255, 216, 255, 224];
+      let isValid = Utils.is_valid_image(pngImage);
+
+      assertTrue(isValid);
+    }),
+    it("should return true for JPEG2 image", do {
+      let pngImage : [Nat8] = [255, 216, 255, 225];
+      let isValid = Utils.is_valid_image(pngImage);
+
+      assertTrue(isValid);
+    }),
+    it("should return false for wrong PNG image", do {
+      let pngImage : [Nat8] = [137,  80,  78,  70];
+      let isValid = Utils.is_valid_image(pngImage);
+
+      assertFalse(isValid);
+    }),
+    it("should return false for wrong JPEG image", do {
+      let pngImage : [Nat8] = [255, 216, 255, 223];
+      let isValid = Utils.is_valid_image(pngImage);
+
+      assertFalse(isValid);
     }),
   ]),
 ]);

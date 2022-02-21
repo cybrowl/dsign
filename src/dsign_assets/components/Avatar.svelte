@@ -17,6 +17,7 @@
 		hasAccount = await hasAccountPromise;
 		let { ok: profile } = await profilePromise;
 
+		// read local storage directly 
 		if (!hasUsername) {
 			//TODO: fix bug when user logout
 			//TODO: set when logout/login

@@ -26,7 +26,7 @@ module {
     };
 
     public type Image = {
-        content: Blob
+        content: [Nat8]
     };
 
     public type HeaderField = (Text, Text);
@@ -34,12 +34,12 @@ module {
     public type HttpRequest = {
         url : Text;
         method : Text;
-        body : Blob;
+        body : [Nat8];
         headers : [HeaderField];
     };
 
     public type HttpResponse = {
-        body : Blob;
+        body : [Nat8];
         headers : [HeaderField];
         status_code : Nat16;
     };

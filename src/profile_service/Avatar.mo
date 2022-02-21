@@ -43,12 +43,15 @@ actor class Avatar() = {
             return ();
         };
 
+        //TODO: check if image is png, jpeg or svg
+        let isValidImg = Utils.is_valid_image(avatar.content);
+
         avatars.put(username, avatar);
     };
 
     public shared query func http_request(req : HttpRequest) : async HttpResponse {
         let username : Text = Utils.get_username(req.url);
-        let NOT_FOUND : Blob = "Not Found";
+        let NOT_FOUND : [Nat8] = [0];
 
         switch (avatars.get(username)) {
             case (?image) {
