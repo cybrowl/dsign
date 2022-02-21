@@ -38,15 +38,20 @@ actor class Avatar() = {
         }
     };
 
-    public shared func set(avatar: Image, username: Username) : async () {
+    public shared func set(avatar: Image, username: Username) : async Bool {
         if (avatar.content.size() > MAX_BYTES) {
-            return ();
+            return false;
         };
 
-        //TODO: check if image is png, jpeg or svg
         let isValidImg = Utils.is_valid_image(avatar.content);
 
+        if (isValidImg == false) {
+            return false;
+        };
+
         avatars.put(username, avatar);
+
+        return true;
     };
 
     public shared query func http_request(req : HttpRequest) : async HttpResponse {

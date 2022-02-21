@@ -45,7 +45,8 @@ module {
     };
 
     public type AvatarError = {
-        #UsernameNotFound
+        #UsernameNotFound;
+        #SetAvatarFailed;
     };
 
     public type ProfileManagerError = {
@@ -60,7 +61,7 @@ module {
     public type AvatarActor = actor {
         ping : query () -> async Text;
         is_full : query () -> async Bool;
-        set : shared (Image, Username) -> async ();
+        set : shared (Image, Username) -> async Bool;
         http_request : shared query HttpRequest -> async HttpResponse;
     };
 

@@ -82,14 +82,18 @@ actor ProfileManager {
 
                 // call avatar canister and set avatar
                 let avatarActor = actor (currentEmptyAvatarCanisterID) : AvatarActor;
-                await avatarActor.set(avatar, username);
+                let isAvatarSet : Bool = await avatarActor.set(avatar, username);
 
-                // call profile canister and set avatar URL
-                let profileActor = actor (currentEmptyProfileCanisterID) : ProfileActor;
-                await profileActor.set_avatar(userId, username);
+                if (isAvatarSet) {
+                    // call profile canister and set avatar URL
+                    let profileActor = actor (currentEmptyProfileCanisterID) : ProfileActor;
+                    await profileActor.set_avatar(userId, username);
 
-                await Logger.log_event(tags, "avatar_created");
-                #ok("avatar_created");
+                    await Logger.log_event(tags, "avatar_created");
+                    #ok("avatar_created");
+                } else {
+                    #err(#SetAvatarFailed);
+                }
             };
             case (null) {
                 await Logger.log_event(tags, "UsernameNotFound");

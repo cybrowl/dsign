@@ -42,7 +42,7 @@ test('Profile Manager: get_profile()', async function (t) {
 
 test('Profile Manager: set_avatar()', async function (t) {
 	try {
-		const imageAsBuffer = fs.readFileSync('tests/images/simulation.gif');
+		const imageAsBuffer = fs.readFileSync('tests/images/motoko.png');
 
 		// covert to unit 8 array
 		const imageAsUnit8ArrayBuffer = new Uint8Array(imageAsBuffer);
