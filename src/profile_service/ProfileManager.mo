@@ -107,6 +107,8 @@ actor ProfileManager {
         let tags = [ACTOR_NAME, "create_profile"];
         let userId : UserID = Principal.toText(msg.caller);
 
+        //TODO: check if is valid username
+        
         switch (canisterProfileIds.get(userId)) {
             // check user exists
             case (?canisterID) {

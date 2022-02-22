@@ -78,6 +78,50 @@ let success = run([
       assertFalse(isValid);
     }),
   ]),
+  describe("Utils: is_valid_username", [
+    it("should return true for valid username", do {
+      let username : Text = "mishicat";
+      let isValid = Utils.is_valid_username(username);
+
+      assertTrue(isValid);
+    }),
+    it("should return true for valid username", do {
+      let username : Text = "mishic4t";
+      let isValid = Utils.is_valid_username(username);
+
+      assertTrue(isValid);
+    }),
+    it("should return true for valid username", do {
+      let username : Text = "mishi123";
+      let isValid = Utils.is_valid_username(username);
+
+      assertTrue(isValid);
+    }),
+    it("should return true for valid username", do {
+      let username : Text = "2323232";
+      let isValid = Utils.is_valid_username(username);
+
+      assertTrue(isValid);
+    }),
+    it("should return false for invalid username", do {
+      let username : Text = "Mishicat";
+      let isValid = Utils.is_valid_username(username);
+
+      assertFalse(isValid);
+    }),
+    it("should return false for invalid username", do {
+      let username : Text = "mish!";
+      let isValid = Utils.is_valid_username(username);
+
+      assertFalse(isValid);
+    }),
+    it("should return false for invalid username", do {
+      let username : Text = "misH";
+      let isValid = Utils.is_valid_username(username);
+
+      assertFalse(isValid);
+    }),
+  ]),
 ]);
 
 if(success == false){

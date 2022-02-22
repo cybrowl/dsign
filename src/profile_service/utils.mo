@@ -1,11 +1,12 @@
 import Array "mo:base/Array";
 import B "mo:base/Buffer";
+import Char "mo:base/Char";
 import Debug "mo:base/Debug";
 import Iter "mo:base/Iter";
 import Text "mo:base/Text";
 
 module {
-    public func get_username(url: Text): Text {
+    public func get_username(url: Text) : Text {
         if (url.size() == 0) {
             return ""
         };
@@ -18,7 +19,7 @@ module {
         return filterBySeparator[0];
     };
 
-    public func is_valid_image(img: [Nat8]): Bool {
+    public func is_valid_image(img: [Nat8]) : Bool {
         var compare = B.Buffer<Nat8>(1);
 
         let gif : [Nat8] = [71,  73,  70,  56];
@@ -48,6 +49,35 @@ module {
         } else {
             return false;
         }
+    };
+
+    public func is_valid_username(username: Text) : Bool {
+        if (username.size() > 20) {
+            return false;
+        };
+
+        var isValidUsername = true;
+
+        // check if char is lowercase letter or number
+        for (char in username.chars()) {
+            let isAZ = Char.isAlphabetic(char);
+            let isDigit = Char.isDigit(char);
+            let isLowercase = Char.isLowercase(char);
+
+            if (isAZ == false) {
+                if (isDigit == false) {
+                    isValidUsername := false;
+                };
+            };
+
+            if (isAZ == true) {
+                if (isLowercase == false) {
+                    isValidUsername := false;
+                };
+            };
+        };
+
+        return isValidUsername;
     };
 
     func isEq(a: Nat8, b: Nat8): Bool { a == b };
