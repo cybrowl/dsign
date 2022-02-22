@@ -12,7 +12,7 @@
 
 <main>
 	<html lang="en" class="dark">
-		<body class="dark:bg-gray-900 dark:text-gray-200">
+		<body class="dark:bg-backdrop dark:text-gray-200">
 			<div class="grid grid-cols-12 gap-2">
 				<Header />
 				{#if $isSettingsActive}

@@ -42,13 +42,13 @@
 {#if hasAvatar}
 	<img
 		alt="avatar"
-		class="rounded-full w-20"
+		class="rounded-full w-16"
 		src={$profileStorage.avatar}
 		on:click={handleSettingsModal}
 	/>
 {:else}
 	<div
-		class="m-2 mr-2 w-16 h-16 flex justify-center items-center rounded-full 
+		class="m-2 mr-2 w-12 h-12 flex justify-center items-center rounded-full 
 		bg-indigo-800 text-xl text-white uppercase cursor-pointer"
 		on:click={handleSettingsModal}
 	>

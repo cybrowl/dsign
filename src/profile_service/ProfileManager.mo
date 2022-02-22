@@ -44,8 +44,8 @@ actor ProfileManager {
 
     // Canister Data Management
     stable var anchorTime = Time.now();
-    stable var currentEmptyAvatarCanisterID : Text = "cljm4-uiaaa-aaaag-aabcq-cai";
-    stable var currentEmptyProfileCanisterID : Text = "kxkd5-7qaaa-aaaag-aaawa-cai";
+    stable var currentEmptyAvatarCanisterID : Text = "renrk-eyaaa-aaaaa-aaada-cai";
+    stable var currentEmptyProfileCanisterID : Text = "rno2w-sqaaa-aaaaa-aaacq-cai";
 
     var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
     stable var canisterCacheEntries : [(CanisterID, Canister)] = [];
@@ -93,6 +93,8 @@ actor ProfileManager {
                     await Logger.log_event(tags, "avatar_created");
                     #ok("avatar_created");
                 } else {
+                    await Logger.log_event(tags, "SetAvatarFailed");
+
                     #err(#SetAvatarFailed);
                 }
             };
