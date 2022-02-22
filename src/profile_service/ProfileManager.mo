@@ -13,6 +13,7 @@ import Avatar "Avatar";
 import Logger "canister:logger";
 import Profile "Profile";
 import Types "./types";
+import Utils "./utils";
 
 actor ProfileManager {
     type AvatarActor = Types.AvatarActor;
@@ -107,37 +108,41 @@ actor ProfileManager {
         let tags = [ACTOR_NAME, "create_profile"];
         let userId : UserID = Principal.toText(msg.caller);
 
-        //TODO: check if is valid username
-        
-        switch (canisterProfileIds.get(userId)) {
-            // check user exists
-            case (?canisterID) {
-                await Logger.log_event(tags, "userId_exists");
-                #err(#UserIDExists)
-            };
-            case (null) {
-                // check username available
-                switch (userIds.get(username)) {
-                    case (?userId) {
-                        await Logger.log_event(tags, "username_taken");
-                        #err(#UsernameTaken)
-                    };
-                    case (null) {
-                        // save to get useId with username
-                        userIds.put(username, userId);
+        let isValidUsername : Bool = Utils.is_valid_username(username);
 
-                        // save to get username with userId
-                        usernames.put(userId, username);
+        if (isValidUsername == false) {
+            #err(#InvalidUsername);
+        } else {
+            switch (canisterProfileIds.get(userId)) {
+                // check user exists
+                case (?canisterID) {
+                    await Logger.log_event(tags, "userId_exists");
+                    #err(#UserIDExists)
+                };
+                case (null) {
+                    // check username available
+                    switch (userIds.get(username)) {
+                        case (?userId) {
+                            await Logger.log_event(tags, "username_taken");
+                            #err(#UsernameTaken)
+                        };
+                        case (null) {
+                            // save to get useId with username
+                            userIds.put(username, userId);
 
-                        // save to get profile canister id with userId
-                        canisterProfileIds.put(userId, currentEmptyProfileCanisterID);
+                            // save to get username with userId
+                            usernames.put(userId, username);
 
-                        // create username in profile
-                        let profile = actor (currentEmptyProfileCanisterID) : ProfileActor;
-                        await profile.create(userId, username);
+                            // save to get profile canister id with userId
+                            canisterProfileIds.put(userId, currentEmptyProfileCanisterID);
 
-                        await Logger.log_event(tags, "profile_created");
-                        #ok("profile_created");
+                            // create username in profile
+                            let profile = actor (currentEmptyProfileCanisterID) : ProfileActor;
+                            await profile.create(userId, username);
+
+                            await Logger.log_event(tags, "profile_created");
+                            #ok("profile_created");
+                        };
                     };
                 };
             };

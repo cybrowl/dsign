@@ -52,6 +52,7 @@ module {
     public type ProfileManagerError = {
         #CanisterIdNotFound;
         #FailedGetProfile;
+        #InvalidUsername;
         #UserIDExists;
         #UsernameTaken;
     };
