@@ -15,16 +15,16 @@
     "watch": "svelte-kit dev"
   },
   "dependencies": {
+    "@dfinity/agent": "^0.10.2",
     "@dfinity/auth-client": "^0.10.2",
-    "@dfinity/candid": "0.10.2",
+    "@dfinity/candid": "^0.10.2",
     "@dfinity/identity": "^0.10.2",
-    "@dfinity/principal": "0.10.2",
-    "dsign-component-lib": "^0.0.4",
+    "@dfinity/principal": "^0.10.2",
+    "dsign-component-lib": "0.0.5",
     "lodash": "^4.17.21",
     "svelte-local-storage-store": "^0.2.6"
   },
   "devDependencies": {
-    "@dfinity/agent": "0.10.2",
     "@sveltejs/adapter-static": "^1.0.0-next.26",
     "@sveltejs/kit": "next",
     "@svitejs/vite-plugin-svelte": "^0.11.1",

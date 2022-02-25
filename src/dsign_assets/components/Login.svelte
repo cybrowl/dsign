@@ -57,7 +57,7 @@
 	{#if $profileManager.loggedIn}
 		<Avatar />
 	{:else}
-		<Button label="Sign In" on:click={login} />
+		<Button label="Sign In" on:click={login} class="mr-4" />
 		<Button primary label="Let’s get started!" />
 	{/if}
 </span>
