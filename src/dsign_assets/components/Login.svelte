@@ -7,6 +7,7 @@
 	import { removeFromStorage } from '../store/local_storage';
 	import Avatar from './Avatar.svelte';
 	import environment from 'environment';
+	import { Button } from 'dsign-component-lib';
 
 	const env = environment();
 	const isProd = env['DFX_NETWORK'] === 'ic' || false;
@@ -56,13 +57,8 @@
 	{#if $profileManager.loggedIn}
 		<Avatar />
 	{:else}
-		<button
-			class="border border-solid border-purple-600 hover:bg-indigo-900 text-white py-2 px-4 rounded"
-			on:click={login}>Log In</button
-		>
-		<button class="bg-indigo-800 hover:bg-indigo-900 text-white py-2 px-4 rounded ml-2"
-			>Get Started!</button
-		>
+		<Button label="Sign In" on:click={login} />
+		<Button primary label="Let’s get started!" />
 	{/if}
 </span>
 

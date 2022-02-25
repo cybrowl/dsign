@@ -51,7 +51,7 @@
 					class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
 					on:click={handleSettingsModal}
 				>
-					<Icon name="close_standard" width="20" height="20" class="closeStandard" />
+					<Icon name="close_standard" width="20" height="20" />
 				</button>
 			</div>
 		</div>
