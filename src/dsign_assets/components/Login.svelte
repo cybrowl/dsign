@@ -7,7 +7,7 @@
 	import { removeFromStorage } from '../store/local_storage';
 	import Avatar from './Avatar.svelte';
 	import environment from 'environment';
-	import { Button } from 'dsign-component-lib';
+	import { Button } from 'dsign-components';
 
 	const env = environment();
 	const isProd = env['DFX_NETWORK'] === 'ic' || false;
