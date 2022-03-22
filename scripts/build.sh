@@ -2,19 +2,19 @@
 
 # DFX BUILD #
 # stop
-dfx stop
+# dfx stop
 
-## start clean
-dfx start --clean --background
+# ## start clean
+# dfx start --clean --background
 
-## register canister identifiers
-dfx canister create --all
+# ## register canister identifiers
+# dfx canister create --all
 
-## build
-dfx build
+# ## build
+# dfx build
 
-## install 
-dfx canister install --all
+# ## install 
+# dfx canister install --all
 
 # TESTING #
 # NOTE: update file OSX ONLY (Linux remove '')
