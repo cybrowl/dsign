@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
 	import { fade, fly } from 'svelte/transition';
 	import { isSettingsActive } from '../store/modal';
 	import { profileStorage } from '../store/local_storage';
@@ -102,4 +102,4 @@
 </div>
 
 <style>
-</style>
+</style> -->

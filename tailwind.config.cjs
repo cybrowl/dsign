@@ -1,6 +1,6 @@
 module.exports = {
 	content: ['./src/dsign_assets/**/*.{html,js,cjs, svelte}'],
-	purge: ['./src/**/*.html', './src/**/*.svelte'],
+    purge: ['./src/**/*.html', './src/**/*.svelte'],
 	darkMode: 'class', // or 'media' or 'class'
 	theme: {
 		extend: {
@@ -23,7 +23,8 @@ module.exports = {
                 'primary-purple': '#7A71DE',
                 'light-purple': '#6259C8',
                 'bubble-purple': '#B6AFFC',
-                'lilalic-purple': '#968CFF'
+                'lilalic-purple': '#968CFF',
+                'error-red': '#F0627C'
 			}
 		}
 	},

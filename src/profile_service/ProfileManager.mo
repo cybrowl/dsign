@@ -28,6 +28,7 @@ actor ProfileManager {
     type Username = Types.Username;
 
     let ACTOR_NAME : Text = "ProfileManager";
+    let cycleAmount : Nat = 1_000_000_000_000;
 
     // User Data Management
     var userIds : HashMap.HashMap<Username, UserID> = HashMap.HashMap(1, Text.equal, Text.hash);
@@ -182,7 +183,7 @@ actor ProfileManager {
         let tags = [ACTOR_NAME, "create_avatar_canister"];
 
         // create canister
-        Cycles.add(1000000000000);
+        Cycles.add(cycleAmount);
         let avatarActor = await Avatar.Avatar();
         let principal = Principal.fromActor(avatarActor);
         let canisterID = Principal.toText(principal);
@@ -208,7 +209,7 @@ actor ProfileManager {
         let profileManagerPrincipalText = Principal.toText(profileManagerPrincipal);
 
         // create canister
-        Cycles.add(1000000000000);
+        Cycles.add(cycleAmount);
         let profileActor = await Profile.Profile(profileManagerPrincipalText, currentEmptyAvatarCanisterID);
         let principal = Principal.fromActor(profileActor);
         let canisterID = Principal.toText(principal);

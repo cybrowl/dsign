@@ -3,7 +3,7 @@
 	import { isSettingsActive } from '../store/modal';
 	import { removeFromStorage } from '../store/local_storage';
 	import { client } from '../store/client';
-	import { Button } from 'dsign-components';
+	import Button from 'dsign-components/components/Button.svelte';
 
 	async function logout() {
 		await $client.logout();

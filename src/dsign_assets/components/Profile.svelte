@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
+	import Avatar from 'dsign-components/components/Avatar.svelte';
 	import { isSettingsActive, isAccountCreationActive } from '../store/modal';
 	import { profileManager } from '../store/profile_manager';
 	import { profileStorage } from '../store/local_storage';
@@ -7,7 +8,7 @@
 
 	let hasAccount = false;
 
-    // read local storage
+	// read local storage
 	let hasAvatar = $profileStorage.avatar.length > 3 || false;
 	let hasUsername = $profileStorage.username.length > 0 || false;
 
@@ -19,7 +20,7 @@
 		hasAccount = await hasAccountPromise;
 		let { ok: profile } = await profilePromise;
 
-		// read local storage directly 
+		// read local storage directly
 		if (!hasUsername) {
 			//TODO: fix bug when user logout
 			//TODO: set when logout/login
@@ -41,25 +42,13 @@
 	}
 </script>
 
-{#if hasAvatar}
-	<img
-		alt="avatar"
-		class="rounded-full w-16"
-		src={$profileStorage.avatar}
-		on:click={handleSettingsModal}
-	/>
-{:else}
-	<div
-		class="m-2 mr-2 w-12 h-12 flex justify-center items-center rounded-full 
-		bg-indigo-800 text-xl text-white uppercase cursor-pointer"
-		on:click={handleSettingsModal}
-	>
-		<p class="cursor-pointer">
-			{$profileStorage.username.charAt(0)}
-			{$profileStorage.username.charAt($profileStorage.username.length - 1)}
-		</p>
-	</div>
-{/if}
+<Avatar
+	avatar={$profileStorage.avatar}
+	firstCharUsername={$profileStorage.username.charAt(0)}
+	{hasAvatar}
+	lastCharUsername={$profileStorage.username.charAt($profileStorage.username.length - 1)}
+	on:click={handleSettingsModal}
+/>
 
 <style>
 </style>
