@@ -1,7 +1,7 @@
 <script>
 	import { profileManager } from '../store/profile_manager';
-	import Modal from "dsign-components/components/Modal.svelte";
 	import CreateUsername from "dsign-components/components/CreateUsername.svelte";
+	import Modal from "dsign-components/components/Modal.svelte";
 
 	let createProfilePromise = null;
 

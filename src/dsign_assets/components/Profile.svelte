@@ -1,10 +1,10 @@
 <script>
-	import { onMount } from 'svelte';
-	import Avatar from 'dsign-components/components/Avatar.svelte';
+	import _ from 'lodash';
 	import { isSettingsActive, isAccountCreationActive } from '../store/modal';
+	import { onMount } from 'svelte';
 	import { profileManager } from '../store/profile_manager';
 	import { profileStorage } from '../store/local_storage';
-	import _ from 'lodash';
+	import Avatar from 'dsign-components/components/Avatar.svelte';
 
 	let hasAccount = false;
 
