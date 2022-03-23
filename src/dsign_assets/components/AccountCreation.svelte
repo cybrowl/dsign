@@ -1,9 +1,9 @@
 <script>
 	import { profileManager } from '../store/profile_manager';
-	import CreateUsername from "dsign-components/components/CreateUsername.svelte";
-	import Modal from "dsign-components/components/Modal.svelte";
+	import CreateUsername from 'dsign-components/components/CreateUsername.svelte';
+	import Modal from 'dsign-components/components/Modal.svelte';
 
-	let createProfilePromise = null;
+	let createProfilePromise;
 
 	function handleCreateProfile(e) {
 		createProfilePromise = $profileManager.actor.create_profile(e.detail.username);

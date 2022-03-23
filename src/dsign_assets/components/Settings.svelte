@@ -7,13 +7,16 @@
 	import Modal from 'dsign-components/components/Modal.svelte';
 	import Settings from 'dsign-components/components/Settings.svelte';
 
-	let hasAvatar = $profileStorage.avatar.length > 3 || false;
-	let profilePromise = $profileManager.actor.get_profile();
+	// let hasAvatar = $profileStorage.avatar.length > 3 || false;
+	// let profilePromise = $profileManager.actor.get_profile();
 	let username = $profileStorage.username;
-	let files;
 	let count = 0;
 
-	async function handleAvatarChange() {
+	async function handleAvatarChange(event) {
+		console.log('event: ', event);
+
+		let files = event.detail;
+
 		const selectedFile = files[0];
 
 		const imageAsUnit8ArrayBuffer = new Uint8Array(await selectedFile.arrayBuffer());
@@ -34,7 +37,7 @@
 	}
 
 	function handleCloseModal() {
-		isSettingsActive.update((isSettingsActive) => !isSettingsActive)
+		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
 	}
 
 	async function handleLogOut() {
@@ -55,13 +58,13 @@
 	}
 </script>
 
-<!-- <input type="file" bind:files on:change={handleAvatarChange} /> -->
-
-<Modal
-	centered={false}
-	on:closeModal={handleCloseModal}
->
-	<Settings on:clickAvatar={handleAvatarChange} {username} on:clickLogOut={handleLogOut} />
+<Modal centered={false} on:closeModal={handleCloseModal}>
+	<Settings
+		{username}
+		on:clickLogOut={handleLogOut}
+		on:avatarChange={handleAvatarChange}
+		triggerInputEvent={true}
+	/>
 </Modal>
 
 <style>
