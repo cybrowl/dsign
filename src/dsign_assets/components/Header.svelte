@@ -4,14 +4,12 @@
 
 <div class="col-span-12">
 	<div class="flex flex-row justify-between items-center m-6">
-		<div class="">
-			<nav>
-				<a href="/" class="mr-5 font-large uppercase">DSign</a>
-				<a href="/" class="mr-5 font-medium hover:underline">Explore</a>
-				<a href="/projects" class="mr-5 font-medium hover:underline">Projects</a>
-				<a href="/favorites" class="mr-5 font-medium hover:underline">Favorites</a>
-			</nav>
-		</div>
+		<nav class="flex items-center">
+			<a href="/" class="mr-12 text-4xl font-bold">DSign</a>
+			<a href="/" class="mr-8 font-medium hover:underline">Explore</a>
+			<a href="/projects" class="mr-8 font-medium hover:underline">Projects</a>
+			<a href="/favorites" class="mr-8 font-medium hover:underline">Favorites</a>
+		</nav>
 		<Login />
 	</div>
 </div>
