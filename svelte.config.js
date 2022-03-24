@@ -24,7 +24,7 @@ const config = {
 			routes: 'src/dsign_assets/routes',
 			template: 'src/dsign_assets/app.html'
 		},
-		adapter: adapter({ pages: 'build' }),
+		adapter: adapter({ pages: 'build', fallback: 'index.html' }),
 		vite: viteConfig(envOptions)
 	}
 };

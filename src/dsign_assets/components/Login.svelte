@@ -55,7 +55,10 @@
 
 <span>
 	{#if $profileManager.loggedIn}
-		<Profile />
+		<div class="flex items-center">
+			<Button label="Upload" primary={true} class="mr-4" />
+			<Profile />
+		</div>
 	{:else}
 		<Button label="Sign In" on:click={login} class="mr-4" />
 		<Button primary label="Let's get started!" />
