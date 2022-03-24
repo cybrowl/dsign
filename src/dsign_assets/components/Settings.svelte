@@ -8,7 +8,6 @@
 	import Settings from 'dsign-components/components/Settings.svelte';
 	import get from 'lodash/get.js';
 	// let profilePromise = $profileManager.actor.get_profile();
-	let count = 0;
 
 	async function handleAvatarChange(event) {
 		let files = event.detail;
@@ -23,10 +22,8 @@
 		await $profileManager.actor.set_avatar(avatar);
 		let { ok: profile } = await $profileManager.actor.get_profile();
 
-		count++;
-
 		profileStorage.set({
-			avatar: get(profile, 'avatar', '') + '&' + count,
+			avatar: get(profile, 'avatar', '') + '&' + Math.floor(Math.random() * 100),
 			username: get(profile, 'username', ''),
 			website: ''
 		});
