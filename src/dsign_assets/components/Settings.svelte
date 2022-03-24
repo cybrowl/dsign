@@ -6,15 +6,11 @@
 	import { removeFromStorage } from '../store/local_storage';
 	import Modal from 'dsign-components/components/Modal.svelte';
 	import Settings from 'dsign-components/components/Settings.svelte';
-
-	// let hasAvatar = $profileStorage.avatar.length > 3 || false;
+	import get from 'lodash/get.js';
 	// let profilePromise = $profileManager.actor.get_profile();
-	let username = $profileStorage.username;
 	let count = 0;
 
 	async function handleAvatarChange(event) {
-		console.log('event: ', event);
-
 		let files = event.detail;
 
 		const selectedFile = files[0];
@@ -30,8 +26,8 @@
 		count++;
 
 		profileStorage.set({
-			avatar: _.get(profile, 'avatar', '') + '&' + count,
-			username: _.get(profile, 'username', ''),
+			avatar: get(profile, 'avatar', '') + '&' + count,
+			username: get(profile, 'username', ''),
 			website: ''
 		});
 	}
@@ -60,9 +56,10 @@
 
 <Modal centered={false} on:closeModal={handleCloseModal}>
 	<Settings
-		{username}
-		on:clickLogOut={handleLogOut}
+		avatar={$profileStorage.avatar}
+		username={$profileStorage.username}
 		on:avatarChange={handleAvatarChange}
+		on:clickLogOut={handleLogOut}
 		triggerInputEvent={true}
 	/>
 </Modal>

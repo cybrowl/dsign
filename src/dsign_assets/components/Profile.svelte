@@ -1,15 +1,14 @@
 <script>
-	import _ from 'lodash';
 	import { isSettingsActive, isAccountCreationActive } from '../store/modal';
 	import { onMount } from 'svelte';
 	import { profileManager } from '../store/profile_manager';
 	import { profileStorage } from '../store/local_storage';
 	import Avatar from 'dsign-components/components/Avatar.svelte';
+	import get from 'lodash/get.js';
 
 	let hasAccount = false;
 
 	// read local storage
-	let hasAvatar = $profileStorage.avatar.length > 3 || false;
 	let hasUsername = $profileStorage.username.length > 0 || false;
 
 	// call profile manager canister
@@ -25,8 +24,8 @@
 			//TODO: fix bug when user logout
 			//TODO: set when logout/login
 			profileStorage.set({
-				avatar: _.get(profile, 'avatar', ''),
-				username: _.get(profile, 'username', '')
+				avatar: get(profile, 'avatar', ''),
+				username: get(profile, 'username', '')
 			});
 		}
 	});
@@ -45,7 +44,6 @@
 <Avatar
 	avatar={$profileStorage.avatar}
 	firstCharUsername={$profileStorage.username.charAt(0)}
-	{hasAvatar}
 	lastCharUsername={$profileStorage.username.charAt($profileStorage.username.length - 1)}
 	on:click={handleSettingsModal}
 />
