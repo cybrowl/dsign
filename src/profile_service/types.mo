@@ -44,19 +44,17 @@ module {
         status_code : Nat16;
     };
 
-    public type AvatarError = {
-        #UsernameNotFound;
-        #SetAvatarFailed;
-    };
-
     public type ProfileManagerError = {
+        #AvatarSetFailed;
         #CanisterIdNotFound;
         #FailedGetProfile;
         #UsernameInvalid;
+        #UsernameNotFound;
         #UsernameTaken;
     };
 
     public type ProfileManagerOk = {
+        #AvatarCreated;
         #ProfileCreated;
     };
 

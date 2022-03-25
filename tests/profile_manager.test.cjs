@@ -65,7 +65,7 @@ test('Profile Manager: set_avatar()', async function (t) {
 
 		const response = await profileManager.set_avatar(avatar);
 
-		t.equal(response.ok, 'avatar_created');
+		t.deepEqual(response.ok, { AvatarCreated: null });
 	} catch (err) {
 		console.error(err);
 	}

@@ -17,7 +17,6 @@ import Utils "./utils";
 
 actor ProfileManager {
     type AvatarActor = Types.AvatarActor;
-    type AvatarError = Types.AvatarError;
     type Canister = Types.Canister;
     type CanisterID = Types.CanisterID;
     type Image = Types.Image;
@@ -54,7 +53,7 @@ actor ProfileManager {
 
     // Canister Logic Utils
     public func version() : async Text {
-        return "0.0.4";
+        return "0.0.5";
     };
 
     public shared (msg) func whoami() : async Principal {
@@ -74,7 +73,7 @@ actor ProfileManager {
         };
     };
 
-    public shared (msg) func set_avatar(avatar: Image) : async Result.Result<Text, AvatarError> {
+    public shared (msg) func set_avatar(avatar: Image) : async Result.Result<ProfileManagerOk, ProfileManagerError> {
         let tags = [ACTOR_NAME, "set_avatar"];
         let userId : UserID = Principal.toText(msg.caller);
 
@@ -93,11 +92,11 @@ actor ProfileManager {
                     await profileActor.set_avatar(userId, username);
 
                     await Logger.log_event(tags, "avatar_created");
-                    #ok("avatar_created");
+                    #ok(#AvatarCreated);
                 } else {
-                    await Logger.log_event(tags, "SetAvatarFailed");
+                    await Logger.log_event(tags, "AvatarSetFailed");
 
-                    #err(#SetAvatarFailed);
+                    #err(#AvatarSetFailed);
                 }
             };
             case (null) {
