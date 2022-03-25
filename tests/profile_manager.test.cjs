@@ -17,19 +17,31 @@ const canisterId = canisterIds.profile_manager.local;
 let profileManager = null;
 const username = fake.word();
 
-test('Profile Manager: ping()', async function (t) {
+test('Profile Manager: version()', async function (t) {
 	profileManager = await getActor(canisterId, idlFactory, Mishi);
 
-	const response = await profileManager.ping();
+	const response = await profileManager.version();
 
+	console.log("version: ", response);
 	t.equal(typeof response, 'string');
-	t.equal(response, 'meow');
 });
 
-test('Profile Manager: create_profile()', async function (t) {
+test('Profile Manager: create_profile with invalid username returns UsernameInvalid', async function (t) {
 	const response = await profileManager.create_profile(username);
 
-	t.strictEqual(response.ok, 'profile_created');
+	t.deepEqual(response.err, { UsernameInvalid: null });
+});
+
+test('Profile Manager: create_profile with taken username returns UsernameTaken', async function (t) {
+	const response = await profileManager.create_profile('cyberowl');
+
+	t.deepEqual(response.err, { UsernameTaken: null });
+});
+
+test('Profile Manager: create_profile() with valid username returns ProfileCreated', async function (t) {
+	const response = await profileManager.create_profile(username.toLowerCase());
+
+	t.deepEqual(response.ok, { ProfileCreated: null });
 });
 
 test('Profile Manager: get_profile()', async function (t) {
@@ -37,7 +49,7 @@ test('Profile Manager: get_profile()', async function (t) {
 
 	const response = await profileManager.get_profile();
 
-	t.equal(response.ok.username, username);
+	t.equal(response.ok.username, username.toLowerCase());
 });
 
 test('Profile Manager: set_avatar()', async function (t) {
@@ -49,8 +61,6 @@ test('Profile Manager: set_avatar()', async function (t) {
 		const avatar = {
 			content: [...imageAsUnit8ArrayBuffer]
 		};
-
-		console.log("avatar: ", avatar);
 
 		const response = await profileManager.set_avatar(avatar);
 
@@ -64,8 +74,6 @@ test('Profile Manager: get_profile()', async function (t) {
 	setTimeout(function () {}, 8000);
 
 	const response = await profileManager.get_profile();
-
-	console.log('profile: ', response);
 
 	t.ok(response.ok.avatar);
 });

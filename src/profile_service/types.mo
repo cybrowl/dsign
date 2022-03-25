@@ -52,9 +52,12 @@ module {
     public type ProfileManagerError = {
         #CanisterIdNotFound;
         #FailedGetProfile;
-        #InvalidUsername;
-        #UserIDExists;
+        #UsernameInvalid;
         #UsernameTaken;
+    };
+
+    public type ProfileManagerOk = {
+        #ProfileCreated;
     };
 
     public type ProfileError = { #ProfileNotFound; };

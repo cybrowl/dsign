@@ -24,6 +24,7 @@ actor ProfileManager {
     type Profile = Types.Profile;
     type ProfileActor = Types.ProfileActor;
     type ProfileManagerError = Types.ProfileManagerError;
+    type ProfileManagerOk = Types.ProfileManagerOk;
     type UserID = Types.UserID;
     type Username = Types.Username;
 
@@ -52,8 +53,8 @@ actor ProfileManager {
     stable var canisterCacheEntries : [(CanisterID, Canister)] = [];
 
     // Canister Logic Utils
-    public func ping() : async Text {
-        return "meow";
+    public func version() : async Text {
+        return "0.0.3";
     };
 
     public shared (msg) func whoami() : async Principal {
@@ -106,7 +107,7 @@ actor ProfileManager {
         };
     };
 
-    public shared (msg) func create_profile(username: Username) : async Result.Result<Text, ProfileManagerError> {
+    public shared (msg) func create_profile(username: Username) : async Result.Result<ProfileManagerOk, ProfileManagerError> {
         // NOTE: this should only be executed once by user
         let tags = [ACTOR_NAME, "create_profile"];
         let userId : UserID = Principal.toText(msg.caller);
@@ -114,39 +115,30 @@ actor ProfileManager {
         let isValidUsername : Bool = Utils.is_valid_username(username);
 
         if (isValidUsername == false) {
-            #err(#InvalidUsername);
+            #err(#UsernameInvalid);
         } else {
-            switch (canisterProfileIds.get(userId)) {
-                // check user exists
-                case (?canisterID) {
-                    await Logger.log_event(tags, "userId_exists");
-                    #err(#UserIDExists)
+            // check username available
+            switch (userIds.get(username)) {
+                case (?userId) {
+                    await Logger.log_event(tags, "username_taken");
+                    #err(#UsernameTaken)
                 };
                 case (null) {
-                    // check username available
-                    switch (userIds.get(username)) {
-                        case (?userId) {
-                            await Logger.log_event(tags, "username_taken");
-                            #err(#UsernameTaken)
-                        };
-                        case (null) {
-                            // save to get useId with username
-                            userIds.put(username, userId);
+                    // save to get useId with username
+                    userIds.put(username, userId);
 
-                            // save to get username with userId
-                            usernames.put(userId, username);
+                    // save to get username with userId
+                    usernames.put(userId, username);
 
-                            // save to get profile canister id with userId
-                            canisterProfileIds.put(userId, currentEmptyProfileCanisterID);
+                    // save to get profile canister id with userId
+                    canisterProfileIds.put(userId, currentEmptyProfileCanisterID);
 
-                            // create username in profile
-                            let profile = actor (currentEmptyProfileCanisterID) : ProfileActor;
-                            await profile.create(userId, username);
+                    // create username in profile
+                    let profile = actor (currentEmptyProfileCanisterID) : ProfileActor;
+                    await profile.create(userId, username);
 
-                            await Logger.log_event(tags, "profile_created");
-                            #ok("profile_created");
-                        };
-                    };
+                    await Logger.log_event(tags, "profile_created");
+                    #ok(#ProfileCreated);
                 };
             };
         };
