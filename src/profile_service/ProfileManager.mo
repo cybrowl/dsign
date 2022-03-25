@@ -54,7 +54,7 @@ actor ProfileManager {
 
     // Canister Logic Utils
     public func version() : async Text {
-        return "0.0.3";
+        return "0.0.4";
     };
 
     public shared (msg) func whoami() : async Principal {

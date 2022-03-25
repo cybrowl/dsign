@@ -12,6 +12,7 @@ const fake = require('fake-words');
 global.fetch = fetch;
 
 let Mishi = Ed25519KeyIdentity.generate();
+let Motoko = Ed25519KeyIdentity.generate();
 const canisterId = canisterIds.profile_manager.local;
 
 let profileManager = null;
@@ -76,4 +77,14 @@ test('Profile Manager: get_profile()', async function (t) {
 	const response = await profileManager.get_profile();
 
 	t.ok(response.ok.avatar);
+});
+
+test('Profile Manager: get_profile() with invalid userId ', async function (t) {
+	setTimeout(function () {}, 8000);
+
+	profileManager = await getActor(canisterId, idlFactory, Motoko);
+
+	const response = await profileManager.get_profile();
+
+	t.deepEqual(response.err, { CanisterIdNotFound: null });
 });
