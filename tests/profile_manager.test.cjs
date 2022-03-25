@@ -39,7 +39,7 @@ test('Profile Manager: create_profile with taken username returns UsernameTaken'
 	t.deepEqual(response.err, { UsernameTaken: null });
 });
 
-test('Profile Manager: create_profile() with valid username returns ProfileCreated', async function (t) {
+test('Profile Manager: create_profile with valid username returns ProfileCreated', async function (t) {
 	const response = await profileManager.create_profile(username.toLowerCase());
 
 	t.deepEqual(response.ok, { ProfileCreated: null });
