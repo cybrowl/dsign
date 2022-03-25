@@ -19,8 +19,8 @@ actor class Avatar() = {
 
     var avatars : HashMap.HashMap<Username, Image> = HashMap.HashMap(1, Text.equal, Text.hash);
 
-    public query func ping() : async Text {
-        return "meow";
+    public query func version() : async Text {
+        return "0.0.1";
     };
 
     public func is_full() : async Bool {

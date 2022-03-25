@@ -61,14 +61,14 @@ module {
     public type ProfileError = { #ProfileNotFound; };
 
     public type AvatarActor = actor {
-        ping : query () -> async Text;
+        version : query () -> async Text;
         is_full : query () -> async Bool;
         set : shared (Image, Username) -> async Bool;
         http_request : shared query HttpRequest -> async HttpResponse;
     };
 
     public type ProfileActor = actor {
-        ping : query () -> async Text;
+        version : query () -> async Text;
         is_full : query () -> async Bool;
         create : shared (Text, Text) -> async ();
         set_avatar : shared (Text, Text) -> async ();

@@ -34,8 +34,8 @@ actor class Profile(profileManagerPrincipalText : Text, avatarCanisterId : Text)
     };
 
     // Canister Management
-    public query func ping() : async Text {
-        return "meow";
+    public query func version() : async Text {
+        return "0.0.1";
     };
 
     public query func get_cycles_balance() : async Nat {
