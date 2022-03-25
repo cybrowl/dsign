@@ -39,6 +39,7 @@ actor class Avatar() = {
     };
 
     public shared func set(avatar: Image, username: Username) : async Bool {
+        //TODO: restrict access
         if (avatar.content.size() > MAX_BYTES) {
             return false;
         };
