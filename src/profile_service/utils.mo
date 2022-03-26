@@ -56,6 +56,10 @@ module {
             return false;
         };
 
+        if (username.size() < 1) {
+            return false;
+        };
+
         var isValidUsername = true;
 
         // check if char is lowercase letter or number

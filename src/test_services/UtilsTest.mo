@@ -115,6 +115,12 @@ let success = run([
 
       assertFalse(isValid);
     }),
+        it("should return false for invalid username", do {
+      let username : Text = "";
+      let isValid = Utils.is_valid_username(username);
+
+      assertFalse(isValid);
+    }),
     it("should return false for invalid username", do {
       let username : Text = "misH";
       let isValid = Utils.is_valid_username(username);
