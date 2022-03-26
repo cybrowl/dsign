@@ -29,6 +29,7 @@
 			}
 		} catch (error) {
 			hasError = true;
+			isCreatingAccount = false;
 			errorMessage = 'Failed calling create profile';
 		}
 	}

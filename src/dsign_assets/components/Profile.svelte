@@ -17,6 +17,11 @@
 
 	onMount(async () => {
 		hasAccount = await hasAccountPromise;
+
+		if (!hasAccount) {
+			isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
+		}
+
 		let { ok: profile } = await profilePromise;
 
 		// read local storage directly
