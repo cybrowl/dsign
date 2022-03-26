@@ -4,24 +4,25 @@
 	import Modal from 'dsign-components/components/Modal.svelte';
 	import { getErrorMessage } from '../lib/utils';
 
-	let errorMessage = '';
 	let errorMessages = {
 		UsernameInvalid: 'Use lower case letters with 20 characters or less',
 		UsernameTaken: 'Username already taken'
 	};
-	let isCreatingAccount = false;
+
+	let errorMessage = '';
 	let hasError = false;
+	let isCreatingAccount = false;
 
 	async function handleCreateProfile(e) {
-		isCreatingAccount = true;
-
 		try {
+			hasError = false;
+			errorMessage = '';
+			isCreatingAccount = true;
+
 			const response = await $profileManager.actor.create_profile(e.detail.username);
 
-			isCreatingAccount = false;
-
-			console.log("response: ", response);
 			errorMessage = getErrorMessage(response, errorMessages);
+			isCreatingAccount = false;
 
 			if (errorMessage.length > 1) {
 				hasError = true;
@@ -34,7 +35,7 @@
 </script>
 
 <Modal>
-	<CreateUsername on:click={handleCreateProfile} {isCreatingAccount} {hasError} {errorMessage} />
+	<CreateUsername on:click={handleCreateProfile} {errorMessage} {hasError} {isCreatingAccount} />
 </Modal>
 
 <style>
