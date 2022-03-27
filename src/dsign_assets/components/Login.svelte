@@ -7,7 +7,7 @@
 	import { removeFromStorage } from '../store/local_storage';
 	import Button from 'dsign-components/components/Button.svelte';
 	import environment from 'environment';
-	import Profile from './Profile.svelte';
+	import ProfileAvatar from './ProfileAvatar.svelte';
 
 	const env = environment();
 	const isProd = env['DFX_NETWORK'] === 'ic' || false;
@@ -57,7 +57,7 @@
 	{#if $profileManager.loggedIn}
 		<div class="flex items-center">
 			<Button label="Upload" primary={true} class="mr-4" />
-			<Profile />
+			<ProfileAvatar />
 		</div>
 	{:else}
 		<Button label="Sign In" on:click={login} class="mr-4" />

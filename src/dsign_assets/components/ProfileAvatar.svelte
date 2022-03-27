@@ -14,8 +14,6 @@
 
 	onMount(async () => {
 		try {
-			// let hasAccountLocalStorage = $profileStorage.username.length > 0 || false;
-
 			hasAccount = await hasAccountPromise;
 			let { ok: profile } = await profilePromise;
 
@@ -36,8 +34,9 @@
 
 	async function openSettingsModal() {
 		if (hasAccount) {
-			//TODO: rename isAccountSettingsModalVisible to isAccountSettingsModalVisible
-			isAccountSettingsModalVisible.update((isAccountSettingsModalVisible) => !isAccountSettingsModalVisible);
+			isAccountSettingsModalVisible.update(
+				(isAccountSettingsModalVisible) => !isAccountSettingsModalVisible
+			);
 		} else {
 			isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
 		}
