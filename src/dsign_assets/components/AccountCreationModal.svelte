@@ -1,17 +1,21 @@
 <script>
+	import { getErrorMessage } from '../lib/utils';
+	import { goto } from '$app/navigation';
 	import { profileManager } from '../store/profile_manager';
 	import AccountCreation from 'dsign-components/components/AccountCreation.svelte';
+	import AccountCreationSuccess from 'dsign-components/components/AccountCreationSuccess.svelte';
 	import Modal from 'dsign-components/components/Modal.svelte';
-	import { getErrorMessage } from '../lib/utils';
 
 	let errorMessages = {
 		UsernameInvalid: 'Use lower case letters with 20 characters or less',
 		UsernameTaken: 'Username already taken'
 	};
 
+	let createdAccount = false;
 	let errorMessage = '';
 	let hasError = false;
 	let isCreatingAccount = false;
+	let isVisible = true;
 
 	async function handleAccountCreation(e) {
 		try {
@@ -27,6 +31,15 @@
 			if (errorMessage.length > 1) {
 				hasError = true;
 			}
+
+			if (response.ok) {
+				createdAccount = true;
+
+				setTimeout(function () {
+					isVisible = false;
+					location.replace("/projects");
+				}, 2000);
+			}
 		} catch (error) {
 			hasError = true;
 			isCreatingAccount = false;
@@ -35,8 +48,19 @@
 	}
 </script>
 
-<Modal>
-	<AccountCreation on:click={handleAccountCreation} {errorMessage} {hasError} {isCreatingAccount} />
+<Modal modalHeaderVisible={!createdAccount}>
+	{#if createdAccount}
+		{#if isVisible}
+			<AccountCreationSuccess />
+		{/if}
+	{:else}
+		<AccountCreation
+			on:click={handleAccountCreation}
+			{errorMessage}
+			{hasError}
+			{isCreatingAccount}
+		/>
+	{/if}
 </Modal>
 
 <style>
