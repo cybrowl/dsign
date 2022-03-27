@@ -1,14 +1,13 @@
-<script>
-	// import { amp, browser, dev, mode, prerendering } from '$app/env';
-	import AccountCreation from '../components/AccountCreation.svelte';
-	import Header from '../components/Header.svelte';
-	import Settings from '../components/Settings.svelte';
-	import { isSettingsActive, isAccountCreationActive } from '../store/modal';
-</script>
-
 <svelte:head>
 	<title>DSign</title>
 </svelte:head>
+
+<script>
+	import { isSettingsActive, isAccountCreationActive } from '../store/modal';
+	import AccountCreationModal from '../components/AccountCreationModal.svelte';
+	import AccountSettingsModal from '../components/AccountSettingsModal.svelte';
+	import Header from '../components/Header.svelte';
+</script>
 
 <main>
 	<html lang="en" class="dark">
@@ -16,10 +15,10 @@
 			<div class="grid grid-cols-12 gap-2">
 				<Header />
 				{#if $isSettingsActive}
-					<Settings />
+					<AccountSettingsModal />
 				{/if}
 				{#if $isAccountCreationActive}
-					<AccountCreation />
+					<AccountCreationModal />
 				{/if}
 			</div>
 		</body>

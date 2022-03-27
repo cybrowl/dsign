@@ -8,40 +8,38 @@
 
 	let hasAccount = false;
 
-	// read local storage
-	let hasUsername = $profileStorage.username.length > 0 || false;
-
 	// call profile manager canister
 	let hasAccountPromise = $profileManager.actor.has_account();
 	let profilePromise = $profileManager.actor.get_profile();
 
 	onMount(async () => {
-		hasAccount = await hasAccountPromise;
+		try {
+			// let hasAccountLocalStorage = $profileStorage.username.length > 0 || false;
 
-		if (!hasAccount) {
-			isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
-		}
+			hasAccount = await hasAccountPromise;
+			let { ok: profile } = await profilePromise;
 
-		let { ok: profile } = await profilePromise;
-
-		// read local storage directly
-		if (!hasUsername) {
-			//TODO: fix bug when user logout
-			//TODO: set when logout/login
+			// save to local storage every time
 			profileStorage.set({
 				avatar: get(profile, 'avatar', ''),
 				username: get(profile, 'username', '')
 			});
+		} catch (error) {
+			console.log('error: ', error);
+		}
+
+		// account creation modal should be visible when user hasn't created an account
+		if (!hasAccount) {
+			isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
 		}
 	});
 
-	async function handleSettingsModal() {
+	async function openSettingsModal() {
 		if (hasAccount) {
+			//TODO: rename isSettingsActive to isAccountSettingsModalVisible
 			isSettingsActive.update((isSettingsActive) => !isSettingsActive);
 		} else {
-			let accountExists = await hasAccountPromise;
-			!accountExists &&
-				isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
+			isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
 		}
 	}
 </script>
@@ -50,7 +48,7 @@
 	avatar={$profileStorage.avatar}
 	firstCharUsername={$profileStorage.username.charAt(0)}
 	lastCharUsername={$profileStorage.username.charAt($profileStorage.username.length - 1)}
-	on:click={handleSettingsModal}
+	on:click={openSettingsModal}
 />
 
 <style>
