@@ -1,5 +1,5 @@
 <script>
-	import { isSettingsActive, isAccountCreationActive } from '../store/modal';
+	import { isAccountSettingsModalVisible, isAccountCreationActive } from '../store/modal';
 	import { onMount } from 'svelte';
 	import { profileManager } from '../store/profile_manager';
 	import { profileStorage } from '../store/local_storage';
@@ -36,8 +36,8 @@
 
 	async function openSettingsModal() {
 		if (hasAccount) {
-			//TODO: rename isSettingsActive to isAccountSettingsModalVisible
-			isSettingsActive.update((isSettingsActive) => !isSettingsActive);
+			//TODO: rename isAccountSettingsModalVisible to isAccountSettingsModalVisible
+			isAccountSettingsModalVisible.update((isAccountSettingsModalVisible) => !isAccountSettingsModalVisible);
 		} else {
 			isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
 		}

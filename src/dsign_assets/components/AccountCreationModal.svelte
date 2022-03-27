@@ -1,6 +1,6 @@
 <script>
 	import { profileManager } from '../store/profile_manager';
-	import CreateUsername from 'dsign-components/components/CreateUsername.svelte';
+	import AccountCreation from 'dsign-components/components/AccountCreation.svelte';
 	import Modal from 'dsign-components/components/Modal.svelte';
 	import { getErrorMessage } from '../lib/utils';
 
@@ -13,7 +13,7 @@
 	let hasError = false;
 	let isCreatingAccount = false;
 
-	async function handleCreateProfile(e) {
+	async function handleAccountCreation(e) {
 		try {
 			hasError = false;
 			errorMessage = '';
@@ -36,7 +36,7 @@
 </script>
 
 <Modal>
-	<CreateUsername on:click={handleCreateProfile} {errorMessage} {hasError} {isCreatingAccount} />
+	<AccountCreation on:click={handleAccountCreation} {errorMessage} {hasError} {isCreatingAccount} />
 </Modal>
 
 <style>

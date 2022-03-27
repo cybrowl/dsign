@@ -1,13 +1,12 @@
 <script>
 	import { client } from '../store/client';
 	import { createActor, profileManager } from '../store/profile_manager';
-	import { isSettingsActive } from '../store/modal';
+	import { isAccountSettingsModalVisible } from '../store/modal';
 	import { profileStorage } from '../store/local_storage';
 	import { removeFromStorage } from '../store/local_storage';
-	import Modal from 'dsign-components/components/Modal.svelte';
-	import Settings from 'dsign-components/components/Settings.svelte';
 	import get from 'lodash/get.js';
-	// let profilePromise = $profileManager.actor.get_profile();
+	import Modal from 'dsign-components/components/Modal.svelte';
+	import AccountSettings from 'dsign-components/components/AccountSettings.svelte';
 
 	async function handleAvatarChange(event) {
 		let files = event.detail;
@@ -30,7 +29,7 @@
 	}
 
 	function handleCloseModal() {
-		isSettingsActive.update((isSettingsActive) => !isSettingsActive);
+		isAccountSettingsModalVisible.update((isAccountSettingsModalVisible) => !isAccountSettingsModalVisible);
 	}
 
 	async function handleLogOut() {
@@ -52,7 +51,7 @@
 </script>
 
 <Modal centered={false} on:closeModal={handleCloseModal}>
-	<Settings
+	<AccountSettings
 		avatar={$profileStorage.avatar}
 		username={$profileStorage.username}
 		on:avatarChange={handleAvatarChange}
