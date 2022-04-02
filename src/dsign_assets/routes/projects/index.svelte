@@ -4,7 +4,7 @@
 </svelte:head>
 
 <script>
-	import { isAccountSettingsModalVisible, isAccountCreationActive } from '../../store/modal';
+	import { isAccountSettingsModalVisible, isAccountCreationModalVisible } from '../../store/modal';
 	import AccountCreationModal from '../../components/AccountCreationModal.svelte';
 	import AccountSettingsModal from '../../components/AccountSettingsModal.svelte';
 	import Header from '../../components/Header.svelte';
@@ -18,7 +18,7 @@
 				{#if $isAccountSettingsModalVisible}
 					<AccountSettingsModal />
 				{/if}
-				{#if $isAccountCreationActive}
+				{#if $isAccountCreationModalVisible}
 					<AccountCreationModal />
 				{/if}
 			</div>

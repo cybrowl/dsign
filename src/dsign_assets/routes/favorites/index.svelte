@@ -1,11 +1,11 @@
+<!-- src/routes/favorites.svelte -->
 <script>
-	import { isAccountSettingsModalVisible, isAccountCreationActive } from '../../store/modal';
+	import { isAccountSettingsModalVisible, isAccountCreationModalVisible } from '../../store/modal';
 	import AccountCreationModal from '../../components/AccountCreationModal.svelte';
 	import AccountSettingsModal from '../../components/AccountSettingsModal.svelte';
 	import Header from '../../components/Header.svelte';
 </script>
 
-<!-- src/routes/favorites.svelte -->
 <svelte:head>
 	<title>Favorites</title>
 </svelte:head>
@@ -18,7 +18,7 @@
 				{#if $isAccountSettingsModalVisible}
 					<AccountSettingsModal />
 				{/if}
-				{#if $isAccountCreationActive}
+				{#if $isAccountCreationModalVisible}
 					<AccountCreationModal />
 				{/if}
 			</div>

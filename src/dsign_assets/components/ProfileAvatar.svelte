@@ -1,5 +1,5 @@
 <script>
-	import { isAccountSettingsModalVisible, isAccountCreationActive } from '../store/modal';
+	import { isAccountSettingsModalVisible, isAccountCreationModalVisible } from '../store/modal';
 	import { onMount } from 'svelte';
 	import { profileManager } from '../store/profile_manager';
 	import { profileStorage } from '../store/local_storage';
@@ -28,7 +28,7 @@
 
 		// account creation modal should be visible when user hasn't created an account
 		if (!hasAccount) {
-			isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
+			isAccountCreationModalVisible.update((isAccountCreationModalVisible) => !isAccountCreationModalVisible);
 		}
 	});
 
@@ -38,7 +38,7 @@
 				(isAccountSettingsModalVisible) => !isAccountSettingsModalVisible
 			);
 		} else {
-			isAccountCreationActive.update((isAccountCreationActive) => !isAccountCreationActive);
+			isAccountCreationModalVisible.update((isAccountCreationModalVisible) => !isAccountCreationModalVisible);
 		}
 	}
 </script>

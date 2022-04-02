@@ -53,7 +53,7 @@ actor ProfileManager {
 
     // Canister Logic Utils
     public func version() : async Text {
-        return "0.0.5";
+        return "0.0.6";
     };
 
     public shared (msg) func whoami() : async Principal {
@@ -220,50 +220,45 @@ actor ProfileManager {
         await Logger.log_event(tags, debug_show(("profile_canister_created", canisterID)));
     };
 
-    system func heartbeat() : async () {
-        let SECONDS_TO_CHECK_CANISTER_FILLED = 60;
-        let now = Time.now();
-        let elapsedSeconds = (now - anchorTime) / 1000_000_000;
+    public shared (msg) func heart_beat() : async ()  {
+        let tags = [ACTOR_NAME, "heartbeat"];
 
-        if (elapsedSeconds > SECONDS_TO_CHECK_CANISTER_FILLED) {
-            let tags = [ACTOR_NAME, "heartbeat"];
+        // initialize first avatar canister
+        if (currentEmptyAvatarCanisterID.size() < 1) {
+            await Logger.log_event(tags, debug_show(("Initialize: currentEmptyAvatarCanisterID", currentEmptyAvatarCanisterID)));
 
-            anchorTime := now;
+            await create_avatar_canister();
+        };
 
-            // initialize first avatar canister
-            if (currentEmptyAvatarCanisterID.size() < 1) {
-                await Logger.log_event(tags, debug_show(("Initialize: currentEmptyAvatarCanisterID", currentEmptyAvatarCanisterID)));
+        // initialize first profile canister
+        if (currentEmptyProfileCanisterID.size() < 1) {
+            await Logger.log_event(tags, debug_show(("Initialize: currentEmptyProfileCanisterID", currentEmptyProfileCanisterID)));
 
-                await create_avatar_canister();
-            };
+            await create_profile_canister();
+        };
 
-            // initialize first profile canister
-            if (currentEmptyProfileCanisterID.size() < 1) {
-                await Logger.log_event(tags, debug_show(("Initialize: currentEmptyProfileCanisterID", currentEmptyProfileCanisterID)));
+        // check if avatar canister is full
+        //TODO: test in Prod
+        let avatarActor = actor (currentEmptyAvatarCanisterID) : AvatarActor;
+        let isAvatarCanisterFull = await avatarActor.is_full();
 
-                await create_profile_canister();
-            };
+        if (isAvatarCanisterFull) {
+            await Logger.log_event(tags, "avatar_canister_is_full");
+            await create_avatar_canister();
+        };
 
-            // check if avatar canister is full
-            //TODO: test in Prod
-            let avatarActor = actor (currentEmptyAvatarCanisterID) : AvatarActor;
-            let isAvatarCanisterFull = await avatarActor.is_full();
+        // check if profile canister is full
+        //TODO: test in Prod
+        let profileActor = actor (currentEmptyProfileCanisterID) : ProfileActor;
+        let isProfileCanisterFull = await profileActor.is_full();
 
-            if (isAvatarCanisterFull) {
-                await Logger.log_event(tags, "avatar_canister_is_full");
-                await create_avatar_canister();
-            };
+        if (isProfileCanisterFull) {
+            await Logger.log_event(tags, "profile_canister_is_full");
+            await create_profile_canister();
+        };
 
-            // check if profile canister is full
-            //TODO: test in Prod
-            let profileActor = actor (currentEmptyProfileCanisterID) : ProfileActor;
-            let isProfileCanisterFull = await profileActor.is_full();
-
-            if (isProfileCanisterFull) {
-                await Logger.log_event(tags, "profile_canister_is_full");
-                await create_profile_canister();
-            };
-        }
+         await Logger.log_event(tags, debug_show(("End: currentEmptyAvatarCanisterID", currentEmptyAvatarCanisterID)));
+         await Logger.log_event(tags, debug_show(("End: currentEmptyProfileCanisterID", currentEmptyProfileCanisterID)));
     };
 
     system func preupgrade() {
