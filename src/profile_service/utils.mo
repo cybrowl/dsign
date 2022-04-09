@@ -56,7 +56,7 @@ module {
             return false;
         };
 
-        if (username.size() < 1) {
+        if (username.size() < 2) {
             return false;
         };
 

@@ -1,13 +1,12 @@
 <script>
 	import { getErrorMessage } from '../lib/utils';
-	import { goto } from '$app/navigation';
 	import { profileManager } from '../store/profile_manager';
 	import AccountCreation from 'dsign-components/components/AccountCreation.svelte';
 	import AccountCreationSuccess from 'dsign-components/components/AccountCreationSuccess.svelte';
 	import Modal from 'dsign-components/components/Modal.svelte';
 
 	let errorMessages = {
-		UsernameInvalid: 'Use lower case letters with 20 characters or less',
+		UsernameInvalid: 'Use lower case letters and numbers only, 2 - 20 characters in length',
 		UsernameTaken: 'Username already taken'
 	};
 

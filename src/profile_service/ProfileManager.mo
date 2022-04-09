@@ -80,6 +80,7 @@ actor ProfileManager {
         switch (usernames.get(userId)) {
             case (?username) {
                 // save to get avatar canister id with userId
+                //TODO: this is not being used
                 canisterAvatarIds.put(userId, currentEmptyAvatarCanisterID);
 
                 // call avatar canister and set avatar
