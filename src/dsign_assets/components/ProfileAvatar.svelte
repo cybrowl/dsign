@@ -8,7 +8,7 @@
 
 	let hasAccount = false;
 
-	// call profile manager canister
+	// call account settings canister
 	let hasAccountPromise = $accountSettings.actor.has_account();
 	let profilePromise = $accountSettings.actor.get_profile();
 
