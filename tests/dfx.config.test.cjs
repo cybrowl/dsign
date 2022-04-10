@@ -11,7 +11,7 @@ test(`${filename}: generateCanisterAliases()`, async function (t) {
 		'$IDLdsign_assets': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/dsign_assets.did.js',
 		'$IDLprofile': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile/profile.did.js',
 		'$IDLprofile_avatar': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile_avatar/profile_avatar.did.js',
-		'$IDLprofile_manager': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile_manager/profile_manager.did.js',
+		'$IDLaccount_settings': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/account_settings/account_settings.did.js',
 		'$IDLlogger': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/logger/logger.did.js'
 	};
 

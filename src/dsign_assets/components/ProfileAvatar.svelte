@@ -1,7 +1,7 @@
 <script>
 	import { isAccountSettingsModalVisible, isAccountCreationModalVisible } from '../store/modal';
 	import { onMount } from 'svelte';
-	import { profileManager } from '../store/profile_manager';
+	import { accountSettings } from '../store/account_settings';
 	import { profileStorage } from '../store/local_storage';
 	import Avatar from 'dsign-components/components/Avatar.svelte';
 	import get from 'lodash/get.js';
@@ -9,8 +9,8 @@
 	let hasAccount = false;
 
 	// call profile manager canister
-	let hasAccountPromise = $profileManager.actor.has_account();
-	let profilePromise = $profileManager.actor.get_profile();
+	let hasAccountPromise = $accountSettings.actor.has_account();
+	let profilePromise = $accountSettings.actor.get_profile();
 
 	onMount(async () => {
 		try {

@@ -15,19 +15,19 @@ import Profile "Profile";
 import Types "./types";
 import Utils "./utils";
 
-actor ProfileManager {
+actor AccountSettings {
+    type AccountSettingsError = Types.AccountSettingsError;
+    type AccountSettingsOk = Types.AccountSettingsOk;
     type AvatarActor = Types.AvatarActor;
     type Canister = Types.Canister;
     type CanisterID = Types.CanisterID;
     type Image = Types.Image;
     type Profile = Types.Profile;
     type ProfileActor = Types.ProfileActor;
-    type ProfileManagerError = Types.ProfileManagerError;
-    type ProfileManagerOk = Types.ProfileManagerOk;
     type UserID = Types.UserID;
     type Username = Types.Username;
 
-    let ACTOR_NAME : Text = "ProfileManager";
+    let ACTOR_NAME : Text = "AccountSettings";
     let cycleAmount : Nat = 1_000_000_000_000;
 
     // User Data Management
@@ -45,8 +45,8 @@ actor ProfileManager {
 
     // Canister Data Management
     stable var anchorTime = Time.now();
-    stable var currentEmptyAvatarCanisterID : Text = "renrk-eyaaa-aaaaa-aaada-cai";
-    stable var currentEmptyProfileCanisterID : Text = "rno2w-sqaaa-aaaaa-aaacq-cai";
+    stable var currentEmptyAvatarCanisterID : Text = "";
+    stable var currentEmptyProfileCanisterID : Text = "";
 
     var canisterCache : HashMap.HashMap<CanisterID, Canister> = HashMap.HashMap(1, Text.equal, Text.hash);
     stable var canisterCacheEntries : [(CanisterID, Canister)] = [];
@@ -73,7 +73,7 @@ actor ProfileManager {
         };
     };
 
-    public shared (msg) func set_avatar(avatar: Image) : async Result.Result<ProfileManagerOk, ProfileManagerError> {
+    public shared (msg) func set_avatar(avatar: Image) : async Result.Result<AccountSettingsOk, AccountSettingsError> {
         let tags = [ACTOR_NAME, "set_avatar"];
         let userId : UserID = Principal.toText(msg.caller);
 
@@ -107,7 +107,7 @@ actor ProfileManager {
         };
     };
 
-    public shared (msg) func create_profile(username: Username) : async Result.Result<ProfileManagerOk, ProfileManagerError> {
+    public shared (msg) func create_profile(username: Username) : async Result.Result<AccountSettingsOk, AccountSettingsError> {
         // NOTE: this should only be executed once by user
         let tags = [ACTOR_NAME, "create_profile"];
         let userId : UserID = Principal.toText(msg.caller);
@@ -144,7 +144,7 @@ actor ProfileManager {
         };
     };
 
-    public shared (msg) func get_profile() : async Result.Result<Profile, ProfileManagerError> {
+    public shared (msg) func get_profile() : async Result.Result<Profile, AccountSettingsError> {
         let tags = [ACTOR_NAME, "get_profile"];
         let userId : UserID = Principal.toText(msg.caller);
 
@@ -197,12 +197,12 @@ actor ProfileManager {
 
     private func create_profile_canister() : async () {
         let tags = [ACTOR_NAME, "create_profile_canister"];
-        let profileManagerPrincipal =  await whoami();
-        let profileManagerPrincipalText = Principal.toText(profileManagerPrincipal);
+        let accountSettingsPrincipal =  await whoami();
+        let accountSettingsPrincipalText = Principal.toText(accountSettingsPrincipal);
 
         // create canister
         Cycles.add(cycleAmount);
-        let profileActor = await Profile.Profile(profileManagerPrincipalText, currentEmptyAvatarCanisterID);
+        let profileActor = await Profile.Profile(accountSettingsPrincipalText, currentEmptyAvatarCanisterID);
         let principal = Principal.fromActor(profileActor);
         let canisterID = Principal.toText(principal);
 

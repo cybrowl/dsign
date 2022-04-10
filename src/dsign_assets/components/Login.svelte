@@ -1,9 +1,9 @@
 <script>
 	import { AuthClient } from '@dfinity/auth-client';
 	import { client } from '../store/client';
-	import { createActor as createActorProfileManager } from '../store/profile_manager';
+	import { createActor as createActorAccountSettings } from '../store/account_settings';
 	import { onMount } from 'svelte';
-	import { profileManager } from '../store/profile_manager';
+	import { accountSettings } from '../store/account_settings';
 	import { removeFromStorage } from '../store/local_storage';
 	import Button from 'dsign-components/components/Button.svelte';
 	import environment from 'environment';
@@ -23,9 +23,9 @@
 		if (isAuthenticated) {
 			handleAuth();
 		} else {
-			profileManager.update(() => ({
+			accountSettings.update(() => ({
 				loggedIn: false,
-				actor: createActorProfileManager()
+				actor: createActorAccountSettings()
 			}));
 
 			removeFromStorage('profile');
@@ -33,9 +33,9 @@
 	});
 
 	function handleAuth() {
-		profileManager.update(() => ({
+		accountSettings.update(() => ({
 			loggedIn: true,
-			actor: createActorProfileManager({
+			actor: createActorAccountSettings({
 				agentOptions: {
 					identity: $client.getIdentity()
 				}
@@ -54,7 +54,7 @@
 </script>
 
 <span>
-	{#if $profileManager.loggedIn}
+	{#if $accountSettings.loggedIn}
 		<div class="flex items-center">
 			<Button label="Upload" primary={true} class="mr-4" />
 			<ProfileAvatar />

@@ -3,7 +3,7 @@
     "dsign_assets": {
       "dependencies": [
         "logger",
-        "profile_manager"
+        "account_settings"
       ],
       "frontend": {
         "entrypoint": "build/index.html"
@@ -13,29 +13,29 @@
       ],
       "type": "assets"
     },
+    "account_settings": {
+      "main": "src/service_account_settings/AccountSettings.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger"
+      ]
+    },
     "profile": {
-      "main": "src/profile_service/Profile.mo",
+      "main": "src/service_account_settings/Profile.mo",
       "type": "motoko",
       "dependencies": [
         "logger"
       ]
     },
     "profile_avatar": {
-      "main": "src/profile_service/Avatar.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger"
-      ]
-    },
-    "profile_manager": {
-      "main": "src/profile_service/ProfileManager.mo",
+      "main": "src/service_account_settings/Avatar.mo",
       "type": "motoko",
       "dependencies": [
         "logger"
       ]
     },
     "logger": {
-      "main": "src/logger_service/logger.mo",
+      "main": "src/service_logger/logger.mo",
       "type": "motoko"
     }
   },

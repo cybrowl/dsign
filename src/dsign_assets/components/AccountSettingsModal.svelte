@@ -1,6 +1,6 @@
 <script>
 	import { client } from '../store/client';
-	import { createActor, profileManager } from '../store/profile_manager';
+	import { createActor, accountSettings } from '../store/account_settings';
 	import { isAccountSettingsModalVisible } from '../store/modal';
 	import { profileStorage } from '../store/local_storage';
 	import { removeFromStorage } from '../store/local_storage';
@@ -18,8 +18,8 @@
 			content: [...imageAsUnit8ArrayBuffer]
 		};
 
-		await $profileManager.actor.set_avatar(avatar);
-		let { ok: profile } = await $profileManager.actor.get_profile();
+		await $accountSettings.actor.set_avatar(avatar);
+		let { ok: profile } = await $accountSettings.actor.get_profile();
 
 		profileStorage.set({
 			avatar: get(profile, 'avatar', '') + '&' + Math.floor(Math.random() * 100),
@@ -35,7 +35,7 @@
 	async function handleLogOut() {
 		await $client.logout();
 
-		profileManager.update(() => ({
+		accountSettings.update(() => ({
 			loggedIn: false,
 			actor: createActor({
 				agentOptions: {

@@ -1,6 +1,6 @@
 <script>
 	import { getErrorMessage } from '../lib/utils';
-	import { profileManager } from '../store/profile_manager';
+	import { accountSettings } from '../store/account_settings';
 	import AccountCreation from 'dsign-components/components/AccountCreation.svelte';
 	import AccountCreationSuccess from 'dsign-components/components/AccountCreationSuccess.svelte';
 	import Modal from 'dsign-components/components/Modal.svelte';
@@ -22,7 +22,7 @@
 			errorMessage = '';
 			isCreatingAccount = true;
 
-			const response = await $profileManager.actor.create_profile(e.detail.username);
+			const response = await $accountSettings.actor.create_profile(e.detail.username);
 
 			errorMessage = getErrorMessage(response, errorMessages);
 			isCreatingAccount = false;

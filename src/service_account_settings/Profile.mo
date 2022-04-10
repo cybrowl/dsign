@@ -10,7 +10,7 @@ import Time "mo:base/Time";
 import Logger "canister:logger";
 import Types "./types";
 
-actor class Profile(profileManagerPrincipalText : Text, avatarCanisterId : Text) = {
+actor class Profile(accountSettingsPrincipalText : Text, avatarCanisterId : Text) = {
     type UserID = Types.UserID;
     type Username = Types.Username;
     type Profile = Types.Profile;
@@ -23,7 +23,7 @@ actor class Profile(profileManagerPrincipalText : Text, avatarCanisterId : Text)
     var isProduction : Bool = false;
     var host : Text = "";
 
-    if (Text.equal(profileManagerPrincipalText, "inwlb-baaaa-aaaag-aaaza-cai")) {
+    if (Text.equal(accountSettingsPrincipalText, "inwlb-baaaa-aaaag-aaaza-cai")) {
         isProduction := true;
     };
 

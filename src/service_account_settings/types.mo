@@ -44,7 +44,7 @@ module {
         status_code : Nat16;
     };
 
-    public type ProfileManagerError = {
+    public type AccountSettingsError = {
         #AvatarSetFailed;
         #CanisterIdNotFound;
         #FailedGetProfile;
@@ -53,7 +53,7 @@ module {
         #UsernameTaken;
     };
 
-    public type ProfileManagerOk = {
+    public type AccountSettingsOk = {
         #AvatarCreated;
         #ProfileCreated;
     };
