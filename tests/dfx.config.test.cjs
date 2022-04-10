@@ -1,24 +1,25 @@
 const test = require('tape');
 const { generateCanisterAliases, getEnvironmentPath } = require('../config/dfx.config.cjs');
 
-const filename = 'dfx.Config';
-
-test(`${filename}: generateCanisterAliases()`, async function (t) {
+test('DFX Config: generateCanisterAliases()', async function (t) {
 	const aliases = generateCanisterAliases();
 
 	const expected = {
 		'local-canister-ids': '/Users/cyberowl/Projects/dsign/.dfx/local/canister_ids.json',
-		'$IDLdsign_assets': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/dsign_assets.did.js',
-		'$IDLprofile': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile/profile.did.js',
-		'$IDLprofile_avatar': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile_avatar/profile_avatar.did.js',
-		'$IDLaccount_settings': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/account_settings/account_settings.did.js',
-		'$IDLlogger': '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/logger/logger.did.js'
+		$IDLdsign_assets:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/dsign_assets.did.js',
+		$IDLprofile: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile/profile.did.js',
+		$IDLprofile_avatar:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile_avatar/profile_avatar.did.js',
+		$IDLaccount_settings:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/account_settings/account_settings.did.js',
+		$IDLlogger: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/logger/logger.did.js'
 	};
 
 	t.deepEqual(aliases, expected);
 });
 
-test(`${filename}: getEnvironmentPath()`, async function (t) {
+test('DFX Config: getEnvironmentPath()', async function (t) {
 	const isDevelopment = false;
 	const environmentDev = getEnvironmentPath(isDevelopment);
 	const environmentProd = getEnvironmentPath(!isDevelopment);
