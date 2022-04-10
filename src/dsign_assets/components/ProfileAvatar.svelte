@@ -1,7 +1,7 @@
 <script>
+	import { accountSettings } from '../store/account_settings';
 	import { isAccountSettingsModalVisible, isAccountCreationModalVisible } from '../store/modal';
 	import { onMount } from 'svelte';
-	import { accountSettings } from '../store/account_settings';
 	import { profileStorage } from '../store/local_storage';
 	import Avatar from 'dsign-components/components/Avatar.svelte';
 	import get from 'lodash/get.js';

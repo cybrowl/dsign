@@ -1,9 +1,9 @@
 <script>
+	import { accountSettings } from '../store/account_settings';
 	import { AuthClient } from '@dfinity/auth-client';
 	import { client } from '../store/client';
 	import { createActor as createActorAccountSettings } from '../store/account_settings';
 	import { onMount } from 'svelte';
-	import { accountSettings } from '../store/account_settings';
 	import { removeFromStorage } from '../store/local_storage';
 	import Button from 'dsign-components/components/Button.svelte';
 	import environment from 'environment';

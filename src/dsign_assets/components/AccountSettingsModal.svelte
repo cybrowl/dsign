@@ -4,9 +4,9 @@
 	import { isAccountSettingsModalVisible } from '../store/modal';
 	import { profileStorage } from '../store/local_storage';
 	import { removeFromStorage } from '../store/local_storage';
+	import AccountSettings from 'dsign-components/components/AccountSettings.svelte';
 	import get from 'lodash/get.js';
 	import Modal from 'dsign-components/components/Modal.svelte';
-	import AccountSettings from 'dsign-components/components/AccountSettings.svelte';
 
 	async function handleAvatarChange(event) {
 		let files = event.detail;

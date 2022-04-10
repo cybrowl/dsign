@@ -1,6 +1,6 @@
 <script>
-	import { getErrorMessage } from '../lib/utils';
 	import { accountSettings } from '../store/account_settings';
+	import { getErrorMessage } from '../lib/utils';
 	import AccountCreation from 'dsign-components/components/AccountCreation.svelte';
 	import AccountCreationSuccess from 'dsign-components/components/AccountCreationSuccess.svelte';
 	import Modal from 'dsign-components/components/Modal.svelte';
