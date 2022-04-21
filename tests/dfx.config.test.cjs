@@ -13,6 +13,7 @@ test('DFX Config: generateCanisterAliases()', async function (t) {
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile_avatar/profile_avatar.did.js',
 		$IDLaccount_settings:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/account_settings/account_settings.did.js',
+		$IDLproject_manager: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/project_manager/project_manager.did.js',
 		$IDLlogger: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/logger/logger.did.js'
 	};
 

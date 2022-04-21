@@ -35,7 +35,7 @@ actor class Profile(accountSettingsPrincipalText : Text, avatarCanisterId : Text
 
     // Canister Management
     public query func version() : async Text {
-        return "0.0.1";
+        return "0.0.2";
     };
 
     public query func get_cycles_balance() : async Nat {

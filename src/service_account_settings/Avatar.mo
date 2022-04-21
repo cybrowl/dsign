@@ -20,7 +20,7 @@ actor class Avatar() = {
     var avatars : HashMap.HashMap<Username, Image> = HashMap.HashMap(1, Text.equal, Text.hash);
 
     public query func version() : async Text {
-        return "0.0.1";
+        return "0.0.2";
     };
 
     public func is_full() : async Bool {

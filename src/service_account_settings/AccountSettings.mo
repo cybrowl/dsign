@@ -53,7 +53,7 @@ actor AccountSettings {
 
     // Canister Logic Utils
     public func version() : async Text {
-        return "0.0.6";
+        return "0.0.2";
     };
 
     public shared (msg) func whoami() : async Principal {
