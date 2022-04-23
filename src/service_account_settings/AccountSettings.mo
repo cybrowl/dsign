@@ -124,7 +124,7 @@ actor AccountSettings {
                     #err(#UsernameTaken)
                 };
                 case (null) {
-                    // save to get useId with username
+                    // save to get userId with username
                     userIds.put(username, userId);
 
                     // save to get username with userId

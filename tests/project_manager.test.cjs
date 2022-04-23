@@ -22,3 +22,15 @@ test('Project Manager: version()', async function (t) {
 	console.log("version: ", response);
 	t.equal(typeof response, 'string');
 });
+
+test('Project Manager: heart_beat()', async function (t) {
+	const response = await projectManager.heart_beat();
+
+	console.log("response: ", response);
+});
+
+test('Project Manager: create_snap()', async function (t) {
+	const response = await projectManager.create_snap();
+
+	console.log("response: ", response);
+});

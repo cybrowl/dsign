@@ -11,6 +11,7 @@
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "preview": "svelte-kit preview",
     "test-d": "tape tests/**.test.cjs",
+    "test-p": "tape tests/project_manager.test.cjs",
     "test": "tape tests/**.test.cjs | tnyan",
     "watch": "svelte-kit dev"
   },
