@@ -6,12 +6,12 @@
   "scripts": {
     "build": "svelte-kit build",
     "dev": "bash ./scripts/build.sh",
-    "debug": "tape tests/debug/debug.test.cjs",
+    "logs": "tape tests/debug/debug.test.cjs",
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "preview": "svelte-kit preview",
     "test-d": "tape tests/**.test.cjs",
-    "test-p": "tape tests/project_manager.test.cjs",
+    "test-p": "tape tests/projects.test.cjs",
     "test": "tape tests/**.test.cjs | tnyan",
     "watch": "svelte-kit dev"
   },
