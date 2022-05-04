@@ -23,10 +23,8 @@ actor ProjectsMain {
 
     // User Logic Management
     public query func version() : async Text {
-        return "0.0.3";
+        return "0.0.1";
     };
-
-
 
     // Canister Logic Management
     private func create_project_canister() : async () {

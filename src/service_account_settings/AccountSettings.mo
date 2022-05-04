@@ -56,8 +56,8 @@ actor AccountSettings {
         return "0.0.2";
     };
 
-    public shared (msg) func whoami() : async Principal {
-        return msg.caller;
+    public shared (msg) func whoami() : async Text {
+        return Principal.toText(msg.caller);
     };
 
     // User Logic Management
@@ -70,6 +70,17 @@ actor AccountSettings {
                 return true;
             };
             case(_) { return false };
+        };
+    };
+
+    public query (msg) func get_username(userPrincipal: Text) : async Text  {
+        //TODO: add auth
+
+        switch (usernames.get(userPrincipal)) {
+            case (?username) {
+                return username;
+            };
+            case(_) { return "" };
         };
     };
 
@@ -198,11 +209,10 @@ actor AccountSettings {
     private func create_profile_canister() : async () {
         let tags = [ACTOR_NAME, "create_profile_canister"];
         let accountSettingsPrincipal =  await whoami();
-        let accountSettingsPrincipalText = Principal.toText(accountSettingsPrincipal);
 
         // create canister
         Cycles.add(cycleAmount);
-        let profileActor = await Profile.Profile(accountSettingsPrincipalText, currentEmptyAvatarCanisterID);
+        let profileActor = await Profile.Profile(accountSettingsPrincipal, currentEmptyAvatarCanisterID);
         let principal = Principal.fromActor(profileActor);
         let canisterID = Principal.toText(principal);
 

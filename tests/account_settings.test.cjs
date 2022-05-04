@@ -53,6 +53,15 @@ test('Account Settings: get_profile()', async function (t) {
 	t.equal(response.ok.username, username.toLowerCase());
 });
 
+test('Account Settings: get_username()', async function (t) {
+	setTimeout(function () {}, 8000);
+
+	const userId = await accountSettings.whoami();
+	const response = await accountSettings.get_username(userId);
+
+	t.equal(typeof response, 'string');
+});
+
 test('Account Settings: set_avatar()', async function (t) {
 	try {
 		const imageAsBuffer = fs.readFileSync('tests/images/motoko.png');
