@@ -6,11 +6,11 @@ module {
     public type Time = Int;
     public type UserPrincipal = Text;
     public type Username = Text;
-    public type CanisterSnapID = Text;
+    public type SnapStorageCanisterID = Text;
     public type SnapID = Text;
 
     public type CanisterSnap = {
-        CanisterSnapID: CanisterSnapID;
+        SnapStorageCanisterID: SnapStorageCanisterID;
         SnapID: SnapID;
     };
 

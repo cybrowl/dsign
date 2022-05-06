@@ -34,6 +34,11 @@ cp .dfx/local/canisters/projects/projects.did.js .dfx/local/canisters/projects/p
 sed -i '' 's/export//g' .dfx/local/canisters/projects/projects.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/projects/projects.did.test.cjs
 
+# snaps
+cp .dfx/local/canisters/snaps/snaps.did.js .dfx/local/canisters/snaps/snaps.did.test.cjs
+sed -i '' 's/export//g' .dfx/local/canisters/snaps/snaps.did.test.cjs
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/snaps/snaps.did.test.cjs
+
 # logger
 cp .dfx/local/canisters/logger/logger.did.js .dfx/local/canisters/logger/logger.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/logger/logger.did.test.cjs

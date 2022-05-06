@@ -1,55 +1,70 @@
+import B "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
-import H "mo:base/HashMap";
-import Principal "mo:base/Principal";
-import Option "mo:base/Option";
-import Text "mo:base/Text";
 import Debug "mo:base/Debug";
+import H "mo:base/HashMap";
+import Option "mo:base/Option";
+import Principal "mo:base/Principal";
+import Text "mo:base/Text";
 
-import Snap "Snap";
 import Logger "canister:logger";
+import Snap "Snap";
 import Types "./types";
 
-actor ProjectsMain {
-    type CanisterSnapID = Types.CanisterSnapID;
-    type CanisterSnap = Types.CanisterSnap;
-    type UserPrincipal = Types.UserPrincipal;
-    type Username = Types.Username;
+actor SnapsMain {
     type SnapID = Types.SnapID;
+    type SnapStorageCanisterID = Types.SnapStorageCanisterID;
+    type Username = Types.Username;
+    type UserPrincipal = Types.UserPrincipal;
 
-    let ACTOR_NAME : Text = "ProjectsMain";
+    let ACTOR_NAME : Text = "SnapsMain";
     let cycleAmount : Nat = 1_000_000_000;
 
     // User Data Management
-    var userSnapCanistersRef : H.HashMap<UserPrincipal, H.HashMap<CanisterSnapID, [SnapID]>> = H.HashMap(1, Text.equal, Text.hash);
-
-    // Canister Data Management
-    var currentEmptySnapCanisterID : Text = "";
+    var userSnapCanistersRef : H.HashMap<UserPrincipal, H.HashMap<SnapStorageCanisterID, B.Buffer<SnapID>>> = H.HashMap(1, Text.equal, Text.hash);
+    var snapStorageCanister : Text = "";
 
     // User Logic Management
     public query func version() : async Text {
-        return "0.0.3";
+        return "0.0.1";
     };
 
     public shared (msg) func create_snap(title: Text, isPublic: Bool, ) : async () {
+        let tags = [ACTOR_NAME, "create_snap"];
         let userPrincipal : UserPrincipal = Principal.toText(msg.caller);
 
+        // check if user has a snapStorageCanister
         switch (userSnapCanistersRef.get(userPrincipal)) {
-            case (?snapCanisterIds) {
-                switch (snapCanisterIds.get(currentEmptySnapCanisterID)) {
-                    case (?listSnapIds) {
-                        //TODO: add to listSnapIds
-                        // listSnapIds.put("New Snap": SnapID);
-                        Debug.print(debug_show(listSnapIds));
+            case (?snapStorageCanisterIds) {
+                // check if user has current Not Filled snapStorageCanister
+                switch (snapStorageCanisterIds.get(snapStorageCanister)) {
+                    case (?listOfSnapIds) {
+                        // create snap
+                        // add snap to snapStorageCanister
+                        // add snap id to listOfSnapIds
+
+                        listOfSnapIds.add("second");
+
+                        await Logger.log_event(tags, debug_show(("listOfSnapIds: ", listOfSnapIds.toArray())));
                     };
                     case(_) {
-                        //TODO: create new 
-                        Debug.print(debug_show("null"));
+                        // user doesn't have current empty snap storage canister
+                        // create snap
+                        // add snap to snapStorageCanister
+                        // add snapStorageCanisterID to snapStorageCanisterIds with listOfSnapIds
+                        await Logger.log_event(tags, debug_show("adding snapStorageCanister to snapStorageCanisterIds"));
                     };
                 };
             };
             case(_) {
-                var initialSnapCreation : H.HashMap<CanisterSnapID, [SnapID]> = H.HashMap(1, Text.equal, Text.hash);        
-                initialSnapCreation.put(currentEmptySnapCanisterID: CanisterSnapID, ["Initial Snap"] : [SnapID]);
+                // create initial SnapStorageCanisterID for user
+                await Logger.log_event(tags, debug_show(("user has zero snapStorageCanisterIds", userPrincipal)));
+
+                var initialSnapCreation : H.HashMap<SnapStorageCanisterID, B.Buffer<SnapID>> = H.HashMap(1, Text.equal, Text.hash);
+                var listOfSnapIds = B.Buffer<SnapID>(1);
+                listOfSnapIds.add("");
+    
+                initialSnapCreation.put(snapStorageCanister: SnapStorageCanisterID, listOfSnapIds);
+
                 userSnapCanistersRef.put(userPrincipal, initialSnapCreation);
             };
         }; 
@@ -59,10 +74,9 @@ actor ProjectsMain {
         let userPrincipal : UserPrincipal = Principal.toText(msg.caller);
 
         switch (userSnapCanistersRef.get(userPrincipal)) {
-            case (?canisterSnaps) {
-                for ((key, val) in canisterSnaps.entries()) {
+            case (?snapStorageCanisterIds) {
+                for ((key, val) in snapStorageCanisterIds.entries()) {
                     Debug.print(debug_show(key));
-                    Debug.print(debug_show(val));
                 };
             };
             case(_) {
@@ -79,24 +93,23 @@ actor ProjectsMain {
         Cycles.add(cycleAmount);
         let snapActor = await Snap.Snap();
         let principal = Principal.fromActor(snapActor);
-        let canisterSnapID = Principal.toText(principal);
+        let snapStorageCanisterID = Principal.toText(principal);
 
         // update current empty canister ID
-        currentEmptySnapCanisterID := canisterSnapID;
+        snapStorageCanister := snapStorageCanisterID;
 
-        await Logger.log_event(tags, debug_show(("create_snap_canister", canisterSnapID)));
+        await Logger.log_event(tags, debug_show(("snapStorageCanister: ", snapStorageCanister)));
     };
 
     public shared (msg) func heart_beat() : async ()  {
         let tags = [ACTOR_NAME, "heartbeat"];
 
-        // initialize first avatar canister
-        if (currentEmptySnapCanisterID.size() < 1) {
-            await Logger.log_event(tags, debug_show(("Initialize: currentEmptySnapCanisterID", currentEmptySnapCanisterID)));
+        if (snapStorageCanister.size() < 1) {
+            await Logger.log_event(tags, debug_show(("Initialize: snapStorageCanister", snapStorageCanister)));
 
             await create_snap_canister();
         };
 
-         await Logger.log_event(tags, debug_show(("End: currentEmptySnapCanisterID", currentEmptySnapCanisterID)));
+         await Logger.log_event(tags, debug_show(("End: snapStorageCanister", snapStorageCanister)));
     };
 };
