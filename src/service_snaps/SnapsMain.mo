@@ -38,6 +38,7 @@ actor SnapsMain {
                 // check if user has current Not Filled snapStorageCanister
                 switch (snapStorageCanisterIds.get(snapStorageCanister)) {
                     case (?listOfSnapIds) {
+                        // store images
                         // create snap
                         // add snap to snapStorageCanister
                         // add snap id to listOfSnapIds
@@ -48,6 +49,7 @@ actor SnapsMain {
                     };
                     case(_) {
                         // user doesn't have current empty snap storage canister
+                        // store images
                         // create snap
                         // add snap to snapStorageCanister
                         // add snapStorageCanisterID to snapStorageCanisterIds with listOfSnapIds

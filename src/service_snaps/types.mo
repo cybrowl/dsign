@@ -3,11 +3,16 @@ import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 
 module {
-    public type Time = Int;
-    public type UserPrincipal = Text;
-    public type Username = Text;
-    public type SnapStorageCanisterID = Text;
+    public type ImageID = Text;
     public type SnapID = Text;
+    public type SnapStorageCanisterID = Text;
+    public type Time = Int;
+    public type Username = Text;
+    public type UserPrincipal = Text;
+
+    public type Image = {
+        content: [Nat8]
+    };
 
     public type CanisterSnap = {
         SnapStorageCanisterID: SnapStorageCanisterID;
