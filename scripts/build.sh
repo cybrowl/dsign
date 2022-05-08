@@ -1,21 +1,5 @@
 #!/bin/bash
 
-# DFX BUILD #
-# stop
-# dfx stop
-
-# ## start clean
-# dfx start --clean --background
-
-# ## register canister identifiers
-# dfx canister create --all
-
-# ## build
-# dfx build
-
-# ## install 
-# dfx canister install --all
-
 # TESTING #
 # NOTE: update file OSX ONLY (Linux remove '')
 
@@ -38,6 +22,11 @@ echo "module.exports = { idlFactory };" >> .dfx/local/canisters/projects/project
 cp .dfx/local/canisters/snaps/snaps.did.js .dfx/local/canisters/snaps/snaps.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/snaps/snaps.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/snaps/snaps.did.test.cjs
+
+# snap_images
+cp .dfx/local/canisters/snap_images/snap_images.did.js .dfx/local/canisters/snap_images/snap_images.did.test.cjs
+sed -i '' 's/export//g' .dfx/local/canisters/snap_images/snap_images.did.test.cjs
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/snap_images/snap_images.did.test.cjs
 
 # logger
 cp .dfx/local/canisters/logger/logger.did.js .dfx/local/canisters/logger/logger.did.test.cjs

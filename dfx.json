@@ -48,6 +48,14 @@
         "logger"
       ]
     },
+    "snap_images": {
+      "main": "src/service_snaps/SnapImages.mo",
+      "type": "motoko",
+      "note": "local_only",
+      "dependencies": [
+        "logger"
+      ]
+    },
     "logger": {
       "main": "src/service_logger/logger.mo",
       "type": "motoko"
@@ -59,7 +67,7 @@
       "packtool": "vessel sources"
     }
   },
-  "dfx": "0.9.2",
+  "dfx": "0.9.3",
   "networks": {
     "local": {
       "bind": "127.0.0.1:8000",

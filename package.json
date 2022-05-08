@@ -13,6 +13,7 @@
     "test-d": "tape tests/**.test.cjs",
     "test-p": "tape tests/projects.test.cjs",
     "test-s": "tape tests/snaps.test.cjs",
+    "test-si": "tape tests/snap_images.test.cjs",
     "test-a": "tape tests/account_settings.test.cjs",
     "test": "tape tests/**.test.cjs | tnyan",
     "watch": "svelte-kit dev"
