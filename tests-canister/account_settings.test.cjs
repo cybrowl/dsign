@@ -1,13 +1,15 @@
-const test = require('tape');
+const { Ed25519KeyIdentity } = require('@dfinity/identity');
+const fake = require('fake-words');
 const fetch = require('node-fetch');
-const { getActor } = require('./actor.cjs');
+const fs = require('fs');
+const test = require('tape');
+
+const { getActor } = require('../tests/actor.cjs');
+
 const canisterIds = require('../.dfx/local/canister_ids.json');
 const {
 	idlFactory
 } = require('../.dfx/local/canisters/account_settings/account_settings.did.test.cjs');
-const { Ed25519KeyIdentity } = require('@dfinity/identity');
-const fs = require('fs');
-const fake = require('fake-words');
 
 global.fetch = fetch;
 

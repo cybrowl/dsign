@@ -1,4 +1,4 @@
-import Utils  "../service_snaps/utils";
+import Utils  "../src/service_snaps/utils";
 import Debug "mo:base/Debug";
 import Text "mo:base/Text";
 

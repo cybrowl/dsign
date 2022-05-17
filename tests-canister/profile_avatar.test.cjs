@@ -1,13 +1,15 @@
 const test = require('tape');
 const fetch = require('node-fetch');
-const { getActor } = require('./actor.cjs');
+const { Ed25519KeyIdentity } = require('@dfinity/identity');
+const fs = require('fs');
+
+const { getActor } = require('../tests/actor.cjs');
+const { callImageCanister } = require('../tests/utils.cjs');
+
 const canisterIds = require('../.dfx/local/canister_ids.json');
 const {
 	idlFactory
 } = require('../.dfx/local/canisters/profile_avatar/profile_avatar.did.test.cjs');
-const { Ed25519KeyIdentity } = require('@dfinity/identity');
-const { callImageCanister } = require("./utils.cjs");
-const fs = require('fs');
 
 global.fetch = fetch;
 
@@ -46,7 +48,7 @@ test('Profile Avatar: set()', async function (t) {
 test('Profile Avatar: should find avatar', async function (t) {
 	const path = `${host}/avatar/mishi?canisterId=${avatarCanisterId}`;
 
-	console.log("path: ", path);
+	console.log('path: ', path);
 
 	let response = await callImageCanister(path);
 
@@ -72,7 +74,7 @@ test('Profile Avatar: save over 2MB()', async function (t) {
 
 		const response = await profileAvatar.set(image, 'overlimit');
 
-        t.equal(response, false);
+		t.equal(response, false);
 	} catch (err) {
 		console.error(err);
 	}

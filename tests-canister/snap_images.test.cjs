@@ -1,13 +1,15 @@
 const test = require('tape');
 const fetch = require('node-fetch');
-const { getActor } = require('./actor.cjs');
+const { Ed25519KeyIdentity } = require('@dfinity/identity');
+const fs = require('fs');
+
+const { getActor } = require('../tests/actor.cjs');
+const { callImageCanister } = require("../tests/utils.cjs");
+
 const canisterIds = require('../.dfx/local/canister_ids.json');
 const {
 	idlFactory
 } = require('../.dfx/local/canisters/snap_images/snap_images.did.test.cjs');
-const { Ed25519KeyIdentity } = require('@dfinity/identity');
-const fs = require('fs');
-const { callImageCanister } = require("./utils.cjs");
 
 global.fetch = fetch;
 

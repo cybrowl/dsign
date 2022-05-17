@@ -12,7 +12,6 @@ module {
     status : Status;
   };
 
-
   type Status = {
     failed : Nat;
     passed : Nat;
