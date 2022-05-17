@@ -10,8 +10,21 @@ module {
     public type Username = Text;
     public type UserPrincipal = Text;
 
-    public type Image = {
-        content: [Nat8]
+    public type Image = [Nat8];
+    public type Images = [Image];
+
+    public type HeaderField = (Text, Text);
+
+    public type HttpRequest = {
+        url : Text;
+        method : Text;
+        headers : [HeaderField];
+    };
+
+    public type HttpResponse = {
+        body : [Nat8];
+        headers : [HeaderField];
+        status_code : Nat16;
     };
 
     public type CanisterSnap = {

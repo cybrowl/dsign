@@ -6,7 +6,7 @@ const {
 	idlFactory
 } = require('../.dfx/local/canisters/profile_avatar/profile_avatar.did.test.cjs');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
-const http = require('http');
+const { callImageCanister } = require("./utils.cjs");
 const fs = require('fs');
 
 global.fetch = fetch;
@@ -15,30 +15,6 @@ let Mishi = Ed25519KeyIdentity.generate();
 const avatarCanisterId = canisterIds.profile_avatar.local;
 let host = 'http://127.0.0.1:8000';
 let profileAvatar = null;
-
-function callImageCanister(path) {
-	const options = {
-		hostname: '127.0.0.1',
-		port: 8000,
-		secure: false,
-		path: path,
-		method: 'GET',
-		headers: {
-			'Content-Type': 'image/png'
-		}
-	};
-
-	return new Promise(function (resolve, reject) {
-		const req = http.request(options, (res) => {
-			resolve(res);
-		});
-
-		req.on('error', (error) => {
-			reject(error);
-		});
-		req.end();
-	});
-}
 
 test('Profile Avatar: version()', async function (t) {
 	profileAvatar = await getActor(avatarCanisterId, idlFactory, Mishi);
@@ -69,6 +45,8 @@ test('Profile Avatar: set()', async function (t) {
 
 test('Profile Avatar: should find avatar', async function (t) {
 	const path = `${host}/avatar/mishi?canisterId=${avatarCanisterId}`;
+
+	console.log("path: ", path);
 
 	let response = await callImageCanister(path);
 

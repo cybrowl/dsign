@@ -1,4 +1,4 @@
-import Utils  "../profile_service/utils";
+import Utils  "../service_account_settings/utils";
 import Debug "mo:base/Debug";
 import Text "mo:base/Text";
 

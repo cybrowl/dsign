@@ -23,7 +23,7 @@ let additions = [
   {
     name = "rand",
     repo = "https://github.com/aviate-labs/rand.mo",
-    version = "v0.2.1",
+    version = "be7f60e428a3805141cd4e2741c2b493086bca0f",
     dependencies = [ "base" ]
   },
   {

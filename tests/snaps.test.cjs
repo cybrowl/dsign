@@ -31,13 +31,13 @@ test('Snaps Main: heart_beat()', async function (t) {
 });
 
 test('Snaps Main: create_snap()', async function (t) {
-	const response = await snapsMain.create_snap("mobile", true);
+	const response = await snapsMain.create_snap("mobile", true, 1);
 
 	console.log("create_snap: ", response);
 });
 
 test('Snaps Main: create_snap()', async function (t) {
-	const response = await snapsMain.create_snap("desktop", true);
+	const response = await snapsMain.create_snap("desktop", true, 0);
 
 	console.log("create_snap: ", response);
 });

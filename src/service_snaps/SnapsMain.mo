@@ -28,9 +28,11 @@ actor SnapsMain {
         return "0.0.1";
     };
 
-    public shared (msg) func create_snap(title: Text, isPublic: Bool, ) : async () {
+    public shared (msg) func create_snap(title: Text, isPublic: Bool, coverImageLocation: Nat, ) : async () {
         let tags = [ACTOR_NAME, "create_snap"];
         let userPrincipal : UserPrincipal = Principal.toText(msg.caller);
+
+        await Logger.log_event(tags, debug_show(("coverImageLocation: ", coverImageLocation)));
 
         // check if user has a snapStorageCanister
         switch (userSnapCanistersRef.get(userPrincipal)) {
