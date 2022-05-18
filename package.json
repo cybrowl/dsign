@@ -11,6 +11,7 @@
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "preview": "svelte-kit preview",
     "test-all": "tape tests-canister/**.test.cjs",
+    "test-as": "tape tests-canister/account_settings.test.cjs",
     "test-config": "tape tests/**.test.cjs",
     "test-si": "tape tests-canister/snap_images.test.cjs",
     "test": "tape tests/**.test.cjs | tnyan",
