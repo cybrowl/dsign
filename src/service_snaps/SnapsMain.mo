@@ -12,7 +12,7 @@ import Types "./types";
 
 actor SnapsMain {
     type SnapID = Types.SnapID;
-    type SnapStorageCanisterID = Types.SnapStorageCanisterID;
+    type SnapCanisterID = Types.SnapCanisterID;
     type Username = Types.Username;
     type UserPrincipal = Types.UserPrincipal;
 
@@ -20,7 +20,7 @@ actor SnapsMain {
     let cycleAmount : Nat = 1_000_000_000;
 
     // User Data Management
-    var userSnapCanistersRef : H.HashMap<UserPrincipal, H.HashMap<SnapStorageCanisterID, B.Buffer<SnapID>>> = H.HashMap(1, Text.equal, Text.hash);
+    var userSnapCanistersRef : H.HashMap<UserPrincipal, H.HashMap<SnapCanisterID, B.Buffer<SnapID>>> = H.HashMap(1, Text.equal, Text.hash);
     var snapStorageCanister : Text = "";
 
     // User Logic Management
@@ -54,20 +54,20 @@ actor SnapsMain {
                         // store images
                         // create snap
                         // add snap to snapStorageCanister
-                        // add snapStorageCanisterID to snapStorageCanisterIds with listOfSnapIds
+                        // add snapCanisterID to snapStorageCanisterIds with listOfSnapIds
                         await Logger.log_event(tags, debug_show("adding snapStorageCanister to snapStorageCanisterIds"));
                     };
                 };
             };
             case(_) {
-                // create initial SnapStorageCanisterID for user
+                // create initial SnapCanisterID for user
                 await Logger.log_event(tags, debug_show(("user has zero snapStorageCanisterIds", userPrincipal)));
 
-                var initialSnapCreation : H.HashMap<SnapStorageCanisterID, B.Buffer<SnapID>> = H.HashMap(1, Text.equal, Text.hash);
+                var initialSnapCreation : H.HashMap<SnapCanisterID, B.Buffer<SnapID>> = H.HashMap(1, Text.equal, Text.hash);
                 var listOfSnapIds = B.Buffer<SnapID>(1);
                 listOfSnapIds.add("");
     
-                initialSnapCreation.put(snapStorageCanister: SnapStorageCanisterID, listOfSnapIds);
+                initialSnapCreation.put(snapStorageCanister: SnapCanisterID, listOfSnapIds);
 
                 userSnapCanistersRef.put(userPrincipal, initialSnapCreation);
             };
@@ -97,10 +97,10 @@ actor SnapsMain {
         Cycles.add(cycleAmount);
         let snapActor = await Snap.Snap();
         let principal = Principal.fromActor(snapActor);
-        let snapStorageCanisterID = Principal.toText(principal);
+        let snapCanisterID = Principal.toText(principal);
 
         // update current empty canister ID
-        snapStorageCanister := snapStorageCanisterID;
+        snapStorageCanister := snapCanisterID;
 
         await Logger.log_event(tags, debug_show(("snapStorageCanister: ", snapStorageCanister)));
     };

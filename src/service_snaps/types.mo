@@ -4,11 +4,17 @@ import Text "mo:base/Text";
 
 module {
     public type ImageID = Text;
+    public type ProjectID = Text;
+    public type SnapCanisterID = Text;
     public type SnapID = Text;
-    public type SnapStorageCanisterID = Text;
     public type Time = Int;
     public type Username = Text;
     public type UserPrincipal = Text;
+
+    public type CanisterSnap = {
+        SnapCanisterID: SnapCanisterID;
+        SnapID: SnapID;
+    };
 
     public type Image = [Nat8];
     public type Images = [Image];
@@ -27,19 +33,14 @@ module {
         status_code : Nat16;
     };
 
-    public type CanisterSnap = {
-        SnapStorageCanisterID: SnapStorageCanisterID;
-        SnapID: SnapID;
-    };
-
     public type ProjectRef = {
-        ID: Text;
+        id: ProjectID;
         name: Text;
     };
 
     public type Snap = {
-        ID: Text;
-        coverImage: Text;
+        id: SnapID;
+        coverLocation: Nat;
         created: Time;
         creator: Username;
         images: [Text];

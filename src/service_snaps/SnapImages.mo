@@ -36,7 +36,7 @@ actor class SnapImages() = this {
     };
 
     public shared (msg) func add(images: Images) : async [ImageID] {
-        var snapInfo = B.Buffer<ImageID>(0);
+        let snapInfo = B.Buffer<ImageID>(0);
 
         for (image in images.vals()) {
             let imageID : ImageID = ULID.toText(se.new());
@@ -51,11 +51,8 @@ actor class SnapImages() = this {
     public shared query func http_request(req : HttpRequest) : async HttpResponse {
         let NOT_FOUND : [Nat8] = [0];
 
-        Debug.print(debug_show("req", req));
-
+        //TODO: return the correct image type
         let imageID : Text = Utils.get_image_id(req.url);
-
-        Debug.print(debug_show("imageID", imageID));
 
         switch (snapImages.get(imageID)) {
             case (?image) {
