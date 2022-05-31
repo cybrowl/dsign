@@ -48,6 +48,13 @@
         "logger"
       ]
     },
+    "snap": {
+      "main": "src/service_snaps/Snap.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger"
+      ]
+    },
     "snap_images": {
       "main": "src/service_snaps/SnapImages.mo",
       "type": "motoko",

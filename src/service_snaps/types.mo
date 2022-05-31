@@ -6,6 +6,7 @@ module {
     public type ImageID = Text;
     public type ProjectID = Text;
     public type SnapCanisterID = Text;
+    public type SnapImagesCanisterID = Text;
     public type SnapID = Text;
     public type Time = Int;
     public type Username = Text;
@@ -14,6 +15,13 @@ module {
     public type CanisterSnap = {
         SnapCanisterID: SnapCanisterID;
         SnapID: SnapID;
+    };
+
+    public type CreateSnapArgs = {
+        title: Text;
+        isPublic: Bool;
+        coverImageLocation: Nat8;
+        images: Images;
     };
 
     public type Image = [Nat8];
@@ -40,14 +48,18 @@ module {
 
     public type Snap = {
         id: SnapID;
-        coverLocation: Nat;
+        coverLocation: Nat8;
         created: Time;
         creator: Username;
         images: [Text];
         isPublic: Bool;
         likes: Nat;
-        projects: [ProjectRef];
+        projects: ?[ProjectRef];
         title: Text;
         views: Nat;
+    };
+
+    public type SnapImagesActor = actor {
+        add : shared (Images) -> async [ImageID];
     };
 };

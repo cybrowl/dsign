@@ -5,16 +5,16 @@
   "type": "module",
   "scripts": {
     "build": "svelte-kit build",
-    "dev": "bash ./scripts/build.sh",
-    "logs": "tape tests/debug/debug.test.cjs",
+    "test-script": "bash ./scripts/test.sh",
+    "logs": "npm run test-script && tape tests/debug/debug.test.cjs",
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "preview": "svelte-kit preview",
-    "test-all": "tape tests-canister/**.test.cjs",
-    "test-as": "tape tests-canister/account_settings.test.cjs",
+    "test": "npm run test-script && tape tests-canister/**.test.cjs",
+    "test-as": "npm run test-script && tape tests-canister/account_settings.test.cjs",
+    "test-s": "npm run test-script && tape tests-canister/snaps.test.cjs",
     "test-config": "tape tests/**.test.cjs",
     "test-si": "tape tests-canister/snap_images.test.cjs",
-    "test": "tape tests/**.test.cjs | tnyan",
     "watch": "svelte-kit dev"
   },
   "dependencies": {

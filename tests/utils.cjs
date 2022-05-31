@@ -1,4 +1,5 @@
 const http = require('http');
+const fs = require('fs');
 
 function callImageCanister(path) {
 	const options = {
@@ -24,6 +25,20 @@ function callImageCanister(path) {
 	});
 }
 
-module.exports = {
-	callImageCanister
+function generateImages() {
+	const mishicatImageBuffer = fs.readFileSync('tests/images/mishicat.png');
+	const motokoImageBuffer = fs.readFileSync('tests/images/motoko.png');
+
+	// covert to unit 8 array
+	const mishicatUnit8ArrayBuffer = new Uint8Array(mishicatImageBuffer);
+	const motokoUnit8ArrayBuffer = new Uint8Array(motokoImageBuffer);
+
+	const images = [[...mishicatUnit8ArrayBuffer], [...motokoUnit8ArrayBuffer]];
+
+	return images;
 }
+
+module.exports = {
+	callImageCanister,
+	generateImages
+};
