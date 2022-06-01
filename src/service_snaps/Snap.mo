@@ -1,4 +1,5 @@
 import H "mo:base/HashMap";
+import B "mo:base/Buffer";
 import Principal "mo:base/Principal";
 import Source "mo:ulid/Source";
 import Text "mo:base/Text";
@@ -20,6 +21,8 @@ actor class Snap() = this {
 
     var snaps : H.HashMap<SnapID, Snap> = H.HashMap(0, Text.equal, Text.hash);
 
+    //TODO: only allow main to accesss methods
+
     public query func version() : async Text {
         return "0.0.1";
     };
@@ -28,8 +31,7 @@ actor class Snap() = this {
         return Principal.toText(Principal.fromActor(this));
     };
 
-    public shared ({caller}) func create(args: CreateSnapArgs, imageIds: [ImageID]) : async () {
-        let userPrincipal : UserPrincipal = Principal.toText(caller);
+    public shared ({caller}) func create(args: CreateSnapArgs, imageIds: [ImageID], userPrincipal: UserPrincipal) : async SnapID {
         let snapID =  ULID.toText(se.new());
 
         let snap : Snap = {
@@ -46,5 +48,23 @@ actor class Snap() = this {
         };
 
         snaps.put(snapID, snap);
+
+        return snapID;
+    };
+
+    public query func get_all(listOfSnapIds: [SnapID]) : async [Snap] {
+        var snapList = B.Buffer<Snap>(0);
+
+        for (snapId in listOfSnapIds.vals()){
+            switch (snaps.get(snapId)){
+                case null {};
+                case (?snapResult) {
+                   snapList.add(snapResult); 
+                };
+                
+            }
+        };
+
+        return snapList.toArray();
     };
 };

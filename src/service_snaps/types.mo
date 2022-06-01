@@ -59,6 +59,11 @@ module {
         views: Nat;
     };
 
+    public type SnapActor = actor {
+        create : shared (args: CreateSnapArgs, imageIds: [ImageID], userPrincipal: UserPrincipal) -> async SnapID;
+        get_all : query (listOfSnapIds: [SnapID]) -> async [Snap];
+    };
+
     public type SnapImagesActor = actor {
         add : shared (Images) -> async [ImageID];
     };
