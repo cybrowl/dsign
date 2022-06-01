@@ -5,6 +5,7 @@ import H "mo:base/HashMap";
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
+import Result "mo:base/Result";
 
 import Logger "canister:logger";
 import Snap "Snap";
@@ -20,6 +21,7 @@ actor SnapsMain {
     type SnapID = Types.SnapID;
     type SnapImagesActor = Types.SnapImagesActor;
     type Username = Types.Username;
+    type SnapsError = Types.SnapsError;
     type UserPrincipal = Types.UserPrincipal;
 
     let ACTOR_NAME : Text = "SnapsMain";
@@ -40,6 +42,8 @@ actor SnapsMain {
     // User Management
     private func create_user_first_canister(args: CreateSnapArgs, userPrincipal: UserPrincipal) : async ()  {
         let tags = [ACTOR_NAME, "create_user_first_canister"];
+
+        await Logger.log_event(tags, debug_show("userPrincipal: ", userPrincipal));
 
         var initialCanisterRef : H.HashMap<SnapCanisterID, B.Buffer<SnapID>> = H.HashMap(0, Text.equal, Text.hash);
         var snapIds = B.Buffer<SnapID>(0);
@@ -66,6 +70,8 @@ actor SnapsMain {
     public shared ({caller}) func create_snap(args: CreateSnapArgs) : async () {
         let tags = [ACTOR_NAME, "create_snap"];
         let userPrincipal : UserPrincipal = Principal.toText(caller);
+
+        await Logger.log_event(tags, debug_show("userPrincipal: ", userPrincipal));
 
         // check if user exists
         switch (userCanistersRef.get(userPrincipal)) {
@@ -101,20 +107,31 @@ actor SnapsMain {
         }; 
     };
 
-    // public shared query({caller}) func get_all_snaps() : async [Snap] {
-    //     let userPrincipal : UserPrincipal = Principal.toText(caller);
+    public shared ({caller}) func get_all_snaps() : async Result.Result<[Snap], SnapsError> {
+        let tags = [ACTOR_NAME, "get_all_snaps"];
+        let userPrincipal : UserPrincipal = Principal.toText(caller);
 
-    //     switch (userCanistersRef.get(userPrincipal)) {
-    //         case (?canisterIds) {
-    //             for ((key, val) in canisterIds.entries()) {
-    //                 Debug.print(debug_show(key));
-    //             };
-    //         };
-    //         case(_) {
-    //             Debug.print(debug_show("null"));
-    //         };
-    //     };
-    // };
+        await Logger.log_event(tags, debug_show("userPrincipal: ", userPrincipal));
+
+        switch (userCanistersRef.get(userPrincipal)) {
+            case (?canisterIds) {
+                // check if user has current snapCanisterId
+                switch (canisterIds.get(snapCanisterId)) {
+                    case null {
+                        #err(#SnapIdsNotFound);
+                    };
+                    case (?snapIds) {
+                        let snapActor = actor (snapCanisterId) : SnapActor;
+                        let snaps = await snapActor.get_all(snapIds.toArray());
+                        #ok(snaps);
+                    };
+                };
+            };
+            case (_) {
+                #err(#UserNotFound)
+            };
+        };
+    };
 
     // Canister Management
     private func create_snap_canister() : async () {

@@ -70,22 +70,22 @@ test('Snaps Main: create_snap()', async function (t) {
 	console.log('create_snap: ', response);
 });
 
-// test('Snaps Main: get_snap()', async function (t) {
-// 	const response = await SnapsMainActor.get_snap();
+test('Snaps Main: get_all_snaps()', async function (t) {
+	const response = await SnapsMainActor.get_all_snaps();
 
-// 	console.log('get_snap: ', response);
-// });
+	console.log('get_all_snaps: ', response);
+});
 
-// test('Logs', async function (t) {
-// 	exec('npm run logs', (error, stdout, stderr) => {
-// 		if (error) {
-// 			console.log(`error: ${error.message}`);
-// 			return;
-// 		}
-// 		if (stderr) {
-// 			console.log(`stderr: ${stderr}`);
-// 			return;
-// 		}
-// 		console.log(`stdout: ${stdout}`);
-// 	});
-// });
+test('Logs', async function (t) {
+	exec('npm run logs', (error, stdout, stderr) => {
+		if (error) {
+			console.log(`error: ${error.message}`);
+			return;
+		}
+		if (stderr) {
+			console.log(`stderr: ${stderr}`);
+			return;
+		}
+		console.log(`stdout: ${stdout}`);
+	});
+});
