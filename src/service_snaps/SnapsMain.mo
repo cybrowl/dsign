@@ -28,7 +28,7 @@ actor SnapsMain {
     let CYCLE_AMOUNT : Nat = 1_000_000_000;
 
     // Snap Data
-    var user_canisters_ref : H.HashMap<UserPrincipal, H.HashMap<SnapCanisterID, B.Buffer<SnapID>>> = H.HashMap(1, Text.equal, Text.hash);
+    var user_canisters_ref : H.HashMap<UserPrincipal, H.HashMap<SnapCanisterID, B.Buffer<SnapID>>> = H.HashMap(0, Text.equal, Text.hash);
 
     // holds data until filled
     // once filled, a new canister is created and assigned

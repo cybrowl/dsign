@@ -8,10 +8,8 @@ https://github.com/cybrowl/dsign-components
 
 ## Getting Started
 ```
-npm run i
-npm run dev
-
-TODO: dfx related commands
+npm install
+sh ./scripts/install-local.sh
 ```
 
 ## Unit Testing
@@ -21,5 +19,5 @@ make
 
 ## Canister Testing
 ```
-npm run test-all
+npm run test
 ```
