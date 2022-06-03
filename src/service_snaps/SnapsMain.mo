@@ -27,7 +27,7 @@ actor SnapsMain {
     let ACTOR_NAME : Text = "SnapsMain";
     let CYCLE_AMOUNT : Nat = 1_000_000_000;
 
-    // User Data Management
+    // Snap Data
     var user_canisters_ref : H.HashMap<UserPrincipal, H.HashMap<SnapCanisterID, B.Buffer<SnapID>>> = H.HashMap(1, Text.equal, Text.hash);
 
     // holds data until filled
@@ -35,11 +35,7 @@ actor SnapsMain {
     var snap_canister_id : Text = "";
     var snap_images_canister_id : Text = "";
 
-    public query func version() : async Text {
-        return "0.0.1";
-    };
-
-    // User Management
+    // ------------------------- Snaps Management -------------------------
     private func create_first_canister_for_user(args: CreateSnapArgs, principal: UserPrincipal) : async ()  {
         let tags = [ACTOR_NAME, "create_first_canister_for_user"];
 
@@ -131,7 +127,11 @@ actor SnapsMain {
         };
     };
 
-    // Canister Management
+    // ------------------------- Canister Management -------------------------
+    public query func version() : async Text {
+        return "0.0.1";
+    };
+
     private func create_snap_canister() : async () {
         let tags = [ACTOR_NAME, "create_snap_canister"];
 
