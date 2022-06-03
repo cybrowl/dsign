@@ -40,8 +40,8 @@ actor SnapsMain {
     };
 
     // User Management
-    private func create_user_first_canister(args: CreateSnapArgs, userPrincipal: UserPrincipal) : async ()  {
-        let tags = [ACTOR_NAME, "create_user_first_canister"];
+    private func create_first_canister_for_user(args: CreateSnapArgs, principal: UserPrincipal) : async ()  {
+        let tags = [ACTOR_NAME, "create_first_canister_for_user"];
 
         var initial_canister_ref : H.HashMap<SnapCanisterID, B.Buffer<SnapID>> = H.HashMap(0, Text.equal, Text.hash);
         var snap_ids = B.Buffer<SnapID>(0);
@@ -56,23 +56,23 @@ actor SnapsMain {
             let image_ids = await snap_images_actor.add(args.images);
 
             // create snap
-            let snap_id = await snap_actor.create(args, image_ids, userPrincipal);
+            let snap_id = await snap_actor.create(args, image_ids, principal);
 
             snap_ids.add(snap_id);
         };
 
         initial_canister_ref.put(snap_canister_id: SnapCanisterID, snap_ids);
 
-        user_canisters_ref.put(userPrincipal, initial_canister_ref);
+        user_canisters_ref.put(principal, initial_canister_ref);
         await Logger.log_event(tags, debug_show(("created")));
     };
 
     public shared ({caller}) func create_snap(args: CreateSnapArgs) : async () {
         let tags = [ACTOR_NAME, "create_snap"];
-        let userPrincipal : UserPrincipal = Principal.toText(caller);
+        let principal : UserPrincipal = Principal.toText(caller);
 
         // check if user exists
-        switch (user_canisters_ref.get(userPrincipal)) {
+        switch (user_canisters_ref.get(principal)) {
             case (?canister_ids) {
                 // check if user has current snap_canister_id
                 switch (canister_ids.get(snap_canister_id)) {
@@ -87,7 +87,7 @@ actor SnapsMain {
                             let image_ids = await snap_images_actor.add(args.images);
 
                             // create snap
-                            let snap_id = await snap_actor.create(args, image_ids, userPrincipal);
+                            let snap_id = await snap_actor.create(args, image_ids, principal);
 
                             snap_ids.add(snap_id);
                         };
@@ -101,16 +101,16 @@ actor SnapsMain {
                 };
             };
             case(_) {
-               await create_user_first_canister(args, userPrincipal);
+               await create_first_canister_for_user(args, principal);
             };
         }; 
     };
 
     public shared ({caller}) func get_all_snaps() : async Result.Result<[Snap], SnapsError> {
         let tags = [ACTOR_NAME, "get_all_snaps"];
-        let userPrincipal : UserPrincipal = Principal.toText(caller);
+        let principal : UserPrincipal = Principal.toText(caller);
 
-        switch (user_canisters_ref.get(userPrincipal)) {
+        switch (user_canisters_ref.get(principal)) {
             case (?canister_ids) {
                 // check if user has current snap_canister_id
                 switch (canister_ids.get(snap_canister_id)) {
