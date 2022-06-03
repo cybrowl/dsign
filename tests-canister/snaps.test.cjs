@@ -11,26 +11,33 @@ const { idlFactory } = require('../.dfx/local/canisters/snaps/snaps.did.test.cjs
 const { idlFactory: idlFactorySnap } = require('../.dfx/local/canisters/snap/snap.did.test.cjs');
 const { idlFactory: idlFactorySnapImages } = require('../.dfx/local/canisters/snap_images/snap_images.did.test.cjs');
 
+const { defaultIdentity, keeperOfCoinIdentity } = require("../tests/identities/identity.cjs");
+
 global.fetch = fetch;
 
-let Mishi = Ed25519KeyIdentity.generate();
+let mishiIdentity = Ed25519KeyIdentity.generate();
+
 const snaps_canister_id = canisterIds.snaps.local;
 const snap_canister_id = canisterIds.snap.local;
 const snap_images_canister_id = canisterIds.snap_images.local;
 
-let SnapsMainActor = null;
+let mishiSnapsMainActor = null;
+let defaultSnapsMainActor = null;
 let SnapMainActor = null;
 let SnapImagesMainActor = null;
 
-test('Snaps Main: version()', async function (t) {
-	SnapsMainActor = await getActor(snaps_canister_id, idlFactory, Mishi);
-	SnapMainActor = await getActor(snap_canister_id, idlFactorySnap, Mishi);
-	SnapImagesMainActor = await getActor(snap_images_canister_id, idlFactorySnapImages, Mishi);
+test('Snaps Main: assign actors()', async function (t) {
+	mishiSnapsMainActor = await getActor(snaps_canister_id, idlFactory, mishiIdentity);
+	defaultSnapsMainActor = await getActor(snaps_canister_id, idlFactory, defaultIdentity);
 
-	const response = await SnapsMainActor.version();
+	SnapMainActor = await getActor(snap_canister_id, idlFactorySnap, mishiIdentity);
+	SnapImagesMainActor = await getActor(snap_images_canister_id, idlFactorySnapImages, mishiIdentity);
 
-	console.log('version: ', response);
+	const response = await mishiSnapsMainActor.version();
 	t.equal(typeof response, 'string');
+
+	console.log("=========== Snaps Main ===========");
+	console.log('version: ', response);
 });
 
 test('Snaps Main: initialize_canisters()', async function (t) {
@@ -39,7 +46,7 @@ test('Snaps Main: initialize_canisters()', async function (t) {
 	console.log("snapCanisterId: ", snapCanisterId);
 	console.log("snapImagesCanisterId: ", snapImagesCanisterId);
 
-	const response = await SnapsMainActor.initialize_canisters([snapCanisterId], [snapImagesCanisterId]);
+	const response = await defaultSnapsMainActor.initialize_canisters([snapCanisterId], [snapImagesCanisterId]);
 
 	console.log('response: ', response);
 });
@@ -52,7 +59,7 @@ test('Snaps Main: create_snap()', async function (t) {
 		images: generateImages()
 	};
 
-	const response = await SnapsMainActor.create_snap(createArgs);
+	const response = await defaultSnapsMainActor.create_snap(createArgs);
 
 	console.log('create_snap: ', response);
 });
@@ -65,14 +72,15 @@ test('Snaps Main: create_snap()', async function (t) {
 		images: generateImages()
 	};
 
-	const response = await SnapsMainActor.create_snap(createArgs);
+	const response = await defaultSnapsMainActor.create_snap(createArgs);
 
 	console.log('create_snap: ', response);
 });
 
 test('Snaps Main: get_all_snaps()', async function (t) {
-	const response = await SnapsMainActor.get_all_snaps();
+	const response = await defaultSnapsMainActor.get_all_snaps();
 
+	console.log("response: ", response.ok[0].images);
 	console.log('get_all_snaps: ', response);
 });
 
@@ -83,9 +91,9 @@ test('Logs', async function (t) {
 			return;
 		}
 		if (stderr) {
-			console.log(`stderr: ${stderr}`);
+			console.info(`stderr: ${stderr}`);
 			return;
 		}
-		console.log(`stdout: ${stdout}`);
+		console.info(`stdout: ${stdout}`);
 	});
 });

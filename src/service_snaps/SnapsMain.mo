@@ -20,20 +20,20 @@ actor SnapsMain {
     type SnapCanisterID = Types.SnapCanisterID;
     type SnapID = Types.SnapID;
     type SnapImagesActor = Types.SnapImagesActor;
-    type Username = Types.Username;
     type SnapsError = Types.SnapsError;
+    type Username = Types.Username;
     type UserPrincipal = Types.UserPrincipal;
 
     let ACTOR_NAME : Text = "SnapsMain";
-    let cycleAmount : Nat = 1_000_000_000;
+    let CYCLE_AMOUNT : Nat = 1_000_000_000;
 
     // User Data Management
-    var userCanistersRef : H.HashMap<UserPrincipal, H.HashMap<SnapCanisterID, B.Buffer<SnapID>>> = H.HashMap(1, Text.equal, Text.hash);
+    var user_canisters_ref : H.HashMap<UserPrincipal, H.HashMap<SnapCanisterID, B.Buffer<SnapID>>> = H.HashMap(1, Text.equal, Text.hash);
 
     // holds data until filled
     // once filled, a new canister is created and assigned
-    var snapCanisterId : Text = "";
-    var snapImagesCanisterId : Text = "";
+    var snap_canister_id : Text = "";
+    var snap_images_canister_id : Text = "";
 
     public query func version() : async Text {
         return "0.0.1";
@@ -43,13 +43,11 @@ actor SnapsMain {
     private func create_user_first_canister(args: CreateSnapArgs, userPrincipal: UserPrincipal) : async ()  {
         let tags = [ACTOR_NAME, "create_user_first_canister"];
 
-        await Logger.log_event(tags, debug_show("userPrincipal: ", userPrincipal));
-
         var initialCanisterRef : H.HashMap<SnapCanisterID, B.Buffer<SnapID>> = H.HashMap(0, Text.equal, Text.hash);
         var snapIds = B.Buffer<SnapID>(0);
 
-        let snapImages = actor (snapImagesCanisterId) : SnapImagesActor;
-        let snapActor = actor (snapCanisterId) : SnapActor;
+        let snapImages = actor (snap_images_canister_id) : SnapImagesActor;
+        let snapActor = actor (snap_canister_id) : SnapActor;
 
         if (args.images.size() > 0) {
             // store images
@@ -61,9 +59,9 @@ actor SnapsMain {
             snapIds.add(snapId);
         };
 
-        initialCanisterRef.put(snapCanisterId: SnapCanisterID, snapIds);
+        initialCanisterRef.put(snap_canister_id: SnapCanisterID, snapIds);
 
-        userCanistersRef.put(userPrincipal, initialCanisterRef);
+        user_canisters_ref.put(userPrincipal, initialCanisterRef);
         await Logger.log_event(tags, debug_show(("created")));
     };
 
@@ -71,33 +69,32 @@ actor SnapsMain {
         let tags = [ACTOR_NAME, "create_snap"];
         let userPrincipal : UserPrincipal = Principal.toText(caller);
 
-        await Logger.log_event(tags, debug_show("userPrincipal: ", userPrincipal));
-
         // check if user exists
-        switch (userCanistersRef.get(userPrincipal)) {
-            case (?canisterIds) {
-                // check if user has current snapCanisterId
-                switch (canisterIds.get(snapCanisterId)) {
-                    case (?snapIds) {
-                        let snapImages = actor (snapImagesCanisterId) : SnapImagesActor;
-                        let snapActor = actor (snapCanisterId) : SnapActor;
+        switch (user_canisters_ref.get(userPrincipal)) {
+            case (?canister_ids) {
+                // check if user has current snap_canister_id
+                switch (canister_ids.get(snap_canister_id)) {
+                    case (?snap_ids) {
+                        let has_images = args.images.size() > 0;
 
-                        if (args.images.size() > 0) {
+                        if (has_images) {
+                            let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
+                            let snap_actor = actor (snap_canister_id) : SnapActor;
+
                             // store images
-                            let imageIds = await snapImages.add(args.images);
+                            let image_ids = await snap_images_actor.add(args.images);
 
                             // create snap
-                            let snapId = await snapActor.create(args, imageIds, userPrincipal);
+                            let snap_id = await snap_actor.create(args, image_ids, userPrincipal);
 
-                            snapIds.add(snapId);
+                            snap_ids.add(snap_id);
                         };
 
                         await Logger.log_event(tags, debug_show("created snap"));
                     };
                     case(_) {
                         // user data is part of filled snap canister
-
-                        await Logger.log_event(tags, debug_show("user snapCanisterId is outdated"));
+                        await Logger.log_event(tags, debug_show("user snap_canister_id is outdated"));
                     };
                 };
             };
@@ -111,18 +108,17 @@ actor SnapsMain {
         let tags = [ACTOR_NAME, "get_all_snaps"];
         let userPrincipal : UserPrincipal = Principal.toText(caller);
 
-        await Logger.log_event(tags, debug_show("userPrincipal: ", userPrincipal));
-
-        switch (userCanistersRef.get(userPrincipal)) {
-            case (?canisterIds) {
-                // check if user has current snapCanisterId
-                switch (canisterIds.get(snapCanisterId)) {
+        switch (user_canisters_ref.get(userPrincipal)) {
+            case (?canister_ids) {
+                // check if user has current snap_canister_id
+                switch (canister_ids.get(snap_canister_id)) {
                     case null {
                         #err(#SnapIdsNotFound);
                     };
-                    case (?snapIds) {
-                        let snapActor = actor (snapCanisterId) : SnapActor;
-                        let snaps = await snapActor.get_all(snapIds.toArray());
+                    case (?snap_ids) {
+                        let snap_actor = actor (snap_canister_id) : SnapActor;
+                        let snaps = await snap_actor.get_all(snap_ids.toArray());
+
                         #ok(snaps);
                     };
                 };
@@ -138,61 +134,61 @@ actor SnapsMain {
         let tags = [ACTOR_NAME, "create_snap_canister"];
 
         // create canister
-        Cycles.add(cycleAmount);
-        let snapActor = await Snap.Snap();
-        let principal = Principal.fromActor(snapActor);
-        let snapCanisterID = Principal.toText(principal);
+        Cycles.add(CYCLE_AMOUNT);
+        let snap_actor = await Snap.Snap();
+        let principal = Principal.fromActor(snap_actor);
+        let snap_canister_id_ = Principal.toText(principal);
 
-        snapCanisterId := snapCanisterID;
+        snap_canister_id := snap_canister_id_;
 
-        await Logger.log_event(tags, debug_show(("snapCanisterId: ", snapCanisterId)));
+        await Logger.log_event(tags, debug_show(("snap_canister_id: ", snap_canister_id)));
     };
 
     private func create_snap_images_canister() : async () {
         let tags = [ACTOR_NAME, "create_snap_images_canister"];
 
         // create canister
-        Cycles.add(cycleAmount);
-        let snapImagesActor = await SnapImages.SnapImages();
-        let principal = Principal.fromActor(snapImagesActor);
-        let snapImagesCanisterID = Principal.toText(principal);
+        Cycles.add(CYCLE_AMOUNT);
+        let snap_images_actor = await SnapImages.SnapImages();
+        let principal = Principal.fromActor(snap_images_actor);
+        let snap_images_canister_id_ = Principal.toText(principal);
 
-        snapImagesCanisterId := snapImagesCanisterID;
+        snap_images_canister_id := snap_images_canister_id_;
 
-        await Logger.log_event(tags, debug_show(("snapImagesCanisterID: ", snapImagesCanisterID)));
+        await Logger.log_event(tags, debug_show(("snap_images_canister_id: ", snap_images_canister_id)));
     };
 
-    public shared (msg) func initialize_canisters(snapCanisterID: ?Text, snapImagesCanisterID: ?Text) : async ()  {
+    public shared (msg) func initialize_canisters(snap_canister_id_: ?Text, snap_images_canister_id_: ?Text) : async ()  {
         let tags = [ACTOR_NAME, "initialize_canisters"];
 
         // create snap
-        if (snapCanisterId.size() < 1) {
-            switch (snapCanisterID) {
+        if (snap_canister_id.size() < 1) {
+            switch (snap_canister_id_) {
                 case null  {
                     await create_snap_canister();
                 };
-                case (?canisterID) {
-                    await Logger.log_event(tags, debug_show(("assign snap local: ", canisterID)));
-                    snapCanisterId := canisterID;
+                case (?canister_id) {
+                    await Logger.log_event(tags, debug_show(("snap initialized", canister_id)));
+                    snap_canister_id := canister_id;
                 };
             };
         } else {
-            await Logger.log_event(tags, debug_show(("snap exists: ", snapCanisterId)));
+            await Logger.log_event(tags, debug_show(("snap exists", snap_canister_id)));
         };
 
         // create snap images
-        if (snapImagesCanisterId.size() < 1) {
-            switch (snapImagesCanisterID) {
+        if (snap_images_canister_id.size() < 1) {
+            switch (snap_images_canister_id_) {
                 case null  {
                     await create_snap_images_canister();
                 };
-                case (?canisterID) {
-                    await Logger.log_event(tags, debug_show(("assign snap_images local: ", canisterID)));
-                    snapImagesCanisterId := canisterID;
+                case (?canister_id) {
+                    await Logger.log_event(tags, debug_show(("snap_images initialized", canister_id)));
+                    snap_images_canister_id := canister_id;
                 };
             };
         } else {
-            await Logger.log_event(tags, debug_show(("snap_images exists: ", snapImagesCanisterId)));
+            await Logger.log_event(tags, debug_show(("snap_images exists", snap_images_canister_id)));
         };
     };
 };
