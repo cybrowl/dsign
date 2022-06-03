@@ -43,25 +43,27 @@ actor SnapsMain {
     private func create_user_first_canister(args: CreateSnapArgs, userPrincipal: UserPrincipal) : async ()  {
         let tags = [ACTOR_NAME, "create_user_first_canister"];
 
-        var initialCanisterRef : H.HashMap<SnapCanisterID, B.Buffer<SnapID>> = H.HashMap(0, Text.equal, Text.hash);
-        var snapIds = B.Buffer<SnapID>(0);
+        var initial_canister_ref : H.HashMap<SnapCanisterID, B.Buffer<SnapID>> = H.HashMap(0, Text.equal, Text.hash);
+        var snap_ids = B.Buffer<SnapID>(0);
 
-        let snapImages = actor (snap_images_canister_id) : SnapImagesActor;
-        let snapActor = actor (snap_canister_id) : SnapActor;
+        let has_images = args.images.size() > 0;
 
-        if (args.images.size() > 0) {
+        if (has_images) {
+            let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
+            let snap_actor = actor (snap_canister_id) : SnapActor;
+
             // store images
-            let imageIds = await snapImages.add(args.images);
+            let image_ids = await snap_images_actor.add(args.images);
 
             // create snap
-            let snapId = await snapActor.create(args, imageIds, userPrincipal);
+            let snap_id = await snap_actor.create(args, image_ids, userPrincipal);
 
-            snapIds.add(snapId);
+            snap_ids.add(snap_id);
         };
 
-        initialCanisterRef.put(snap_canister_id: SnapCanisterID, snapIds);
+        initial_canister_ref.put(snap_canister_id: SnapCanisterID, snap_ids);
 
-        user_canisters_ref.put(userPrincipal, initialCanisterRef);
+        user_canisters_ref.put(userPrincipal, initial_canister_ref);
         await Logger.log_event(tags, debug_show(("created")));
     };
 
@@ -158,12 +160,12 @@ actor SnapsMain {
         await Logger.log_event(tags, debug_show(("snap_images_canister_id: ", snap_images_canister_id)));
     };
 
-    public shared (msg) func initialize_canisters(snap_canister_id_: ?Text, snap_images_canister_id_: ?Text) : async ()  {
+    public shared (msg) func initialize_canisters(snapCanisterId: ?Text, snapImagesCanisterId: ?Text) : async ()  {
         let tags = [ACTOR_NAME, "initialize_canisters"];
 
         // create snap
         if (snap_canister_id.size() < 1) {
-            switch (snap_canister_id_) {
+            switch (snapCanisterId) {
                 case null  {
                     await create_snap_canister();
                 };
@@ -178,7 +180,7 @@ actor SnapsMain {
 
         // create snap images
         if (snap_images_canister_id.size() < 1) {
-            switch (snap_images_canister_id_) {
+            switch (snapImagesCanisterId) {
                 case null  {
                     await create_snap_images_canister();
                 };
