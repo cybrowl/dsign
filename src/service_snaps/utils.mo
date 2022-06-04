@@ -24,17 +24,21 @@ module {
         return filterBySeparator[0];
     };
 
-    public func generate_snap_image_url(snapImagesCanisterID: Text, imageID: ImageID) : ImageUrl {
-        let url = Text.join("", (["https://", snapImagesCanisterID, ".raw.ic0.app", "/snap_image/", imageID].vals()));
+    public func generate_snap_image_url(snapImagesCanisterID: Text, imageID: ImageID, isProduction: Bool) : ImageUrl {
+        var url = Text.join("", (["https://", snapImagesCanisterID, ".raw.ic0.app", "/snap_image/", imageID].vals()));
+
+        if (isProduction == false) {
+            url:= Text.join("", (["http://", snapImagesCanisterID, ".localhost:8000", "/snap_image/", imageID].vals()));
+        };
 
         return url;
     };
 
-    public func generate_snap_image_urls(snapImagesCanisterID: Text, imageIds: [ImageID]) : ImagesUrls {
+    public func generate_snap_image_urls(snapImagesCanisterID: Text, imageIds: [ImageID], isProduction: Bool) : ImagesUrls {
         var image_urls = B.Buffer<ImageUrl>(0);
 
         for (image_id in imageIds.vals()) {
-            var image_url = generate_snap_image_url(snapImagesCanisterID, image_id);
+            var image_url = generate_snap_image_url(snapImagesCanisterID, image_id, isProduction);
 
             image_urls.add(image_url);
         };

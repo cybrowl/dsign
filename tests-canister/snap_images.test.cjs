@@ -25,10 +25,11 @@ test('Snap Images: version()', async function (t) {
 });
 
 test('Snap Images: add()', async function (t) {
-	const response = await snapImagesActor.add(generateImages());
-	const canisterID = await snapImagesActor.get_canister_id();
+	// Note: local dev refernces images via
+	// http://qoctq-giaaa-aaaaa-aaaea-cai.localhost:8000/snap_image/70KXHF4E2ZFJCPQ5TSBM6F9Y5Z
 
-	// https://cljm4-uiaaa-aaaag-aabcq-cai.raw.ic0.app/mishicat/snap/image/192929393939
+	const response = await snapImagesActor.save_images(generateImages());
+	const canisterID = await snapImagesActor.get_canister_id();
 
 	const path = `${host}/mishicat/snap/image/${response[0]}?canisterId=${canisterID}`;
 

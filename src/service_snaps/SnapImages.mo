@@ -25,6 +25,7 @@ actor class SnapImages() = this {
     
     private let rr = XorShift.toReader(XorShift.XorShift64(null));
     private let se = Source.Source(rr, 0);
+    private var isProduction : Bool = false;
 
     var snap_images : H.HashMap<ImageID, Image> = H.HashMap(1, Text.equal, Text.hash);
 
@@ -48,7 +49,7 @@ actor class SnapImages() = this {
             image_ids.add(image_id);
         };
 
-        let image_urls = Utils.generate_snap_image_urls(snap_images_canister_id, image_ids.toArray());
+        let image_urls = Utils.generate_snap_image_urls(snap_images_canister_id, image_ids.toArray(), isProduction);
 
         return image_urls;
     };

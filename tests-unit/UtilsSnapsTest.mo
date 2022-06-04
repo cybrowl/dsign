@@ -18,19 +18,20 @@ func isEq(a: Text, b: Text): Bool { a == b };
 
 let success = run([
   describe("Utils: get_image_id", [
-    it("LOCAL: should get username when params exist", do {
-      let url = "http://127.0.0.1:8000/mishicat/snap/image/6Z61B30JFYWX0Y9TV04PQBMYEM?canisterId=va76m-bqaaa-aaaaa-aaayq-cai";
+    it("should get image_id from url", do {
+      let url = "https://qoctq-giaaa-aaaaa-aaaea-cai.raw.ic0.app/snap_image/70KX5HX4X39606KF1SVY3X25QZ";
       let imageID = Utils.get_image_id(url);
 
-      assertTrue(Text.equal(imageID, "6Z61B30JFYWX0Y9TV04PQBMYEM"));
+      assertTrue(Text.equal(imageID, "70KX5HX4X39606KF1SVY3X25QZ"));
     }),
   ]),
   describe("Utils: generate_snap_image_url", [
     it("should generate snap image url", do {
       let snap_images_canister_id = "qoctq-giaaa-aaaaa-aaaea-cai";
       let image_id = "70KKS0195HX5MS56MQVGV02C1Z";
+      let isProduction = true;
 
-      let image_url = Utils.generate_snap_image_url(snap_images_canister_id, image_id);
+      let image_url = Utils.generate_snap_image_url(snap_images_canister_id, image_id, isProduction);
 
       let expected = "https://qoctq-giaaa-aaaaa-aaaea-cai.raw.ic0.app/snap_image/70KKS0195HX5MS56MQVGV02C1Z";
 
@@ -41,8 +42,9 @@ let success = run([
     it("should generate snap image urls", do {
       let snap_images_canister_id = "qoctq-giaaa-aaaaa-aaaea-cai";
       let image_ids = ["70KKS0195HX5MS56MQVGV02C1Z", "70KMAVP65RQ88HQ1R2BM5ZWKPA"];
+      let isProduction = true;
 
-      let image_urls = Utils.generate_snap_image_urls(snap_images_canister_id, image_ids);
+      let image_urls = Utils.generate_snap_image_urls(snap_images_canister_id, image_ids, isProduction);
 
       let expected = [
         "https://qoctq-giaaa-aaaaa-aaaea-cai.raw.ic0.app/snap_image/70KKS0195HX5MS56MQVGV02C1Z",
