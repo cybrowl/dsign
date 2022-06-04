@@ -19,8 +19,8 @@ module {
 
     public type CreateSnapArgs = {
         title: Text;
-        isPublic: Bool;
-        coverImageLocation: Nat8;
+        is_public: Bool;
+        cover_image_location: Nat8;
         images: Images;
     };
 
@@ -70,6 +70,6 @@ module {
     };
 
     public type SnapImagesActor = actor {
-        add : shared (Images) -> async [ImageID];
+        save_images : shared (Images) -> async [ImageID];
     };
 };

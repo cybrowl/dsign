@@ -25,7 +25,7 @@ actor class SnapImages() = this {
     private let rr = XorShift.toReader(XorShift.XorShift64(null));
     private let se = Source.Source(rr, 0);
 
-    var snapImages : H.HashMap<ImageID, Image> = H.HashMap(1, Text.equal, Text.hash);
+    var snap_images : H.HashMap<ImageID, Image> = H.HashMap(1, Text.equal, Text.hash);
 
     public query func version() : async Text {
         return "0.0.1";
@@ -35,26 +35,28 @@ actor class SnapImages() = this {
         return Principal.toText(Principal.fromActor(this));
     };
 
-    public shared (msg) func add(images: Images) : async [ImageID] {
-        let snapInfo = B.Buffer<ImageID>(0);
+    public shared (msg) func save_images(images: Images) : async [ImageID] {
+        let image_ids = B.Buffer<ImageID>(0);
 
         for (image in images.vals()) {
-            let imageID : ImageID = ULID.toText(se.new());
+            let image_id : ImageID = ULID.toText(se.new());
 
-            snapImages.put(imageID, image);
-            snapInfo.add(imageID);
+            snap_images.put(image_id, image);
+
+            image_ids.add(image_id);
         };
 
-        return snapInfo.toArray();
+        return image_ids.toArray();
     };
 
+    // serves the image to the client when requested via image url
     public shared query func http_request(req : HttpRequest) : async HttpResponse {
         let NOT_FOUND : [Nat8] = [0];
 
         //TODO: return the correct image type
-        let imageID : Text = Utils.get_image_id(req.url);
+        let image_id : Text = Utils.get_image_id(req.url);
 
-        switch (snapImages.get(imageID)) {
+        switch (snap_images.get(image_id)) {
             case (?image) {
                 return {
                     status_code = 200;
@@ -62,7 +64,7 @@ actor class SnapImages() = this {
                     body = image;
                 };
             };
-            case (null) {
+            case (_) {
                 return {
                     status_code = 404;
                     headers = [ ("content-type", "image/png") ];

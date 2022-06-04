@@ -31,16 +31,22 @@ actor class Snap() = this {
         return Principal.toText(Principal.fromActor(this));
     };
 
-    public shared ({caller}) func create(args: CreateSnapArgs, imageIds: [ImageID], userPrincipal: UserPrincipal) : async SnapID {
-        let snapID =  ULID.toText(se.new());
+    public shared ({caller}) func create_snap(
+        args: CreateSnapArgs,
+        image_urls: [ImageID], 
+        principal: UserPrincipal) : async SnapID {
+
+        let snap_id =  ULID.toText(se.new());
+
+        // TODO: fix image_ids to contain images urls
 
         let snap : Snap = {
-            id = snapID;
-            coverLocation = args.coverImageLocation;
+            id = snap_id;
+            cover_location = args.cover_image_location;
             created = Time.now();
-            creator = userPrincipal;
-            images = imageIds;
-            isPublic = args.isPublic;
+            creator = principal;
+            image_urls = image_urls;
+            is_public = args.is_public;
             likes = 0;
             projects = null;
             title = args.title;
@@ -52,7 +58,7 @@ actor class Snap() = this {
         return snapID;
     };
 
-    public query func get_all(listOfSnapIds: [SnapID]) : async [Snap] {
+    public query func get_all_snaps(listOfSnapIds: [SnapID]) : async [Snap] {
         var snapList = B.Buffer<Snap>(0);
 
         for (snapId in listOfSnapIds.vals()){
