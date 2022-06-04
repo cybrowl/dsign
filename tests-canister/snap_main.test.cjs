@@ -83,7 +83,7 @@ test('Snaps Main: create_snap()', async function (t) {
 test('Snaps Main: get_all_snaps()', async function (t) {
 	const response = await defaultSnapsMainActor.get_all_snaps();
 
-	console.log('get_all_snaps: ', response);
+	console.info('get_all_snaps: ', response.ok);
 });
 
 test('Logs', async function (t) {

@@ -18,6 +18,7 @@ actor class SnapImages() = this {
     type Image = Types.Image;
     type ImageID = Types.ImageID;
     type Images = Types.Images;
+    type ImagesUrls = Types.ImagesUrls;
 
     let ACTOR_NAME : Text = "SnapImages";
     let MAX_BYTES = 2_000_000;
@@ -35,8 +36,9 @@ actor class SnapImages() = this {
         return Principal.toText(Principal.fromActor(this));
     };
 
-    public shared (msg) func save_images(images: Images) : async [ImageID] {
+    public shared (msg) func save_images(images: Images) : async ImagesUrls {
         let image_ids = B.Buffer<ImageID>(0);
+        let snap_images_canister_id = Principal.toText(Principal.fromActor(this));
 
         for (image in images.vals()) {
             let image_id : ImageID = ULID.toText(se.new());
@@ -46,9 +48,9 @@ actor class SnapImages() = this {
             image_ids.add(image_id);
         };
 
-        //TODO: return images_urls
+        let image_urls = Utils.generate_snap_image_urls(snap_images_canister_id, image_ids.toArray());
 
-        return image_ids.toArray();
+        return image_urls;
     };
 
     // serves the image to the client when requested via image url
