@@ -81,9 +81,8 @@ actor SnapMain {
                         await Logger.log_event(tags, debug_show("created snap"));
                     };
                     case(_) {
-                        // canister is full
-                        // user doesn't have a current empty snap_canister_id in their snap_canister_ids
-                        // get snap_canister_id and save snap_ids there
+                        // canister is full / snap_canister_id NOT Found
+                        await Logger.log_event(tags, debug_show("canister_full"));
                         let snap_ids = B.Buffer<SnapID>(0);
 
                         if (has_images) {
@@ -98,7 +97,7 @@ actor SnapMain {
                         };
 
                         snap_canister_ids.put(snap_canister_id, snap_ids);
-                        await Logger.log_event(tags, debug_show("canister_full"));
+                        await Logger.log_event(tags, debug_show("created snap"));
                     };
                 };
             };
@@ -114,18 +113,18 @@ actor SnapMain {
 
         switch (user_canisters_ref.get(principal)) {
             case (?snap_canister_ids) {
-                // check if user has current snap_canister_id
-                switch (snap_canister_ids.get(snap_canister_id)) {
-                    case null {
-                        #err(#SnapIdsNotFound);
-                    };
-                    case (?snap_ids) {
-                        let snap_actor = actor (snap_canister_id) : SnapActor;
-                        let snaps = await snap_actor.get_all_snaps(snap_ids.toArray());
+                let snap_list = B.Buffer<Snap>(0);
 
-                        #ok(snaps);
+                for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
+                    let snap_actor = actor (canister_id) : SnapActor;
+                    let snaps = await snap_actor.get_all_snaps(snap_ids.toArray());
+
+                    for (snap in snaps.vals()) {
+                        snap_list.add(snap);
                     };
                 };
+
+                return #ok(snap_list.toArray());
             };
             case (_) {
                 #err(#UserNotFound)
