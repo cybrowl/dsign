@@ -41,8 +41,8 @@
         "logger"
       ]
     },
-    "snaps": {
-      "main": "src/service_snaps/SnapsMain.mo",
+    "snap_main": {
+      "main": "src/service_snaps/SnapMain.mo",
       "type": "motoko",
       "dependencies": [
         "logger"

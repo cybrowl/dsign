@@ -66,8 +66,8 @@ module {
 
     // Actor Interface
     public type SnapActor = actor {
-        create : shared (args: CreateSnapArgs, imageIds: [ImageID], userPrincipal: UserPrincipal) -> async SnapID;
-        get_all_snaps : query (listOfSnapIds: [SnapID]) -> async [Snap];
+        save_snap : shared (args: CreateSnapArgs, imageUrls: [ImageID], principal: UserPrincipal) -> async SnapID;
+        get_all_snaps : query (snapIds: [SnapID]) -> async [Snap];
     };
 
     public type SnapImagesActor = actor {

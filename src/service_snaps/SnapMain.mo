@@ -49,10 +49,10 @@ actor SnapsMain {
             let snap_actor = actor (snap_canister_id) : SnapActor;
 
             // store images
-            let image_ids = await snap_images_actor.add(args.images);
+            let image_ids = await snap_images_actor.save_images(args.images);
 
             // create snap
-            let snap_id = await snap_actor.create(args, image_ids, principal);
+            let snap_id = await snap_actor.save_snap(args, image_ids, principal);
 
             snap_ids.add(snap_id);
         };
@@ -83,7 +83,7 @@ actor SnapsMain {
                             let image_ids = await snap_images_actor.save_images(args.images);
 
                             // create snap
-                            let snap_id = await snap_actor.create_snap(args, image_ids, principal);
+                            let snap_id = await snap_actor.save_snap(args, image_ids, principal);
 
                             snap_ids.add(snap_id);
                         };

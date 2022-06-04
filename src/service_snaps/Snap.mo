@@ -31,9 +31,9 @@ actor class Snap() = this {
         return Principal.toText(Principal.fromActor(this));
     };
 
-    public shared ({caller}) func create_snap(
+    public shared ({caller}) func save_snap(
         args: CreateSnapArgs,
-        image_urls: [ImageID], 
+        imageUrls: [ImageID], 
         principal: UserPrincipal) : async SnapID {
 
         let snap_id =  ULID.toText(se.new());
@@ -43,7 +43,7 @@ actor class Snap() = this {
             cover_image_location = args.cover_image_location;
             created = Time.now();
             creator = principal;
-            image_urls = image_urls;
+            image_urls = imageUrls;
             is_public = args.is_public;
             likes = 0;
             projects = null;
@@ -56,19 +56,19 @@ actor class Snap() = this {
         return snap_id;
     };
 
-    public query func get_all_snaps(listOfSnapIds: [SnapID]) : async [Snap] {
-        var snapList = B.Buffer<Snap>(0);
+    public query func get_all_snaps(snapIds: [SnapID]) : async [Snap] {
+        var snaps_list = B.Buffer<Snap>(0);
 
-        for (snapId in listOfSnapIds.vals()){
-            switch (snaps.get(snapId)){
+        for (snap_id in snapIds.vals()){
+            switch (snaps.get(snap_id)){
                 case null {};
-                case (?snapResult) {
-                   snapList.add(snapResult); 
+                case (?snap) {
+                   snaps_list.add(snap); 
                 };
                 
             }
         };
 
-        return snapList.toArray();
+        return snaps_list.toArray();
     };
 };
