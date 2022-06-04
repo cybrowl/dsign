@@ -36,31 +36,13 @@ actor SnapsMain {
     var snap_images_canister_id : Text = "";
 
     // ------------------------- Snaps Management -------------------------
-    private func create_first_canister_for_user(args: CreateSnapArgs, principal: UserPrincipal) : async ()  {
-        let tags = [ACTOR_NAME, "create_first_canister_for_user"];
+    private func inistialize_user(principal: UserPrincipal) : async ()  {
+        let tags = [ACTOR_NAME, "inistialize_user"];
+        var empty_snap_canister_id_storage : H.HashMap<SnapCanisterID, B.Buffer<SnapID>> = H.HashMap(0, Text.equal, Text.hash);
 
-        var initial_canister_ref : H.HashMap<SnapCanisterID, B.Buffer<SnapID>> = H.HashMap(0, Text.equal, Text.hash);
-        var snap_ids = B.Buffer<SnapID>(0);
+        user_canisters_ref.put(principal, empty_snap_canister_id_storage);
 
-        let has_images = args.images.size() > 0;
-
-        if (has_images) {
-            let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
-            let snap_actor = actor (snap_canister_id) : SnapActor;
-
-            // store images
-            let image_ids = await snap_images_actor.save_images(args.images);
-
-            // create snap
-            let snap_id = await snap_actor.save_snap(args, image_ids, principal);
-
-            snap_ids.add(snap_id);
-        };
-
-        initial_canister_ref.put(snap_canister_id: SnapCanisterID, snap_ids);
-
-        user_canisters_ref.put(principal, initial_canister_ref);
-        await Logger.log_event(tags, debug_show(("created")));
+        await Logger.log_event(tags, debug_show(("completed")));
     };
 
     public shared ({caller}) func create_snap(args: CreateSnapArgs) : async () {
@@ -69,9 +51,10 @@ actor SnapsMain {
 
         // check if user exists
         switch (user_canisters_ref.get(principal)) {
-            case (?canister_ids) {
-                // check if user has current snap_canister_id
-                switch (canister_ids.get(snap_canister_id)) {
+            case (?snap_canister_ids) {
+                // check if user has current empty snap_canister_id
+                switch (snap_canister_ids.get(snap_canister_id)) {
+                    // canister is not full
                     case (?snap_ids) {
                         let has_images = args.images.size() > 0;
 
@@ -79,10 +62,8 @@ actor SnapsMain {
                             let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
                             let snap_actor = actor (snap_canister_id) : SnapActor;
 
-                            // store images
+                            // save images and snap
                             let image_ids = await snap_images_actor.save_images(args.images);
-
-                            // create snap
                             let snap_id = await snap_actor.save_snap(args, image_ids, principal);
 
                             snap_ids.add(snap_id);
@@ -91,13 +72,15 @@ actor SnapsMain {
                         await Logger.log_event(tags, debug_show("created snap"));
                     };
                     case(_) {
-                        // user data is part of filled snap canister
-                        await Logger.log_event(tags, debug_show("user snap_canister_id is outdated"));
+                        // canister is full
+                        // user doesn't have a current empty snap_canister_id in their snap_canister_ids
+                        // get snap_canister_id and save snap_ids there
+                        await Logger.log_event(tags, debug_show(""));
                     };
                 };
             };
             case(_) {
-               await create_first_canister_for_user(args, principal);
+               await inistialize_user(principal);
             };
         }; 
     };
@@ -107,9 +90,9 @@ actor SnapsMain {
         let principal : UserPrincipal = Principal.toText(caller);
 
         switch (user_canisters_ref.get(principal)) {
-            case (?canister_ids) {
+            case (?snap_canister_ids) {
                 // check if user has current snap_canister_id
-                switch (canister_ids.get(snap_canister_id)) {
+                switch (snap_canister_ids.get(snap_canister_id)) {
                     case null {
                         #err(#SnapIdsNotFound);
                     };
