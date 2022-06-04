@@ -113,18 +113,18 @@ actor SnapMain {
 
         switch (user_canisters_ref.get(principal)) {
             case (?snap_canister_ids) {
-                let snap_list = B.Buffer<Snap>(0);
+                let all_snaps = B.Buffer<Snap>(0);
 
                 for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
                     let snap_actor = actor (canister_id) : SnapActor;
                     let snaps = await snap_actor.get_all_snaps(snap_ids.toArray());
 
                     for (snap in snaps.vals()) {
-                        snap_list.add(snap);
+                        all_snaps.add(snap);
                     };
                 };
 
-                return #ok(snap_list.toArray());
+                return #ok(all_snaps.toArray());
             };
             case (_) {
                 #err(#UserNotFound)
