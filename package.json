@@ -12,7 +12,7 @@
     "preview": "svelte-kit preview",
     "test": "npm run test-script && tape tests-canister/**.test.cjs",
     "test-as": "npm run test-script && tape tests-canister/account_settings.test.cjs",
-    "test-s": "npm run test-script && tape tests-canister/snaps.test.cjs",
+    "test-s": "npm run test-script && tape tests-canister/snap_main.test.cjs",
     "test-config": "tape tests/**.test.cjs",
     "test-si": "tape tests-canister/snap_images.test.cjs",
     "watch": "svelte-kit dev"

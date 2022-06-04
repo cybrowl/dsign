@@ -28,15 +28,15 @@ cp .dfx/local/canisters/snap_images/snap_images.did.js .dfx/local/canisters/snap
 sed -i '' 's/export//g' .dfx/local/canisters/snap_images/snap_images.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/snap_images/snap_images.did.test.cjs
 
-# snaps
-cp .dfx/local/canisters/snaps/snaps.did.js .dfx/local/canisters/snaps/snaps.did.test.cjs
-sed -i '' 's/export//g' .dfx/local/canisters/snaps/snaps.did.test.cjs
-echo "module.exports = { idlFactory };" >> .dfx/local/canisters/snaps/snaps.did.test.cjs
-
 # snap_images
 cp .dfx/local/canisters/snap_images/snap_images.did.js .dfx/local/canisters/snap_images/snap_images.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/snap_images/snap_images.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/snap_images/snap_images.did.test.cjs
+
+# snap_main
+cp .dfx/local/canisters/snap_main/snap_main.did.js .dfx/local/canisters/snap_main/snap_main.did.test.cjs
+sed -i '' 's/export//g' .dfx/local/canisters/snap_main/snap_main.did.test.cjs
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/snap_main/snap_main.did.test.cjs
 
 # logger
 cp .dfx/local/canisters/logger/logger.did.js .dfx/local/canisters/logger/logger.did.test.cjs

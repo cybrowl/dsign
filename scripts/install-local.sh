@@ -1,3 +1,5 @@
+npm install
+
 dfx stop
 dfx start --background --clean
 
@@ -14,9 +16,7 @@ dfx deploy profile --argument '("'${ACCOUNT_SETTINGS_ID}'", "'${PROFILE_AVATAR_I
 dfx deploy projects
 
 # snaps
-dfx deploy snaps
-dfx deploy snap
-dfx deploy snap_images
+sh ./install-snaps.sh
 
 # logger
 dfx deploy logger

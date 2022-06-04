@@ -7,31 +7,32 @@ const { getActor } = require('../tests/actor.cjs');
 const { generateImages } = require('../tests/utils.cjs');
 
 const canisterIds = require('../.dfx/local/canister_ids.json');
-const { idlFactory } = require('../.dfx/local/canisters/snaps/snaps.did.test.cjs');
+
+const { idlFactory: idlFactorySnapMain } = require('../.dfx/local/canisters/snap_main/snap_main.did.test.cjs');
 const { idlFactory: idlFactorySnap } = require('../.dfx/local/canisters/snap/snap.did.test.cjs');
 const { idlFactory: idlFactorySnapImages } = require('../.dfx/local/canisters/snap_images/snap_images.did.test.cjs');
 
-const { defaultIdentity, keeperOfCoinIdentity } = require("../tests/identities/identity.cjs");
-
 global.fetch = fetch;
 
+const { defaultIdentity } = require("../tests/identities/identity.cjs");
 let mishiIdentity = Ed25519KeyIdentity.generate();
 
-const snaps_canister_id = canisterIds.snaps.local;
+const snap_main_canister_id = canisterIds.snap_main.local;
 const snap_canister_id = canisterIds.snap.local;
 const snap_images_canister_id = canisterIds.snap_images.local;
 
 let mishiSnapsMainActor = null;
 let defaultSnapsMainActor = null;
-let SnapMainActor = null;
-let SnapImagesMainActor = null;
+
+let defaultSnapActor = null;
+let defaultSnapsImagesActor = null;
 
 test('Snaps Main: assign actors()', async function (t) {
-	mishiSnapsMainActor = await getActor(snaps_canister_id, idlFactory, mishiIdentity);
-	defaultSnapsMainActor = await getActor(snaps_canister_id, idlFactory, defaultIdentity);
+	mishiSnapsMainActor = await getActor(snap_main_canister_id, idlFactorySnapMain, mishiIdentity);
+	defaultSnapsMainActor = await getActor(snap_main_canister_id, idlFactorySnapMain, defaultIdentity);
 
-	SnapMainActor = await getActor(snap_canister_id, idlFactorySnap, mishiIdentity);
-	SnapImagesMainActor = await getActor(snap_images_canister_id, idlFactorySnapImages, mishiIdentity);
+	defaultSnapActor = await getActor(snap_canister_id, idlFactorySnap, defaultIdentity);
+	defaultSnapsImagesActor = await getActor(snap_images_canister_id, idlFactorySnapImages, defaultIdentity);
 
 	const response = await mishiSnapsMainActor.version();
 	t.equal(typeof response, 'string');
@@ -41,21 +42,23 @@ test('Snaps Main: assign actors()', async function (t) {
 });
 
 test('Snaps Main: initialize_canisters()', async function (t) {
-	const snapCanisterId = await SnapMainActor.get_canister_id();
-	const snapImagesCanisterId = await SnapImagesMainActor.get_canister_id();
-	console.log("snapCanisterId: ", snapCanisterId);
-	console.log("snapImagesCanisterId: ", snapImagesCanisterId);
+	const snapCanisterId = await defaultSnapActor.get_canister_id();
+	const snapImagesCanisterId = await defaultSnapsImagesActor.get_canister_id();
 
-	const response = await defaultSnapsMainActor.initialize_canisters([snapCanisterId], [snapImagesCanisterId]);
+	await defaultSnapsMainActor.initialize_canisters([snapCanisterId], [snapImagesCanisterId]);
+});
 
-	console.log('response: ', response);
+test('Snaps Main: inistialize_user()', async function (t) {
+	const response = await defaultSnapsMainActor.inistialize_user();
+
+	console.log('inistialize_user: ', response);
 });
 
 test('Snaps Main: create_snap()', async function (t) {
 	let createArgs = {
 		title: 'mobile',
-		isPublic: true,
-		coverImageLocation: 1,
+		is_public: true,
+		cover_image_location: 1,
 		images: generateImages()
 	};
 
@@ -67,8 +70,8 @@ test('Snaps Main: create_snap()', async function (t) {
 test('Snaps Main: create_snap()', async function (t) {
 	let createArgs = {
 		title: 'desktop',
-		isPublic: true,
-		coverImageLocation: 0,
+		is_public: true,
+		cover_image_location: 0,
 		images: generateImages()
 	};
 
@@ -80,7 +83,6 @@ test('Snaps Main: create_snap()', async function (t) {
 test('Snaps Main: get_all_snaps()', async function (t) {
 	const response = await defaultSnapsMainActor.get_all_snaps();
 
-	console.log("response: ", response.ok[0].images);
 	console.log('get_all_snaps: ', response);
 });
 

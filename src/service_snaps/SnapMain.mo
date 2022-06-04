@@ -12,7 +12,7 @@ import Snap "Snap";
 import SnapImages "SnapImages";
 import Types "./types";
 
-actor SnapsMain {
+actor SnapMain {
     type CreateSnapArgs = Types.CreateSnapArgs;
     type ImageID =  Types.ImageID;
     type Snap = Types.Snap;
@@ -24,7 +24,7 @@ actor SnapsMain {
     type Username = Types.Username;
     type UserPrincipal = Types.UserPrincipal;
 
-    let ACTOR_NAME : Text = "SnapsMain";
+    let ACTOR_NAME : Text = "SnapMain";
     let CYCLE_AMOUNT : Nat = 1_000_000_000;
 
     // Snap Data
@@ -36,18 +36,29 @@ actor SnapsMain {
     var snap_images_canister_id : Text = "";
 
     // ------------------------- Snaps Management -------------------------
-    private func inistialize_user(principal: UserPrincipal) : async ()  {
+    public shared ({caller}) func inistialize_user() : async Bool {
         let tags = [ACTOR_NAME, "inistialize_user"];
-        var empty_snap_canister_id_storage : H.HashMap<SnapCanisterID, B.Buffer<SnapID>> = H.HashMap(0, Text.equal, Text.hash);
+        let principal : UserPrincipal = Principal.toText(caller);
 
-        user_canisters_ref.put(principal, empty_snap_canister_id_storage);
+        switch (user_canisters_ref.get(principal)) {
+            case (?snap_canister_ids) {
+                return false;
+            };
+            case (_) {
+                var empty_snap_canister_id_storage : H.HashMap<SnapCanisterID, B.Buffer<SnapID>> = H.HashMap(0, Text.equal, Text.hash);
 
-        await Logger.log_event(tags, debug_show(("completed")));
+                //TODO: add current snap_canister_id to SnapCanisterID
+                user_canisters_ref.put(principal, empty_snap_canister_id_storage);
+
+                return true;
+            };
+        };
     };
 
     public shared ({caller}) func create_snap(args: CreateSnapArgs) : async () {
         let tags = [ACTOR_NAME, "create_snap"];
         let principal : UserPrincipal = Principal.toText(caller);
+        let has_images = args.images.size() > 0;
 
         // check if user exists
         switch (user_canisters_ref.get(principal)) {
@@ -56,8 +67,6 @@ actor SnapsMain {
                 switch (snap_canister_ids.get(snap_canister_id)) {
                     // canister is not full
                     case (?snap_ids) {
-                        let has_images = args.images.size() > 0;
-
                         if (has_images) {
                             let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
                             let snap_actor = actor (snap_canister_id) : SnapActor;
@@ -75,12 +84,26 @@ actor SnapsMain {
                         // canister is full
                         // user doesn't have a current empty snap_canister_id in their snap_canister_ids
                         // get snap_canister_id and save snap_ids there
-                        await Logger.log_event(tags, debug_show(""));
+                        let snap_ids = B.Buffer<SnapID>(0);
+
+                        if (has_images) {
+                            let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
+                            let snap_actor = actor (snap_canister_id) : SnapActor;
+
+                            // save images and snap
+                            let image_ids = await snap_images_actor.save_images(args.images);
+                            let snap_id = await snap_actor.save_snap(args, image_ids, principal);
+
+                            snap_ids.add(snap_id);
+                        };
+
+                        snap_canister_ids.put(snap_canister_id, snap_ids);
+                        await Logger.log_event(tags, debug_show("canister_full"));
                     };
                 };
             };
             case(_) {
-               await inistialize_user(principal);
+               await Logger.log_event(tags, debug_show("will return error to frontend, whereby it will call inistialize_user"));
             };
         }; 
     };
