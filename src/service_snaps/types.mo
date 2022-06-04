@@ -8,9 +8,11 @@ module {
     public type UserPrincipal = Text;
 
     // Images
-    public type ImageID = Text;
     public type Image = [Nat8];
+    public type ImageID = Text;
     public type Images = [Image];
+    public type ImagesUrls = [ImageUrl];
+    public type ImageUrl = Text;
 
     public type HeaderField = (Text, Text);
 

@@ -1,6 +1,7 @@
 import Utils  "../src/service_snaps/utils";
 import Debug "mo:base/Debug";
 import Text "mo:base/Text";
+import Array "mo:base/Array";
 
 import ActorSpec "./ActorSpec";
 type Group = ActorSpec.Group;
@@ -13,6 +14,8 @@ let skip = ActorSpec.skip;
 let pending = ActorSpec.pending;
 let run = ActorSpec.run;
 
+func isEq(a: Text, b: Text): Bool { a == b };
+
 let success = run([
   describe("Utils: get_image_id", [
     it("LOCAL: should get username when params exist", do {
@@ -20,6 +23,33 @@ let success = run([
       let imageID = Utils.get_image_id(url);
 
       assertTrue(Text.equal(imageID, "6Z61B30JFYWX0Y9TV04PQBMYEM"));
+    }),
+  ]),
+  describe("Utils: generate_snap_image_url", [
+    it("should generate snap image url", do {
+      let snap_images_canister_id = "qoctq-giaaa-aaaaa-aaaea-cai";
+      let image_id = "70KKS0195HX5MS56MQVGV02C1Z";
+
+      let image_url = Utils.generate_snap_image_url(snap_images_canister_id, image_id);
+
+      let expected = "https://qoctq-giaaa-aaaaa-aaaea-cai.raw.ic0.app/snap_image/70KKS0195HX5MS56MQVGV02C1Z";
+
+      assertTrue(Text.equal(image_url, expected));
+    }),
+  ]),
+  describe("Utils: generate_snap_image_urls", [
+    it("should generate snap image urls", do {
+      let snap_images_canister_id = "qoctq-giaaa-aaaaa-aaaea-cai";
+      let image_ids = ["70KKS0195HX5MS56MQVGV02C1Z", "70KMAVP65RQ88HQ1R2BM5ZWKPA"];
+
+      let image_urls = Utils.generate_snap_image_urls(snap_images_canister_id, image_ids);
+
+      let expected = [
+        "https://qoctq-giaaa-aaaaa-aaaea-cai.raw.ic0.app/snap_image/70KKS0195HX5MS56MQVGV02C1Z",
+        "https://qoctq-giaaa-aaaaa-aaaea-cai.raw.ic0.app/snap_image/70KMAVP65RQ88HQ1R2BM5ZWKPA"
+        ];
+
+      assertTrue(Array.equal(image_urls, expected, isEq));
     }),
   ]),
   describe("Utils: is_valid_image", [

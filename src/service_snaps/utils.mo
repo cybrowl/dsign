@@ -4,8 +4,13 @@ import Char "mo:base/Char";
 import Debug "mo:base/Debug";
 import Iter "mo:base/Iter";
 import Text "mo:base/Text";
+import Types "./types";
 
 module {
+    type ImageID =  Types.ImageID;
+    type ImageUrl = Types.ImageUrl;
+    type ImagesUrls = Types.ImagesUrls;
+
     public func get_image_id(url: Text) : Text {
         if (url.size() == 0) {
             return ""
@@ -19,14 +24,26 @@ module {
         return filterBySeparator[0];
     };
 
-    public func generate_snap_image_url(owner: Text, snapImagesCanisterID: Text, imageID: Text) : Text {
-        let url = Text.join("", (["https://", snapImagesCanisterID, ".raw.ic0.app/", owner, "/snap/image/", imageID].vals()));
+    public func generate_snap_image_url(snapImagesCanisterID: Text, imageID: ImageID) : ImageUrl {
+        let url = Text.join("", (["https://", snapImagesCanisterID, ".raw.ic0.app", "/snap_image/", imageID].vals()));
 
         return url;
     };
 
+    public func generate_snap_image_urls(snapImagesCanisterID: Text, imageIds: [ImageID]) : ImagesUrls {
+        var image_urls = B.Buffer<ImageUrl>(0);
+
+        for (image_id in imageIds.vals()) {
+            var image_url = generate_snap_image_url(snapImagesCanisterID, image_id);
+
+            image_urls.add(image_url);
+        };
+
+        return image_urls.toArray();
+    };
+
     public func is_valid_image(img: [Nat8]) : Bool {
-        var compare = B.Buffer<Nat8>(1);
+        var compare = B.Buffer<Nat8>(0);
 
         let gif : [Nat8] = [71,  73,  70,  56];
         let jpeg : [Nat8] = [255, 216, 255, 224];
