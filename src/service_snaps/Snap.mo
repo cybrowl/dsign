@@ -38,11 +38,9 @@ actor class Snap() = this {
 
         let snap_id =  ULID.toText(se.new());
 
-        // TODO: fix image_ids to contain images urls
-
         let snap : Snap = {
             id = snap_id;
-            cover_location = args.cover_image_location;
+            cover_image_location = args.cover_image_location;
             created = Time.now();
             creator = principal;
             image_urls = image_urls;
@@ -53,9 +51,9 @@ actor class Snap() = this {
             views = 0;
         };
 
-        snaps.put(snapID, snap);
+        snaps.put(snap_id, snap);
 
-        return snapID;
+        return snap_id;
     };
 
     public query func get_all_snaps(listOfSnapIds: [SnapID]) : async [Snap] {

@@ -46,6 +46,7 @@ actor class SnapImages() = this {
             image_ids.add(image_id);
         };
 
+        //TODO: return images_urls
         return image_ids.toArray();
     };
 

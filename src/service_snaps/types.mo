@@ -3,27 +3,12 @@ import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 
 module {
-    public type ImageID = Text;
-    public type ProjectID = Text;
-    public type SnapCanisterID = Text;
-    public type SnapImagesCanisterID = Text;
-    public type SnapID = Text;
     public type Time = Int;
     public type Username = Text;
     public type UserPrincipal = Text;
 
-    public type CanisterSnap = {
-        SnapCanisterID: SnapCanisterID;
-        SnapID: SnapID;
-    };
-
-    public type CreateSnapArgs = {
-        title: Text;
-        is_public: Bool;
-        cover_image_location: Nat8;
-        images: Images;
-    };
-
+    // Images
+    public type ImageID = Text;
     public type Image = [Nat8];
     public type Images = [Image];
 
@@ -41,18 +26,18 @@ module {
         status_code : Nat16;
     };
 
-    public type ProjectRef = {
-        id: ProjectID;
-        name: Text;
-    };
+    // Snap
+    public type SnapCanisterID = Text;
+    public type SnapID = Text;
+    public type SnapImagesCanisterID = Text;
 
     public type Snap = {
         id: SnapID;
-        coverLocation: Nat8;
+        cover_image_location: Nat8;
         created: Time;
         creator: Username;
-        images: [Text];
-        isPublic: Bool;
+        image_urls: [Text];
+        is_public: Bool;
         likes: Nat;
         projects: ?[ProjectRef];
         title: Text;
@@ -64,9 +49,25 @@ module {
         #SnapIdsNotFound;
     };
 
+    public type CreateSnapArgs = {
+        title: Text;
+        is_public: Bool;
+        cover_image_location: Nat8;
+        images: Images;
+    };
+
+    // Project
+    public type ProjectID = Text;
+
+    public type ProjectRef = {
+        id: ProjectID;
+        name: Text;
+    };
+
+    // Actor Interface
     public type SnapActor = actor {
         create : shared (args: CreateSnapArgs, imageIds: [ImageID], userPrincipal: UserPrincipal) -> async SnapID;
-        get_all : query (listOfSnapIds: [SnapID]) -> async [Snap];
+        get_all_snaps : query (listOfSnapIds: [SnapID]) -> async [Snap];
     };
 
     public type SnapImagesActor = actor {
