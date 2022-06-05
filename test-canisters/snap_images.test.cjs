@@ -35,6 +35,14 @@ test('SnapImages.version()', async function (t) {
 	console.log('version: ', response);
 });
 
+test('SnapImages.get_canister_id():: => snap_images_canister_id', async function (t) {
+	const snap_images_canister_id = await snap_images_actor.get_canister_id();
+
+	let has_snap_images_canister_id = snap_images_canister_id.length > 1;
+
+	t.equal(has_snap_images_canister_id, true);
+});
+
 test('SnapImages.save_images():: for motoko and mishicat images', async function (t) {
 	const image_urls = await snap_images_actor.save_images(generate_images());
 
