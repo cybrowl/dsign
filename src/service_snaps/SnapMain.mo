@@ -10,6 +10,7 @@ import Result "mo:base/Result";
 import Logger "canister:logger";
 import Snap "Snap";
 import SnapImages "SnapImages";
+
 import Types "./types";
 
 actor SnapMain {

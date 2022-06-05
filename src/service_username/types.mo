@@ -6,5 +6,6 @@ module {
         #UsernameInvalid;
         #UsernameTaken;
         #UserNotFound;
+        #UserHasUsername;
     };
 }
