@@ -15,7 +15,7 @@ export PROFILE_AVATAR_ID=$(dfx canister id profile_avatar)
 dfx deploy profile --argument '("'${ACCOUNT_SETTINGS_ID}'", "'${PROFILE_AVATAR_ID}'")'
 
 # projects
-dfx deploy projects
+dfx deploy project_main
 
 # snaps
 sh ./install-snaps.sh

@@ -34,8 +34,8 @@
         "logger"
       ]
     },
-    "projects": {
-      "main": "src/service_projects/ProjectsMain.mo",
+    "project_main": {
+      "main": "src/service_projects/ProjectMain.mo",
       "type": "motoko",
       "dependencies": [
         "logger"
