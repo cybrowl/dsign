@@ -46,6 +46,7 @@ test('SnapImages.get_canister_id():: => snap_images_canister_id', async function
 test('SnapImages.save_images():: for motoko and mishicat images', async function (t) {
 	const image_urls = await snap_images_actor.save_images(generate_images());
 
+	console.log("image_urls: ", image_urls);
 	t.equal(image_urls.length, 2);
 });
 
