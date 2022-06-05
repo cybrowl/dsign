@@ -23,8 +23,7 @@ actor class Avatar() = {
         return "0.0.2";
     };
 
-    public func is_full() : async Bool {
-        // TODO: change to query
+    public query func is_full() : async Bool {
         let MAX_SIZE_THRESHOLD_MB : Float = 3500;
 
         let rtsMemorySize : Nat = Prim.rts_memory_size();

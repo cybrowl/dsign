@@ -63,6 +63,13 @@
         "logger"
       ]
     },
+    "username": {
+      "main": "src/service_username/Username.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger"
+      ]
+    },
     "logger": {
       "main": "src/service_logger/logger.mo",
       "type": "motoko"

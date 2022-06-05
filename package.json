@@ -1,21 +1,22 @@
 {
   "private": true,
   "name": "dsign",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "build": "svelte-kit build",
     "format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
+    "generate_test_interface": "bash ./scripts/generate_can_test_interface.sh",
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
-    "logs": "npm run test-script && tape tests/debug/debug.test.cjs",
+    "logs": "npm run generate_test_interface && tape tests/debug/debug.test.cjs",
     "preview": "svelte-kit preview",
     "test-all": "bash ./scripts/test-all.sh",
-    "test-as": "npm run test-script && tape test-canisters/account_settings.test.cjs",
+    "test-as": "npm run generate_test_interface && tape test-canisters/account_settings.test.cjs",
     "test-config": "tape test-env/dfx.config.test.cjs",
-    "test-s": "npm run test-script && tape test-canisters/snap.test.cjs",
-    "test-sm": "npm run test-script && tape test-canisters/snap_main.test.cjs",
-    "test-script": "bash ./scripts/test.sh",
+    "test-s": "npm run generate_test_interface && tape test-canisters/snap.test.cjs",
     "test-si": "tape test-canisters/snap_images.test.cjs",
+    "test-sm": "npm run generate_test_interface && tape test-canisters/snap_main.test.cjs",
+    "test-u": "npm run generate_test_interface && tape test-canisters/username.test.cjs",
     "watch": "svelte-kit dev"
   },
   "dependencies": {
