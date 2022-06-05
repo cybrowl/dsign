@@ -2,18 +2,25 @@ const test = require('tape');
 const fetch = require('node-fetch');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
 
-const { getActor } = require('../tests/actor.cjs');
-const { callImageCanister, generateImages } = require('../tests/utils.cjs');
+const { getActor } = require('../tests-utils/actor.cjs');
+const { callImageCanister, generateImages } = require('../tests-utils/utils.cjs');
 
-const canisterIds = require('../.dfx/local/canister_ids.json');
+
 const { idlFactory } = require('../.dfx/local/canisters/snap_images/snap_images.did.test.cjs');
 
 global.fetch = fetch;
 
-let Mishi = Ed25519KeyIdentity.generate();
-const canisterId = canisterIds.snap_images.local;
+
+
 let host = 'http://127.0.0.1:8000';
 let snapImagesActor = null;
+
+// Canister Ids
+const canisterIds = require('../.dfx/local/canister_ids.json');
+const canisterId = canisterIds.snap_images.local;
+
+// Identities
+let Mishi = Ed25519KeyIdentity.generate();
 
 test('Snap Images: version()', async function (t) {
 	snapImagesActor = await getActor(canisterId, idlFactory, Mishi);

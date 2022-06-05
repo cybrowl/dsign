@@ -3,8 +3,8 @@ const fetch = require('node-fetch');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
 const fs = require('fs');
 
-const { getActor } = require('../tests/actor.cjs');
-const { callImageCanister } = require('../tests/utils.cjs');
+const { getActor } = require('../tests-utils/actor.cjs');
+const { callImageCanister } = require('../tests-utils/utils.cjs');
 
 const canisterIds = require('../.dfx/local/canister_ids.json');
 const {

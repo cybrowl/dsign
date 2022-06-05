@@ -25,9 +25,9 @@ function callImageCanister(path) {
 	});
 }
 
-function generateImages() {
-	const mishicatImageBuffer = fs.readFileSync('tests/images/mishicat.png');
-	const motokoImageBuffer = fs.readFileSync('tests/images/motoko.png');
+function generate_images() {
+	const mishicatImageBuffer = fs.readFileSync('test-utils/images/mishicat.png');
+	const motokoImageBuffer = fs.readFileSync('test-utils/images/motoko.png');
 
 	// covert to unit 8 array
 	const mishicatUnit8ArrayBuffer = new Uint8Array(mishicatImageBuffer);
@@ -40,5 +40,5 @@ function generateImages() {
 
 module.exports = {
 	callImageCanister,
-	generateImages
+	generate_images
 };

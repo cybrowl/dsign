@@ -19,10 +19,10 @@ const parseIdentity = (keyPath) => {
   return Secp256k1KeyIdentity.fromSecretKey(Uint8Array.from(privKey).buffer);
 };
 
-const defaultIdentity = parseIdentity("secp256k1-priv-key-default.pem");
-const keeperOfCoinIdentity = parseIdentity("secp256k1-priv-key-keeper-of-coin.pem");
+const default_identity = parseIdentity("secp256k1-priv-key-default.pem");
+const keeper_of_coin_identity = parseIdentity("secp256k1-priv-key-keeper-of-coin.pem");
 
 module.exports = {
-  defaultIdentity,
-  keeperOfCoinIdentity
+  default_identity,
+  keeper_of_coin_identity
 };

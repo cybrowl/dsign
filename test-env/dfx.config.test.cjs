@@ -8,12 +8,16 @@ test('DFX Config: generateCanisterAliases()', async function (t) {
 		'local-canister-ids': '/Users/cyberowl/Projects/dsign/.dfx/local/canister_ids.json',
 		$IDLdsign_assets:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/dsign_assets.did.js',
+		$IDLaccount_settings:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/account_settings/account_settings.did.js',
 		$IDLprofile: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile/profile.did.js',
 		$IDLprofile_avatar:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile_avatar/profile_avatar.did.js',
-		$IDLaccount_settings:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/account_settings/account_settings.did.js',
-		$IDLproject_manager: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/project_manager/project_manager.did.js',
+		$IDLprojects: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/projects/projects.did.js',
+		$IDLsnap_main: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/snap_main/snap_main.did.js',
+		$IDLsnap: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/snap/snap.did.js',
+		$IDLsnap_images:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/snap_images/snap_images.did.js',
 		$IDLlogger: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/logger/logger.did.js'
 	};
 

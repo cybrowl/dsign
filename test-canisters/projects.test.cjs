@@ -2,7 +2,7 @@ const test = require('tape');
 const fetch = require('node-fetch');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
 
-const { getActor } = require('../tests/actor.cjs');
+const { getActor } = require('../tests-utils/actor.cjs');
 
 const canisterIds = require('../.dfx/local/canister_ids.json');
 const {

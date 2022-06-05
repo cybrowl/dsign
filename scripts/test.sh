@@ -4,8 +4,11 @@
 # NOTE: update file OSX ONLY (Linux remove '')
 
 # profile_avatar
+# convert js file to cjs 
 cp .dfx/local/canisters/profile_avatar/profile_avatar.did.js .dfx/local/canisters/profile_avatar/profile_avatar.did.test.cjs
+# add export to file
 sed -i '' 's/export//g' .dfx/local/canisters/profile_avatar/profile_avatar.did.test.cjs
+# add module export to file
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/profile_avatar/profile_avatar.did.test.cjs
 
 # account_settings

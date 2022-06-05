@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # snaps
 dfx deploy snap_images
 dfx deploy snap

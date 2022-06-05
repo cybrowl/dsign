@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 const test = require('tape');
 
-const { getActor } = require('../tests/actor.cjs');
+const { getActor } = require('../tests-utils/actor.cjs');
 
 const canisterIds = require('../.dfx/local/canister_ids.json');
 const {
