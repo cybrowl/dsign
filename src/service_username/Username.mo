@@ -96,7 +96,7 @@ actor class Username() = {
 
                     await Logger.log_event(tags, debug_show("created"));
 
-                    //TODO: update profile with correct username
+                    //TODO: trigger create profile
                     #ok(username);
                 };
             };
@@ -121,6 +121,7 @@ actor class Username() = {
                 username_owners.delete(current_username);
                 username_owners.put(username, principal);
                 usernames.put(principal, username);
+                //TODO: update username in snaps, profile, avatar_url
                 #ok(username);
             };
         };
