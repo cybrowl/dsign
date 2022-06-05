@@ -3,8 +3,8 @@ module {
     public type UserPrincipal = Text;
 
     public type UsernameError = {
-        #UserNotFound;
+        #UsernameInvalid;
         #UsernameTaken;
+        #UserNotFound;
     };
-
 }

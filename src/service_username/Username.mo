@@ -6,6 +6,7 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 
 import Types "./types";
+import Utils "./utils";
 
 actor class Username() = {
     type Username = Types.Username;
@@ -39,13 +40,24 @@ actor class Username() = {
     public shared ({caller}) func save_username(username: Username) : async Result.Result<Username, UsernameError> {
         let principal : UserPrincipal = Principal.toText(caller);
 
-        switch (username_owners.get(username)) {
-            case (?username) {
-                #err(#UsernameTaken);
-            };
-            case(_) {
-                usernames.put(principal, username);
-                #ok(username);
+        //TODO check identity is not ANON
+
+        let valid_username : Bool = Utils.is_valid_username(username);
+
+        if (valid_username == false) {
+            #err(#UsernameInvalid);
+        } else {
+            switch (username_owners.get(username)) {
+                case (?username) {
+                    #err(#UsernameTaken);
+                };
+                case(_) {
+                    usernames.put(principal, username);
+                    username_owners.put(username, principal);
+
+                    //TODO: update profile with correct username
+                    #ok(username);
+                };
             };
         };
     };
