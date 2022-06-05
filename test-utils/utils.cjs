@@ -1,7 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 
-function callImageCanister(path) {
+function request_image_canister(path) {
 	const options = {
 		hostname: '127.0.0.1',
 		port: 8000,
@@ -39,6 +39,6 @@ function generate_images() {
 }
 
 module.exports = {
-	callImageCanister,
+	request_image_canister,
 	generate_images
 };

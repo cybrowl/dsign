@@ -2,48 +2,45 @@ const test = require('tape');
 const fetch = require('node-fetch');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
 
-const { getActor } = require('../tests-utils/actor.cjs');
-const { callImageCanister, generateImages } = require('../tests-utils/utils.cjs');
-
-
-const { idlFactory } = require('../.dfx/local/canisters/snap_images/snap_images.did.test.cjs');
-
 global.fetch = fetch;
 
-
-
-let host = 'http://127.0.0.1:8000';
-let snapImagesActor = null;
+// Actor Interface
+const {
+	idlFactory: snap_images_interface
+} = require('../.dfx/local/canisters/snap_images/snap_images.did.test.cjs');
 
 // Canister Ids
-const canisterIds = require('../.dfx/local/canister_ids.json');
-const canisterId = canisterIds.snap_images.local;
+const canister_ids = require('../.dfx/local/canister_ids.json');
+const snap_images_canister_id = canister_ids.snap_images.local;
 
 // Identities
-let Mishi = Ed25519KeyIdentity.generate();
+let mishicat_identity = Ed25519KeyIdentity.generate();
 
-test('Snap Images: version()', async function (t) {
-	snapImagesActor = await getActor(canisterId, idlFactory, Mishi);
+// Utils
+const { getActor: get_actor } = require('../test-utils/actor.cjs');
+const { generate_images } = require('../test-utils/utils.cjs');
 
-	const response = await snapImagesActor.version();
+let snap_images_actor = null;
 
+test('SnapImages.version()', async function (t) {
+	snap_images_actor = await get_actor(
+		snap_images_canister_id,
+		snap_images_interface,
+		mishicat_identity
+	);
+
+	const response = await snap_images_actor.version();
+
+	console.log('=========== Snaps Images ===========');
 	console.log('version: ', response);
-	t.equal(typeof response, 'string');
 });
 
-test('Snap Images: add()', async function (t) {
-	// Note: local dev refernces images via
-	// http://qoctq-giaaa-aaaaa-aaaea-cai.localhost:8000/snap_image/70KXHF4E2ZFJCPQ5TSBM6F9Y5Z
+test('SnapImages.save_images():: for motoko and mishicat images', async function (t) {
+	const image_urls = await snap_images_actor.save_images(generate_images());
 
-	const response = await snapImagesActor.save_images(generateImages());
-	const canisterID = await snapImagesActor.get_canister_id();
+	t.equal(image_urls.length, 2);
+});
 
-	const path = `${host}/mishicat/snap/image/${response[0]}?canisterId=${canisterID}`;
-
-	console.log('path: ', path);
-	let responseGetImage = await callImageCanister(path);
-
-	t.strictEqual(responseGetImage.statusCode, 200);
-	console.log('canisterID: ', canisterID);
-	console.log('response: ', response);
+test('SnapImages.save_images():: http request returns 200', async function (t) {
+	//TODO: test http request to images
 });
