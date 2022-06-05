@@ -117,15 +117,11 @@ actor class Username() = {
             if (username_available == false) {
                 #err(#UsernameTaken);
             } else {
-                if (user_has_username == true) {
-                    #err(#UserHasUsername);
-                } else {
-                    let current_username: Username = get_current_username(principal);
-                    username_owners.delete(current_username);
-                    username_owners.put(username, principal);
-                    usernames.put(principal, username);
-                    #ok(username);
-                };
+                let current_username: Username = get_current_username(principal);
+                username_owners.delete(current_username);
+                username_owners.put(username, principal);
+                usernames.put(principal, username);
+                #ok(username);
             };
         };
     };
