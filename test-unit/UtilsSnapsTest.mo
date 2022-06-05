@@ -17,7 +17,7 @@ let run = ActorSpec.run;
 func isEq(a: Text, b: Text): Bool { a == b };
 
 let success = run([
-  describe("Utils: get_image_id", [
+  describe("Utils.get_image_id()", [
     it("should get image_id from url", do {
       let url = "https://qoctq-giaaa-aaaaa-aaaea-cai.raw.ic0.app/snap_image/70KX5HX4X39606KF1SVY3X25QZ";
       let imageID = Utils.get_image_id(url);
@@ -25,7 +25,7 @@ let success = run([
       assertTrue(Text.equal(imageID, "70KX5HX4X39606KF1SVY3X25QZ"));
     }),
   ]),
-  describe("Utils: generate_snap_image_url", [
+  describe("Utils.generate_snap_image_url()", [
     it("should generate snap image url", do {
       let snap_images_canister_id = "qoctq-giaaa-aaaaa-aaaea-cai";
       let image_id = "70KKS0195HX5MS56MQVGV02C1Z";
@@ -38,7 +38,7 @@ let success = run([
       assertTrue(Text.equal(image_url, expected));
     }),
   ]),
-  describe("Utils: generate_snap_image_urls", [
+  describe("Utils.generate_snap_image_urls()", [
     it("should generate snap image urls", do {
       let snap_images_canister_id = "qoctq-giaaa-aaaaa-aaaea-cai";
       let image_ids = ["70KKS0195HX5MS56MQVGV02C1Z", "70KMAVP65RQ88HQ1R2BM5ZWKPA"];
@@ -54,7 +54,7 @@ let success = run([
       assertTrue(Array.equal(image_urls, expected, isEq));
     }),
   ]),
-  describe("Utils: is_valid_image", [
+  describe("Utils.is_valid_image()", [
     it("should return true for GIF image", do {
       let gifImage : [Nat8] = [71,  73,  70,  56];
       let isValid = Utils.is_valid_image(gifImage);

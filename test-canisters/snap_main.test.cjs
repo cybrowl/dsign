@@ -30,7 +30,7 @@ let default_snap_main_actor = null;
 let default_snap_actor = null;
 let default_snap_images_actor = null;
 
-test('Snaps Main: assign actors()', async function (t) {
+test('SnapMain.assign actors()', async function (t) {
 	mishicat_snap_main_actor = await get_actor(snap_main_canister_id, snap_main_interface, mishicat_identity);
 	default_snap_main_actor = await get_actor(snap_main_canister_id, snap_main_interface, default_identity);
 
@@ -44,20 +44,20 @@ test('Snaps Main: assign actors()', async function (t) {
 	console.log('version: ', response);
 });
 
-test('Snaps Main: initialize_canisters()', async function (t) {
+test('SnapMain.initialize_canisters()', async function (t) {
 	const snap_canister_id = await default_snap_actor.get_canister_id();
 	const snap_images_canister_id = await default_snap_images_actor.get_canister_id();
 
 	await default_snap_main_actor.initialize_canisters([snap_canister_id], [snap_images_canister_id]);
 });
 
-test('Snaps Main: inistialize_user()', async function (t) {
+test('SnapMain.inistialize_user()', async function (t) {
 	const response = await default_snap_main_actor.inistialize_user();
 
 	console.log('inistialize_user: ', response);
 });
 
-test('Snaps Main: create_snap()', async function (t) {
+test('SnapMain.create_snap()', async function (t) {
 	let create_args = {
 		title: 'mobile',
 		is_public: true,
@@ -70,7 +70,7 @@ test('Snaps Main: create_snap()', async function (t) {
 	console.log('create_snap: ', response);
 });
 
-test('Snaps Main: create_snap()', async function (t) {
+test('SnapMain.create_snap()', async function (t) {
 	let create_args = {
 		title: 'desktop',
 		is_public: true,
@@ -83,7 +83,7 @@ test('Snaps Main: create_snap()', async function (t) {
 	console.log('create_snap: ', response);
 });
 
-test('Snaps Main: get_all_snaps()', async function (t) {
+test('SnapMain.get_all_snaps()', async function (t) {
 	const response = await default_snap_main_actor.get_all_snaps();
 
 	console.info('get_all_snaps: ', response.ok);

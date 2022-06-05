@@ -14,7 +14,7 @@ let pending = ActorSpec.pending;
 let run = ActorSpec.run;
 
 let success = run([
-  describe("Utils: get_username", [
+  describe("Utils.get_username()", [
     it("should get username when params exist", do {
       let url = "https://dsign.ic/avatar/heyday?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai";
       let username = Utils.get_username(url);
@@ -40,7 +40,7 @@ let success = run([
       assertTrue(Text.equal(username, "heyday"));
     }),
   ]),
-  describe("Utils: is_valid_image", [
+  describe("Utils.is_valid_image()", [
     it("should return true for GIF image", do {
       let gifImage : [Nat8] = [71,  73,  70,  56];
       let isValid = Utils.is_valid_image(gifImage);
@@ -78,7 +78,7 @@ let success = run([
       assertFalse(isValid);
     }),
   ]),
-  describe("Utils: is_valid_username", [
+  describe("Utils.is_valid_username()", [
     it("should return true for valid username", do {
       let username : Text = "mishicat";
       let isValid = Utils.is_valid_username(username);
