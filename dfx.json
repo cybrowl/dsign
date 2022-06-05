@@ -21,7 +21,7 @@
       ]
     },
     "profile": {
-      "main": "src/service_account_settings/Profile.mo",
+      "main": "src/service_profile/Profile.mo",
       "type": "motoko",
       "dependencies": [
         "logger"

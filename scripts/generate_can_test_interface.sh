@@ -13,6 +13,11 @@ cp .dfx/local/canisters/logger/logger.did.js .dfx/local/canisters/logger/logger.
 sed -i '' 's/export//g' .dfx/local/canisters/logger/logger.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/logger/logger.did.test.cjs
 
+# profile
+cp .dfx/local/canisters/profile/profile.did.js .dfx/local/canisters/profile/profile.did.test.cjs
+sed -i '' 's/export//g' .dfx/local/canisters/profile/profile.did.test.cjs
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/profile/profile.did.test.cjs
+
 # profile_avatar
 cp .dfx/local/canisters/profile_avatar/profile_avatar.did.js .dfx/local/canisters/profile_avatar/profile_avatar.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/profile_avatar/profile_avatar.did.test.cjs

@@ -8,4 +8,8 @@ module {
         created: Time;
         username: Username;
     };
+
+    public type ProfileError = {
+        #ProfileNotFound;
+    };
 }
