@@ -13,9 +13,13 @@ actor class Profile() = {
 
     let ACTOR_NAME : Text = "Profile";
 
-    var profiles : HashMap.HashMap<UserPrincipal, Profile> = HashMap.HashMap(1, Text.equal, Text.hash);
+    var profiles : HashMap.HashMap<UserPrincipal, Profile> = HashMap.HashMap(0, Text.equal, Text.hash);
 
     public query func version() : async Text {
         return "0.0.1";
+    };
+
+    public shared func create_profile() : async Bool {
+
     };
 };

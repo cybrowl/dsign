@@ -39,7 +39,7 @@ actor class Username() = {
         };
     };
 
-    private func check_username_is_available(username: Username): Bool {
+    private func check_username_is_available(username: Username) : Bool {
         switch (username_owners.get(username)) {
             case (?owner) {
                 return false;
@@ -50,7 +50,7 @@ actor class Username() = {
         };  
     };
 
-    private func check_user_has_a_username(principal: UserPrincipal): Bool {
+    private func check_user_has_a_username(principal: UserPrincipal) : Bool {
         switch (usernames.get(principal)) {
             case (?username) {
                 return true;
@@ -61,7 +61,7 @@ actor class Username() = {
         };
     };
 
-    private func get_current_username(principal: UserPrincipal): Username {
+    private func get_current_username(principal: UserPrincipal) : Username {
         switch (usernames.get(principal)) {
             case (?current_username) {
                 return current_username;

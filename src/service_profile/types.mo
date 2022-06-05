@@ -3,13 +3,8 @@ module {
     public type Username = Text;
     public type UserPrincipal = Text;
 
-    public type UsernameError = {
-        #UserNotFound;
-        #UsernameTaken;
-    };
-
     public type Profile = {
-        avatar: Text;
+        avatar_url: Text;
         created: Time;
         username: Username;
     };
