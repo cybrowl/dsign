@@ -26,14 +26,14 @@ function callImageCanister(path) {
 }
 
 function generate_images() {
-	const mishicatImageBuffer = fs.readFileSync('test-utils/images/mishicat.png');
-	const motokoImageBuffer = fs.readFileSync('test-utils/images/motoko.png');
+	const mishicat_image_buffer = fs.readFileSync('test-utils/images/mishicat.png');
+	const motoko_image_buffer = fs.readFileSync('test-utils/images/motoko.png');
 
 	// covert to unit 8 array
-	const mishicatUnit8ArrayBuffer = new Uint8Array(mishicatImageBuffer);
-	const motokoUnit8ArrayBuffer = new Uint8Array(motokoImageBuffer);
+	const mishicat_unit8_array_buffer = new Uint8Array(mishicat_image_buffer);
+	const motoko_unit8_array_buffer = new Uint8Array(motoko_image_buffer);
 
-	const images = [[...mishicatUnit8ArrayBuffer], [...motokoUnit8ArrayBuffer]];
+	const images = [[...mishicat_unit8_array_buffer], [...motoko_unit8_array_buffer]];
 
 	return images;
 }
