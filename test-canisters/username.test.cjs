@@ -105,3 +105,35 @@ test('Username.create_username()::[motoko_username_actor]: create second with ne
 	t.deepEqual(response.err, { UserHasUsername: null });
 });
 
+// update_username
+test('Username.update_username()::[anon_username_actor] with anon identity => #err - UserAnonymous', async function (t) {
+	const username = fake.word();
+
+	const response = await anon_username_actor.update_username(username.toLowerCase());
+
+	t.deepEqual(response.err, { UserAnonymous: null });
+});
+
+test('Username.update_username()::[motoko_username_actor] with invalid username => #err - UsernameInvalid', async function (t) {
+	const username = fake.word();
+
+	const response = await motoko_username_actor.update_username(username);
+
+	t.deepEqual(response.err, { UsernameInvalid: null });
+});
+
+test('Username.update_username()::[motoko_username_actor] with taken username => #err - UsernameTaken', async function (t) {
+	const username = 'mishicat';
+
+	const response = await motoko_username_actor.update_username(username);
+
+	t.deepEqual(response.err, { UsernameTaken: null });
+});
+
+test('Username.update_username()::[motoko_username_actor] with taken username => #ok - username', async function (t) {
+	const username = fake.word();
+
+	const response = await motoko_username_actor.update_username(username.toLowerCase());
+
+	t.equal(response.ok, username.toLowerCase());
+});

@@ -110,10 +110,15 @@ actor class Username() = {
 
     public shared ({caller}) func update_username(username: Username) : async Result.Result<Username, UsernameError> {
         let tags = [ACTOR_NAME, "update_username"];
+        let is_anonymous = Principal.isAnonymous(caller);
 
         let valid_username : Bool = Utils.is_valid_username(username);
         let username_available : Bool = check_username_is_available(username);
         let user_has_username: Bool = check_user_has_a_username(caller);
+
+        if (is_anonymous == true) {
+            return #err(#UserAnonymous);
+        };
 
         if (valid_username == false) {
             return #err(#UsernameInvalid);

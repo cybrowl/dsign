@@ -6,9 +6,9 @@ module {
 
     public type UsernameError = {
         #UserAnonymous;
+        #UserHasUsername;
         #UsernameInvalid;
         #UsernameTaken;
         #UserNotFound;
-        #UserHasUsername;
     };
 }
