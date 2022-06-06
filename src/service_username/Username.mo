@@ -88,23 +88,23 @@ actor class Username() = {
         let user_has_username: Bool = check_user_has_a_username(caller);
     
         if (valid_username == false) {
-            #err(#UsernameInvalid);
+            return #err(#UsernameInvalid);
+        };
+
+        if (username_available == false) {
+            return #err(#UsernameTaken);
+        };
+
+        if (user_has_username == true) {
+            return #err(#UserHasUsername);
         } else {
-            if (username_available == false) {
-                #err(#UsernameTaken);
-            } else {
-                if (user_has_username == true) {
-                    #err(#UserHasUsername);
-                } else {
-                    usernames.put(caller, username);
-                    username_owners.put(username, caller);
+            usernames.put(caller, username);
+            username_owners.put(username, caller);
 
-                    await Logger.log_event(tags, debug_show("created"));
+            await Logger.log_event(tags, debug_show("created"));
 
-                    //TODO: trigger create profile
-                    #ok(username);
-                };
-            };
+            //TODO: trigger create profile
+            return #ok(username);
         };
     };
 
