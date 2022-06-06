@@ -45,7 +45,7 @@ test('Username.assign actors()', async function (t) {
 	);
 	const response = await username_actors.mishicat.version();
 
-	console.log('=========== Snaps Images ===========');
+	console.log('=========== Username ===========');
 	console.log('version: ', response);
 });
 
