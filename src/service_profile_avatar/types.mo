@@ -29,7 +29,7 @@ module {
     public type AvatarImgErr = {
         #AvatarImgTooBig;
         #ImgNotValid;
-        #ProfileFailedToUpdateAvatarUrl;
+        #FailedAvatarUrlUpdateProfileNotFound;
     };
 
     public type Image = {

@@ -70,8 +70,8 @@ actor class ProfileAvatarImages() = {
 
         // update_avatar_url 
         switch(await Profile.update_avatar_url(avatar_images_canister_id, username, caller)) {
-            case(#err update_avatar_url_err){
-                return #err(#ProfileFailedToUpdateAvatarUrl);
+            case(#err(#ProfileNotFound)){
+                return #err(#FailedAvatarUrlUpdateProfileNotFound);
             };
             case(#ok avatar_url){
                 #ok({avatar_url});

@@ -67,7 +67,7 @@
       "main": "src/service_username/Username.mo",
       "type": "motoko",
       "dependencies": [
-        "logger"
+        "logger", "profile"
       ]
     },
     "logger": {

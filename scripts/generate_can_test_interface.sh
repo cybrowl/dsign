@@ -3,11 +3,6 @@
 # TESTING #
 # NOTE: update file OSX ONLY (Linux remove '')
 
-# account_settings
-cp .dfx/local/canisters/account_settings/account_settings.did.js .dfx/local/canisters/account_settings/account_settings.did.test.cjs
-sed -i '' 's/export//g' .dfx/local/canisters/account_settings/account_settings.did.test.cjs
-echo "module.exports = { idlFactory };" >> .dfx/local/canisters/account_settings/account_settings.did.test.cjs
-
 # logger
 cp .dfx/local/canisters/logger/logger.did.js .dfx/local/canisters/logger/logger.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/logger/logger.did.test.cjs

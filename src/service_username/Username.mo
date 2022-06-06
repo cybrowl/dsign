@@ -7,6 +7,7 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 
 import Logger "canister:logger";
+import Profile "canister:profile";
 
 import Types "./types";
 import Utils "./utils";
@@ -103,7 +104,8 @@ actor class Username() = {
 
             await Logger.log_event(tags, "created");
 
-            //TODO: call create_profile(principal: UserPrincipal, username: Username)
+            //TODO: this might need to complete before we create username
+            ignore await Profile.create_profile(caller, username);
 
             return #ok({username});
         };

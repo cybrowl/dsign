@@ -17,6 +17,7 @@
     "test-si": "tape test-canisters/snap_images.test.cjs",
     "test-sm": "npm run generate_test_interface && tape test-canisters/snap_main.test.cjs",
     "test-p": "npm run generate_test_interface && tape test-canisters/profile.test.cjs",
+    "test-pai": "npm run generate_test_interface && tape test-canisters/profile_avatar_images.test.cjs",
     "test-u": "npm run generate_test_interface && tape test-canisters/username.test.cjs",
     "watch": "svelte-kit dev"
   },
