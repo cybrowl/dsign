@@ -19,7 +19,7 @@ actor class Username() = {
 
     var username_owners : HashMap.HashMap<Username, UserPrincipal> = HashMap.HashMap(0, Text.equal, Text.hash);
     // stable var username_owners_entries : [(Username, UserPrincipal)] = [];
-    var usernames : HashMap.HashMap<UserPrincipal, Username> = HashMap.HashMap(0, Text.equal, Text.hash);
+    var usernames : HashMap.HashMap<UserPrincipal, Username> = HashMap.HashMap(0, Principal.equal, Principal.hash);
     // stable var usernames_entries : [(UserPrincipal, Username)] = [];
 
     public query func version() : async Text {
@@ -27,9 +27,10 @@ actor class Username() = {
     };
 
     public query ({caller}) func get_username() : async Result.Result<Username, UsernameError> {
-        let principal : UserPrincipal = Principal.toText(caller);
 
-        switch (usernames.get(principal)) {
+        Debug.print(debug_show(Principal.isAnonymous(caller)));
+
+        switch (usernames.get(caller)) {
             case (?username) {
                 #ok(username);
             };
@@ -50,8 +51,8 @@ actor class Username() = {
         };  
     };
 
-    private func check_user_has_a_username(principal: UserPrincipal) : Bool {
-        switch (usernames.get(principal)) {
+    private func check_user_has_a_username(caller: UserPrincipal) : Bool {
+        switch (usernames.get(caller)) {
             case (?username) {
                 return true;
             };
@@ -61,8 +62,8 @@ actor class Username() = {
         };
     };
 
-    private func get_current_username(principal: UserPrincipal) : Username {
-        switch (usernames.get(principal)) {
+    private func get_current_username(caller: UserPrincipal) : Username {
+        switch (usernames.get(caller)) {
             case (?current_username) {
                 return current_username;
             };
@@ -74,13 +75,12 @@ actor class Username() = {
 
     public shared ({caller}) func create_username(username: Username) : async Result.Result<Username, UsernameError> {
         let tags = [ACTOR_NAME, "create_username"];
-        let principal : UserPrincipal = Principal.toText(caller);
 
         //TODO check identity is not ANON
 
         let valid_username : Bool = Utils.is_valid_username(username);
         let username_available : Bool = check_username_is_available(username);
-        let user_has_username: Bool = check_user_has_a_username(principal);
+        let user_has_username: Bool = check_user_has_a_username(caller);
     
         if (valid_username == false) {
             #err(#UsernameInvalid);
@@ -91,8 +91,8 @@ actor class Username() = {
                 if (user_has_username == true) {
                     #err(#UserHasUsername);
                 } else {
-                    usernames.put(principal, username);
-                    username_owners.put(username, principal);
+                    usernames.put(caller, username);
+                    username_owners.put(username, caller);
 
                     await Logger.log_event(tags, debug_show("created"));
 
@@ -105,11 +105,10 @@ actor class Username() = {
 
     public shared ({caller}) func update_username(username: Username) : async Result.Result<Username, UsernameError> {
         let tags = [ACTOR_NAME, "update_username"];
-        let principal : UserPrincipal = Principal.toText(caller);
 
         let valid_username : Bool = Utils.is_valid_username(username);
         let username_available : Bool = check_username_is_available(username);
-        let user_has_username: Bool = check_user_has_a_username(principal);
+        let user_has_username: Bool = check_user_has_a_username(caller);
 
         if (valid_username == false) {
             #err(#UsernameInvalid);
@@ -117,10 +116,10 @@ actor class Username() = {
             if (username_available == false) {
                 #err(#UsernameTaken);
             } else {
-                let current_username: Username = get_current_username(principal);
+                let current_username: Username = get_current_username(caller);
                 username_owners.delete(current_username);
-                username_owners.put(username, principal);
-                usernames.put(principal, username);
+                username_owners.put(username, caller);
+                usernames.put(caller, username);
                 //TODO: update username in snaps, profile, avatar_url
                 #ok(username);
             };

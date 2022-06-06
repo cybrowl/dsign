@@ -13,13 +13,6 @@
       ],
       "type": "assets"
     },
-    "account_settings": {
-      "main": "src/service_account_settings/AccountSettings.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger"
-      ]
-    },
     "profile": {
       "main": "src/service_profile/Profile.mo",
       "type": "motoko",

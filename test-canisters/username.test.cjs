@@ -54,8 +54,6 @@ test('Username.create_username()::[mishicat_username_actor] with invalid usernam
 	const username = fake.word();
 	const response = await mishicat_username_actor.create_username(username);
 
-	console.log("response: ", response);
-
 	t.deepEqual(response.err, { UsernameInvalid: null });
 });
 

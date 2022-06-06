@@ -25,6 +25,7 @@ actor class Profile() = {
     public shared ({caller}) func create_profile(principal: UserPrincipal, username: Username) : async () {
         let principal : UserPrincipal = Principal.toText(caller);
 
+        //TODO: set avatar url
         let profile : Profile = {
             avatar_url = "";
             created = Time.now();
