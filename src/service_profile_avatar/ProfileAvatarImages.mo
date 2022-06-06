@@ -8,8 +8,14 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import Types "./types";
+import Utils "./utils";
 
 actor class ProfileAvatarImages() = {
+    type AvatarImgErr = Types.AvatarImgErr;
+    type AvatarImgOk = Types.AvatarImgOk;
+    type HttpRequest = Types.HttpRequest;
+    type HttpResponse = Types.HttpResponse;
+    type Image = Types.Image;
     type Username = Types.Username;
     type UserPrincipal =  Types.UserPrincipal;
 
@@ -34,5 +40,43 @@ actor class ProfileAvatarImages() = {
         } else {
             return false;
         }
+    };
+
+    public shared func save_image(avatar: Image, username: Username) : async Result.Result<AvatarImgOk, AvatarImgErr> {
+        if (avatar.content.size() > MAX_BYTES) {
+            return #err(#AvatarImgTooBig);
+        };
+
+        let is_valid_img = Utils.is_valid_image(avatar.content);
+
+        if (is_valid_img == false) {
+            return #err(#ImgNotValid);
+        };
+
+        avatar_images.put(username, avatar);
+
+        return #ok(#AvatarImgSaved);
+    };
+
+    public shared query func http_request(req : HttpRequest) : async HttpResponse {
+        let username : Text = Utils.get_username(req.url);
+        let NOT_FOUND : [Nat8] = [0];
+
+        switch (avatar_images.get(username)) {
+            case (?image) {
+                return {
+                    status_code = 200;
+                    headers = [ ("content-type", "image/png") ];
+                    body = image.content;
+                };
+            };
+            case (null) {
+                return {
+                    status_code = 404;
+                    headers = [ ("content-type", "image/png") ];
+                    body = NOT_FOUND;
+                };
+            };
+        };
     };
 };
