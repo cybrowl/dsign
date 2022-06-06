@@ -65,11 +65,17 @@ actor class ProfileAvatarImages() = {
 
         avatar_images.put(username, avatar);
 
-        let avatar_images_canister_id = await get_canister_id();
+        let canister_id = await get_canister_id();
+        let avatar_images_canister_id = Principal.toText(canister_id);
 
-        let avatar_url = await Profile.update_avatar_url(avatar_images_canister_id, username, caller);
-
-        return #ok({avatar_url});
+        switch(await Profile.update_avatar_url(avatar_images_canister_id, username, caller)) {
+            case(#err update_avatar_url_err){
+                return #err(#ProfileFailedToUpdateAvatarUrl);
+            };
+            case(#ok avatar_url){
+                #ok({avatar_url});
+            };
+        }
     };
 
     public shared query func http_request(req : HttpRequest) : async HttpResponse {

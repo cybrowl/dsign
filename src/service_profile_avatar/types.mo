@@ -1,5 +1,5 @@
 import Principal "mo:base/Principal";
-import Text "mo:base/Text";
+// import Text "mo:base/Text";
 
 // service_profile_avatar
 module {
@@ -29,15 +29,10 @@ module {
     public type AvatarImgErr = {
         #AvatarImgTooBig;
         #ImgNotValid;
+        #ProfileFailedToUpdateAvatarUrl;
     };
 
     public type Image = {
         content: [Nat8]
-    };
-
-    public type ProfileActor = actor {
-        version : query () -> async Text;
-        create_profile : shared (UserPrincipal, Username) -> async ();
-        update_avatar_url : shared (Text, Text) -> async ();
     };
 }

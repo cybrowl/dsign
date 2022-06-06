@@ -8,8 +8,8 @@ import Time "mo:base/Time";
 import Types "./types";
 import Utils "./utils";
 
-actor class Profile() = {
-    type AvatarImgOk = Types.AvatarImgOk;
+actor Profile = {
+    type AvatarImgUrl = Types.AvatarImgUrl;
     type Profile = Types.Profile;
     type ProfileError = Types.ProfileError;
     type ProfileOk = Types.ProfileOk;
@@ -49,7 +49,7 @@ actor class Profile() = {
     public shared func update_avatar_url(
         avatarCanisterId: Text,
         username: Text,
-        principal: UserPrincipal) : async Result.Result<AvatarImgOk, ProfileError> {
+        principal: UserPrincipal) : async Result.Result<AvatarImgUrl, ProfileError> {
         switch (profiles.get(principal)) {
             case (null) {
                 #err(#ProfileNotFound)
@@ -68,7 +68,7 @@ actor class Profile() = {
 
                 profiles.put(principal, updated_profile);
 
-                return #ok({avatar_url});
+                return #ok(avatar_url);
             };
         };
     };

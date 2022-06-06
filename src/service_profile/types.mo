@@ -5,6 +5,7 @@ module {
     public type Time = Int;
     public type Username = Text;
     public type UserPrincipal = Principal;
+    public type AvatarImgUrl = Text;
 
     public type Profile = {
         avatar_url: Text;
@@ -14,10 +15,6 @@ module {
 
     public type ProfileOk = {
         profile: Profile;
-    };
-
-    public type AvatarImgOk = {
-        avatar_url: Text;
     };
 
     public type ProfileError = {
