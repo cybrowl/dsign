@@ -86,7 +86,7 @@ test('Username.create_username()::[mishicat_username_actor]: with taken username
 	const createdUsername = await mishicat_username_actor.create_username(username.toLowerCase());
 	const response = await mishicat_username_actor.create_username(username.toLowerCase());
 
-	t.equal(createdUsername.ok, username.toLowerCase());
+	t.equal(createdUsername.ok.username, username.toLowerCase());
 	t.deepEqual(response.err, { UsernameTaken: null });
 });
 
@@ -95,7 +95,7 @@ test('Username.create_username()::[motoko_username_actor]: create first with val
 
 	const response = await motoko_username_actor.create_username(username.toLowerCase());
 
-	t.equal(response.ok, username.toLowerCase());
+	t.equal(response.ok.username, username.toLowerCase());
 });
 
 test('Username.create_username()::[motoko_username_actor]: create second with new valid username => #err - UserHasUsername', async function (t) {
@@ -136,18 +136,20 @@ test('Username.update_username()::[motoko_username_actor] with taken username =>
 
 	const response = await motoko_username_actor.update_username(username.toLowerCase());
 
-	t.equal(response.ok, username.toLowerCase());
+	t.equal(response.ok.username, username.toLowerCase());
 });
 
 // get_username
 test('Username.get_username()::[mishicat_username_actor]: user has username => #ok - username', async function (t) {
 	const response = await mishicat_username_actor.get_username();
+	const hasUsername = response.ok.username.length > 1;
 
-	t.equal(response.ok, username.toLowerCase());
+	t.equal(hasUsername, true);
 });
 
 test('Username.get_username()::[motoko_username_actor]: user has username => #ok - username', async function (t) {
 	const response = await motoko_username_actor.get_username();
+	const hasUsername = response.ok.username.length > 1;
 
-	console.log("response: ", response);
+	t.equal(hasUsername, true);
 });
