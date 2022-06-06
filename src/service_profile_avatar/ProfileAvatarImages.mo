@@ -68,6 +68,7 @@ actor class ProfileAvatarImages() = {
         let canister_id = await get_canister_id();
         let avatar_images_canister_id = Principal.toText(canister_id);
 
+        // update_avatar_url 
         switch(await Profile.update_avatar_url(avatar_images_canister_id, username, caller)) {
             case(#err update_avatar_url_err){
                 return #err(#ProfileFailedToUpdateAvatarUrl);
