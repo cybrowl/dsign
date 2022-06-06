@@ -81,11 +81,12 @@ test('Username.create_username()::[mishicat_username_actor] with invalid usernam
 });
 
 test('Username.create_username()::[mishicat_username_actor]: with taken username => #err - UsernameTaken', async function (t) {
-	const username = 'mishicat';
+	const username = fake.word();
 
-	await mishicat_username_actor.create_username(username);
-	const response = await mishicat_username_actor.create_username(username);
+	const createdUsername = await mishicat_username_actor.create_username(username.toLowerCase());
+	const response = await mishicat_username_actor.create_username(username.toLowerCase());
 
+	t.equal(createdUsername.ok, username.toLowerCase());
 	t.deepEqual(response.err, { UsernameTaken: null });
 });
 
@@ -136,4 +137,17 @@ test('Username.update_username()::[motoko_username_actor] with taken username =>
 	const response = await motoko_username_actor.update_username(username.toLowerCase());
 
 	t.equal(response.ok, username.toLowerCase());
+});
+
+// get_username
+test('Username.get_username()::[mishicat_username_actor]: user has username => #ok - username', async function (t) {
+	const response = await mishicat_username_actor.get_username();
+
+	t.equal(response.ok, username.toLowerCase());
+});
+
+test('Username.get_username()::[motoko_username_actor]: user has username => #ok - username', async function (t) {
+	const response = await motoko_username_actor.get_username();
+
+	console.log("response: ", response);
 });

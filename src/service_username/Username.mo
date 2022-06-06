@@ -13,7 +13,8 @@ import Utils "./utils";
 
 actor class Username() = {
     type Username = Types.Username;
-    type UsernameError =  Types.UsernameError;
+    type UsernameOk =  Types.UsernameOk;
+    type UsernameErr =  Types.UsernameErr;
     type UserPrincipal =  Types.UserPrincipal;
 
     let ACTOR_NAME : Text = "Username";
@@ -63,10 +64,10 @@ actor class Username() = {
         return "0.0.1";
     };
 
-    public query ({caller}) func get_username() : async Result.Result<Username, UsernameError> {
+    public query ({caller}) func get_username() : async Result.Result<UsernameOk, UsernameErr> {
         switch (usernames.get(caller)) {
             case (?username) {
-                #ok(username);
+                #ok({username});
             };
             case(_) {
                 #err(#UserNotFound)
@@ -74,7 +75,7 @@ actor class Username() = {
         };
     };
 
-    public shared ({caller}) func create_username(username: Username) : async Result.Result<Username, UsernameError> {
+    public shared ({caller}) func create_username(username: Username) : async Result.Result<UsernameOk, UsernameErr> {
         let tags = [ACTOR_NAME, "create_username"];
         let is_anonymous = Principal.isAnonymous(caller);
 
@@ -104,11 +105,11 @@ actor class Username() = {
 
             //TODO: call create_profile(principal: UserPrincipal, username: Username)
 
-            return #ok(username);
+            return #ok({username});
         };
     };
 
-    public shared ({caller}) func update_username(username: Username) : async Result.Result<Username, UsernameError> {
+    public shared ({caller}) func update_username(username: Username) : async Result.Result<UsernameOk, UsernameErr> {
         let tags = [ACTOR_NAME, "update_username"];
         let is_anonymous = Principal.isAnonymous(caller);
 
@@ -136,7 +137,7 @@ actor class Username() = {
 
             //TODO: update username in snaps, profile, avatar_url
 
-            return #ok(username);
+            return #ok({username});
         };
     };
 
