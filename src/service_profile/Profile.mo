@@ -6,8 +6,10 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import Types "./types";
+import Utils "./utils";
 
 actor class Profile() = {
+    type AvatarImgOk = Types.AvatarImgOk;
     type Profile = Types.Profile;
     type ProfileError = Types.ProfileError;
     type ProfileOk = Types.ProfileOk;
@@ -41,5 +43,33 @@ actor class Profile() = {
         };
 
         profiles.put(principal, profile);
+    };
+
+    // note: this is only invoked from profile avatar images
+    public shared func update_avatar_url(
+        avatarCanisterId: Text,
+        username: Text,
+        principal: UserPrincipal) : async Result.Result<AvatarImgOk, ProfileError> {
+        switch (profiles.get(principal)) {
+            case (null) {
+                #err(#ProfileNotFound)
+            };
+            case (?profile) {
+                //TODO make production check more dynamic. Maybe a call to a canister.
+
+                let isProduction = false;
+                let avatar_url = Utils.generate_avatar_url(avatarCanisterId, username, isProduction);
+
+                let updated_profile : Profile = {
+                    avatar_url = avatar_url;
+                    created = profile.created;
+                    username = profile.username;
+                };
+
+                profiles.put(principal, updated_profile);
+
+                return #ok({avatar_url});
+            };
+        };
     };
 };

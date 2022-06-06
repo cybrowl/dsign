@@ -7,6 +7,8 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
+import Profile "canister:profile";
+
 import Types "./types";
 import Utils "./utils";
 
@@ -23,6 +25,14 @@ actor class ProfileAvatarImages() = {
     let MAX_BYTES = 2_000_000;
 
     var avatar_images : HashMap.HashMap<Username, Image> = HashMap.HashMap(0, Text.equal, Text.hash);
+
+    public shared ({caller}) func whoami() : async Principal {
+        return caller;
+    };
+
+    public func get_canister_id() : async Principal {
+        return await whoami();
+    };
 
     public query func version() : async Text {
         return "0.0.1";
@@ -42,7 +52,7 @@ actor class ProfileAvatarImages() = {
         }
     };
 
-    public shared func save_image(avatar: Image, username: Username) : async Result.Result<AvatarImgOk, AvatarImgErr> {
+    public shared ({caller}) func save_image(avatar: Image, username: Username) : async Result.Result<AvatarImgOk, AvatarImgErr> {
         if (avatar.content.size() > MAX_BYTES) {
             return #err(#AvatarImgTooBig);
         };
@@ -55,7 +65,11 @@ actor class ProfileAvatarImages() = {
 
         avatar_images.put(username, avatar);
 
-        return #ok(#AvatarImgSaved);
+        let avatar_images_canister_id = await get_canister_id();
+
+        let avatar_url = await Profile.update_avatar_url(avatar_images_canister_id, username, caller);
+
+        return #ok({avatar_url});
     };
 
     public shared query func http_request(req : HttpRequest) : async HttpResponse {

@@ -16,6 +16,10 @@ module {
         profile: Profile;
     };
 
+    public type AvatarImgOk = {
+        avatar_url: Text;
+    };
+
     public type ProfileError = {
         #ProfileNotFound;
     };

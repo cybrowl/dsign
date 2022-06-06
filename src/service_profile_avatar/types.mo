@@ -23,7 +23,7 @@ module {
     };
 
     public type AvatarImgOk = {
-        #AvatarImgSaved;
+        avatar_url: Text;
     };
 
     public type AvatarImgErr = {
@@ -33,5 +33,11 @@ module {
 
     public type Image = {
         content: [Nat8]
+    };
+
+    public type ProfileActor = actor {
+        version : query () -> async Text;
+        create_profile : shared (UserPrincipal, Username) -> async ();
+        update_avatar_url : shared (Text, Text) -> async ();
     };
 }
