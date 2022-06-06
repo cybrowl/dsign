@@ -1,5 +1,6 @@
 import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import Prim "mo:⛔";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
@@ -18,28 +19,12 @@ actor class Username() = {
     let ACTOR_NAME : Text = "Username";
 
     var username_owners : HashMap.HashMap<Username, UserPrincipal> = HashMap.HashMap(0, Text.equal, Text.hash);
-    // stable var username_owners_entries : [(Username, UserPrincipal)] = [];
+    stable var username_owners_stable_storage : [(Username, UserPrincipal)] = [];
+
     var usernames : HashMap.HashMap<UserPrincipal, Username> = HashMap.HashMap(0, Principal.equal, Principal.hash);
-    // stable var usernames_entries : [(UserPrincipal, Username)] = [];
+    stable var usernames_stable_storage : [(UserPrincipal, Username)] = [];
 
-    public query func version() : async Text {
-        return "0.0.1";
-    };
-
-    public query ({caller}) func get_username() : async Result.Result<Username, UsernameError> {
-
-        Debug.print(debug_show(Principal.isAnonymous(caller)));
-
-        switch (usernames.get(caller)) {
-            case (?username) {
-                #ok(username);
-            };
-            case(_) {
-                #err(#UserNotFound)
-            };
-        };
-    };
-
+    // ------------------------- Private Methods -------------------------
     private func check_username_is_available(username: Username) : Bool {
         switch (username_owners.get(username)) {
             case (?owner) {
@@ -69,6 +54,26 @@ actor class Username() = {
             };
             case(_) {
                 return "";
+            };
+        };
+    };
+
+    // ------------------------- Public Methods -------------------------
+    public query func version() : async Text {
+        return "0.0.1";
+    };
+
+    public query ({caller}) func get_username() : async Result.Result<Username, UsernameError> {
+        assert not Principal.isAnonymous(caller);
+
+        Debug.print(debug_show(Principal.isAnonymous(caller)));
+
+        switch (usernames.get(caller)) {
+            case (?username) {
+                #ok(username);
+            };
+            case(_) {
+                #err(#UserNotFound)
             };
         };
     };
@@ -124,5 +129,21 @@ actor class Username() = {
                 #ok(username);
             };
         };
+    };
+
+    // ------------------------- System Methods -------------------------
+    system func preupgrade() {
+        username_owners_stable_storage := Iter.toArray(username_owners.entries());
+        usernames_stable_storage := Iter.toArray(usernames.entries());
+    };
+
+    system func postupgrade() {
+        // owners
+        username_owners := HashMap.fromIter<Username, UserPrincipal>(username_owners_stable_storage.vals(), 0, Text.equal, Text.hash);
+        username_owners_stable_storage := [];
+
+        // username
+        usernames := HashMap.fromIter<UserPrincipal, Username>(usernames_stable_storage.vals(), 0, Principal.equal, Principal.hash);
+        usernames_stable_storage := [];
     };
 };
