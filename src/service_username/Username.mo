@@ -64,10 +64,6 @@ actor class Username() = {
     };
 
     public query ({caller}) func get_username() : async Result.Result<Username, UsernameError> {
-        assert not Principal.isAnonymous(caller);
-
-        Debug.print(debug_show(Principal.isAnonymous(caller)));
-
         switch (usernames.get(caller)) {
             case (?username) {
                 #ok(username);
@@ -81,6 +77,7 @@ actor class Username() = {
     public shared ({caller}) func create_username(username: Username) : async Result.Result<Username, UsernameError> {
         let tags = [ACTOR_NAME, "create_username"];
 
+        assert not Principal.isAnonymous(caller);
         //TODO check identity is not ANON
 
         let valid_username : Bool = Utils.is_valid_username(username);
@@ -101,9 +98,10 @@ actor class Username() = {
             usernames.put(caller, username);
             username_owners.put(username, caller);
 
-            await Logger.log_event(tags, debug_show("created"));
+            await Logger.log_event(tags, "created");
 
-            //TODO: trigger create profile
+            //TODO: call create_profile(principal: UserPrincipal, username: Username)
+
             return #ok(username);
         };
     };
@@ -120,14 +118,18 @@ actor class Username() = {
         };
 
         if (username_available == false) {
-            #err(#UsernameTaken);
+            return #err(#UsernameTaken);
         } else {
             let current_username: Username = get_current_username(caller);
             username_owners.delete(current_username);
             username_owners.put(username, caller);
             usernames.put(caller, username);
+
+            await Logger.log_event(tags, "updated");
+
             //TODO: update username in snaps, profile, avatar_url
-            #ok(username);
+
+            return #ok(username);
         };
     };
 
