@@ -5,6 +5,7 @@ module {
     public type UserPrincipal = Principal;
 
     public type UsernameError = {
+        #UserAnonymous;
         #UsernameInvalid;
         #UsernameTaken;
         #UserNotFound;

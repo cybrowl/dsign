@@ -17,12 +17,14 @@ const username_canister_id = canister_ids.username.local;
 // Identities
 let mishicat_identity = Ed25519KeyIdentity.generate();
 let motoko_identity = Ed25519KeyIdentity.generate();
+let anonymous_identity = null;
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
 
 let mishicat_username_actor = null;
 let motoko_username_actor = null;
+let anon_username_actor = null;
 
 test('Username.version()', async function (t) {
 	mishicat_username_actor = await get_actor(
@@ -37,6 +39,11 @@ test('Username.version()', async function (t) {
 		motoko_identity
 	);
 
+	anon_username_actor = await get_actor(
+		username_canister_id,
+		username_interface,
+		anonymous_identity
+	);
 	const response = await mishicat_username_actor.version();
 
 	console.log('=========== Snaps Images ===========');
@@ -55,6 +62,20 @@ test('Username.create_username()::[mishicat_username_actor] with invalid usernam
 	const response = await mishicat_username_actor.create_username(username);
 
 	t.deepEqual(response.err, { UsernameInvalid: null });
+});
+
+test('Username.create_username()::[anon_username_actor] with anon identity => #err - ', async function (t) {
+	const username = fake.word();
+	try {
+		const response = await anon_username_actor.create_username(username.toLowerCase());
+
+	} catch (error) {
+		console.log("anon_username_actor: ", error);
+
+	}
+
+
+	// t.deepEqual(response.err, { UsernameInvalid: null });
 });
 
 test('Username.create_username()::[motoko_username_actor]: with taken username => #err - UsernameTaken', async function (t) {

@@ -76,14 +76,16 @@ actor class Username() = {
 
     public shared ({caller}) func create_username(username: Username) : async Result.Result<Username, UsernameError> {
         let tags = [ACTOR_NAME, "create_username"];
-
-        assert not Principal.isAnonymous(caller);
-        //TODO check identity is not ANON
+        let is_anonymous = Principal.isAnonymous(caller);
 
         let valid_username : Bool = Utils.is_valid_username(username);
         let username_available : Bool = check_username_is_available(username);
         let user_has_username: Bool = check_user_has_a_username(caller);
-    
+
+        if (is_anonymous == true) {
+            return #err(#UserAnonymous);
+        };
+
         if (valid_username == false) {
             return #err(#UsernameInvalid);
         };
