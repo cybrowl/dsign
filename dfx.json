@@ -20,8 +20,15 @@
         "logger"
       ]
     },
-    "profile_avatar": {
-      "main": "src/service_account_settings/Avatar.mo",
+    "profile_avatar_images": {
+      "main": "src/service_profile_avatar/ProfileAvatarImages.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger"
+      ]
+    },
+    "profile_avatar_main": {
+      "main": "src/service_profile_avatar/ProfileAvatarMain.mo",
       "type": "motoko",
       "dependencies": [
         "logger"

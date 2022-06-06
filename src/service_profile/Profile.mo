@@ -33,14 +33,13 @@ actor class Profile() = {
         };
     };
 
-    public shared ({caller}) func create_profile(principal: UserPrincipal, username: Username) : async () {
-        //TODO: set avatar url
+    public shared func create_profile(principal: UserPrincipal, username: Username) : async () {
         let profile : Profile = {
             avatar_url = "";
             created = Time.now();
             username = username;
         };
 
-        profiles.put(caller, profile);
+        profiles.put(principal, profile);
     };
 };
