@@ -116,18 +116,18 @@ actor class Username() = {
         let user_has_username: Bool = check_user_has_a_username(caller);
 
         if (valid_username == false) {
-            #err(#UsernameInvalid);
+            return #err(#UsernameInvalid);
+        };
+
+        if (username_available == false) {
+            #err(#UsernameTaken);
         } else {
-            if (username_available == false) {
-                #err(#UsernameTaken);
-            } else {
-                let current_username: Username = get_current_username(caller);
-                username_owners.delete(current_username);
-                username_owners.put(username, caller);
-                usernames.put(caller, username);
-                //TODO: update username in snaps, profile, avatar_url
-                #ok(username);
-            };
+            let current_username: Username = get_current_username(caller);
+            username_owners.delete(current_username);
+            username_owners.put(username, caller);
+            usernames.put(caller, username);
+            //TODO: update username in snaps, profile, avatar_url
+            #ok(username);
         };
     };
 
@@ -142,7 +142,7 @@ actor class Username() = {
         username_owners := HashMap.fromIter<Username, UserPrincipal>(username_owners_stable_storage.vals(), 0, Text.equal, Text.hash);
         username_owners_stable_storage := [];
 
-        // username
+        // usernames
         usernames := HashMap.fromIter<UserPrincipal, Username>(usernames_stable_storage.vals(), 0, Principal.equal, Principal.hash);
         usernames_stable_storage := [];
     };
