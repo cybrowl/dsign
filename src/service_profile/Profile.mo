@@ -55,8 +55,7 @@ actor Profile = {
                 #err(#ProfileNotFound)
             };
             case (?profile) {
-                //TODO make production check more dynamic. Maybe a call to a canister.
-
+                //TODO: make isProduction check more dynamic. Maybe a call to a canister.
                 let isProduction = false;
                 let avatar_url = Utils.generate_avatar_url(avatarCanisterId, username, isProduction);
 

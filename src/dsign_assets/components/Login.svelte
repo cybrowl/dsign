@@ -1,13 +1,15 @@
 <script>
-	import { accountSettings } from '../store/account_settings';
 	import { AuthClient } from '@dfinity/auth-client';
-	import { client } from '../store/client';
-	import { createActor as createActorAccountSettings } from '../store/account_settings';
 	import { onMount } from 'svelte';
-	import { removeFromStorage } from '../store/local_storage';
 	import Button from 'dsign-components/components/Button.svelte';
 	import environment from 'environment';
 	import ProfileAvatar from './ProfileAvatar.svelte';
+
+	import { createActor as create_actor_username, actor_username } from '../store/actor_username';
+	import { createActor as create_actor_profile, actor_profile } from '../store/actor_profile';
+
+	import { client } from '../store/client';
+	import { local_storage_remove } from '../store/local_storage';
 
 	const env = environment();
 	const isProd = env['DFX_NETWORK'] === 'ic' || false;
@@ -23,19 +25,33 @@
 		if (isAuthenticated) {
 			handleAuth();
 		} else {
-			accountSettings.update(() => ({
+			actor_username.update(() => ({
 				loggedIn: false,
-				actor: createActorAccountSettings()
+				actor: create_actor_username()
 			}));
 
-			removeFromStorage('profile');
+			actor_profile.update(() => ({
+				loggedIn: false,
+				actor: create_actor_profile()
+			}));
+
+			local_storage_remove('profile');
 		}
 	});
 
 	function handleAuth() {
-		accountSettings.update(() => ({
+		actor_username.update(() => ({
 			loggedIn: true,
-			actor: createActorAccountSettings({
+			actor: create_actor_username({
+				agentOptions: {
+					identity: $client.getIdentity()
+				}
+			})
+		}));
+
+		actor_profile.update(() => ({
+			loggedIn: true,
+			actor: create_actor_profile({
 				agentOptions: {
 					identity: $client.getIdentity()
 				}
@@ -54,7 +70,7 @@
 </script>
 
 <span>
-	{#if $accountSettings.loggedIn}
+	{#if $actor_username.loggedIn}
 		<div class="flex items-center">
 			<Button label="Upload" primary={true} class="mr-4" />
 			<ProfileAvatar />

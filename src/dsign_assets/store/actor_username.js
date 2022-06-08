@@ -1,5 +1,5 @@
 import { Actor, HttpAgent } from '@dfinity/agent';
-import { idlFactory } from '$IDLaccount_settings';
+import { idlFactory } from '$IDLusername';
 import { writable } from 'svelte/store';
 import environment from 'environment';
 
@@ -7,7 +7,7 @@ const env = environment();
 console.info(env);
 
 const isProd = env['DFX_NETWORK'] === 'ic';
-const canisterId = env.canisterIds.account_settings[env['DFX_NETWORK']];
+const canisterId = env.canisterIds.username[env['DFX_NETWORK']];
 
 const host = isProd
 	? `https://${canisterId}.ic0.app/`
@@ -37,7 +37,7 @@ export function createActor(options) {
 	});
 }
 
-export const accountSettings = writable({
+export const actor_username = writable({
 	loggedIn: false,
 	actor: createActor()
 });

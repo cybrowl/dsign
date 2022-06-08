@@ -1,25 +1,30 @@
 <script>
-	import { accountSettings } from '../store/account_settings';
-	import { isAccountSettingsModalVisible, isAccountCreationModalVisible } from '../store/modal';
 	import { onMount } from 'svelte';
-	import { profileStorage } from '../store/local_storage';
 	import Avatar from 'dsign-components/components/Avatar.svelte';
 	import get from 'lodash/get.js';
 
+	import { actor_profile } from '../store/actor_profile';
+
+	import { isAccountSettingsModalVisible, isAccountCreationModalVisible } from '../store/modal';
+	import { local_storage_profile } from '../store/local_storage';
+
 	let hasAccount = false;
 
-	// call account settings canister
-	let hasAccountPromise = $accountSettings.actor.has_account();
-	let profilePromise = $accountSettings.actor.get_profile();
+	let profilePromise = $actor_profile.actor.get_profile();
 
 	onMount(async () => {
 		try {
-			hasAccount = await hasAccountPromise;
-			let { ok: profile } = await profilePromise;
+			let {
+				ok: { profile }
+			} = await profilePromise;
+
+			if (profile) {
+				hasAccount = true;
+			}
 
 			// save to local storage every time
-			profileStorage.set({
-				avatar: get(profile, 'avatar', ''),
+			local_storage_profile.set({
+				avatar_url: get(profile, 'avatar_url', ''),
 				username: get(profile, 'username', '')
 			});
 		} catch (error) {
@@ -28,7 +33,9 @@
 
 		// account creation modal should be visible when user hasn't created an account
 		if (!hasAccount) {
-			isAccountCreationModalVisible.update((isAccountCreationModalVisible) => !isAccountCreationModalVisible);
+			isAccountCreationModalVisible.update(
+				(isAccountCreationModalVisible) => !isAccountCreationModalVisible
+			);
 		}
 	});
 
@@ -38,15 +45,19 @@
 				(isAccountSettingsModalVisible) => !isAccountSettingsModalVisible
 			);
 		} else {
-			isAccountCreationModalVisible.update((isAccountCreationModalVisible) => !isAccountCreationModalVisible);
+			isAccountCreationModalVisible.update(
+				(isAccountCreationModalVisible) => !isAccountCreationModalVisible
+			);
 		}
 	}
 </script>
 
 <Avatar
-	avatar={$profileStorage.avatar}
-	firstCharUsername={$profileStorage.username.charAt(0)}
-	lastCharUsername={$profileStorage.username.charAt($profileStorage.username.length - 1)}
+	avatar={$local_storage_profile.avatar_url}
+	firstCharUsername={$local_storage_profile.username.charAt(0)}
+	lastCharUsername={$local_storage_profile.username.charAt(
+		$local_storage_profile.username.length - 1
+	)}
 	on:click={openSettingsModal}
 />
 

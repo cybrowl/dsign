@@ -1,12 +1,15 @@
 <script>
-	import { client } from '../store/client';
-	import { createActor, accountSettings } from '../store/account_settings';
-	import { isAccountSettingsModalVisible } from '../store/modal';
-	import { profileStorage } from '../store/local_storage';
-	import { removeFromStorage } from '../store/local_storage';
 	import AccountSettings from 'dsign-components/components/AccountSettings.svelte';
 	import get from 'lodash/get.js';
 	import Modal from 'dsign-components/components/Modal.svelte';
+
+	import { createActor as create_actor_username,  actor_username} from '../store/actor_username';
+	import { createActor as create_actor_profile,  actor_profile} from '../store/actor_profile';
+
+	import { client } from '../store/client';
+	import { isAccountSettingsModalVisible } from '../store/modal';
+	import { local_storage_profile } from '../store/local_storage';
+	import { local_storage_remove } from '../store/local_storage';
 
 	async function handleAvatarChange(event) {
 		let files = event.detail;
@@ -18,11 +21,11 @@
 			content: [...imageAsUnit8ArrayBuffer]
 		};
 
-		await $accountSettings.actor.set_avatar(avatar);
-		let { ok: profile } = await $accountSettings.actor.get_profile();
+		// await $actor_username.actor.set_avatar(avatar);
+		let { ok: { profile } } = await $actor_username.actor.get_profile();
 
-		profileStorage.set({
-			avatar: get(profile, 'avatar', '') + '&' + Math.floor(Math.random() * 100),
+		local_storage_profile.set({
+			avatar_url: get(profile, 'avatar_url', '') + '&' + Math.floor(Math.random() * 100),
 			username: get(profile, 'username', ''),
 			website: ''
 		});
@@ -35,16 +38,25 @@
 	async function handleLogOut() {
 		await $client.logout();
 
-		accountSettings.update(() => ({
+		actor_username.update(() => ({
 			loggedIn: false,
-			actor: createActor({
+			actor: create_actor_username({
 				agentOptions: {
 					identity: $client.getIdentity()
 				}
 			})
 		}));
 
-		removeFromStorage('profile');
+		actor_profile.update(() => ({
+			loggedIn: false,
+			actor: create_actor_profile({
+				agentOptions: {
+					identity: $client.getIdentity()
+				}
+			})
+		}));
+
+		local_storage_remove('profile');
 
 		handleCloseModal();
 	}
@@ -52,8 +64,8 @@
 
 <Modal centered={false} on:closeModal={handleCloseModal}>
 	<AccountSettings
-		avatar={$profileStorage.avatar}
-		username={$profileStorage.username}
+		avatar={$local_storage_profile.avatar_url}
+		username={$local_storage_profile.username}
 		on:avatarChange={handleAvatarChange}
 		on:clickLogOut={handleLogOut}
 		triggerInputEvent={true}

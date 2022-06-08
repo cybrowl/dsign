@@ -1,9 +1,10 @@
 <script>
-	import { accountSettings } from '../store/account_settings';
-	import { getErrorMessage } from '../lib/utils';
 	import AccountCreation from 'dsign-components/components/AccountCreation.svelte';
 	import AccountCreationSuccess from 'dsign-components/components/AccountCreationSuccess.svelte';
 	import Modal from 'dsign-components/components/Modal.svelte';
+	import { getErrorMessage } from '../lib/utils';
+
+	import { actor_username } from '../store/actor_username';
 
 	let errorMessages = {
 		UsernameInvalid: 'Use lower case letters and numbers only, 2 - 20 characters in length',
@@ -22,7 +23,7 @@
 			errorMessage = '';
 			isCreatingAccount = true;
 
-			const response = await $accountSettings.actor.create_profile(e.detail.username);
+			const response = await $actor_username.actor.create_username(e.detail.username);
 
 			errorMessage = getErrorMessage(response, errorMessages);
 			isCreatingAccount = false;

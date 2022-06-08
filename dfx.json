@@ -3,7 +3,8 @@
     "dsign_assets": {
       "dependencies": [
         "logger",
-        "account_settings"
+        "profile",
+        "username"
       ],
       "frontend": {
         "entrypoint": "build/index.html"
