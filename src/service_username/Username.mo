@@ -119,6 +119,10 @@ actor class Username() = {
         let username_available : Bool = check_username_is_available(username);
         let user_has_username: Bool = check_user_has_a_username(caller);
 
+        if (user_has_username == false) {
+            return #err(#UsernameNotFound);
+        };
+
         if (is_anonymous == true) {
             return #err(#UserAnonymous);
         };

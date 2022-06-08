@@ -14,6 +14,7 @@ module {
         #UserHasUsername;
         #UsernameInvalid;
         #UsernameTaken;
+        #UsernameNotFound;
         #UserNotFound;
     };
 }

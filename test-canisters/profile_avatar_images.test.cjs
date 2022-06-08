@@ -8,6 +8,9 @@ global.fetch = fetch;
 
 // Actor Interface
 const {
+	idlFactory: profile_interface
+} = require('../.dfx/local/canisters/profile/profile.did.test.cjs');
+const {
 	idlFactory: profile_avatar_images_interface
 } = require('../.dfx/local/canisters/profile_avatar_images/profile_avatar_images.did.test.cjs');
 const {
@@ -16,6 +19,7 @@ const {
 
 // Canister Ids
 const canister_ids = require('../.dfx/local/canister_ids.json');
+const profile_canister_id = canister_ids.profile.local;
 const profile_avatar_images_canister_id = canister_ids.profile_avatar_images.local;
 const username_canister_id = canister_ids.username.local;
 
@@ -30,10 +34,17 @@ const { getActor: get_actor } = require('../test-utils/actor.cjs');
 
 let avatar_images_actors = {};
 let username_actors = {};
+let profile_actors = {};
 
 const username = lowerCase(fake.word());
 
 test('ProfileAvatarImages.version()', async function (t) {
+	profile_actors.mishicat = await get_actor(
+		profile_canister_id,
+		profile_interface,
+		mishicat_identity
+	);
+
 	avatar_images_actors.mishicat = await get_actor(
 		profile_avatar_images_canister_id,
 		profile_avatar_images_interface,
@@ -76,10 +87,41 @@ test('Username.create_username()::[username_actors.mishicat] with valid username
 	t.equal(response.ok.username, username);
 });
 
+test('Username.get_username()::[username_actors.mishicat] => #ok - username', async function (t) {
+	const response = await username_actors.mishicat.get_username();
+
+	t.equal(response.ok.username, username);
+});
+
+test('Profile.get_profile()::[profile_actors.mishicat]  => #ok - profile', async function (t) {
+	const response = await profile_actors.mishicat.get_profile();
+
+	const hasUsername = response.ok.profile.username.length > 1;
+	const hasCreated = response.ok.profile.created.toString().length > 2;
+	const hasAvatarUrl = response.ok.profile.avatar_url.length > 2;
+
+
+	t.equal(hasUsername, true);
+	t.equal(hasCreated, true);
+	t.equal(hasAvatarUrl, false);
+});
+
 test('ProfileAvatarImages.save_image()::[avatar_images_actors.mishicat]:  => #ok - avatar_url', async function (t) {
 	const images = generate_images();
 	const response = await avatar_images_actors.mishicat.save_image({content: images[0]}, username);
 
-	console.log("response: ", response);
+	const hasAvatarUrl = response.ok.avatar_url.length > 2;
 
+	t.equal(hasAvatarUrl, true);
+});
+
+test('Profile.get_profile()::[profile_actors.mishicat]  => #ok - profile', async function (t) {
+	const response = await profile_actors.mishicat.get_profile();
+	const hasUsername = response.ok.profile.username.length > 1;
+	const hasCreated = response.ok.profile.created.toString().length > 2;
+	const hasAvatarUrl = response.ok.profile.avatar_url.length > 2;
+
+	t.equal(hasUsername, true);
+	t.equal(hasCreated, true);
+	t.equal(hasAvatarUrl, true);
 });
