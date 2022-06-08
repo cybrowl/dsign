@@ -106,7 +106,7 @@ test('Profile.get_profile()::[profile_actors.mishicat]  => #ok - profile', async
 	t.equal(hasAvatarUrl, false);
 });
 
-test('ProfileAvatarImages.save_image()::[avatar_images_actors.mishicat]:  => #ok - avatar_url', async function (t) {
+test('ProfileAvatarImages.save_image()::[avatar_images_actors.mishicat]: after making profile => #ok - avatar_url', async function (t) {
 	const images = generate_images();
 	const response = await avatar_images_actors.mishicat.save_image({content: images[0]}, username);
 
@@ -115,7 +115,7 @@ test('ProfileAvatarImages.save_image()::[avatar_images_actors.mishicat]:  => #ok
 	t.equal(hasAvatarUrl, true);
 });
 
-test('Profile.get_profile()::[profile_actors.mishicat]  => #ok - profile', async function (t) {
+test('Profile.get_profile()::[profile_actors.mishicat]: updated avatar_url=> #ok - profile', async function (t) {
 	const response = await profile_actors.mishicat.get_profile();
 	const hasUsername = response.ok.profile.username.length > 1;
 	const hasCreated = response.ok.profile.created.toString().length > 2;
