@@ -25,7 +25,9 @@
       "main": "src/service_profile_avatar/ProfileAvatarImages.mo",
       "type": "motoko",
       "dependencies": [
-        "logger", "profile"
+        "logger",
+        "profile",
+        "username"
       ]
     },
     "profile_avatar_main": {
@@ -33,7 +35,7 @@
       "type": "motoko",
       "dependencies": [
         "logger",
-        "username"
+        "profile_avatar_images"
       ]
     },
     "project_main": {

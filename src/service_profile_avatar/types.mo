@@ -42,6 +42,6 @@ module {
 
     // Actor Interface
     public type ProfileAvatarImagesActor = actor {
-        save_image : shared (avatar: Image, username: Username) -> async Result.Result<AvatarImgOk, AvatarImgErr>;
+        save_image : shared (avatar: Image, caller: UserPrincipal) -> async Result.Result<AvatarImgOk, AvatarImgErr>;
     };
 }

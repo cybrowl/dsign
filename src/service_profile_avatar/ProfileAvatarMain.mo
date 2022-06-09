@@ -8,7 +8,6 @@ import Time "mo:base/Time";
 
 import Logger "canister:logger";
 import ProfileAvatarImages "ProfileAvatarImages";
-import Username "canister:username";
 
 import Utils "./utils";
 import Types "./types";
@@ -46,21 +45,9 @@ actor class ProfileAvatarMain() = {
             return #err(#ImgNotValid);
         };
 
-        canister_history.put(profile_avatar_images_canister_id, profile_avatar_images_canister_id);
-
         let profile_avatar_images_actor = actor (profile_avatar_images_canister_id) : ProfileAvatarImagesActor;
-        var username = "";
 
-        switch(await Username.get_username(caller)) {
-            case(#ok response){
-                username:= response.username;
-            };
-            case(_){
-                return #err(#FailedGetUsername);
-            };
-        };
-
-        switch(await profile_avatar_images_actor.save_image(avatar, username)) {
+        switch(await profile_avatar_images_actor.save_image(avatar, caller)) {
             case(#ok avatar_url){
                 #ok(avatar_url);
             };
@@ -80,6 +67,8 @@ actor class ProfileAvatarMain() = {
         let profile_avatar_images_canister_id_ = Principal.toText(principal);
 
         profile_avatar_images_canister_id := profile_avatar_images_canister_id_;
+
+        canister_history.put(profile_avatar_images_canister_id, profile_avatar_images_canister_id);
 
         await Logger.log_event(tags, debug_show(("profile_avatar_images_canister_id: ", profile_avatar_images_canister_id)));
     };

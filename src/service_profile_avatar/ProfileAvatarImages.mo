@@ -8,6 +8,7 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import Profile "canister:profile";
+import Username "canister:username";
 
 import Types "./types";
 import Utils "./utils";
@@ -51,15 +52,26 @@ actor class ProfileAvatarImages() = {
         }
     };
 
-    public shared ({caller}) func save_image(avatar: Image, username: Username) : async Result.Result<AvatarImgOk, AvatarImgErr> {
+    public shared ({caller}) func save_image(avatar: Image, principal: UserPrincipal) : async Result.Result<AvatarImgOk, AvatarImgErr> {
         //TODO: only main should be able to call this
+        var username = "";
+
+        switch(await Username.get_username(principal)) {
+            case(#ok response){
+                username:= response.username;
+            };
+            case(_){
+                return #err(#FailedGetUsername);
+            };
+        };
+
         avatar_images.put(username, avatar);
 
         let canister_id = await get_canister_id();
         let avatar_images_canister_id = Principal.toText(canister_id);
 
         // update_avatar_url 
-        switch(await Profile.update_avatar_url(avatar_images_canister_id, username, caller)) {
+        switch(await Profile.update_avatar_url(avatar_images_canister_id, username, principal)) {
             case(#err(#ProfileNotFound)){
                 return #err(#FailedAvatarUrlUpdateProfileNotFound);
             };
