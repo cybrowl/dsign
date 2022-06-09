@@ -1,5 +1,6 @@
 import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
