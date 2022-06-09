@@ -37,6 +37,7 @@ actor Profile = {
         };
     };
 
+    // note: this is only invoked from username.create_username()
     public shared func create_profile(principal: UserPrincipal, username: Username) : async () {
         let profile : Profile = {
             avatar_url = "";
@@ -47,7 +48,7 @@ actor Profile = {
         profiles.put(principal, profile);
     };
 
-    // note: this is only invoked from profile avatar images
+    // note: this is only invoked from profile_avatar_images.save_image()
     public shared func update_avatar_url(
         avatarCanisterId: Text,
         username: Text,
@@ -80,7 +81,6 @@ actor Profile = {
     };
 
     system func postupgrade() {
-        // owners
         profiles := HashMap.fromIter<UserPrincipal, Profile>(profiles_stable_storage.vals(), 0, Principal.equal, Principal.hash);
         profiles_stable_storage := [];
     };
