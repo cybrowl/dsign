@@ -80,7 +80,7 @@ actor Profile = {
 
     system func postupgrade() {
         // owners
-        profiles := HashMap.fromIter<Username, UserPrincipal>(profiles_stable_storage.vals(), 0, Text.equal, Text.hash);
+        profiles := HashMap.fromIter<UserPrincipal, Profile>(profiles_stable_storage.vals(), 0, Principal.equal, Principal.hash);
         profiles_stable_storage := [];
     };
 };
