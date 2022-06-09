@@ -56,7 +56,7 @@ actor class ProfileAvatarImages() = {
         //TODO: only main should be able to call this
         var username = "";
 
-        switch(await Username.get_username(principal)) {
+        switch(await Username.get_username_actor(principal)) {
             case(#ok response){
                 username:= response.username;
             };

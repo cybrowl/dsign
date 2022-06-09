@@ -18,10 +18,10 @@ cp .dfx/local/canisters/profile_avatar_images/profile_avatar_images.did.js .dfx/
 sed -i '' 's/export//g' .dfx/local/canisters/profile_avatar_images/profile_avatar_images.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/profile_avatar_images/profile_avatar_images.did.test.cjs
 
-# # profile_avatar_main
-# cp .dfx/local/canisters/profile_avatar_main/profile_avatar_main.did.js .dfx/local/canisters/profile_avatar_main/profile_avatar_main.did.test.cjs
-# sed -i '' 's/export//g' .dfx/local/canisters/profile_avatar_main/profile_avatar_main.did.test.cjs
-# echo "module.exports = { idlFactory };" >> .dfx/local/canisters/profile_avatar_main/profile_avatar_main.did.test.cjs
+# profile_avatar_main
+cp .dfx/local/canisters/profile_avatar_main/profile_avatar_main.did.js .dfx/local/canisters/profile_avatar_main/profile_avatar_main.did.test.cjs
+sed -i '' 's/export//g' .dfx/local/canisters/profile_avatar_main/profile_avatar_main.did.test.cjs
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/profile_avatar_main/profile_avatar_main.did.test.cjs
 
 # # project_main
 # cp .dfx/local/canisters/project_main/project_main.did.js .dfx/local/canisters/project_main/project_main.did.test.cjs

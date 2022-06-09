@@ -65,24 +65,24 @@ actor Username = {
         return "0.0.1";
     };
 
-    public query ({caller}) func get_username(principal: UserPrincipal) : async Result.Result<UsernameOk, UsernameErr> {
-        if (Principal.toText(principal).size() > 2) {
-            switch (usernames.get(principal)) {
-                case (?username) {
-                    #ok({username});
-                };
-                case(_) {
-                    #err(#UserNotFound)
-                };
+    public query ({caller}) func get_username() : async Result.Result<UsernameOk, UsernameErr> {
+        switch (usernames.get(caller)) {
+            case (?username) {
+                #ok({username});
             };
-        } else {
-            switch (usernames.get(caller)) {
-                case (?username) {
-                    #ok({username});
-                };
-                case(_) {
-                    #err(#UserNotFound)
-                };
+            case(_) {
+                #err(#UserNotFound)
+            };
+        };     
+    };
+
+    public query func get_username_actor(principal: UserPrincipal) : async Result.Result<UsernameOk, UsernameErr> {
+        switch (usernames.get(principal)) {
+            case (?username) {
+                #ok({username});
+            };
+            case(_) {
+                #err(#UserNotFound)
             };
         };
     };

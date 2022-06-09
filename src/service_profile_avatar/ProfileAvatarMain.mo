@@ -22,7 +22,7 @@ actor class ProfileAvatarMain() = {
     type UserPrincipal =  Types.UserPrincipal;
 
     let ACTOR_NAME : Text = "ProfileAvatarMain";
-    let CYCLE_AMOUNT : Nat = 1_000_000_000;
+    let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
     let MAX_BYTES = 2_000_000;
 
     var canister_history : H.HashMap<ProfileAvatarImagesCanisterId, ProfileAvatarImagesCanisterId> = H.HashMap(0, Text.equal, Text.hash);
