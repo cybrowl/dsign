@@ -23,7 +23,7 @@ let success = run([
         let username = "mishicat";
         let isProduction = false;
 
-        let expected = "http://qoctq-giaaa-aaaaa-aaaea-cai.localhost:8000/avatar/mishicat";
+        let expected = "http://127.0.0.1:8000/avatar/mishicat?canisterId=qoctq-giaaa-aaaaa-aaaea-cai";
         let avatar_url = Utils.generate_avatar_url(avatarCanisterId, username, isProduction);
 
         assertTrue(Text.equal(avatar_url, expected));
