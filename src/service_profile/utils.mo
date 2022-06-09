@@ -6,7 +6,8 @@ module {
         var avatar_url = Text.join("", (["https://", avatarCanisterId, ".raw.ic0.app","/avatar/",username].vals()));
 
         if (isProduction == false) {
-           avatar_url := Text.join("", (["http://", avatarCanisterId, ".localhost:8000", "/avatar/", username].vals()));
+            // http://localhost:8000/avatar/reedaled?canisterId=q4eej-kyaaa-aaaaa-aaaha-cai
+            avatar_url := Text.join("", (["http://127.0.0.1:8000/avatar/", username, "?canisterId=", avatarCanisterId].vals()));
         };
 
         return avatar_url;

@@ -19,6 +19,7 @@ actor Profile = {
     let ACTOR_NAME : Text = "Profile";
 
     var profiles : HashMap.HashMap<UserPrincipal, Profile> = HashMap.HashMap(0, Principal.equal, Principal.hash);
+    stable var profiles_stable_storage : [(UserPrincipal, Profile)] = [];
 
     public query func version() : async Text {
         return "0.0.1";
@@ -70,5 +71,16 @@ actor Profile = {
                 return #ok(avatar_url);
             };
         };
+    };
+
+    // ------------------------- System Methods -------------------------
+    system func preupgrade() {
+        profiles_stable_storage := Iter.toArray(profiles.entries());
+    };
+
+    system func postupgrade() {
+        // owners
+        profiles := HashMap.fromIter<Username, UserPrincipal>(profiles_stable_storage.vals(), 0, Text.equal, Text.hash);
+        profiles_stable_storage := [];
     };
 };
