@@ -12,7 +12,7 @@ import Profile "canister:profile";
 import Types "./types";
 import Utils "./utils";
 
-actor class Username() = {
+actor Username = {
     type Username = Types.Username;
     type UsernameOk =  Types.UsernameOk;
     type UsernameErr =  Types.UsernameErr;
@@ -65,13 +65,24 @@ actor class Username() = {
         return "0.0.1";
     };
 
-    public query ({caller}) func get_username() : async Result.Result<UsernameOk, UsernameErr> {
-        switch (usernames.get(caller)) {
-            case (?username) {
-                #ok({username});
+    public query ({caller}) func get_username(principal: UserPrincipal) : async Result.Result<UsernameOk, UsernameErr> {
+        if (Principal.toText(principal).size() > 2) {
+            switch (usernames.get(principal)) {
+                case (?username) {
+                    #ok({username});
+                };
+                case(_) {
+                    #err(#UserNotFound)
+                };
             };
-            case(_) {
-                #err(#UserNotFound)
+        } else {
+            switch (usernames.get(caller)) {
+                case (?username) {
+                    #ok({username});
+                };
+                case(_) {
+                    #err(#UserNotFound)
+                };
             };
         };
     };
@@ -105,7 +116,7 @@ actor class Username() = {
             await Logger.log_event(tags, "created");
 
             //TODO: this might need to complete before we create username
-            ignore await Profile.create_profile(caller, username);
+            await Profile.create_profile(caller, username);
 
             return #ok({username});
         };

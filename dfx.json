@@ -32,7 +32,8 @@
       "main": "src/service_profile_avatar/ProfileAvatarMain.mo",
       "type": "motoko",
       "dependencies": [
-        "logger"
+        "logger",
+        "username"
       ]
     },
     "project_main": {

@@ -22,7 +22,6 @@ actor class ProfileAvatarImages() = {
     type UserPrincipal =  Types.UserPrincipal;
 
     let ACTOR_NAME : Text = "ProfileAvatarImages";
-    let MAX_BYTES = 2_000_000;
 
     var avatar_images : HashMap.HashMap<Username, Image> = HashMap.HashMap(0, Text.equal, Text.hash);
 
@@ -53,16 +52,7 @@ actor class ProfileAvatarImages() = {
     };
 
     public shared ({caller}) func save_image(avatar: Image, username: Username) : async Result.Result<AvatarImgOk, AvatarImgErr> {
-        if (avatar.content.size() > MAX_BYTES) {
-            return #err(#AvatarImgTooBig);
-        };
-
-        let is_valid_img = Utils.is_valid_image(avatar.content);
-
-        if (is_valid_img == false) {
-            return #err(#ImgNotValid);
-        };
-
+        //TODO: only main should be able to call this
         avatar_images.put(username, avatar);
 
         let canister_id = await get_canister_id();

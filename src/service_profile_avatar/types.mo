@@ -1,8 +1,10 @@
 import Principal "mo:base/Principal";
+import Result "mo:base/Result";
 // import Text "mo:base/Text";
 
 // service_profile_avatar
 module {
+    public type ProfileAvatarImagesCanisterId = Text;
     public type Time = Int;
     public type Username = Text;
     public type UserPrincipal = Principal;
@@ -29,10 +31,17 @@ module {
     public type AvatarImgErr = {
         #AvatarImgTooBig;
         #ImgNotValid;
+        #FailedGetUsername;
+        #FailedSaveAvatarImg;
         #FailedAvatarUrlUpdateProfileNotFound;
     };
 
     public type Image = {
         content: [Nat8]
+    };
+
+    // Actor Interface
+    public type ProfileAvatarImagesActor = actor {
+        save_image : shared (avatar: Image, username: Username) -> async Result.Result<AvatarImgOk, AvatarImgErr>;
     };
 }
