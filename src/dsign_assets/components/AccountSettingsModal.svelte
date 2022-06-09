@@ -3,8 +3,12 @@
 	import get from 'lodash/get.js';
 	import Modal from 'dsign-components/components/Modal.svelte';
 
-	import { createActor as create_actor_username,  actor_username} from '../store/actor_username';
-	import { createActor as create_actor_profile,  actor_profile} from '../store/actor_profile';
+	import { createActor as create_actor_username, actor_username } from '../store/actor_username';
+	import { createActor as create_actor_profile, actor_profile } from '../store/actor_profile';
+	import {
+		createActor as create_actor_profile_avatar_main,
+		actor_profile_avatar_main
+	} from '../store/actor_profile_avatar_main';
 
 	import { client } from '../store/client';
 	import { isAccountSettingsModalVisible } from '../store/modal';
@@ -21,8 +25,10 @@
 			content: [...imageAsUnit8ArrayBuffer]
 		};
 
-		// await $actor_username.actor.set_avatar(avatar);
-		let { ok: { profile } } = await $actor_username.actor.get_profile();
+		await $actor_profile_avatar_main.actor.save_image(avatar);
+		let {
+			ok: { profile }
+		} = await $actor_profile.actor.get_profile();
 
 		local_storage_profile.set({
 			avatar_url: get(profile, 'avatar_url', '') + '&' + Math.floor(Math.random() * 100),
@@ -32,7 +38,9 @@
 	}
 
 	function handleCloseModal() {
-		isAccountSettingsModalVisible.update((isAccountSettingsModalVisible) => !isAccountSettingsModalVisible);
+		isAccountSettingsModalVisible.update(
+			(isAccountSettingsModalVisible) => !isAccountSettingsModalVisible
+		);
 	}
 
 	async function handleLogOut() {
@@ -50,6 +58,15 @@
 		actor_profile.update(() => ({
 			loggedIn: false,
 			actor: create_actor_profile({
+				agentOptions: {
+					identity: $client.getIdentity()
+				}
+			})
+		}));
+
+		actor_profile_avatar_main.update(() => ({
+			loggedIn: false,
+			actor: create_actor_profile_avatar_main({
 				agentOptions: {
 					identity: $client.getIdentity()
 				}
