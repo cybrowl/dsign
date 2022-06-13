@@ -8,6 +8,7 @@ import Text "mo:base/Text";
 
 import Logger "canister:logger";
 import Profile "canister:profile";
+import SnapMain "canister:snap_main";
 
 import Types "./types";
 import Utils "./utils";
@@ -117,6 +118,7 @@ actor Username = {
 
             //TODO: this might need to complete before we create username
             await Profile.create_profile(caller, username);
+            ignore await SnapMain.create_user_snap_storage(caller);
 
             return #ok({username});
         };

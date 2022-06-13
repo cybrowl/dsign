@@ -45,13 +45,6 @@
         "logger"
       ]
     },
-    "snap_main": {
-      "main": "src/service_snaps/SnapMain.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger"
-      ]
-    },
     "snap": {
       "main": "src/service_snaps/Snap.mo",
       "type": "motoko",
@@ -67,11 +60,18 @@
         "logger"
       ]
     },
+    "snap_main": {
+      "main": "src/service_snaps/SnapMain.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger"
+      ]
+    },
     "username": {
       "main": "src/service_username/Username.mo",
       "type": "motoko",
       "dependencies": [
-        "logger", "profile"
+        "logger", "profile", "snap_main"
       ]
     },
     "logger": {

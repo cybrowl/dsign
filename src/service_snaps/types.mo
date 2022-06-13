@@ -1,11 +1,12 @@
 import Int "mo:base/Int";
 import Nat "mo:base/Nat";
+import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 
 module {
     public type Time = Int;
     public type Username = Text;
-    public type UserPrincipal = Text;
+    public type UserPrincipal = Principal;
 
     // Images
     public type Image = [Nat8];

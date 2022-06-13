@@ -11,7 +11,7 @@ import Types "./types";
 
 actor class Snap() = this {
     type CreateSnapArgs = Types.CreateSnapArgs;
-    type ImageID =  Types.ImageID;
+    type ImagesUrls =  Types.ImagesUrls;
     type Snap = Types.Snap;
     type SnapID = Types.SnapID;
     type UserPrincipal = Types.UserPrincipal;
@@ -33,7 +33,7 @@ actor class Snap() = this {
 
     public shared ({caller}) func save_snap(
         args: CreateSnapArgs,
-        imageUrls: [ImageID], 
+        imageUrls: ImagesUrls, 
         principal: UserPrincipal) : async SnapID {
 
         let snap_id =  ULID.toText(se.new());
@@ -42,7 +42,7 @@ actor class Snap() = this {
             id = snap_id;
             cover_image_location = args.cover_image_location;
             created = Time.now();
-            creator = principal;
+            creator = Principal.toText(principal);
             image_urls = imageUrls;
             is_public = args.is_public;
             likes = 0;

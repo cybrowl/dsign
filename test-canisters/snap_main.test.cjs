@@ -1,4 +1,5 @@
 const test = require('tape');
+const fake = require('fake-words');
 const fetch = require('node-fetch');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
 const { exec } = require('child_process');
@@ -6,15 +7,10 @@ const { exec } = require('child_process');
 global.fetch = fetch;
 
 // Actor Interface
-const { idlFactory: snap_main_interface } = require('../.dfx/local/canisters/snap_main/snap_main.did.test.cjs');
-const { idlFactory: snap_interface } = require('../.dfx/local/canisters/snap/snap.did.test.cjs');
-const { idlFactory: snap_images_interface } = require('../.dfx/local/canisters/snap_images/snap_images.did.test.cjs');
+const { snap_main_interface, username_interface } = require('../test-utils/actor_interface.cjs');
 
 // Canister Ids
-const canister_ids = require('../.dfx/local/canister_ids.json');
-const snap_main_canister_id = canister_ids.snap_main.local;
-const snap_canister_id = canister_ids.snap.local;
-const snap_images_canister_id = canister_ids.snap_images.local;
+const {snap_main_canister_id, username_canister_id} = require('../test-utils/actor_canister_ids.cjs');
 
 // Identities
 const { default_identity } = require("../test-utils/identities/identity.cjs");
@@ -24,20 +20,21 @@ let mishicat_identity = Ed25519KeyIdentity.generate();
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
 const { generate_images } = require('../test-utils/utils.cjs');
 
-let mishicat_snap_main_actor = null;
-let default_snap_main_actor = null;
+let images = generate_images();
 
-let default_snap_actor = null;
-let default_snap_images_actor = null;
+let snap_main_actor = {};
+let username_actors = {};
 
 test('SnapMain.assign actors()', async function (t) {
-	mishicat_snap_main_actor = await get_actor(snap_main_canister_id, snap_main_interface, mishicat_identity);
-	default_snap_main_actor = await get_actor(snap_main_canister_id, snap_main_interface, default_identity);
+	console.log("snap_main_canister_id: ", snap_main_canister_id);
+	
+	snap_main_actor.mishicat = await get_actor(snap_main_canister_id, snap_main_interface, mishicat_identity);
+	snap_main_actor.default = await get_actor(snap_main_canister_id, snap_main_interface, default_identity);
 
-	default_snap_actor = await get_actor(snap_canister_id, snap_interface, default_identity);
-	default_snap_images_actor = await get_actor(snap_images_canister_id, snap_images_interface, default_identity);
+	username_actors.mishicat = await get_actor(username_canister_id, username_interface, mishicat_identity);
+	username_actors.default = await get_actor(username_canister_id, username_interface, default_identity);
 
-	const response = await mishicat_snap_main_actor.version();
+	const response = await snap_main_actor.mishicat.version();
 	t.equal(typeof response, 'string');
 
 	console.log("=========== Snaps Main ===========");
@@ -45,16 +42,18 @@ test('SnapMain.assign actors()', async function (t) {
 });
 
 test('SnapMain.initialize_canisters()', async function (t) {
-	const snap_canister_id = await default_snap_actor.get_canister_id();
-	const snap_images_canister_id = await default_snap_images_actor.get_canister_id();
+	// const snap_canister_id = await default_snap_actor.get_canister_id();
+	// const snap_images_canister_id = await default_snap_images_actor.get_canister_id();
 
-	await default_snap_main_actor.initialize_canisters([snap_canister_id], [snap_images_canister_id]);
+	await snap_main_actor.mishicat.initialize_canisters([], []);
 });
 
-test('SnapMain.inistialize_user()', async function (t) {
-	const response = await default_snap_main_actor.inistialize_user();
+test('Username.create_username()::[username_actors.mishicat]: create first with valid username => #ok - username', async function (t) {
+	const username = fake.word();
 
-	console.log('inistialize_user: ', response);
+	const response = await username_actors.mishicat.create_username(username.toLowerCase());
+
+	t.equal(response.ok.username, username.toLowerCase());
 });
 
 test('SnapMain.create_snap()', async function (t) {
@@ -62,10 +61,10 @@ test('SnapMain.create_snap()', async function (t) {
 		title: 'mobile',
 		is_public: true,
 		cover_image_location: 1,
-		images: generate_images()
+		images: [images[0]]
 	};
 
-	const response = await default_snap_main_actor.create_snap(create_args);
+	const response = await snap_main_actor.mishicat.create_snap(create_args);
 
 	console.log('create_snap: ', response);
 });
@@ -75,16 +74,16 @@ test('SnapMain.create_snap()', async function (t) {
 		title: 'desktop',
 		is_public: true,
 		cover_image_location: 0,
-		images: generate_images()
+		images: [images[1]]
 	};
 
-	const response = await default_snap_main_actor.create_snap(create_args);
+	const response = await snap_main_actor.mishicat.create_snap(create_args);
 
 	console.log('create_snap: ', response);
 });
 
 test('SnapMain.get_all_snaps()', async function (t) {
-	const response = await default_snap_main_actor.get_all_snaps();
+	const response = await snap_main_actor.mishicat.get_all_snaps();
 
 	console.info('get_all_snaps: ', response.ok);
 });

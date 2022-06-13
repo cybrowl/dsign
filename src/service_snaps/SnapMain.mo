@@ -15,7 +15,6 @@ import Types "./types";
 
 actor SnapMain {
     type CreateSnapArgs = Types.CreateSnapArgs;
-    type ImageID =  Types.ImageID;
     type Snap = Types.Snap;
     type SnapActor = Types.SnapActor;
     type SnapCanisterID = Types.SnapCanisterID;
@@ -26,10 +25,10 @@ actor SnapMain {
     type UserPrincipal = Types.UserPrincipal;
 
     let ACTOR_NAME : Text = "SnapMain";
-    let CYCLE_AMOUNT : Nat = 1_000_000_000;
+    let CYCLE_AMOUNT : Nat = 100_000_0000_000;
 
     // Snap Data
-    var user_canisters_ref : H.HashMap<UserPrincipal, H.HashMap<SnapCanisterID, B.Buffer<SnapID>>> = H.HashMap(0, Text.equal, Text.hash);
+    var user_canisters_ref : H.HashMap<UserPrincipal, H.HashMap<SnapCanisterID, B.Buffer<SnapID>>> = H.HashMap(0, Principal.equal, Principal.hash);
 
     // holds data until filled
     // once filled, a new canister is created and assigned
@@ -37,18 +36,16 @@ actor SnapMain {
     var snap_images_canister_id : Text = "";
 
     // ------------------------- Snaps Management -------------------------
-    public shared ({caller}) func inistialize_user() : async Bool {
-        let tags = [ACTOR_NAME, "inistialize_user"];
-        let principal : UserPrincipal = Principal.toText(caller);
+    public shared ({caller}) func create_user_snap_storage(principal: UserPrincipal) : async Bool {
+        let tags = [ACTOR_NAME, "create_user_snap_storage"];
 
-        switch (user_canisters_ref.get(principal)) {
+        switch (user_canisters_ref.get(caller)) {
             case (?snap_canister_ids) {
                 return false;
             };
             case (_) {
                 var empty_snap_canister_id_storage : H.HashMap<SnapCanisterID, B.Buffer<SnapID>> = H.HashMap(0, Text.equal, Text.hash);
 
-                //TODO: add current snap_canister_id to SnapCanisterID
                 user_canisters_ref.put(principal, empty_snap_canister_id_storage);
 
                 return true;
@@ -58,11 +55,10 @@ actor SnapMain {
 
     public shared ({caller}) func create_snap(args: CreateSnapArgs) : async () {
         let tags = [ACTOR_NAME, "create_snap"];
-        let principal : UserPrincipal = Principal.toText(caller);
         let has_images = args.images.size() > 0;
 
         // check if user exists
-        switch (user_canisters_ref.get(principal)) {
+        switch (user_canisters_ref.get(caller)) {
             case (?snap_canister_ids) {
                 // check if user has current empty snap_canister_id
                 switch (snap_canister_ids.get(snap_canister_id)) {
@@ -73,8 +69,8 @@ actor SnapMain {
                             let snap_actor = actor (snap_canister_id) : SnapActor;
 
                             // save images and snap
-                            let image_ids = await snap_images_actor.save_images(args.images);
-                            let snap_id = await snap_actor.save_snap(args, image_ids, principal);
+                            let image_urls = await snap_images_actor.save_images(args.images);
+                            let snap_id = await snap_actor.save_snap(args, image_urls, caller);
 
                             snap_ids.add(snap_id);
                         };
@@ -91,8 +87,8 @@ actor SnapMain {
                             let snap_actor = actor (snap_canister_id) : SnapActor;
 
                             // save images and snap
-                            let image_ids = await snap_images_actor.save_images(args.images);
-                            let snap_id = await snap_actor.save_snap(args, image_ids, principal);
+                            let image_urls = await snap_images_actor.save_images(args.images);
+                            let snap_id = await snap_actor.save_snap(args, image_urls, caller);
 
                             snap_ids.add(snap_id);
                         };
@@ -103,16 +99,15 @@ actor SnapMain {
                 };
             };
             case(_) {
-               await Logger.log_event(tags, debug_show("will return error to frontend, whereby it will call inistialize_user"));
+               await Logger.log_event(tags, debug_show("Error: failed to initialize user canister during account creation"));
             };
         }; 
     };
 
     public shared ({caller}) func get_all_snaps() : async Result.Result<[Snap], SnapsError> {
         let tags = [ACTOR_NAME, "get_all_snaps"];
-        let principal : UserPrincipal = Principal.toText(caller);
 
-        switch (user_canisters_ref.get(principal)) {
+        switch (user_canisters_ref.get(caller)) {
             case (?snap_canister_ids) {
                 let all_snaps = B.Buffer<Snap>(0);
 
@@ -142,8 +137,10 @@ actor SnapMain {
         let tags = [ACTOR_NAME, "create_snap_canister"];
 
         // create canister
+        await Logger.log_event(tags, debug_show(("cycles: before")));
         Cycles.add(CYCLE_AMOUNT);
         let snap_actor = await Snap.Snap();
+        await Logger.log_event(tags, debug_show(("cycles: after actor"), Cycles.balance()));
         let principal = Principal.fromActor(snap_actor);
         let snap_canister_id_ = Principal.toText(principal);
 

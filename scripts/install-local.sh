@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# dfx stop
-# dfx start --background --clean
-
-dfx deploy profile_avatar_images
-export PROFILE_AVATAR_ID=$(dfx canister id profile_avatar)
-
 # username
 dfx deploy username
+
+# profile_avatar
+dfx deploy profile_avatar_images
+# export PROFILE_AVATAR_ID=$(dfx canister id profile_avatar)
+
+dfx deploy profile_avatar_main
 
 # profile
 dfx deploy profile
