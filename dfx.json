@@ -14,6 +14,10 @@
       ],
       "type": "assets"
     },
+    "canister_map": {
+      "main": "src/service_canister_map/CanisterMap.mo",
+      "type": "motoko"
+    },
     "profile": {
       "main": "src/service_profile/Profile.mo",
       "type": "motoko",
@@ -49,13 +53,12 @@
       "main": "src/service_snaps/Snap.mo",
       "type": "motoko",
       "dependencies": [
-        "logger"
+        "logger", "username"
       ]
     },
     "snap_images": {
       "main": "src/service_snaps/SnapImages.mo",
       "type": "motoko",
-      "note": "local_only",
       "dependencies": [
         "logger"
       ]
@@ -71,7 +74,7 @@
       "main": "src/service_username/Username.mo",
       "type": "motoko",
       "dependencies": [
-        "logger", "profile", "snap_main"
+        "logger", "profile"
       ]
     },
     "logger": {

@@ -106,9 +106,12 @@ actor SnapMain {
         }; 
     };
 
+    //note: this will be deprecated in future when message transmission > 8MB
     public shared ({caller}) func finalize_snap_creation(args: FinalizeSnapArgs) : async () {
         let tags = [ACTOR_NAME, "finalize_snap_creation"];
-
+        // save image to snap_images_canister_id -> image_url
+        // find snap_canister_id that has matching snap_id -> snap_canister_id
+        // add image_url to snap_id
     };
 
     public shared ({caller}) func get_all_snaps() : async Result.Result<[Snap], SnapsError> {

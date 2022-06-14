@@ -7,6 +7,8 @@ import Time "mo:base/Time";
 import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
+import Username "canister:username";
+
 import Types "./types";
 
 actor class Snap() = this {
@@ -37,12 +39,22 @@ actor class Snap() = this {
         principal: UserPrincipal) : async SnapID {
 
         let snap_id =  ULID.toText(se.new());
+        var username = "";
+
+        switch(await Username.get_username_actor(principal)) {
+            case(#ok response) {
+                username:= response.username;
+            };
+            case(#err error) {
+                username:= "";
+            };
+        };
 
         let snap : Snap = {
             id = snap_id;
             cover_image_location = args.cover_image_location;
             created = Time.now();
-            creator = Principal.toText(principal);
+            creator = username;
             image_urls = imageUrls;
             is_public = args.is_public;
             likes = 0;
