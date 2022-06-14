@@ -56,6 +56,14 @@ test('Username.create_username()::[username_actors.mishicat]: create first with 
 	t.equal(response.ok.username, username.toLowerCase());
 });
 
+test('Username.create_username()::[username_actors.mishicat]: create first with valid username => #ok - username', async function (t) {
+	const username = fake.word();
+
+	const response = await username_actors.mishicat.create_username(username.toLowerCase());
+
+	t.equal(response.ok.username, username.toLowerCase());
+});
+
 test('SnapMain.create_snap()', async function (t) {
 	let create_args = {
 		title: 'mobile',
@@ -71,10 +79,10 @@ test('SnapMain.create_snap()', async function (t) {
 
 test('SnapMain.create_snap()', async function (t) {
 	let create_args = {
-		title: 'desktop',
+		title: 'mobile',
 		is_public: true,
-		cover_image_location: 0,
-		images: [images[1]]
+		cover_image_location: 1,
+		images: [images[0]]
 	};
 
 	const response = await snap_main_actor.mishicat.create_snap(create_args);
@@ -88,16 +96,16 @@ test('SnapMain.get_all_snaps()', async function (t) {
 	console.info('get_all_snaps: ', response.ok);
 });
 
-test('Logs', async function (t) {
-	exec('npm run logs', (error, stdout, stderr) => {
-		if (error) {
-			console.log(`error: ${error.message}`);
-			return;
-		}
-		if (stderr) {
-			console.info(`stderr: ${stderr}`);
-			return;
-		}
-		console.info(`stdout: ${stdout}`);
-	});
-});
+// test('Logs', async function (t) {
+// 	exec('npm run logs', (error, stdout, stderr) => {
+// 		if (error) {
+// 			console.log(`error: ${error.message}`);
+// 			return;
+// 		}
+// 		if (stderr) {
+// 			console.info(`stderr: ${stderr}`);
+// 			return;
+// 		}
+// 		console.info(`stdout: ${stdout}`);
+// 	});
+// });

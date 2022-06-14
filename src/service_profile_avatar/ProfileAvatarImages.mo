@@ -1,6 +1,7 @@
 import Debug "mo:base/Debug";
 import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import Prim "mo:⛔";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
@@ -25,6 +26,7 @@ actor class ProfileAvatarImages() = {
     let ACTOR_NAME : Text = "ProfileAvatarImages";
 
     var avatar_images : HashMap.HashMap<Username, Image> = HashMap.HashMap(0, Text.equal, Text.hash);
+    stable var avatar_images_stable_storage : [(Username, Image)] = [];
 
     public shared ({caller}) func whoami() : async Principal {
         return caller;
@@ -101,5 +103,15 @@ actor class ProfileAvatarImages() = {
                 };
             };
         };
+    };
+
+    // ------------------------- System Methods -------------------------
+    system func preupgrade() {
+        avatar_images_stable_storage := Iter.toArray(avatar_images.entries());
+    };
+
+    system func postupgrade() {
+        avatar_images := HashMap.fromIter<Username, Image>(avatar_images_stable_storage.vals(), 0, Text.equal, Text.hash);
+        avatar_images_stable_storage := [];
     };
 };

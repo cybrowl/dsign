@@ -59,6 +59,11 @@ module {
         images: Images;
     };
 
+    public type FinalizeSnapArgs = {
+        snap_id: SnapID;
+        image: Image;
+    };
+
     // Project
     public type ProjectID = Text;
 

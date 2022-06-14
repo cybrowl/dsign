@@ -1,6 +1,7 @@
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
-import H "mo:base/HashMap";
+import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
@@ -25,10 +26,12 @@ actor class ProfileAvatarMain() = {
     let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
     let MAX_BYTES = 2_000_000;
 
-    var canister_history : H.HashMap<ProfileAvatarImagesCanisterId, ProfileAvatarImagesCanisterId> = H.HashMap(0, Text.equal, Text.hash);
+    var canister_history : HashMap.HashMap<ProfileAvatarImagesCanisterId, ProfileAvatarImagesCanisterId> = HashMap.HashMap(0, Text.equal, Text.hash);
+    stable var canister_history_stable_storage : [(ProfileAvatarImagesCanisterId, ProfileAvatarImagesCanisterId)] = [];
+
     // holds data until filled
     // once filled, a new canister is created and assigned
-    var profile_avatar_images_canister_id : Text = "";
+    stable var profile_avatar_images_canister_id : Text = "";
 
     public query func version() : async Text {
         return "0.0.1";
@@ -90,5 +93,15 @@ actor class ProfileAvatarMain() = {
         } else {
             await Logger.log_event(tags, debug_show(("avatar images exists", profile_avatar_images_canister_id)));
         };
+    };
+
+    // ------------------------- System Methods -------------------------
+    system func preupgrade() {
+        canister_history_stable_storage := Iter.toArray(canister_history.entries());
+    };
+
+    system func postupgrade() {
+        canister_history := HashMap.fromIter<ProfileAvatarImagesCanisterId, ProfileAvatarImagesCanisterId>(canister_history_stable_storage.vals(), 0, Text.equal, Text.hash);
+        canister_history_stable_storage := [];
     };
 };

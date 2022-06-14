@@ -15,6 +15,7 @@ import Types "./types";
 
 actor SnapMain {
     type CreateSnapArgs = Types.CreateSnapArgs;
+    type FinalizeSnapArgs = Types.FinalizeSnapArgs;
     type Snap = Types.Snap;
     type SnapActor = Types.SnapActor;
     type SnapCanisterID = Types.SnapCanisterID;
@@ -69,6 +70,7 @@ actor SnapMain {
                             let snap_actor = actor (snap_canister_id) : SnapActor;
 
                             // save images and snap
+                            // note: this will only send one image until messages can transmit data > 2MB
                             let image_urls = await snap_images_actor.save_images(args.images);
                             let snap_id = await snap_actor.save_snap(args, image_urls, caller);
 
@@ -102,6 +104,11 @@ actor SnapMain {
                await Logger.log_event(tags, debug_show("Error: failed to initialize user canister during account creation"));
             };
         }; 
+    };
+
+    public shared ({caller}) func finalize_snap_creation(args: FinalizeSnapArgs) : async () {
+        let tags = [ACTOR_NAME, "finalize_snap_creation"];
+
     };
 
     public shared ({caller}) func get_all_snaps() : async Result.Result<[Snap], SnapsError> {
