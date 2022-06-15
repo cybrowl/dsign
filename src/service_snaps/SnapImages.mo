@@ -1,7 +1,7 @@
-import B "mo:base/Buffer";
+import Buffer "mo:base/Buffer";
 import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
-import H "mo:base/HashMap";
+import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
 import Rand "mo:base/Random";
 import Source "mo:ulid/Source";
@@ -27,7 +27,7 @@ actor class SnapImages() = this {
     private let se = Source.Source(rr, 0);
     private var isProduction : Bool = false;
 
-    var snap_images : H.HashMap<ImageID, Image> = H.HashMap(1, Text.equal, Text.hash);
+    var snap_images : HashMap.HashMap<ImageID, Image> = HashMap.HashMap(0, Text.equal, Text.hash);
 
     public query func version() : async Text {
         return "0.0.1";
@@ -38,8 +38,8 @@ actor class SnapImages() = this {
     };
 
     public shared (msg) func save_images(images: Images) : async ImagesUrls {
-        let image_ids = B.Buffer<ImageID>(0);
-        let snap_images_canister_id = Principal.toText(Principal.fromActor(this));
+        let image_ids = Buffer.Buffer<ImageID>(0);
+        let snap_images_canister_id = await get_canister_id();
 
         for (image in images.vals()) {
             let image_id : ImageID = ULID.toText(se.new());
