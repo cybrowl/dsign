@@ -136,27 +136,20 @@ actor SnapMain {
     public shared ({caller}) func get_all_snaps() : async Result.Result<[Snap], SnapsError> {
         let tags = [ACTOR_NAME, "get_all_snaps"];
 
-        await Logger.log_event(tags, debug_show(("caller", caller)));
-
         switch (user_canisters_ref.get(caller)) {
             case (?snap_canister_ids) {
                 let all_snaps = Buffer.Buffer<Snap>(0);
                 let can_ids = Iter.toArray(snap_canister_ids.entries());
 
-                await Logger.log_event(tags, debug_show("can_ids"));
-
                 for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
                     let snap_actor = actor (canister_id) : SnapActor;
                     let snaps = await snap_actor.get_all_snaps(snap_ids.toArray());
-
-                    Debug.print(debug_show("snaps"));
 
                     for (snap in snaps.vals()) {
                         all_snaps.add(snap);
                     };
                 };
 
-                await Logger.log_event(tags, debug_show("ok"));
                 return #ok(all_snaps.toArray());
             };
             case (_) {
