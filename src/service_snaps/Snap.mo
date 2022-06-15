@@ -1,6 +1,7 @@
-import H "mo:base/HashMap";
-import B "mo:base/Buffer";
+import Buffer "mo:base/Buffer";
+import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
+import Result "mo:base/Result";
 import Source "mo:ulid/Source";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
@@ -14,6 +15,7 @@ import Types "./types";
 actor class Snap() = this {
     type CreateSnapArgs = Types.CreateSnapArgs;
     type ImagesUrls =  Types.ImagesUrls;
+    type SaveSnapErr = Types.SaveSnapErr;
     type Snap = Types.Snap;
     type SnapID = Types.SnapID;
     type UserPrincipal = Types.UserPrincipal;
@@ -21,10 +23,9 @@ actor class Snap() = this {
     private let rr = XorShift.toReader(XorShift.XorShift64(null));
     private let se = Source.Source(rr, 0);
 
-    var snaps : H.HashMap<SnapID, Snap> = H.HashMap(0, Text.equal, Text.hash);
+    var snaps : HashMap.HashMap<SnapID, Snap> = HashMap.HashMap(0, Text.equal, Text.hash);
 
-    //TODO: only allow main to accesss methods
-
+    //TODO: only allow snap_main to accesss write methods
     public query func version() : async Text {
         return "0.0.1";
     };
@@ -36,17 +37,17 @@ actor class Snap() = this {
     public shared ({caller}) func save_snap(
         args: CreateSnapArgs,
         imageUrls: ImagesUrls, 
-        principal: UserPrincipal) : async SnapID {
+        principal: UserPrincipal) : async Result.Result<Snap, SaveSnapErr> {
 
         let snap_id =  ULID.toText(se.new());
         var username = "";
 
         switch(await Username.get_username_actor(principal)) {
-            case(#ok response) {
-                username:= response.username;
+            case(#ok username_) {
+                username:= username_;
             };
             case(#err error) {
-                username:= "";
+                return #err(#UsernameNotFound);
             };
         };
 
@@ -65,11 +66,11 @@ actor class Snap() = this {
 
         snaps.put(snap_id, snap);
 
-        return snap_id;
+        return #ok(snap);
     };
 
     public query func get_all_snaps(snapIds: [SnapID]) : async [Snap] {
-        var snaps_list = B.Buffer<Snap>(0);
+        var snaps_list = Buffer.Buffer<Snap>(0);
 
         for (snap_id in snapIds.vals()){
             switch (snaps.get(snap_id)){

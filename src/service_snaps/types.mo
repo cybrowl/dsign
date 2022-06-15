@@ -1,6 +1,7 @@
 import Int "mo:base/Int";
 import Nat "mo:base/Nat";
 import Principal "mo:base/Principal";
+import Result "mo:base/Result";
 import Text "mo:base/Text";
 
 module {
@@ -47,6 +48,16 @@ module {
         views: Nat;
     };
 
+    public type SaveSnapErr = {
+        #UsernameNotFound;
+    };
+
+    public type CreateSnapErr = {
+        #NoImageToSave;
+        #UsernameNotFound;
+        #UserNotFound;
+    };
+
     public type SnapsError = {
         #UserNotFound;
         #SnapIdsNotFound;
@@ -74,7 +85,7 @@ module {
 
     // Actor Interface
     public type SnapActor = actor {
-        save_snap : shared (args: CreateSnapArgs, imageUrls: [ImageID], principal: UserPrincipal) -> async SnapID;
+        save_snap : shared (args: CreateSnapArgs, imageUrls: [ImageID], principal: UserPrincipal) -> async Result.Result<Snap, SaveSnapErr>;
         get_all_snaps : query (snapIds: [SnapID]) -> async [Snap];
     };
 

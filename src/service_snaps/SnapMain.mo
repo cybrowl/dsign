@@ -15,6 +15,7 @@ import Types "./types";
 
 actor SnapMain {
     type CreateSnapArgs = Types.CreateSnapArgs;
+    type CreateSnapErr = Types.CreateSnapErr;
     type FinalizeSnapArgs = Types.FinalizeSnapArgs;
     type Snap = Types.Snap;
     type SnapActor = Types.SnapActor;
@@ -55,9 +56,13 @@ actor SnapMain {
         };
     };
 
-    public shared ({caller}) func create_snap(args: CreateSnapArgs) : async () {
+    public shared ({caller}) func create_snap(args: CreateSnapArgs) : async Result.Result<Snap, CreateSnapErr> {
         let tags = [ACTOR_NAME, "create_snap"];
         let has_images = args.images.size() > 0;
+
+        if (has_images == false) {
+            return #err(#NoImageToSave);
+        };
 
         // check if user exists
         switch (user_canisters_ref.get(caller)) {
@@ -66,43 +71,52 @@ actor SnapMain {
                 switch (snap_canister_ids.get(snap_canister_id)) {
                     // canister is not full
                     case (?snap_ids) {
-                        if (has_images) {
-                            let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
-                            let snap_actor = actor (snap_canister_id) : SnapActor;
+                        let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
+                        let snap_actor = actor (snap_canister_id) : SnapActor;
 
-                            // save images and snap
-                            // note: this will only send one image until messages can transmit data > 2MB
-                            let image_urls = await snap_images_actor.save_images(args.images);
-                            let snap_id = await snap_actor.save_snap(args, image_urls, caller);
+                        // save images and snap
+                        // note: this will only send one image until messages can transmit data > 2MB
+                        let image_urls = await snap_images_actor.save_images(args.images);
+                        let snap = await snap_actor.save_snap(args, image_urls, caller);
 
-                            snap_ids.add(snap_id);
+                        switch(snap) {
+                            case(#err err) {
+                                return #err(#UsernameNotFound);
+                            };
+                            case(#ok snap) {
+                                snap_ids.add(snap.id);
+                                #ok(snap);
+                            };
                         };
-
-                        await Logger.log_event(tags, debug_show("created snap"));
                     };
                     case(_) {
                         // canister is full / snap_canister_id NOT Found
                         await Logger.log_event(tags, debug_show("canister_full"));
                         let snap_ids = B.Buffer<SnapID>(0);
 
-                        if (has_images) {
-                            let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
-                            let snap_actor = actor (snap_canister_id) : SnapActor;
+                        let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
+                        let snap_actor = actor (snap_canister_id) : SnapActor;
 
-                            // save images and snap
-                            let image_urls = await snap_images_actor.save_images(args.images);
-                            let snap_id = await snap_actor.save_snap(args, image_urls, caller);
+                        // save images and snap
+                        // note: this will only send one image until messages can transmit data > 2MB
+                        let image_urls = await snap_images_actor.save_images(args.images);
+                        // let snap_id = await snap_actor.save_snap(args, image_urls, caller);
+                        switch(await snap_actor.save_snap(args, image_urls, caller))  {
+                            case(#err error) {
+                                return #err(#UsernameNotFound);
+                            };
+                            case(#ok snap) {
+                                snap_ids.add(snap.id);
+                                snap_canister_ids.put(snap.id, snap_ids);
 
-                            snap_ids.add(snap_id);
+                                return #ok(snap);
+                            };
                         };
-
-                        snap_canister_ids.put(snap_canister_id, snap_ids);
-                        await Logger.log_event(tags, debug_show("created snap"));
                     };
                 };
             };
             case(_) {
-               await Logger.log_event(tags, debug_show("Error: failed to initialize user canister during account creation"));
+               return #err(#UserNotFound);
             };
         }; 
     };
