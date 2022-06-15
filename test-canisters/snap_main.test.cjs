@@ -37,7 +37,7 @@ test('SnapMain.assign actors()', async function (t) {
 	const response = await snap_main_actor.mishicat.version();
 	t.equal(typeof response, 'string');
 
-	console.log("=========== Snaps Main ===========");
+	console.log("=========== Snap Main ===========");
 	console.log('version: ', response);
 });
 
@@ -53,15 +53,14 @@ test('Username.create_username()::[username_actors.mishicat]: create first with 
 
 	const response = await username_actors.mishicat.create_username(username.toLowerCase());
 
+	console.info("response: ", response);
 	t.equal(response.ok.username, username.toLowerCase());
 });
 
-test('Username.create_username()::[username_actors.mishicat]: create first with valid username => #ok - username', async function (t) {
-	const username = fake.word();
+test('SnapMain.create_user_snap_storage()::[snap_main_actor.mishicat]: create initial storage for snaps => #ok - true', async function (t) {
+	const response = await snap_main_actor.mishicat.create_user_snap_storage();
 
-	const response = await username_actors.mishicat.create_username(username.toLowerCase());
-
-	t.equal(response.ok.username, username.toLowerCase());
+	console.info("response: ", response);
 });
 
 test('SnapMain.create_snap()', async function (t) {
@@ -87,25 +86,12 @@ test('SnapMain.create_snap()', async function (t) {
 
 	const response = await snap_main_actor.mishicat.create_snap(create_args);
 
-	console.log('create_snap: ', response);
+	console.info('create_snap: ', response);
 });
 
 test('SnapMain.get_all_snaps()', async function (t) {
 	const response = await snap_main_actor.mishicat.get_all_snaps();
 
-	console.info('get_all_snaps: ', response.ok);
+	console.info('get_all_snaps: ', response);
 });
 
-// test('Logs', async function (t) {
-// 	exec('npm run logs', (error, stdout, stderr) => {
-// 		if (error) {
-// 			console.log(`error: ${error.message}`);
-// 			return;
-// 		}
-// 		if (stderr) {
-// 			console.info(`stderr: ${stderr}`);
-// 			return;
-// 		}
-// 		console.info(`stdout: ${stdout}`);
-// 	});
-// });

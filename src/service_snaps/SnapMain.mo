@@ -1,7 +1,8 @@
-import B "mo:base/Buffer";
+import Buffer "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
-import H "mo:base/HashMap";
+import Hashmap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
@@ -30,7 +31,7 @@ actor SnapMain {
     let CYCLE_AMOUNT : Nat = 100_000_0000_000;
 
     // Snap Data
-    var user_canisters_ref : H.HashMap<UserPrincipal, H.HashMap<SnapCanisterID, B.Buffer<SnapID>>> = H.HashMap(0, Principal.equal, Principal.hash);
+    var user_canisters_ref : Hashmap.HashMap<UserPrincipal, Hashmap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>>> = Hashmap.HashMap(0, Principal.equal, Principal.hash);
 
     // holds data until filled
     // once filled, a new canister is created and assigned
@@ -47,7 +48,7 @@ actor SnapMain {
                 return false;
             };
             case (_) {
-                var empty_snap_canister_id_storage : H.HashMap<SnapCanisterID, B.Buffer<SnapID>> = H.HashMap(0, Text.equal, Text.hash);
+                var empty_snap_canister_id_storage : Hashmap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>> = Hashmap.HashMap(0, Text.equal, Text.hash);
 
                 user_canisters_ref.put(caller, empty_snap_canister_id_storage);
 
@@ -60,6 +61,8 @@ actor SnapMain {
         let tags = [ACTOR_NAME, "create_snap"];
         let has_images = args.images.size() > 0;
 
+        Debug.print(debug_show("create_snap caller", caller));
+
         if (has_images == false) {
             return #err(#NoImageToSave);
         };
@@ -71,6 +74,7 @@ actor SnapMain {
                 switch (snap_canister_ids.get(snap_canister_id)) {
                     // canister is not full
                     case (?snap_ids) {
+                        await Logger.log_event(tags, debug_show("current snap_canister_id"));
                         let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
                         let snap_actor = actor (snap_canister_id) : SnapActor;
 
@@ -91,8 +95,8 @@ actor SnapMain {
                     };
                     case(_) {
                         // canister is full / snap_canister_id NOT Found
-                        await Logger.log_event(tags, debug_show("canister_full"));
-                        let snap_ids = B.Buffer<SnapID>(0);
+                        await Logger.log_event(tags, debug_show("canister_full/snap_canister_id_empty"));
+                        let snap_ids = Buffer.Buffer<SnapID>(0);
 
                         let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
                         let snap_actor = actor (snap_canister_id) : SnapActor;
@@ -107,7 +111,7 @@ actor SnapMain {
                             };
                             case(#ok snap) {
                                 snap_ids.add(snap.id);
-                                snap_canister_ids.put(snap.id, snap_ids);
+                                snap_canister_ids.put(snap_canister_id, snap_ids);
 
                                 return #ok(snap);
                             };
@@ -132,19 +136,27 @@ actor SnapMain {
     public shared ({caller}) func get_all_snaps() : async Result.Result<[Snap], SnapsError> {
         let tags = [ACTOR_NAME, "get_all_snaps"];
 
+        await Logger.log_event(tags, debug_show(("caller", caller)));
+
         switch (user_canisters_ref.get(caller)) {
             case (?snap_canister_ids) {
-                let all_snaps = B.Buffer<Snap>(0);
+                let all_snaps = Buffer.Buffer<Snap>(0);
+                let can_ids = Iter.toArray(snap_canister_ids.entries());
+
+                await Logger.log_event(tags, debug_show("can_ids"));
 
                 for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
                     let snap_actor = actor (canister_id) : SnapActor;
                     let snaps = await snap_actor.get_all_snaps(snap_ids.toArray());
+
+                    Debug.print(debug_show("snaps"));
 
                     for (snap in snaps.vals()) {
                         all_snaps.add(snap);
                     };
                 };
 
+                await Logger.log_event(tags, debug_show("ok"));
                 return #ok(all_snaps.toArray());
             };
             case (_) {

@@ -40,8 +40,8 @@ actor class Snap() = this {
         principal: UserPrincipal) : async Result.Result<Snap, SaveSnapErr> {
 
         let snap_id =  ULID.toText(se.new());
-        var username = "";
 
+        var username = "";
         switch(await Username.get_username_actor(principal)) {
             case(#ok username_) {
                 username:= username_;
