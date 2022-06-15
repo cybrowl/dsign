@@ -14,8 +14,8 @@ import Utils "./utils";
 
 actor Username = {
     type Username = Types.Username;
-    type UsernameOk =  Types.UsernameOk;
     type UsernameErr =  Types.UsernameErr;
+    type UsernameOk =  Types.UsernameOk;
     type UserPrincipal =  Types.UserPrincipal;
 
     let ACTOR_NAME : Text = "Username";
@@ -65,6 +65,10 @@ actor Username = {
         return "0.0.1";
     };
 
+    public query func get_number_of_users() : async Nat {
+        return usernames.size();
+    };
+
     public query ({caller}) func get_username() : async Result.Result<UsernameOk, UsernameErr> {
         switch (usernames.get(caller)) {
             case (?username) {
@@ -76,10 +80,10 @@ actor Username = {
         };     
     };
 
-    public query func get_username_actor(principal: UserPrincipal) : async Result.Result<UsernameOk, UsernameErr> {
+    public query func get_username_actor(principal: UserPrincipal) : async Result.Result<Username, UsernameErr> {
         switch (usernames.get(principal)) {
             case (?username) {
-                #ok({username});
+                #ok(username);
             };
             case(_) {
                 #err(#UserNotFound)
@@ -130,10 +134,6 @@ actor Username = {
         let username_available : Bool = check_username_is_available(username);
         let user_has_username: Bool = check_user_has_a_username(caller);
 
-        if (user_has_username == false) {
-            return #err(#UsernameNotFound);
-        };
-
         if (is_anonymous == true) {
             return #err(#UserAnonymous);
         };
@@ -142,8 +142,12 @@ actor Username = {
             return #err(#UsernameInvalid);
         };
 
+        if (user_has_username == false) {
+            return #err(#UsernameNotFound);
+        };
+
         if (username_available == false) {
-            return #err(#UsernameTaken);
+            return #err(#UsernameTaken);            
         } else {
             let current_username: Username = get_current_username(caller);
             username_owners.delete(current_username);
@@ -154,7 +158,7 @@ actor Username = {
 
             //TODO: update username in snaps, profile, avatar_url
 
-            return #ok({username});
+            return #ok({username});      
         };
     };
 

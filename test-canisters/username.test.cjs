@@ -124,6 +124,7 @@ test('Username.update_username()::[username_actors.motoko] with invalid username
 
 test('Username.update_username()::[username_actors.motoko] with taken username => #err - UsernameTaken', async function (t) {
 	const username = 'mishicat';
+	await username_actors.motoko.create_username(username);
 
 	const response = await username_actors.motoko.update_username(username);
 

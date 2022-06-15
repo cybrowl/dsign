@@ -67,7 +67,7 @@
       "main": "src/service_snaps/SnapMain.mo",
       "type": "motoko",
       "dependencies": [
-        "logger"
+        "logger", "snap"
       ]
     },
     "username": {

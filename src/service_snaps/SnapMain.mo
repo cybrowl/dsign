@@ -37,7 +37,8 @@ actor SnapMain {
     var snap_images_canister_id : Text = "";
 
     // ------------------------- Snaps Management -------------------------
-    public shared ({caller}) func create_user_snap_storage(principal: UserPrincipal) : async Bool {
+    //Todo: Call this in the client
+    public shared ({caller}) func create_user_snap_storage() : async Bool {
         let tags = [ACTOR_NAME, "create_user_snap_storage"];
 
         switch (user_canisters_ref.get(caller)) {
@@ -47,7 +48,7 @@ actor SnapMain {
             case (_) {
                 var empty_snap_canister_id_storage : H.HashMap<SnapCanisterID, B.Buffer<SnapID>> = H.HashMap(0, Text.equal, Text.hash);
 
-                user_canisters_ref.put(principal, empty_snap_canister_id_storage);
+                user_canisters_ref.put(caller, empty_snap_canister_id_storage);
 
                 return true;
             };
