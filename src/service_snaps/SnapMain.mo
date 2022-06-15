@@ -18,12 +18,12 @@ actor SnapMain {
     type CreateSnapArgs = Types.CreateSnapArgs;
     type CreateSnapErr = Types.CreateSnapErr;
     type FinalizeSnapArgs = Types.FinalizeSnapArgs;
+    type GetAllSnapsErr = Types.GetAllSnapsErr;
     type Snap = Types.Snap;
     type SnapActor = Types.SnapActor;
     type SnapCanisterID = Types.SnapCanisterID;
     type SnapID = Types.SnapID;
     type SnapImagesActor = Types.SnapImagesActor;
-    type SnapsError = Types.SnapsError;
     type Username = Types.Username;
     type UserPrincipal = Types.UserPrincipal;
 
@@ -133,7 +133,7 @@ actor SnapMain {
         // add image_url to snap_id
     };
 
-    public shared ({caller}) func get_all_snaps() : async Result.Result<[Snap], SnapsError> {
+    public shared ({caller}) func get_all_snaps() : async Result.Result<[Snap], GetAllSnapsErr> {
         let tags = [ACTOR_NAME, "get_all_snaps"];
 
         switch (user_canisters_ref.get(caller)) {

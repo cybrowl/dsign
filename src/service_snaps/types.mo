@@ -58,9 +58,8 @@ module {
         #UserNotFound;
     };
 
-    public type SnapsError = {
+   public type GetAllSnapsErr = {
         #UserNotFound;
-        #SnapIdsNotFound;
     };
 
     public type CreateSnapArgs = {
