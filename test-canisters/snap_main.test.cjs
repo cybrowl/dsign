@@ -2,7 +2,6 @@ const test = require('tape');
 const fake = require('fake-words');
 const fetch = require('node-fetch');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
-const { exec } = require('child_process');
 
 global.fetch = fetch;
 
@@ -24,6 +23,8 @@ let images = generate_images();
 
 let snap_main_actor = {};
 let username_actors = {};
+
+let created_snap = {};
 
 test('SnapMain.assign actors()', async function (t) {
 	console.log("snap_main_canister_id: ", snap_main_canister_id);
@@ -85,13 +86,39 @@ test('SnapMain.create_snap()', async function (t) {
 	};
 
 	const response = await snap_main_actor.mishicat.create_snap(create_args);
-
+	created_snap = response.ok;
 	console.info('create_snap: ', response);
 });
+
+
+test('SnapMain.finalize_snap_creation()', async function (t) {
+	for (let step = 0; step < 3; step++) {
+		let args = {
+			canister_id: created_snap.canister_id,
+			snap_id: created_snap.id,
+			image: images[1]
+		};
+	
+		const response = await snap_main_actor.mishicat.finalize_snap_creation(args);
+	  }
+});
+
+test('SnapMain.finalize_snap_creation()', async function (t) {
+	let args = {
+        canister_id: created_snap.canister_id,
+        snap_id: created_snap.id,
+        image: images[1]
+	};
+
+	const response = await snap_main_actor.mishicat.finalize_snap_creation(args);
+
+	console.info('finalize_snap_creation: ', response);
+});
+
 
 test('SnapMain.get_all_snaps()', async function (t) {
 	const response = await snap_main_actor.mishicat.get_all_snaps();
 
-	console.info('get_all_snaps: ', response);
+	console.info('get_all_snaps: ', response.ok);
 });
 

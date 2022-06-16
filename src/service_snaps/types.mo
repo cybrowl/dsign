@@ -37,6 +37,7 @@ module {
 
     public type Snap = {
         id: SnapID;
+        canister_id: Text;
         cover_image_location: Nat8;
         created: Time;
         creator: Username;
@@ -58,6 +59,13 @@ module {
         #UserNotFound;
     };
 
+    public type AddImgUrlSnapErr = {
+        #ImgLimitReached;
+        #UserNotCreator;
+        #UsernameNotFound;
+        #SnapNotFound;
+    };
+
    public type GetAllSnapsErr = {
         #UserNotFound;
     };
@@ -70,6 +78,7 @@ module {
     };
 
     public type FinalizeSnapArgs = {
+        canister_id: Text;
         snap_id: SnapID;
         image: Image;
     };
@@ -84,11 +93,13 @@ module {
 
     // Actor Interface
     public type SnapActor = actor {
-        save_snap : shared (args: CreateSnapArgs, imageUrls: [ImageID], principal: UserPrincipal) -> async Result.Result<Snap, SaveSnapErr>;
-        get_all_snaps : query (snapIds: [SnapID]) -> async [Snap];
+        save_snap : shared (CreateSnapArgs, [ImageID], UserPrincipal) -> async Result.Result<Snap, SaveSnapErr>;
+        get_all_snaps : query ([SnapID]) -> async [Snap];
+        add_img_url_to_snap : shared (ImageUrl, SnapID, UserPrincipal) -> async Result.Result<Snap, AddImgUrlSnapErr>;
     };
 
     public type SnapImagesActor = actor {
+        save_image : shared (Image) -> async ImageUrl;
         save_images : shared (Images) -> async [ImageID];
     };
 };

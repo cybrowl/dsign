@@ -18,6 +18,7 @@ actor class SnapImages() = this {
     type Image = Types.Image;
     type ImageID = Types.ImageID;
     type Images = Types.Images;
+    type ImageUrl =  Types.ImageUrl;
     type ImagesUrls = Types.ImagesUrls;
 
     let ACTOR_NAME : Text = "SnapImages";
@@ -35,6 +36,18 @@ actor class SnapImages() = this {
 
     public query func get_canister_id() : async Text {
         return Principal.toText(Principal.fromActor(this));
+    };
+
+    public shared (msg) func save_image(image: Image) : async ImageUrl {
+        let image_id : ImageID = ULID.toText(se.new());
+
+        snap_images.put(image_id, image);
+
+        let snap_images_canister_id = await get_canister_id();
+
+        let image_url = Utils.generate_snap_image_url(snap_images_canister_id, image_id, isProduction);
+
+        return image_url;
     };
 
     public shared (msg) func save_images(images: Images) : async ImagesUrls {
