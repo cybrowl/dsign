@@ -56,11 +56,11 @@ actor class ProfileAvatarImages() = {
 
     public shared ({caller}) func save_image(avatar: Image, principal: UserPrincipal) : async Result.Result<AvatarImgOk, AvatarImgErr> {
         //TODO: only main should be able to call this
-        var username = "";
+        var username : Username = "";
 
         switch(await Username.get_username_actor(principal)) {
-            case(#ok response){
-                username:= response.username;
+            case(#ok res_username){
+                username:= res_username;
             };
             case(_){
                 return #err(#FailedGetUsername);
