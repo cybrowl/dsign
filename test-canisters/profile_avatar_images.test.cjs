@@ -74,11 +74,12 @@ test('ProfileAvatarImages.version()', async function (t) {
 	console.log('version: ', response);
 });
 
-test('ProfileAvatarImages.save_image()::[avatar_images_actors.mishicat]: before making profile => #err - FailedAvatarUrlUpdateProfileNotFound', async function (t) {
+test('ProfileAvatarImages.save_image()::[avatar_images_actors.mishicat]: before making profile => #err - FailedGetUsername', async function (t) {
 	const images = generate_images();
-	const response = await avatar_images_actors.mishicat.save_image({content: images[0]}, username);
 
-	t.deepEqual(response.err, { FailedAvatarUrlUpdateProfileNotFound: null });
+	const response = await avatar_images_actors.mishicat.save_image({content: images[0]}, mishicat_identity.getPrincipal());
+
+	t.deepEqual(response.err, { FailedGetUsername: null });
 });
 
 test('Username.create_username()::[username_actors.mishicat] with valid username => #ok - username', async function (t) {
@@ -108,7 +109,7 @@ test('Profile.get_profile()::[profile_actors.mishicat]  => #ok - profile', async
 
 test('ProfileAvatarImages.save_image()::[avatar_images_actors.mishicat]: after making profile => #ok - avatar_url', async function (t) {
 	const images = generate_images();
-	const response = await avatar_images_actors.mishicat.save_image({content: images[0]}, username);
+	const response = await avatar_images_actors.mishicat.save_image({content: images[0]}, mishicat_identity.getPrincipal());
 
 	const hasAvatarUrl = response.ok.avatar_url.length > 2;
 
