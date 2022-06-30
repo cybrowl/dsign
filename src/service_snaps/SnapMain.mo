@@ -59,12 +59,15 @@ actor SnapMain {
 
     public shared ({caller}) func create_snap(args: CreateSnapArgs) : async Result.Result<Snap, CreateSnapErr> {
         let tags = [ACTOR_NAME, "create_snap"];
-        let has_images = args.images.size() > 0;
+        let has_image = args.images.size() > 0;
+        let too_many_images = args.images.size() > 1;
 
-        Debug.print(debug_show("create_snap caller", caller));
-
-        if (has_images == false) {
+        if (has_image == false) {
             return #err(#NoImageToSave);
+        };
+
+        if (too_many_images == true) {
+            return #err(#OneImageMax);
         };
 
         // check if user exists
@@ -79,7 +82,6 @@ actor SnapMain {
                         let snap_actor = actor (snap_canister_id) : SnapActor;
 
                         // save images and snap
-                        // note: this will only send one image until messages can transmit data > 2MB
                         let image_urls = await snap_images_actor.save_images(args.images);
                         let snap = await snap_actor.save_snap(args, image_urls, caller);
 
@@ -102,7 +104,6 @@ actor SnapMain {
                         let snap_actor = actor (snap_canister_id) : SnapActor;
 
                         // save images and snap
-                        // note: this will only send one image until messages can transmit data > 2MB
                         let image_urls = await snap_images_actor.save_images(args.images);
                         let snap = await snap_actor.save_snap(args, image_urls, caller);
 

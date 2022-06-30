@@ -100,6 +100,7 @@ actor class Snap() = this {
                     return #err(#ImgLimitReached); 
                 };
 
+                // TODO: refactor to not use append
                 let update_img_urls = Array.append(snap.image_urls, [img_url]);
                 let updated_snap: Snap = {
                     id = snap.id;

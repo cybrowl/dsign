@@ -11,7 +11,6 @@
     "logs": "npm run generate_test_interface && tape test-utils/debug/debug.test.cjs",
     "preview": "svelte-kit preview",
     "test-all": "bash ./scripts/test-all.sh",
-    "test-as": "npm run generate_test_interface && tape test-canisters/account_settings.test.cjs",
     "test-config": "tape test-env/dfx.config.test.cjs",
     "test-s": "npm run generate_test_interface && tape test-canisters/snap.test.cjs",
     "test-si": "tape test-canisters/snap_images.test.cjs",

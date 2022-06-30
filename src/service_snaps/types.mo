@@ -55,6 +55,7 @@ module {
 
     public type CreateSnapErr = {
         #NoImageToSave;
+        #OneImageMax;
         #UsernameNotFound;
         #UserNotFound;
     };

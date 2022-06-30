@@ -91,6 +91,19 @@ test('SnapMain.create_snap()', async function (t) {
 });
 
 
+test('SnapMain.create_snap(): too many images', async function (t) {
+	let create_args = {
+		title: 'mobile',
+		is_public: true,
+		cover_image_location: 1,
+		images: [images[0], images[1]]
+	};
+
+	const response = await snap_main_actor.mishicat.create_snap(create_args);
+
+	t.deepEqual(response.err, { UserNotFound: null });
+});
+
 test('SnapMain.finalize_snap_creation()', async function (t) {
 	for (let step = 0; step < 3; step++) {
 		let args = {
@@ -101,18 +114,6 @@ test('SnapMain.finalize_snap_creation()', async function (t) {
 	
 		const response = await snap_main_actor.mishicat.finalize_snap_creation(args);
 	  }
-});
-
-test('SnapMain.finalize_snap_creation()', async function (t) {
-	let args = {
-        canister_id: created_snap.canister_id,
-        snap_id: created_snap.id,
-        image: images[1]
-	};
-
-	const response = await snap_main_actor.mishicat.finalize_snap_creation(args);
-
-	console.info('finalize_snap_creation: ', response);
 });
 
 

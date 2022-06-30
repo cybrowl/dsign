@@ -50,6 +50,7 @@ actor class SnapImages() = this {
         return image_url;
     };
 
+    // note: this will only send one image until messages can transmit data > 2MB
     public shared (msg) func save_images(images: Images) : async ImagesUrls {
         let image_ids = Buffer.Buffer<ImageID>(0);
         let snap_images_canister_id = await get_canister_id();
