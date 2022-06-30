@@ -13,7 +13,7 @@ dfx deploy profile
 export PROFILE_ID=$(dfx canister id profile)
 
 # projects
-# dfx deploy project_main
+dfx deploy project_main
 
 # snaps
 dfx deploy snap_images

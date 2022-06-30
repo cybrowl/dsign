@@ -39,7 +39,7 @@ actor SnapMain {
     var snap_images_canister_id : Text = "";
 
     // ------------------------- Snaps Management -------------------------
-    //Todo: Call this in the client
+    // TODO: Call this in the client
     public shared ({caller}) func create_user_snap_storage() : async Bool {
         let tags = [ACTOR_NAME, "create_user_snap_storage"];
 
@@ -134,6 +134,7 @@ actor SnapMain {
 
         let image_url = await snap_images_actor.save_image(args.image);
 
+        // TODO: only allow 4 images per snap
         ignore await snap_actor.add_img_url_to_snap(image_url, args.snap_id, caller);
     };
 
