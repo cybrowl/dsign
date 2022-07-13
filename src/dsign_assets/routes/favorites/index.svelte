@@ -1,8 +1,8 @@
 <!-- src/routes/favorites.svelte -->
 <script>
 	import { isAccountSettingsModalVisible, isAccountCreationModalVisible } from '../../store/modal';
-	import AccountCreationModal from '../../components/AccountCreationModal.svelte';
-	import AccountSettingsModal from '../../components/AccountSettingsModal.svelte';
+	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
+	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
 	import Header from '../../components/Header.svelte';
 </script>
 

@@ -4,10 +4,14 @@
 	import Button from 'dsign-components/components/Button.svelte';
 	import environment from 'environment';
 	import ProfileAvatar from './ProfileAvatar.svelte';
+	import { isSnapCreationModalVisible } from '../store/modal';
 
 	import { createActor as create_actor_username, actor_username } from '../store/actor_username';
 	import { createActor as create_actor_profile, actor_profile } from '../store/actor_profile';
-	import { createActor as create_actor_profile_avatar_main, actor_profile_avatar_main } from '../store/actor_profile_avatar_main';
+	import {
+		createActor as create_actor_profile_avatar_main,
+		actor_profile_avatar_main
+	} from '../store/actor_profile_avatar_main';
 
 	import { client } from '../store/client';
 	import { local_storage_remove } from '../store/local_storage';
@@ -82,12 +86,16 @@
 			onSuccess: handleAuth
 		});
 	}
+
+	async function openSnapCreationModal() {
+		isSnapCreationModalVisible.update((isSnapCreationModalVisible) => !isSnapCreationModalVisible);
+	}
 </script>
 
 <span>
 	{#if $actor_username.loggedIn}
 		<div class="flex items-center">
-			<Button label="Upload" primary={true} class="mr-4" />
+			<Button label="Upload" primary={true} class="mr-4" on:click={openSnapCreationModal} />
 			<ProfileAvatar />
 		</div>
 	{:else}
