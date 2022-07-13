@@ -78,7 +78,7 @@
 		$client.login({
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'
-				: 'http://localhost:8000/?canisterId=qvhpv-4qaaa-aaaaa-aaagq-cai',
+				: 'http://localhost:8000/?canisterId=rwlgt-iiaaa-aaaaa-aaaaa-cai',
 			onSuccess: handleAuth
 		});
 	}

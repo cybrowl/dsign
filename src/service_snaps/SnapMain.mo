@@ -82,6 +82,7 @@ actor SnapMain {
                         let snap_actor = actor (snap_canister_id) : SnapActor;
 
                         // save images and snap
+                        // note: image_urls only stores one image for now
                         let image_urls = await snap_images_actor.save_images(args.images);
                         let snap = await snap_actor.save_snap(args, image_urls, caller);
 

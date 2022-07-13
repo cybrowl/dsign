@@ -79,7 +79,7 @@
 	}
 </script>
 
-<Modal centered={false} on:closeModal={handleCloseModal}>
+<Modal on:closeModal={handleCloseModal}>
 	<AccountSettings
 		avatar={$local_storage_profile.avatar_url}
 		username={$local_storage_profile.username}
