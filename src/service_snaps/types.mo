@@ -10,7 +10,9 @@ module {
     public type UserPrincipal = Principal;
 
     // Images
-    public type Image = [Nat8];
+    public type Image = {
+        data: Blob
+    };
     public type ImageID = Text;
     public type Images = [Image];
     public type ImagesUrls = [ImageUrl];
@@ -25,7 +27,7 @@ module {
     };
 
     public type HttpResponse = {
-        body : [Nat8];
+        body : Blob;
         headers : [HeaderField];
         status_code : Nat16;
     };
@@ -81,7 +83,7 @@ module {
     public type FinalizeSnapArgs = {
         canister_id: Text;
         snap_id: SnapID;
-        image: Image;
+        images: Images;
     };
 
     // Project

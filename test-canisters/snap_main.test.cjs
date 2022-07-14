@@ -9,10 +9,13 @@ global.fetch = fetch;
 const { snap_main_interface, username_interface } = require('../test-utils/actor_interface.cjs');
 
 // Canister Ids
-const {snap_main_canister_id, username_canister_id} = require('../test-utils/actor_canister_ids.cjs');
+const {
+	snap_main_canister_id,
+	username_canister_id
+} = require('../test-utils/actor_canister_ids.cjs');
 
 // Identities
-const { default_identity } = require("../test-utils/identities/identity.cjs");
+const { default_identity } = require('../test-utils/identities/identity.cjs');
 let mishicat_identity = Ed25519KeyIdentity.generate();
 
 // Utils
@@ -27,18 +30,34 @@ let username_actors = {};
 let created_snap = {};
 
 test('SnapMain.assign actors()', async function (t) {
-	console.log("snap_main_canister_id: ", snap_main_canister_id);
-	
-	snap_main_actor.mishicat = await get_actor(snap_main_canister_id, snap_main_interface, mishicat_identity);
-	snap_main_actor.default = await get_actor(snap_main_canister_id, snap_main_interface, default_identity);
+	console.log('snap_main_canister_id: ', snap_main_canister_id);
 
-	username_actors.mishicat = await get_actor(username_canister_id, username_interface, mishicat_identity);
-	username_actors.default = await get_actor(username_canister_id, username_interface, default_identity);
+	snap_main_actor.mishicat = await get_actor(
+		snap_main_canister_id,
+		snap_main_interface,
+		mishicat_identity
+	);
+	snap_main_actor.default = await get_actor(
+		snap_main_canister_id,
+		snap_main_interface,
+		default_identity
+	);
+
+	username_actors.mishicat = await get_actor(
+		username_canister_id,
+		username_interface,
+		mishicat_identity
+	);
+	username_actors.default = await get_actor(
+		username_canister_id,
+		username_interface,
+		default_identity
+	);
 
 	const response = await snap_main_actor.mishicat.version();
 	t.equal(typeof response, 'string');
 
-	console.log("=========== Snap Main ===========");
+	console.log('=========== Snap Main ===========');
 	console.log('version: ', response);
 });
 
@@ -54,27 +73,26 @@ test('Username.create_username()::[username_actors.mishicat]: create first with 
 
 	const response = await username_actors.mishicat.create_username(username.toLowerCase());
 
-	console.info("response: ", response);
 	t.equal(response.ok.username, username.toLowerCase());
 });
 
 test('SnapMain.create_user_snap_storage()::[snap_main_actor.mishicat]: create initial storage for snaps => #ok - true', async function (t) {
 	const response = await snap_main_actor.mishicat.create_user_snap_storage();
 
-	console.info("response: ", response);
+	t.equal(response, true);
 });
 
-test('SnapMain.create_snap()', async function (t) {
+test('SnapMain.create_snap()::[snap_main_actor.mishicat] => #err - too many images', async function (t) {
 	let create_args = {
 		title: 'mobile',
 		is_public: true,
 		cover_image_location: 1,
-		images: [images[0]]
+		images: [{ data: images[0] }, { data: images[1] }]
 	};
 
 	const response = await snap_main_actor.mishicat.create_snap(create_args);
 
-	console.log('create_snap: ', response);
+	t.deepEqual(response.err, { OneImageMax: null });
 });
 
 test('SnapMain.create_snap()', async function (t) {
@@ -82,44 +100,34 @@ test('SnapMain.create_snap()', async function (t) {
 		title: 'mobile',
 		is_public: true,
 		cover_image_location: 1,
-		images: [images[0]]
+		images: [{ data: images[0] }]
 	};
 
 	const response = await snap_main_actor.mishicat.create_snap(create_args);
 	created_snap = response.ok;
-	console.info('create_snap: ', response);
-});
 
-
-test('SnapMain.create_snap(): too many images', async function (t) {
-	let create_args = {
-		title: 'mobile',
-		is_public: true,
-		cover_image_location: 1,
-		images: [images[0], images[1]]
-	};
-
-	const response = await snap_main_actor.mishicat.create_snap(create_args);
-
-	t.deepEqual(response.err, { UserNotFound: null });
+	t.deepEqual(response.ok.image_urls.length, 1);
 });
 
 test('SnapMain.finalize_snap_creation()', async function (t) {
-	for (let step = 0; step < 3; step++) {
-		let args = {
+	let snap_creation_promises = [];
+
+	for (const image of images) {
+		let snap_temp = {
 			canister_id: created_snap.canister_id,
 			snap_id: created_snap.id,
-			image: images[1]
+			images: [{ data: image }]
 		};
-	
-		const response = await snap_main_actor.mishicat.finalize_snap_creation(args);
-	  }
-});
 
+		snap_creation_promises.push(snap_main_actor.mishicat.finalize_snap_creation(snap_temp));
+	}
+	console.info("snap_creation_promises:", snap_creation_promises[0])
+
+	const responses = await Promise.all(snap_creation_promises);
+});
 
 test('SnapMain.get_all_snaps()', async function (t) {
 	const response = await snap_main_actor.mishicat.get_all_snaps();
 
 	console.info('get_all_snaps: ', response.ok);
 });
-

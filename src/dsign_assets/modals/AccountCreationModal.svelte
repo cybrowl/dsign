@@ -1,10 +1,12 @@
 <script>
+	import { onMount } from 'svelte';
 	import AccountCreation from 'dsign-components/components/AccountCreation.svelte';
 	import AccountCreationSuccess from 'dsign-components/components/AccountCreationSuccess.svelte';
 	import Modal from 'dsign-components/components/Modal.svelte';
 	import { getErrorMessage } from '../lib/utils';
 
 	import { actor_username } from '../store/actor_username';
+	import { actor_snap_main } from '../store/actor_snap_main';
 
 	let errorMessages = {
 		UsernameInvalid: 'Use lower case letters and numbers only, 2 - 20 characters in length',
@@ -16,6 +18,10 @@
 	let hasError = false;
 	let isCreatingAccount = false;
 	let isVisible = true;
+
+	onMount(async () => {
+		await $actor_snap_main.actor.create_user_snap_storage();
+	});
 
 	async function handleAccountCreation(e) {
 		try {
@@ -37,7 +43,7 @@
 
 				setTimeout(function () {
 					isVisible = false;
-					location.replace("/projects");
+					location.replace('/projects');
 				}, 2000);
 			}
 		} catch (error) {

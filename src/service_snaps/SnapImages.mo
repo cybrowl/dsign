@@ -70,7 +70,7 @@ actor class SnapImages() = this {
 
     // serves the image to the client when requested via image url
     public shared query func http_request(req : HttpRequest) : async HttpResponse {
-        let NOT_FOUND : [Nat8] = [0];
+        let NOT_FOUND : Blob = Blob.fromArray([0]);
 
         //TODO: return the correct image type
         let image_id : Text = Utils.get_image_id(req.url);
@@ -80,7 +80,7 @@ actor class SnapImages() = this {
                 return {
                     status_code = 200;
                     headers = [ ("content-type", "image/png") ];
-                    body = image;
+                    body = image.data;
                 };
             };
             case (_) {

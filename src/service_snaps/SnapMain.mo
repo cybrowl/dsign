@@ -134,10 +134,10 @@ actor SnapMain {
         let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
         let snap_actor = actor (args.canister_id) : SnapActor;
 
-        let image_url = await snap_images_actor.save_image(args.image);
+        let image_urls = await snap_images_actor.save_images(args.images);
 
         // TODO: only allow 4 images per snap
-        ignore await snap_actor.add_img_url_to_snap(image_url, args.snap_id, caller);
+        ignore await snap_actor.add_img_url_to_snap(image_urls[0], args.snap_id, caller);
     };
 
     public shared ({caller}) func get_all_snaps() : async Result.Result<[Snap], GetAllSnapsErr> {
