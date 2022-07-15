@@ -81,7 +81,9 @@
 				<!-- Fetching Snaps -->
 				{#if $snap_storage.isFetching === true}
 					<div class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4">
-						<SnapCard isLoadingSnap={true} />
+						<span class="mt-10">
+							<SnapCard isLoadingSnap={true} />
+						</span>
 					</div>
 				{/if}
 
@@ -93,10 +95,10 @@
 				{/if}
 
 				<!-- Snaps -->
-				{#if $snap_storage.ok.length > 1}
+				{#if $snap_storage.ok.length > 0}
 					<div
 						class="flex flex-wrap col-start-2 col-end-12 
-						row-start-3 row-end-10 mx-4 justify-between"
+						row-start-3 row-end-10 mx-4 gap-10"
 					>
 						{#each $snap_storage.ok as snap}
 							<span class="mt-10">
