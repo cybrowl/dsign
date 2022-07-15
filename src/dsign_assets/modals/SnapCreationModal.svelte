@@ -3,7 +3,7 @@
 	import get from 'lodash/get.js';
 	import Modal from 'dsign-components/components/Modal.svelte';
 
-	import { actor_snap_main } from '../store/actor_snap_main';
+	import { actor_snap_main, snap_storage } from '../store/actor_snap_main';
 
 	import { isSnapCreationModalVisible } from '../store/modal';
 
@@ -16,7 +16,7 @@
 
 		const first_image = snap.images.shift();
 
-		const created_snap = await $actor_snap_main.actor.create_snap({
+		const created_snap_res = await $actor_snap_main.actor.create_snap({
 			...snap,
 			images: [{ data: first_image }]
 		});
@@ -26,8 +26,8 @@
 		for (const image of snap.images) {
 			snap_creation_promises.push(
 				$actor_snap_main.actor.finalize_snap_creation({
-					canister_id: created_snap.ok.canister_id,
-					snap_id: created_snap.ok.id,
+					canister_id: created_snap_res.ok.canister_id,
+					snap_id: created_snap_res.ok.id,
 					images: [{ data: image }]
 				})
 			);
@@ -35,7 +35,8 @@
 
 		Promise.all(snap_creation_promises).then(async () => {
 			const all_snaps = await $actor_snap_main.actor.get_all_snaps();
-			console.log('all_snaps: ', all_snaps);
+
+			snap_storage.set({ isFetching: false, ...all_snaps });
 		});
 	}
 </script>

@@ -4,14 +4,11 @@ import { writable } from 'svelte/store';
 import environment from 'environment';
 
 const env = environment();
-console.info(env);
 
 const isProd = env['DFX_NETWORK'] === 'ic';
 const canisterId = env.canisterIds.snap_main[env['DFX_NETWORK']];
 
-const host = isProd
-	? `https://${canisterId}.ic0.app/`
-	: `http://127.0.0.1:8000`;
+const host = isProd ? `https://${canisterId}.ic0.app/` : `http://127.0.0.1:8000`;
 
 export function createActor(options) {
 	const agentOptions = { host };
@@ -41,3 +38,5 @@ export const actor_snap_main = writable({
 	loggedIn: false,
 	actor: createActor()
 });
+
+export const snap_storage = writable({ isFetching: false, ok: {} });

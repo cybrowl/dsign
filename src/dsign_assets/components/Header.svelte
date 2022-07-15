@@ -2,8 +2,8 @@
 	import Login from './Login.svelte';
 </script>
 
-<div class="col-span-12">
-	<div class="flex flex-row justify-between items-center m-6">
+<div class="col-start-2 col-end-12">
+	<div class="flex flex-row justify-between items-center my-6">
 		<nav class="flex items-center">
 			<a href="/" class="mr-12 text-4xl font-bold">DSign</a>
 			<a href="/" class="mr-8 font-medium hover:underline">Explore</a>

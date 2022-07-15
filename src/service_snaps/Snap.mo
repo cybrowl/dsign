@@ -37,6 +37,7 @@ actor class Snap() = this {
         return Principal.toText(Principal.fromActor(this));
     };
 
+    //TODO: remove
     public shared ({caller}) func save_snap(
         args: CreateSnapArgs,
         imageUrls: ImagesUrls, 

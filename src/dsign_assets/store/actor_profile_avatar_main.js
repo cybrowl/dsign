@@ -4,7 +4,6 @@ import { writable } from 'svelte/store';
 import environment from 'environment';
 
 const env = environment();
-console.info(env);
 
 const isProd = env['DFX_NETWORK'] === 'ic';
 const canisterId = env.canisterIds.profile_avatar_main[env['DFX_NETWORK']];
