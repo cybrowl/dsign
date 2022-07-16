@@ -8,9 +8,9 @@
 	import Header from '../../components/Header.svelte';
 	import ProjectEditActionsBar from 'dsign-components/components/ProjectEditActionsBar.svelte';
 	import ProjectsTabs from 'dsign-components/components/ProjectsTabs.svelte';
-	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 	import SnapCardEmpty from 'dsign-components/components/SnapCardEmpty.svelte';
+	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
 	import {
 		isAccountSettingsModalVisible,
@@ -85,7 +85,9 @@
 	<html lang="en" class="dark">
 		<body class="dark:bg-backdrop dark:text-gray-200 h-screen">
 			<div class="grid grid-cols-12 gap-y-2">
-				<Header />
+				<div class="col-start-2 col-end-12 mb-24">
+					<Header />
+				</div>
 
 				{#if $isAccountSettingsModalVisible}
 					<AccountSettingsModal />
