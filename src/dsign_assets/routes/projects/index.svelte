@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { AuthClient } from '@dfinity/auth-client';
+	import get from 'lodash/get.js';
 
 	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
 	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
@@ -20,6 +21,7 @@
 	import { actor_snap_main, snap_storage } from '../../store/actor_snap_main';
 
 	let isAuthenticated = false;
+	let isEditMode = false;
 
 	onMount(async () => {
 		let authClient = await AuthClient.create();
@@ -35,6 +37,8 @@
 			};
 		});
 
+		console.log('snap_storage.ok: ', $snap_storage.ok);
+
 		if (isAuthenticated) {
 			const all_snaps = await $actor_snap_main.actor.get_all_snaps();
 
@@ -45,6 +49,31 @@
 			window.location.href = '/';
 		}
 	});
+
+	function handleToggleEditMode(e) {
+		const isEditActive = get(e, 'detail');
+		console.log('isEditActive: ', isEditActive);
+
+		isEditMode = isEditActive;
+
+		snap_storage.update((snaps) => {
+			const all_snaps = snaps.ok;
+
+			const new_all_snaps = all_snaps.map((snap) => {
+				return {
+					...snap,
+					isSelected: false
+				};
+			});
+
+			return {
+				isFetching: false,
+				ok: [...new_all_snaps]
+			};
+		});
+
+		console.log('snap_storage.ok: ', $snap_storage.ok);
+	}
 </script>
 
 <!-- src/routes/projects.svelte -->
@@ -73,37 +102,34 @@
 						class="flex col-start-2 col-end-12 row-start-2 row-end-auto mx-4 
 					self-end justify-between items-center"
 					>
-						<ProjectsTabs />
-						<ProjectEditActionsBar />
+						<ProjectsTabs isSnapsSelected={true} />
+						<ProjectEditActionsBar on:toggleEditMode={handleToggleEditMode} />
 					</div>
 				{/if}
 
 				<!-- Fetching Snaps -->
 				{#if $snap_storage.isFetching === true}
-					<div class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4">
-						<span class="mt-10">
-							<SnapCard isLoadingSnap={true} />
-						</span>
+					<div class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4 mt-10">
+						<SnapCard isLoadingSnap={true} />
 					</div>
 				{/if}
 
 				<!-- No Snaps Found -->
 				{#if $snap_storage.ok.length === 0}
-					<div class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4">
+					<div class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4 mt-10">
 						<SnapCardEmpty />
 					</div>
 				{/if}
 
 				<!-- Snaps -->
+				{@debug isEditMode}
 				{#if $snap_storage.ok.length > 0}
 					<div
 						class="flex flex-wrap col-start-2 col-end-12 
-						row-start-3 row-end-10 mx-4 gap-10"
+						row-start-3 row-end-10 mx-4 gap-10 mt-10"
 					>
 						{#each $snap_storage.ok as snap}
-							<span class="mt-10">
-								<SnapCard {snap} />
-							</span>
+							<SnapCard {snap} {isEditMode} />
 						{/each}
 					</div>
 				{/if}
