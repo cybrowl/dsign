@@ -111,7 +111,10 @@
 
 				<!-- Fetching Snaps -->
 				{#if $snap_storage.isFetching === true}
-					<div class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4 mt-10">
+					<div
+						class="col-start-2 col-end-12 grid grid-cols-4 
+					row-start-3 row-end-auto mx-4 gap-10 mt-10"
+					>
 						<SnapCard isLoadingSnap={true} snap={{ views: 0, likes: 0 }} />
 					</div>
 				{/if}
