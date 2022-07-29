@@ -17,13 +17,13 @@ const username_canister_id = canister_ids.username.local;
 // Identities
 let mishicat_identity = Ed25519KeyIdentity.generate();
 let motoko_identity = Ed25519KeyIdentity.generate();
+let bot_identity = Ed25519KeyIdentity.generate();
 let anonymous_identity = null;
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
 
 let username_actors = {};
-
 
 test('Username.assign actors()', async function (t) {
 	username_actors.mishicat = await get_actor(
@@ -37,6 +37,8 @@ test('Username.assign actors()', async function (t) {
 		username_interface,
 		motoko_identity
 	);
+
+	username_actors.bot = await get_actor(username_canister_id, username_interface, bot_identity);
 
 	username_actors.anonymous = await get_actor(
 		username_canister_id,
@@ -124,7 +126,7 @@ test('Username.update_username()::[username_actors.motoko] with invalid username
 
 test('Username.update_username()::[username_actors.motoko] with taken username => #err - UsernameTaken', async function (t) {
 	const username = 'mishicat';
-	await username_actors.motoko.create_username(username);
+	await username_actors.bot.create_username(username);
 
 	const response = await username_actors.motoko.update_username(username);
 

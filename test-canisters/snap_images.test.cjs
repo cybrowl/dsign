@@ -46,17 +46,17 @@ test('SnapImages.get_canister_id():: => snap_images_canister_id', async function
 test('SnapImages.save_images():: for motoko and mishicat image', async function (t) {
 	const images = generate_images();
 
-	const image_url = await snap_images_actor.save_images([images[0]]);
+	const image_url = await snap_images_actor.save_images([{ data: images[0] }]);
 
-	console.log("image_url: ", image_url);
+	console.log('image_url: ', image_url);
 });
 
 test('SnapImages.save_images():: for motoko and mishicat images => #ok - Img Url ', async function (t) {
 	const images = generate_images();
 
-	const image_url = await snap_images_actor.save_images([images[0], images[1]]);
+	const image_url = await snap_images_actor.save_images([{ data: images[0] }, { data: images[1] }]);
 
-	console.log("image_url: ", image_url);
+	console.log('image_url: ', image_url);
 });
 
 test('SnapImages.save_images():: http request returns 200', async function (t) {

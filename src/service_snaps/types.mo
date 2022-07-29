@@ -102,7 +102,6 @@ module {
     };
 
     public type SnapImagesActor = actor {
-        save_image : shared (Image) -> async ImageUrl;
-        save_images : shared (Images) -> async [ImageID];
+        save_images : shared (Images) -> async ImagesUrls;
     };
 };

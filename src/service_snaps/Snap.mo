@@ -1,6 +1,7 @@
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Source "mo:ulid/Source";
@@ -27,6 +28,7 @@ actor class Snap() = this {
     private let se = Source.Source(rr, 0);
 
     var snaps : HashMap.HashMap<SnapID, Snap> = HashMap.HashMap(0, Text.equal, Text.hash);
+    stable var snaps_stable_storage : [(SnapID, Snap)] = [];
 
     //TODO: only allow snap_main to accesss write methods
     public query func version() : async Text {
@@ -37,7 +39,6 @@ actor class Snap() = this {
         return Principal.toText(Principal.fromActor(this));
     };
 
-    //TODO: remove
     public shared ({caller}) func save_snap(
         args: CreateSnapArgs,
         imageUrls: ImagesUrls, 
@@ -101,15 +102,16 @@ actor class Snap() = this {
                     return #err(#ImgLimitReached); 
                 };
 
-                // TODO: refactor to not use append
-                let update_img_urls = Array.append(snap.image_urls, [img_url]);
+                let snap_img_urls = Buffer.fromArray<Text>(snap.image_urls);
+                snap_img_urls.add(img_url);
+
                 let updated_snap: Snap = {
                     id = snap.id;
                     canister_id = snap.canister_id;
                     cover_image_location = snap.cover_image_location;
                     created = snap.created;
                     creator = snap.creator;
-                    image_urls = update_img_urls;
+                    image_urls = snap_img_urls.toArray();
                     is_public = snap.is_public;
                     likes = snap.likes;
                     projects = snap.projects;
@@ -142,5 +144,26 @@ actor class Snap() = this {
         };
 
         return snaps_list.toArray();
+    };
+
+    public shared ({caller}) func delete_snaps(snapIds: [SnapID]) : async () {
+        for (snap_id in snapIds.vals()){
+            switch (snaps.get(snap_id)){
+                case null {};
+                case (?snap) {
+                   snaps.delete(snap_id);
+                };
+            }
+        };
+    };
+
+    // ------------------------- System Methods -------------------------
+    system func preupgrade() {
+        snaps_stable_storage := Iter.toArray(snaps.entries());
+    };
+
+    system func postupgrade() {
+        snaps := HashMap.fromIter<SnapID, Snap>(snaps_stable_storage.vals(), 0, Text.equal, Text.hash);
+        snaps_stable_storage := [];
     };
 };

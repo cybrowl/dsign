@@ -165,6 +165,25 @@ actor SnapMain {
         };
     };
 
+    // public shared ({caller}) func delete_snaps(snapIds: [SnapID]) : async () {
+    //     let tags = [ACTOR_NAME, "delete_snaps"];
+
+    //     switch (user_canisters_ref.get(caller)) {
+    //         case (?snap_canister_ids) {
+    //             for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
+    //                 let snap_actor = actor (canister_id) : SnapActor;
+    //                 let snaps = await snap_actor.delete_snaps(snapIds);
+    //             };
+
+    //             return;
+    //         };
+    //         case (_) {
+    //             #err(#UserNotFound)
+    //         };
+    //     };
+    // };
+
+
     // ------------------------- Canister Management -------------------------
     public query func version() : async Text {
         return "0.0.1";

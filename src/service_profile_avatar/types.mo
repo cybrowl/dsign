@@ -19,7 +19,7 @@ module {
     };
 
     public type HttpResponse = {
-        body : [Nat8];
+        body : Blob;
         headers : [HeaderField];
         status_code : Nat16;
     };
@@ -37,7 +37,7 @@ module {
     };
 
     public type Image = {
-        content: [Nat8]
+        data: Blob
     };
 
     // Actor Interface

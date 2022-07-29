@@ -127,7 +127,6 @@
 				{/if}
 
 				<!-- Snaps -->
-				{@debug isEditMode}
 				{#if $snap_storage.ok.length > 0}
 					<div
 						class="col-start-2 col-end-12 grid grid-cols-4 

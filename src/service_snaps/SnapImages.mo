@@ -2,6 +2,7 @@ import Buffer "mo:base/Buffer";
 import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Rand "mo:base/Random";
 import Source "mo:ulid/Source";
@@ -29,6 +30,7 @@ actor class SnapImages() = this {
     private var isProduction : Bool = false;
 
     var snap_images : HashMap.HashMap<ImageID, Image> = HashMap.HashMap(0, Text.equal, Text.hash);
+    stable var snap_images_stable_storage : [(ImageID, Image)] = [];
 
     public query func version() : async Text {
         return "0.0.1";
@@ -36,18 +38,6 @@ actor class SnapImages() = this {
 
     public query func get_canister_id() : async Text {
         return Principal.toText(Principal.fromActor(this));
-    };
-
-    public shared (msg) func save_image(image: Image) : async ImageUrl {
-        let image_id : ImageID = ULID.toText(se.new());
-
-        snap_images.put(image_id, image);
-
-        let snap_images_canister_id = await get_canister_id();
-
-        let image_url = Utils.generate_snap_image_url(snap_images_canister_id, image_id, isProduction);
-
-        return image_url;
     };
 
     // note: this will only send one image until messages can transmit data > 2MB
@@ -91,5 +81,15 @@ actor class SnapImages() = this {
                 };
             };
         };
+    };
+
+    // ------------------------- System Methods -------------------------
+    system func preupgrade() {
+        snap_images_stable_storage := Iter.toArray(snap_images.entries());
+    };
+
+    system func postupgrade() {
+        snap_images := HashMap.fromIter<ImageID, Image>(snap_images_stable_storage.vals(), 0, Text.equal, Text.hash);
+        snap_images_stable_storage := [];
     };
 };

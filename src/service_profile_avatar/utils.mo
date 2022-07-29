@@ -1,5 +1,6 @@
 import Array "mo:base/Array";
-import B "mo:base/Buffer";
+import Blob "mo:base/Blob";
+import Buffer "mo:base/Buffer";
 import Char "mo:base/Char";
 import Debug "mo:base/Debug";
 import Iter "mo:base/Iter";
@@ -19,8 +20,9 @@ module {
         return filterBySeparator[0];
     };
 
-    public func is_valid_image(img: [Nat8]) : Bool {
-        var compare = B.Buffer<Nat8>(1);
+    public func is_valid_image(img: Blob) : Bool {
+        var img_arr = Blob.toArray(img);
+        var compare = Buffer.Buffer<Nat8>(0);
 
         let gif : [Nat8] = [71,  73,  70,  56];
         let jpeg : [Nat8] = [255, 216, 255, 224];
@@ -28,7 +30,7 @@ module {
         let png : [Nat8] = [137,  80,  78,  71];
 
         for (i in Iter.range(0, 3)) {
-            compare.add(img[i]);
+            compare.add(img_arr[i]);
         };
 
         let compareArr = compare.toArray();

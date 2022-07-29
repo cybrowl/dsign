@@ -1,3 +1,4 @@
+import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
 import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
@@ -85,14 +86,14 @@ actor class ProfileAvatarImages() = {
 
     public shared query func http_request(req : HttpRequest) : async HttpResponse {
         let username : Text = Utils.get_username(req.url);
-        let NOT_FOUND : [Nat8] = [0];
+        let NOT_FOUND : Blob = Blob.fromArray([0x4e]);
 
         switch (avatar_images.get(username)) {
             case (?image) {
                 return {
                     status_code = 200;
                     headers = [ ("content-type", "image/png") ];
-                    body = image.content;
+                    body = image.data;
                 };
             };
             case (null) {

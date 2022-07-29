@@ -38,11 +38,11 @@ actor class ProfileAvatarMain() = {
     };
 
     public shared ({caller}) func save_image(avatar: Image) : async Result.Result<AvatarImgOk, AvatarImgErr> {
-        if (avatar.content.size() > MAX_BYTES) {
+        if (avatar.data.size() > MAX_BYTES) {
             return #err(#AvatarImgTooBig);
         };
 
-        let is_valid_img = Utils.is_valid_image(avatar.content);
+        let is_valid_img = Utils.is_valid_image(avatar.data);
 
         if (is_valid_img == false) {
             return #err(#ImgNotValid);

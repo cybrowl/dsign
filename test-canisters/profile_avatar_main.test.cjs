@@ -2,7 +2,7 @@ const test = require('tape');
 const fetch = require('node-fetch');
 const fake = require('fake-words');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
-const lowerCase = require("lodash/lowerCase");
+const lowerCase = require('lodash/lowerCase');
 
 global.fetch = fetch;
 
@@ -80,9 +80,7 @@ test('ProfileAvatarMain.initialize_canisters()', async function (t) {
 
 test('ProfileAvatarMain.save_image()::[avatar_main_actor.mishicat]: before making profile => #err - FailedSaveAvatarImg', async function (t) {
 	const images = generate_images();
-	const response = await avatar_main_actor.mishicat.save_image({content: images[0]});
-
-    console.log("response: ", response);
+	const response = await avatar_main_actor.mishicat.save_image({ data: images[0] });
 
 	t.deepEqual(response.err, { FailedSaveAvatarImg: null });
 });
@@ -106,7 +104,6 @@ test('Profile.get_profile()::[profile_actors.mishicat]  => #ok - profile', async
 	const hasCreated = response.ok.profile.created.toString().length > 2;
 	const hasAvatarUrl = response.ok.profile.avatar_url.length > 2;
 
-
 	t.equal(hasUsername, true);
 	t.equal(hasCreated, true);
 	t.equal(hasAvatarUrl, false);
@@ -114,9 +111,7 @@ test('Profile.get_profile()::[profile_actors.mishicat]  => #ok - profile', async
 
 test('ProfileAvatarMain.save_image()::[avatar_main_actor.mishicat]: after making profile => #ok - avatar_url', async function (t) {
 	const images = generate_images();
-	const response = await avatar_main_actor.mishicat.save_image({content: images[0]});
-
-    console.log("response: ", response);
+	const response = await avatar_main_actor.mishicat.save_image({ data: images[0] });
 
 	const hasAvatarUrl = response.ok.avatar_url.length > 2;
 

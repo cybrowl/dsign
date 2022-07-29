@@ -53,7 +53,8 @@
       "main": "src/service_snaps/Snap.mo",
       "type": "motoko",
       "dependencies": [
-        "logger", "username"
+        "logger",
+        "username"
       ]
     },
     "snap_images": {
@@ -67,14 +68,16 @@
       "main": "src/service_snaps/SnapMain.mo",
       "type": "motoko",
       "dependencies": [
-        "logger", "snap"
+        "logger",
+        "snap"
       ]
     },
     "username": {
       "main": "src/service_username/Username.mo",
       "type": "motoko",
       "dependencies": [
-        "logger", "profile"
+        "logger",
+        "profile"
       ]
     },
     "logger": {
@@ -88,7 +91,7 @@
       "packtool": "vessel sources"
     }
   },
-  "dfx": "0.10.0",
+  "dfx": "0.11.0",
   "networks": {
     "local": {
       "bind": "127.0.0.1:8000",
