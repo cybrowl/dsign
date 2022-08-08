@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "_app/immutable/start-9078f53e.js",
+    "file": "_app/immutable/start-84d7c714.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -24,7 +24,7 @@
       "_index-233313f1.js"
     ],
     "css": [
-      "_app/immutable/assets/__layout-8cac25cc.css"
+      "_app/immutable/assets/__layout-183aa1c1.css"
     ]
   },
   ".svelte-kit/runtime/components/error.svelte": {
@@ -37,35 +37,35 @@
     ]
   },
   "src/dsign_assets/routes/favorites/index.svelte": {
-    "file": "_app/immutable/pages/favorites/index.svelte-5048eb91.js",
+    "file": "_app/immutable/pages/favorites/index.svelte-1ae64cd4.js",
     "src": "src/dsign_assets/routes/favorites/index.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-233313f1.js",
-      "_SnapCreationModal-4125516c.js",
+      "_SnapCreationModal-f4d418d2.js",
       "_index-3c3cbbfa.js"
     ]
   },
   "src/dsign_assets/routes/index.svelte": {
-    "file": "_app/immutable/pages/index.svelte-97a8ea82.js",
+    "file": "_app/immutable/pages/index.svelte-c92d5f8e.js",
     "src": "src/dsign_assets/routes/index.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-233313f1.js",
-      "_SnapCreationModal-4125516c.js",
+      "_SnapCreationModal-f4d418d2.js",
       "_index-3c3cbbfa.js"
     ]
   },
   "src/dsign_assets/routes/projects/index.svelte": {
-    "file": "_app/immutable/pages/projects/index.svelte-909b75d0.js",
+    "file": "_app/immutable/pages/projects/index.svelte-a4e66e64.js",
     "src": "src/dsign_assets/routes/projects/index.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-233313f1.js",
-      "_SnapCreationModal-4125516c.js",
+      "_SnapCreationModal-f4d418d2.js",
       "_index-3c3cbbfa.js"
     ],
     "css": [
@@ -81,8 +81,8 @@
       "_index-233313f1.js"
     ]
   },
-  "_SnapCreationModal-4125516c.js": {
-    "file": "_app/immutable/chunks/SnapCreationModal-4125516c.js",
+  "_SnapCreationModal-f4d418d2.js": {
+    "file": "_app/immutable/chunks/SnapCreationModal-f4d418d2.js",
     "imports": [
       "_index-233313f1.js",
       "_index-3c3cbbfa.js"
@@ -91,13 +91,13 @@
       "_app/immutable/assets/SnapCreationModal-197843ed.css"
     ]
   },
-  "src/dsign_assets/routes/__layout.css": {
-    "file": "_app/immutable/assets/__layout-8cac25cc.css",
-    "src": "src/dsign_assets/routes/__layout.css"
-  },
   "src/dsign_assets/routes/projects/index.css": {
     "file": "_app/immutable/assets/index-d178c8f2.css",
     "src": "src/dsign_assets/routes/projects/index.css"
+  },
+  "src/dsign_assets/routes/__layout.css": {
+    "file": "_app/immutable/assets/__layout-183aa1c1.css",
+    "src": "src/dsign_assets/routes/__layout.css"
   },
   "SnapCreationModal.css": {
     "file": "_app/immutable/assets/SnapCreationModal-197843ed.css",
