@@ -83,9 +83,9 @@
 
 <main>
 	<html lang="en" class="dark">
-		<body class="dark:bg-backdrop dark:text-gray-200 h-screen">
+		<body class="dark:bg-backdrop dark:text-gray-200">
 			<div class="grid grid-cols-12 gap-y-2">
-				<div class="col-start-2 col-end-12 mb-24">
+				<div class="col-start-2 col-end-12 mb-16">
 					<Header />
 				</div>
 
@@ -113,7 +113,7 @@
 				{#if $snap_storage.isFetching === true}
 					<div
 						class="col-start-2 col-end-12 grid grid-cols-4 
-					row-start-3 row-end-auto mx-4 gap-10 mt-10"
+					row-start-3 row-end-auto mx-4 gap-10 mt-10 h-screen"
 					>
 						<SnapCard isLoadingSnap={true} snap={{ views: 0, likes: 0 }} />
 					</div>
@@ -121,7 +121,7 @@
 
 				<!-- No Snaps Found -->
 				{#if $snap_storage.ok.length === 0}
-					<div class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4 mt-10">
+					<div class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4 mt-10 h-screen">
 						<SnapCardEmpty />
 					</div>
 				{/if}
@@ -130,7 +130,7 @@
 				{#if $snap_storage.ok.length > 0}
 					<div
 						class="col-start-2 col-end-12 grid grid-cols-4 
-						row-start-3 row-end-auto mx-4 gap-10 mt-10"
+						row-start-3 row-end-auto mx-4 gap-10 mt-10 mb-16"
 					>
 						{#each $snap_storage.ok as snap}
 							<SnapCard {snap} {isEditMode} />
