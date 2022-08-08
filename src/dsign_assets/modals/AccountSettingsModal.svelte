@@ -22,7 +22,7 @@
 
 		const imageAsUnit8ArrayBuffer = new Uint8Array(await selectedFile.arrayBuffer());
 		const avatar = {
-			content: [...imageAsUnit8ArrayBuffer]
+			data: [...imageAsUnit8ArrayBuffer]
 		};
 
 		await $actor_profile_avatar_main.actor.save_image(avatar);
