@@ -76,6 +76,8 @@
 		local_storage_remove('profile');
 
 		handleCloseModal();
+
+		window.location.href = '/';
 	}
 </script>
 

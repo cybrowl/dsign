@@ -36,7 +36,7 @@
 		Promise.all(snap_creation_promises).then(async () => {
 			const all_snaps = await $actor_snap_main.actor.get_all_snaps();
 
-			snap_storage.set({ isFetching: false, ...all_snaps });
+			snap_storage.set({ isFetching: false, snaps: [...all_snaps.ok] });
 		});
 	}
 </script>
