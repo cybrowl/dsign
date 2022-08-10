@@ -62,7 +62,7 @@ test('SnapMain.assign actors()', async function (t) {
 });
 
 test('SnapMain.initialize_canisters()', async function (t) {
-	await snap_main_actor.mishicat.initialize_canisters([], []);
+	await snap_main_actor.mishicat.initialize_canisters();
 });
 
 test('Username.create_username()::[username_actors.mishicat]: create first with valid username => #ok - username', async function (t) {
