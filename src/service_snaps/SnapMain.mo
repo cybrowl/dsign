@@ -38,8 +38,8 @@ actor SnapMain {
 
     // holds data until filled
     // once filled, a new canister is created and assigned
-    var snap_canister_id : Text = "";
-    var snap_images_canister_id : Text = "";
+    stable var snap_canister_id : Text = "";
+    stable var snap_images_canister_id : Text = "";
 
     // ------------------------- Snaps Management -------------------------
     // TODO: Call this in the client

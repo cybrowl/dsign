@@ -14,10 +14,6 @@
       ],
       "type": "assets"
     },
-    "canister_map": {
-      "main": "src/service_canister_map/CanisterMap.mo",
-      "type": "motoko"
-    },
     "profile": {
       "main": "src/service_profile/Profile.mo",
       "type": "motoko",

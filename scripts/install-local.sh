@@ -24,9 +24,6 @@ export SNAP_MAIN_ID=$(dfx canister id snap_main)
 # logger
 dfx deploy logger
 
-# canister_map
-dfx deploy canister_map --argument '(record {profile = "'${PROFILE_ID}'"; snap_main = "'${SNAP_MAIN_ID}'"; username = "'${USERNAME_ID}'"; })'
-
 # front end
 dfx deploy dsign_assets
 
