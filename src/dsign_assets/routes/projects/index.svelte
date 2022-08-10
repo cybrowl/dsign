@@ -31,20 +31,19 @@
 		snap_storage.update((snaps) => {
 			return {
 				isFetching: true,
-				ok: {
+				snaps: {
 					...snaps.ok
 				}
 			};
 		});
 
-		console.log('snap_storage.ok: ', $snap_storage.ok);
-
 		if (isAuthenticated) {
 			const all_snaps = await $actor_snap_main.actor.get_all_snaps();
 
-			snap_storage.set({ isFetching: false, ...all_snaps });
+			console.log("all_snaps: ", all_snaps);
 
-			console.log('all_snaps: ', $snap_storage.ok);
+			snap_storage.set({ isFetching: false, snaps: [...all_snaps.ok]});
+
 		} else {
 			window.location.href = '/';
 		}
@@ -52,14 +51,12 @@
 
 	function handleToggleEditMode(e) {
 		const isEditActive = get(e, 'detail');
-		console.log('isEditActive: ', isEditActive);
 
 		isEditMode = isEditActive;
 
-		snap_storage.update((snaps) => {
-			const all_snaps = snaps.ok;
+		snap_storage.update(({snaps}) => {
 
-			const new_all_snaps = all_snaps.map((snap) => {
+			const new_all_snaps = snaps.map((snap) => {
 				return {
 					...snap,
 					isSelected: false
@@ -68,11 +65,9 @@
 
 			return {
 				isFetching: false,
-				ok: [...new_all_snaps]
+				snaps: [...new_all_snaps]
 			};
 		});
-
-		console.log('snap_storage.ok: ', $snap_storage.ok);
 	}
 </script>
 
@@ -120,19 +115,19 @@
 				{/if}
 
 				<!-- No Snaps Found -->
-				{#if $snap_storage.ok.length === 0}
+				{#if $snap_storage.snaps.length === 0}
 					<div class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4 mt-10 h-screen">
 						<SnapCardEmpty />
 					</div>
 				{/if}
 
 				<!-- Snaps -->
-				{#if $snap_storage.ok.length > 0}
+				{#if $snap_storage.snaps.length > 0}
 					<div
 						class="col-start-2 col-end-12 grid grid-cols-4 
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-10 mb-16"
 					>
-						{#each $snap_storage.ok as snap}
+						{#each $snap_storage.snaps as snap}
 							<SnapCard {snap} {isEditMode} />
 						{/each}
 					</div>

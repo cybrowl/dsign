@@ -39,7 +39,7 @@ actor class SnapImages() = this {
     public query func get_canister_id() : async Text {
         return Principal.toText(Principal.fromActor(this));
     };
-
+        
     // note: this will only send one image until messages can transmit data > 2MB
     public shared (msg) func save_images(images: Images) : async ImagesUrls {
         let image_ids = Buffer.Buffer<ImageID>(0);

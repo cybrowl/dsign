@@ -73,6 +73,10 @@ module {
         #UserNotFound;
     };
 
+    public type DeleteAllSnapsErr = {
+        #UserNotFound;
+    };
+
     public type CreateSnapArgs = {
         title: Text;
         is_public: Bool;
@@ -96,6 +100,7 @@ module {
 
     // Actor Interface
     public type SnapActor = actor {
+        delete_snaps : shared ([SnapID]) -> async ();
         save_snap : shared (CreateSnapArgs, [ImageID], UserPrincipal) -> async Result.Result<Snap, SaveSnapErr>;
         get_all_snaps : query ([SnapID]) -> async [Snap];
         add_img_url_to_snap : shared (ImageUrl, SnapID, UserPrincipal) -> async Result.Result<Snap, AddImgUrlSnapErr>;

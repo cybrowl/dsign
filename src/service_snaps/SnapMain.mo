@@ -1,7 +1,8 @@
+import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
-import Hashmap "mo:base/HashMap";
+import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
@@ -17,6 +18,7 @@ import Types "./types";
 actor SnapMain {
     type CreateSnapArgs = Types.CreateSnapArgs;
     type CreateSnapErr = Types.CreateSnapErr;
+    type DeleteAllSnapsErr = Types.DeleteAllSnapsErr;
     type FinalizeSnapArgs = Types.FinalizeSnapArgs;
     type GetAllSnapsErr = Types.GetAllSnapsErr;
     type Snap = Types.Snap;
@@ -31,7 +33,8 @@ actor SnapMain {
     let CYCLE_AMOUNT : Nat = 100_000_0000_000;
 
     // Snap Data
-    var user_canisters_ref : Hashmap.HashMap<UserPrincipal, Hashmap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>>> = Hashmap.HashMap(0, Principal.equal, Principal.hash);
+    var user_canisters_ref : HashMap.HashMap<UserPrincipal, HashMap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>>> = HashMap.HashMap(0, Principal.equal, Principal.hash);
+    stable var user_canisters_ref_storage : [var (UserPrincipal, [(SnapCanisterID, [SnapID])])] = [var];
 
     // holds data until filled
     // once filled, a new canister is created and assigned
@@ -48,7 +51,7 @@ actor SnapMain {
                 return false;
             };
             case (_) {
-                var empty_snap_canister_id_storage : Hashmap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>> = Hashmap.HashMap(0, Text.equal, Text.hash);
+                var empty_snap_canister_id_storage : HashMap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>> = HashMap.HashMap(0, Text.equal, Text.hash);
 
                 user_canisters_ref.put(caller, empty_snap_canister_id_storage);
 
@@ -165,28 +168,29 @@ actor SnapMain {
         };
     };
 
-    // public shared ({caller}) func delete_snaps(snapIds: [SnapID]) : async () {
-    //     let tags = [ACTOR_NAME, "delete_snaps"];
+    public shared ({caller}) func delete_snaps(snapIds: [SnapID]) : async Result.Result<Text, DeleteAllSnapsErr> {
+        let tags = [ACTOR_NAME, "delete_snaps"];
 
-    //     switch (user_canisters_ref.get(caller)) {
-    //         case (?snap_canister_ids) {
-    //             for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
-    //                 let snap_actor = actor (canister_id) : SnapActor;
-    //                 let snaps = await snap_actor.delete_snaps(snapIds);
-    //             };
+        switch (user_canisters_ref.get(caller)) {
+            case (?snap_canister_ids) {
+                for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
+                    //todo: delete snapIds in snap_ids
 
-    //             return;
-    //         };
-    //         case (_) {
-    //             #err(#UserNotFound)
-    //         };
-    //     };
-    // };
+                    let snap_actor = actor (canister_id) : SnapActor;
+                    await snap_actor.delete_snaps(snapIds);
+                };
 
+                return #ok("");
+            };
+            case (_) {
+                #err(#UserNotFound)
+            };
+        };
+    };
 
     // ------------------------- Canister Management -------------------------
     public query func version() : async Text {
-        return "0.0.1";
+        return "0.0.2";
     };
 
     private func create_snap_canister() : async () {
@@ -251,5 +255,43 @@ actor SnapMain {
         } else {
             await Logger.log_event(tags, debug_show(("snap_images exists", snap_images_canister_id)));
         };
+    };
+
+    // ------------------------- System Methods -------------------------
+    system func preupgrade() {
+        var anon_principal = Principal.fromText("aaaaa-aa");
+        user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
+
+        var i = 0;
+        for ((user_principal, snap_canister_ids) in user_canisters_ref.entries()) {
+            var canisters : HashMap.HashMap<SnapCanisterID, [SnapID]> = HashMap.HashMap(0, Text.equal, Text.hash);
+
+            for ((snap_canister_id, snap_ids) in snap_canister_ids.entries()) {
+                var snap_ids_array = snap_ids.toArray();
+                canisters.put(snap_canister_id, snap_ids_array);
+            };
+
+            user_canisters_ref_storage[i] := (user_principal, Iter.toArray(canisters.entries()));
+            i += 1;
+        };
+    };
+
+    system func postupgrade() {
+        var user_canisters_ref_temp : HashMap.HashMap<UserPrincipal, HashMap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>>> = HashMap.HashMap(0, Principal.equal, Principal.hash);
+
+        for ((user_principal, snap_canister_ids) in user_canisters_ref_storage.vals()) {
+            var canisters : HashMap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>> = HashMap.HashMap(0, Text.equal, Text.hash);
+
+            for ((snap_canister_id, snap_ids) in snap_canister_ids.vals()) {
+                var snap_ids_buffer : Buffer.Buffer<SnapID> = Buffer.fromArray(snap_ids);
+                canisters.put(snap_canister_id, snap_ids_buffer);
+            };
+
+            user_canisters_ref_temp.put(user_principal, canisters);
+        };
+
+        user_canisters_ref := user_canisters_ref_temp;
+        var anon_principal = Principal.fromText("aaaaa-aa");
+        user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
     };
 };
