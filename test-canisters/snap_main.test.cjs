@@ -62,9 +62,6 @@ test('SnapMain.assign actors()', async function (t) {
 });
 
 test('SnapMain.initialize_canisters()', async function (t) {
-	// const snap_canister_id = await default_snap_actor.get_canister_id();
-	// const snap_images_canister_id = await default_snap_images_actor.get_canister_id();
-
 	await snap_main_actor.mishicat.initialize_canisters([], []);
 });
 
@@ -121,9 +118,14 @@ test('SnapMain.finalize_snap_creation()', async function (t) {
 
 		snap_creation_promises.push(snap_main_actor.mishicat.finalize_snap_creation(snap_temp));
 	}
-	console.info("snap_creation_promises:", snap_creation_promises[0])
 
 	const responses = await Promise.all(snap_creation_promises);
+});
+
+test('SnapMain.get_all_snaps()', async function (t) {
+	const response = await snap_main_actor.mishicat.get_all_snaps();
+
+	console.info('get_all_snaps: ', response.ok);
 });
 
 test('SnapMain.get_all_snaps()', async function (t) {

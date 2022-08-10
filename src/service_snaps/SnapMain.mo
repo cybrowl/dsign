@@ -223,35 +223,19 @@ actor SnapMain {
         await Logger.log_event(tags, debug_show(("snap_images_canister_id: ", snap_images_canister_id)));
     };
 
-    public shared (msg) func initialize_canisters(snapCanisterId: ?Text, snapImagesCanisterId: ?Text) : async ()  {
+    public shared (msg) func initialize_canisters() : async ()  {
         let tags = [ACTOR_NAME, "initialize_canisters"];
 
         // create snap
         if (snap_canister_id.size() < 1) {
-            switch (snapCanisterId) {
-                case null  {
-                    await create_snap_canister();
-                };
-                case (?canister_id) {
-                    await Logger.log_event(tags, debug_show(("snap initialized", canister_id)));
-                    snap_canister_id := canister_id;
-                };
-            };
+            await create_snap_canister();
         } else {
             await Logger.log_event(tags, debug_show(("snap exists", snap_canister_id)));
         };
 
         // create snap images
         if (snap_images_canister_id.size() < 1) {
-            switch (snapImagesCanisterId) {
-                case null  {
-                    await create_snap_images_canister();
-                };
-                case (?canister_id) {
-                    await Logger.log_event(tags, debug_show(("snap_images initialized", canister_id)));
-                    snap_images_canister_id := canister_id;
-                };
-            };
+            await create_snap_images_canister();
         } else {
             await Logger.log_event(tags, debug_show(("snap_images exists", snap_images_canister_id)));
         };
