@@ -243,7 +243,7 @@ actor SnapMain {
 
     // ------------------------- System Methods -------------------------
     system func preupgrade() {
-        var anon_principal = Principal.fromText("aaaaa-aa");
+        var anon_principal = Principal.fromText("");
         user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
 
         var i = 0;
@@ -275,7 +275,7 @@ actor SnapMain {
         };
 
         user_canisters_ref := user_canisters_ref_temp;
-        var anon_principal = Principal.fromText("aaaaa-aa");
+        var anon_principal = Principal.fromText("");
         user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
     };
 };
