@@ -3,7 +3,7 @@
 	import get from 'lodash/get.js';
 	import Modal from 'dsign-components/components/Modal.svelte';
 
-	import { actor_snap_main, snap_storage } from '../store/actor_snap_main';
+	import { actor_snap_main, snap_store } from '../store/actor_snap_main';
 
 	import { isSnapCreationModalVisible } from '../store/modal';
 
@@ -36,7 +36,7 @@
 		Promise.all(snap_creation_promises).then(async () => {
 			const all_snaps = await $actor_snap_main.actor.get_all_snaps();
 
-			snap_storage.set({ isFetching: false, snaps: [...all_snaps.ok] });
+			snap_store.set({ isFetching: false, snaps: [...all_snaps.ok] });
 		});
 	}
 </script>

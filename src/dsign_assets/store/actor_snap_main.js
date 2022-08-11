@@ -39,4 +39,4 @@ export const actor_snap_main = writable({
 	actor: createActor()
 });
 
-export const snap_storage = writable({ isFetching: false, snaps: {} });
+export const snap_store = writable({ isFetching: false, snaps: {} });

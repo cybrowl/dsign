@@ -18,7 +18,8 @@
 		isSnapCreationModalVisible
 	} from '../../store/modal';
 
-	import { actor_snap_main, snap_storage } from '../../store/actor_snap_main';
+	import { actor_snap_main, snap_store } from '../../store/actor_snap_main';
+	import { local_storage_projects } from '../store/local_storage';
 
 	let isAuthenticated = false;
 	let isEditMode = false;
@@ -28,7 +29,7 @@
 
 		isAuthenticated = await authClient.isAuthenticated();
 
-		snap_storage.update((snaps) => {
+		snap_store.update((snaps) => {
 			return {
 				isFetching: true,
 				snaps: {
@@ -39,10 +40,11 @@
 
 		if (isAuthenticated) {
 			const all_snaps = await $actor_snap_main.actor.get_all_snaps();
+			const all_snaps_count = all_snaps.length;
 
-			console.log('all_snaps: ', all_snaps);
+			local_storage_projects.set({ all_snaps_count: all_snaps_count });
 
-			snap_storage.set({ isFetching: false, snaps: [...all_snaps.ok] });
+			snap_store.set({ isFetching: false, snaps: [...all_snaps.ok] });
 		} else {
 			window.location.href = '/';
 		}
@@ -53,7 +55,7 @@
 
 		isEditMode = isEditActive;
 
-		snap_storage.update(({ snaps }) => {
+		snap_store.update(({ snaps }) => {
 			const new_all_snaps = snaps.map((snap) => {
 				return {
 					...snap,
@@ -100,7 +102,7 @@
 	{/if}
 
 	<!-- Fetching Snaps -->
-	{#if $snap_storage.isFetching === true}
+	{#if $snap_store.isFetching === true}
 		<div
 			class="col-start-2 col-end-12 grid grid-cols-4 
 					row-start-3 row-end-auto mx-4 gap-10 mt-10"
@@ -110,19 +112,19 @@
 	{/if}
 
 	<!-- No Snaps Found -->
-	{#if $snap_storage.snaps.length === 0}
+	{#if $snap_store.snaps.length === 0}
 		<div class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4 mt-10">
 			<SnapCardEmpty />
 		</div>
 	{/if}
 
 	<!-- Snaps -->
-	{#if $snap_storage.snaps.length > 0}
+	{#if $snap_store.snaps.length > 0}
 		<div
 			class="col-start-2 col-end-12 grid grid-cols-4 
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-10 mb-16"
 		>
-			{#each $snap_storage.snaps as snap}
+			{#each $snap_store.snaps as snap}
 				<SnapCard {snap} {isEditMode} />
 			{/each}
 		</div>
