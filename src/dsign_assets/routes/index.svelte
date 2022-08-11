@@ -15,31 +15,25 @@
 	<title>DSign</title>
 </svelte:head>
 
-<main>
-	<html lang="en" class="dark">
-		<body class="dark:bg-backdrop dark:text-gray-200">
-			<div class="grid grid-cols-12 gap-2">
-				<div class="col-start-2 col-end-12 mb-24">
-					<Header />
-				</div>
+<main class="grid grid-cols-12 gap-y-2">
+	<div class="col-start-2 col-end-12 mb-24">
+		<Header />
+	</div>
 
-				<!-- AccountSettingsModal -->
-				{#if $isAccountSettingsModalVisible}
-					<AccountSettingsModal />
-				{/if}
+	<!-- AccountSettingsModal -->
+	{#if $isAccountSettingsModalVisible}
+		<AccountSettingsModal />
+	{/if}
 
-				<!-- AccountCreationModal -->
-				{#if $isAccountCreationModalVisible}
-					<AccountCreationModal />
-				{/if}
+	<!-- AccountCreationModal -->
+	{#if $isAccountCreationModalVisible}
+		<AccountCreationModal />
+	{/if}
 
-				<!-- SnapCreationModal -->
-				{#if $isSnapCreationModalVisible}
-					<SnapCreationModal />
-				{/if}
-			</div>
-		</body>
-	</html>
+	<!-- SnapCreationModal -->
+	{#if $isSnapCreationModalVisible}
+		<SnapCreationModal />
+	{/if}
 </main>
 
 <style>
