@@ -7,7 +7,6 @@
 		<a href="/" class="mr-12 text-4xl font-bold">DSign</a>
 		<a href="/" class="mr-8 font-medium hover:underline">Explore</a>
 		<a href="/projects" class="mr-8 font-medium hover:underline">Projects</a>
-		<a href="/collab" class="mr-8 font-medium hover:underline">Collab</a>
 		<a href="/favorites" class="mr-8 font-medium hover:underline">Favorites</a>
 		<a href="/profile" class="mr-8 font-medium hover:underline">Profile</a>
 	</nav>
