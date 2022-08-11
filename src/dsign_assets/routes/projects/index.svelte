@@ -29,14 +29,14 @@
 
 		isAuthenticated = await authClient.isAuthenticated();
 
-		snap_store.update((snaps) => {
-			return {
-				isFetching: true,
-				snaps: {
-					...snaps.ok
-				}
-			};
-		});
+		if ($snap_store.snaps.length === 0) {
+			snap_store.update((snaps) => {
+				return {
+					isFetching: true,
+					snaps: snaps
+				};
+			});
+		}
 
 		if (isAuthenticated) {
 			const all_snaps = await $actor_snap_main.actor.get_all_snaps();
