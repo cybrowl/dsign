@@ -12,8 +12,7 @@
 
 	import { client } from '../store/client';
 	import { isAccountSettingsModalVisible } from '../store/modal';
-	import { local_storage_profile } from '../store/local_storage';
-	import { local_storage_remove } from '../store/local_storage';
+	import { local_storage_profile, local_storage_remove } from '../store/local_storage';
 
 	async function handleAvatarChange(event) {
 		let files = event.detail;

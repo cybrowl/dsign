@@ -19,7 +19,7 @@
 	} from '../../store/modal';
 
 	import { actor_snap_main, snap_store } from '../../store/actor_snap_main';
-	import { local_storage_projects } from '../store/local_storage';
+	import { local_storage_projects } from '../../store/local_storage';
 
 	let isAuthenticated = false;
 	let isEditMode = false;
@@ -40,11 +40,10 @@
 
 		if (isAuthenticated) {
 			const all_snaps = await $actor_snap_main.actor.get_all_snaps();
-			const all_snaps_count = all_snaps.length;
-
-			local_storage_projects.set({ all_snaps_count: all_snaps_count });
 
 			snap_store.set({ isFetching: false, snaps: [...all_snaps.ok] });
+
+			local_storage_projects.set({ all_snaps_count: all_snaps.ok.length || 1 });
 		} else {
 			window.location.href = '/';
 		}
@@ -107,7 +106,9 @@
 			class="col-start-2 col-end-12 grid grid-cols-4 
 					row-start-3 row-end-auto mx-4 gap-10 mt-10"
 		>
-			<SnapCard isLoadingSnap={true} snap={{ views: 0, likes: 0 }} />
+			{#each { length: $local_storage_projects.all_snaps_count } as _, i}
+				<SnapCard isLoadingSnap={true} snap={{ views: 0, likes: 0 }} />
+			{/each}
 		</div>
 	{/if}
 

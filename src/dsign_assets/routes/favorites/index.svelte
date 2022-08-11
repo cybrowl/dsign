@@ -35,6 +35,8 @@
 	{#if $isSnapCreationModalVisible}
 		<SnapCreationModal />
 	{/if}
+
+	<div class="h-screen" />
 </main>
 
 <style>
