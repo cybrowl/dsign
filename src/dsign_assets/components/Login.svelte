@@ -14,7 +14,7 @@
 	} from '../store/actor_profile_avatar_main';
 	import { createActor as create_actor_snap_main, actor_snap_main } from '../store/actor_snap_main';
 
-	import { client } from '../store/client';
+	import { auth_client } from '../store/client';
 	import { local_storage_remove } from '../store/local_storage';
 
 	const env = environment();
@@ -24,7 +24,7 @@
 		// on component load check if user logged in
 		let authClient = await AuthClient.create();
 
-		client.set(authClient);
+		auth_client.set(authClient);
 
 		let isAuthenticated = await authClient.isAuthenticated();
 
@@ -60,7 +60,7 @@
 			loggedIn: true,
 			actor: create_actor_username({
 				agentOptions: {
-					identity: $client.getIdentity()
+					identity: $auth_client.getIdentity()
 				}
 			})
 		}));
@@ -69,7 +69,7 @@
 			loggedIn: true,
 			actor: create_actor_profile({
 				agentOptions: {
-					identity: $client.getIdentity()
+					identity: $auth_client.getIdentity()
 				}
 			})
 		}));
@@ -78,7 +78,7 @@
 			loggedIn: true,
 			actor: create_actor_profile_avatar_main({
 				agentOptions: {
-					identity: $client.getIdentity()
+					identity: $auth_client.getIdentity()
 				}
 			})
 		}));
@@ -87,14 +87,14 @@
 			loggedIn: true,
 			actor: create_actor_snap_main({
 				agentOptions: {
-					identity: $client.getIdentity()
+					identity: $auth_client.getIdentity()
 				}
 			})
 		}));
 	}
 
 	function login() {
-		$client.login({
+		$auth_client.login({
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'
 				: 'http://localhost:8000/?canisterId=rwlgt-iiaaa-aaaaa-aaaaa-cai',

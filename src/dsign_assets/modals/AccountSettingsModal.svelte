@@ -10,7 +10,7 @@
 		actor_profile_avatar_main
 	} from '../store/actor_profile_avatar_main';
 
-	import { client } from '../store/client';
+	import { auth_client } from '../store/client';
 	import { isAccountSettingsModalVisible } from '../store/modal';
 	import { local_storage_profile, local_storage_remove } from '../store/local_storage';
 
@@ -43,13 +43,13 @@
 	}
 
 	async function handleLogOut() {
-		await $client.logout();
+		await $auth_client.logout();
 
 		actor_username.update(() => ({
 			loggedIn: false,
 			actor: create_actor_username({
 				agentOptions: {
-					identity: $client.getIdentity()
+					identity: $auth_client.getIdentity()
 				}
 			})
 		}));
@@ -58,7 +58,7 @@
 			loggedIn: false,
 			actor: create_actor_profile({
 				agentOptions: {
-					identity: $client.getIdentity()
+					identity: $auth_client.getIdentity()
 				}
 			})
 		}));
@@ -67,7 +67,7 @@
 			loggedIn: false,
 			actor: create_actor_profile_avatar_main({
 				agentOptions: {
-					identity: $client.getIdentity()
+					identity: $auth_client.getIdentity()
 				}
 			})
 		}));

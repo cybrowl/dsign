@@ -5,7 +5,8 @@
 
 	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
 	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
-	import Header from '../../components/Header.svelte';
+	import Login from './components/Login.svelte';
+	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import ProjectEditActionsBar from 'dsign-components/components/ProjectEditActionsBar.svelte';
 	import ProjectsTabs from 'dsign-components/components/ProjectsTabs.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
@@ -77,7 +78,9 @@
 
 <main class="grid grid-cols-12 gap-y-2">
 	<div class="col-start-2 col-end-12 mb-16">
-		<Header />
+		<PageNavigation>
+			<Login />
+		</PageNavigation>
 	</div>
 
 	{#if $isAccountSettingsModalVisible}

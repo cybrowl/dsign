@@ -2,7 +2,8 @@
 <script>
 	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
 	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
-	import Header from '../../components/Header.svelte';
+	import Login from './components/Login.svelte';
+	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
 	import {
@@ -18,7 +19,9 @@
 
 <main class="grid grid-cols-12 gap-y-2">
 	<div class="col-start-2 col-end-12 mb-24">
-		<Header />
+		<PageNavigation>
+			<Login />
+		</PageNavigation>
 	</div>
 
 	<!-- AccountSettingsModal -->

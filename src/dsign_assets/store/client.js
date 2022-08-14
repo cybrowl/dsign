@@ -1,3 +1,3 @@
 import { writable } from 'svelte/store';
 
-export const client = writable({});
+export const auth_client = writable({});
