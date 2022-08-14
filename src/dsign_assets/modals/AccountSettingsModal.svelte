@@ -10,7 +10,7 @@
 		actor_profile_avatar_main
 	} from '../store/actor_profile_avatar_main';
 
-	import { auth_client } from '../store/client';
+	import { auth_client } from '../store/auth_client';
 	import { isAccountSettingsModalVisible } from '../store/modal';
 	import { local_storage_profile, local_storage_remove } from '../store/local_storage';
 

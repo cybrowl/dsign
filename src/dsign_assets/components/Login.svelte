@@ -14,7 +14,7 @@
 	} from '../store/actor_profile_avatar_main';
 	import { createActor as create_actor_snap_main, actor_snap_main } from '../store/actor_snap_main';
 
-	import { auth_client } from '../store/client';
+	import { auth_client } from '../store/auth_client';
 	import { local_storage_remove } from '../store/local_storage';
 
 	const env = environment();

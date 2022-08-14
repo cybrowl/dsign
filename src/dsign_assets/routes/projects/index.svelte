@@ -5,7 +5,7 @@
 
 	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
 	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
-	import Login from './components/Login.svelte';
+	import Login from '../../components/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import ProjectEditActionsBar from 'dsign-components/components/ProjectEditActionsBar.svelte';
 	import ProjectsTabs from 'dsign-components/components/ProjectsTabs.svelte';
@@ -21,6 +21,7 @@
 
 	import { actor_snap_main, snap_store } from '../../store/actor_snap_main';
 	import { local_storage_projects } from '../../store/local_storage';
+	import { page_navigation } from '../../store/page_navigation';
 
 	let isAuthenticated = false;
 	let isEditMode = false;
@@ -78,7 +79,7 @@
 
 <main class="grid grid-cols-12 gap-y-2">
 	<div class="col-start-2 col-end-12 mb-16">
-		<PageNavigation>
+		<PageNavigation navItems={$page_navigation.navItems}>
 			<Login />
 		</PageNavigation>
 	</div>
