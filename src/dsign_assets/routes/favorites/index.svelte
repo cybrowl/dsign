@@ -12,6 +12,17 @@
 		isSnapCreationModalVisible
 	} from '../../store/modal';
 	import { page_navigation } from '../../store/page_navigation';
+
+	page_navigation.update(({ navItems }) => {
+		navItems.forEach((navItem) => {
+			navItem.isSelected = false;
+		});
+		navItems[2].isSelected = true;
+
+		return {
+			navItems: navItems
+		};
+	});
 </script>
 
 <svelte:head>

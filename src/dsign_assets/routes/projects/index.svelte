@@ -29,10 +29,23 @@
 	onMount(async () => {
 		let authClient = await AuthClient.create();
 
+		console.log('on mount', $snap_store.snaps);
+
 		isAuthenticated = await authClient.isAuthenticated();
 
+		page_navigation.update(({ navItems }) => {
+			navItems.forEach((navItem) => {
+				navItem.isSelected = false;
+			});
+			navItems[1].isSelected = true;
+
+			return {
+				navItems: navItems
+			};
+		});
+
 		if ($snap_store.snaps.length === 0) {
-			snap_store.update((snaps) => {
+			snap_store.update(({ snaps }) => {
 				return {
 					isFetching: true,
 					snaps: snaps
@@ -117,7 +130,7 @@
 	{/if}
 
 	<!-- No Snaps Found -->
-	{#if $snap_store.snaps.length === 0}
+	{#if $snap_store.snaps.length === 0 && $snap_store.isFetching === false}
 		<div class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4 mt-10">
 			<SnapCardEmpty />
 		</div>

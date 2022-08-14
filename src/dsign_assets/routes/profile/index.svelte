@@ -1,22 +1,23 @@
+<!-- src/routes/profile.svelte -->
 <script>
-	import AccountCreationModal from '../modals/AccountCreationModal.svelte';
-	import AccountSettingsModal from '../modals/AccountSettingsModal.svelte';
-	import Login from '../components/Login.svelte';
+	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
+	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
+	import Login from '../../components/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
-	import SnapCreationModal from '../modals/SnapCreationModal.svelte';
+	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
 	import {
 		isAccountSettingsModalVisible,
 		isAccountCreationModalVisible,
 		isSnapCreationModalVisible
-	} from '../store/modal';
-	import { page_navigation } from '../store/page_navigation';
+	} from '../../store/modal';
+	import { page_navigation } from '../../store/page_navigation';
 
 	page_navigation.update(({ navItems }) => {
 		navItems.forEach((navItem) => {
 			navItem.isSelected = false;
 		});
-		navItems[0].isSelected = true;
+		navItems[3].isSelected = true;
 
 		return {
 			navItems: navItems
@@ -25,7 +26,7 @@
 </script>
 
 <svelte:head>
-	<title>DSign</title>
+	<title>Profile</title>
 </svelte:head>
 
 <main class="grid grid-cols-12 gap-y-2">
@@ -49,6 +50,8 @@
 	{#if $isSnapCreationModalVisible}
 		<SnapCreationModal />
 	{/if}
+
+	<div class="h-screen" />
 </main>
 
 <style>
