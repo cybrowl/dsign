@@ -131,7 +131,10 @@
 
 	<!-- No Snaps Found -->
 	{#if $snap_store.snaps.length === 0 && $snap_store.isFetching === false}
-		<div class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4 mt-10">
+		<div
+			class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4 mt-2
+		"
+		>
 			<SnapCardEmpty />
 		</div>
 	{/if}
