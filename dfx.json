@@ -18,6 +18,20 @@
       "main": "src/service_assets/AssetsMain.mo",
       "type": "motoko",
       "dependencies": [
+        "logger", "username", "assets_file_chunks"
+      ]
+    },
+    "assets": {
+      "main": "src/service_assets/Assets.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger", "assets_file_chunks"
+      ]
+    },
+    "assets_file_chunks": {
+      "main": "src/service_assets/FileAssetChunks.mo",
+      "type": "motoko",
+      "dependencies": [
         "logger"
       ]
     },
