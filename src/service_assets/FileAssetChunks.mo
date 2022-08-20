@@ -45,4 +45,6 @@ actor FileAssetChunks = {
             };
         };
     };
+
+    //TODO: Add a delete_chunks function
 };

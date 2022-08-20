@@ -1,9 +1,6 @@
 import Principal "mo:base/Principal";
 
 module {
-
-    public type HeaderField = (Text, Text);
-
     public type Chunk = {
         data  : Blob;
         file_name : Text;
@@ -15,16 +12,14 @@ module {
     };
 
     public type Asset = {
-        encoding: AssetEncoding;
         content_type: Text;
+        created: Int;
+        data_chunks : [Blob];
+        owner: Principal;
+        total_length   : Nat;
     };
 
-    public type AssetEncoding = {
-        modified       : Int;
-        content_chunks : [Blob];
-        total_length   : Nat;
-        certified      : Bool;
-    };
+    public type HeaderField = (Text, Text);
 
     public type HttpRequest = {
         url : Text;
@@ -34,9 +29,9 @@ module {
     };
 
     public type HttpResponse = {
-        body : [Nat8];
+        body : [Blob];
         headers : [HeaderField];
-        status_code : Nat16;
+        status_code : Nat8;
         streaming_strategy : ?StreamingStrategy;
     };
 
