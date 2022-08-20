@@ -1,16 +1,23 @@
 import Array "mo:base/Array";
 import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
+import Rand "mo:base/Random";
+import Source "mo:ulid/Source";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
+import ULID "mo:ulid/ULID";
+import XorShift "mo:rand/XorShift";
 
 import FileAssetChunks "canister:assets_file_chunks";
 
 import Types "./types";
 
-actor class Assets() = {
-     private let assets: HashMap.HashMap<Text, Types.Asset> = HashMap.HashMap<Text, Types.Asset>(0, Text.equal, Text.hash);
-    
+actor class Assets() = {    
+    private let rr = XorShift.toReader(XorShift.XorShift64(null));
+    private let se = Source.Source(rr, 0);
+
+    private let assets: HashMap.HashMap<Text, Types.Asset> = HashMap.HashMap<Text, Types.Asset>(0, Text.equal, Text.hash);
+
     public query func version() : async Text {
         return "0.0.1";
     };
@@ -55,6 +62,9 @@ actor class Assets() = {
     public shared({caller}) func create_asset_from_chunks(chunk_ids: [Nat], content_type: Text, principal: Principal) : async () {
         // todo: call file asset chunks to get the chunks
         var asset : Types.Asset = await get_chunks_to_create_asset(chunk_ids, content_type, principal);
+
+        let asset_id : Text = ULID.toText(se.new());
+        assets.put(asset_id, asset);
     };
 
 };
