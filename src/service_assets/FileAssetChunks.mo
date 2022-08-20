@@ -31,7 +31,7 @@ actor FileAssetChunks = {
         return {chunk_id = chunk_id_count};
     };
 
-    public query func get_chunk(chunk_id: Nat, principal: Principal) : async Result.Result<Types.Chunk, Text> {
+    public query func get_chunk(chunk_id: Nat, principal: Principal) : async Result.Result<Types.AssetChunk, Text> {
         switch (chunks.get(chunk_id)) {
             case (?chunk) {
                 if (chunk.owner != principal) {
