@@ -2,6 +2,7 @@ import Array "mo:base/Array";
 import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
 import Rand "mo:base/Random";
+import Result "mo:base/Result";
 import Source "mo:ulid/Source";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
@@ -22,25 +23,26 @@ actor class Assets() = {
         return "0.0.1";
     };
 
-    private func get_chunks_to_create_asset(chunk_ids: [Nat], content_type: Text, principal: Principal) : async Types.Asset {
+    private func get_chunks_to_create_asset(args : Types.CreateAssetArgs) : async Result.Result<Types.Asset, Text> {
         var asset_data : [Blob] = [];
-        var has_looped_once : Bool = false;
+        var all_chunks_match_owner : Bool = true;
 
-        var created : Int = 1;
-        var owner : Principal = principal;
-        var total_length : Nat = 0;
+        var created : Int = 0;
+        var owner : Principal = args.principal;
+        var data_chunks_size : Nat = 0;
 
-        for (chunk_id in chunk_ids.vals()) {
-            switch (await FileAssetChunks.get_chunk(chunk_id, principal)) {
+        // get all chunks and check if onwers match
+        for (chunk_id in args.chunk_ids.vals()) {
+            switch (await FileAssetChunks.get_chunk(chunk_id, args.principal)) {
                 case(#ok chunk){
                     asset_data := Array.append<Blob>(asset_data, [chunk.data]);
 
-                    if (has_looped_once == false) {
-                        has_looped_once := true;
-
-                        created := chunk.created;
-                        owner := chunk.owner;
+                    if (owner != chunk.owner) {
+                        all_chunks_match_owner := false;
                     };
+
+                    created := chunk.created;
+                    owner := chunk.owner;
                 };
                 case(#err err){
                    //TODO: log error
@@ -48,23 +50,32 @@ actor class Assets() = {
             };
         };
 
+        if (all_chunks_match_owner == false) {
+            return #err("All Chunks Must Match Owner");
+        };
+
         let asset : Types.Asset  = {
-            content_type = content_type;
+            content_type = args.content_type;
             created = created;
             data_chunks = asset_data;
             owner = owner;
-            total_length = asset_data.size();
+            data_chunks_size = asset_data.size();
         };
 
-        return asset;
+        return #ok(asset);
     };
 
-    public shared({caller}) func create_asset_from_chunks(chunk_ids: [Nat], content_type: Text, principal: Principal) : async () {
-        // todo: call file asset chunks to get the chunks
-        var asset : Types.Asset = await get_chunks_to_create_asset(chunk_ids, content_type, principal);
+    public shared({caller}) func create_asset_from_chunks(args : Types.CreateAssetArgs) : async Result.Result<Types.Asset, Text> {
+        switch (await get_chunks_to_create_asset(args)) {
+            case(#ok asset){
+                let asset_id : Text = ULID.toText(se.new());
+                assets.put(asset_id, asset);
 
-        let asset_id : Text = ULID.toText(se.new());
-        assets.put(asset_id, asset);
+                #ok(asset);
+            };
+            case(#err err){
+                #err(err);
+            };
+        };
     };
-
 };

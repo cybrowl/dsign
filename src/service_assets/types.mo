@@ -2,21 +2,27 @@ import Principal "mo:base/Principal";
 
 module {
     public type Chunk = {
-        data  : Blob;
+        data : Blob;
         file_name : Text;
     };
 
     public type AssetChunk = Chunk and {
-        created: Int;
-        owner: Principal;
+        created : Int;
+        owner : Principal;
     };
 
     public type Asset = {
-        content_type: Text;
-        created: Int;
+        content_type : Text;
+        created : Int;
         data_chunks : [Blob];
-        owner: Principal;
-        total_length   : Nat;
+        owner : Principal;
+        data_chunks_size : Nat;
+    };
+
+    public type CreateAssetArgs = {
+        chunk_ids : [Nat];
+        content_type : Text;
+        principal : Principal;
     };
 
     public type HeaderField = (Text, Text);
