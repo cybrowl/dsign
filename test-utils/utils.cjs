@@ -47,7 +47,14 @@ function generate_images() {
 	return images;
 }
 
+function generate_figma_asset() {
+	const figma_asset_buffer = fs.readFileSync('test-utils/assets/dsign_stage_1.fig');
+
+	return figma_asset_buffer;
+}
+
 module.exports = {
 	request_image_canister,
-	generate_images
+	generate_images,
+	generate_figma_asset
 };

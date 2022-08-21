@@ -6,6 +6,8 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Time "mo:base/Time";
 
+import Debug "mo:base/Debug";
+
 import Types "./types";
 
 actor FileAssetChunks = {
@@ -16,7 +18,7 @@ actor FileAssetChunks = {
         return "0.0.1";
     };
 
-    public shared ({caller}) func create_chunk(chunk: Types.Chunk) : async { chunk_id : Nat} {
+    public shared ({caller}) func create_chunk(chunk: Types.Chunk) : async Nat {
         chunk_id_count := chunk_id_count + 1;
 
         let asset_chunk : Types.AssetChunk = {
@@ -28,7 +30,7 @@ actor FileAssetChunks = {
 
         chunks.put(chunk_id_count, asset_chunk);
 
-        return {chunk_id = chunk_id_count};
+        return chunk_id_count;
     };
 
     public query func get_chunk(chunk_id: Nat, principal: Principal) : async Result.Result<Types.AssetChunk, Text> {

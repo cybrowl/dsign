@@ -26,12 +26,13 @@ let mishicat_identity = Ed25519KeyIdentity.generate();
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
+const { generate_figma_asset } = require('../test-utils/utils.cjs');
 
 let assets_main_actors = {};
 let assets_actors = {};
 let assets_file_chunks_actors = {};
 
-test('Assets Main: version()', async function (t) {
+test('AssetsMain.version()', async function (t) {
 	assets_main_actors.mishicat = await get_actor(
 		assets_main_canister_id,
 		assets_main_interface,
@@ -49,4 +50,42 @@ test('Assets Main: version()', async function (t) {
 
 	t.equal(typeof response, 'string');
 	t.equal(response, '0.0.1');
+});
+
+test('AssetsMain.create_chunk():: upload chunks from file to canister', async function (t) {
+	const uploadChunk = async ({ chunk, file_name }) => {
+		return assets_file_chunks_actors.mishicat.create_chunk({
+			data: [...chunk],
+			file_name: file_name
+		});
+	};
+
+	const figma_asset_buffer = generate_figma_asset();
+	const figma_asset_unit8Array = new Uint8Array(figma_asset_buffer);
+
+	const file_name = 'dsign_stage_1.fig';
+
+	const promises = [];
+	const chunkSize = 2000000;
+
+	for (let start = 0; start < figma_asset_unit8Array.length; start += chunkSize) {
+		const chunk = figma_asset_unit8Array.slice(start, start + chunkSize);
+
+		promises.push(
+			uploadChunk({
+				file_name,
+				chunk
+			})
+		);
+	}
+
+	const chunkIds = await Promise.all(promises);
+	console.log('chunkIds: ', chunkIds);
+
+	const first_chunk = await assets_file_chunks_actors.mishicat.get_chunk(
+		chunkIds[0],
+		mishicat_identity.getPrincipal()
+	);
+
+	console.log('first_chunk: ', first_chunk);
 });

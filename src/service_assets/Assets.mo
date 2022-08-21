@@ -23,6 +23,7 @@ actor class Assets() = {
         return "0.0.1";
     };
 
+    // ------------------------- Create Asset -------------------------
     private func get_chunks_to_create_asset(args : Types.CreateAssetArgs) : async Result.Result<Types.Asset, Text> {
         var asset_data : [Blob] = [];
         var all_chunks_match_owner : Bool = true;
