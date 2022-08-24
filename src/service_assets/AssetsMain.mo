@@ -1,13 +1,15 @@
 import Blob "mo:base/Blob";
 import Cycles "mo:base/ExperimentalCycles";
-import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
+import Result "mo:base/Result";
 import Text "mo:base/Text";
 
 import Assets "Assets";
 import Logger "canister:logger";
 import Username "canister:username";
+
+import Types "./types";
 
 actor AssetsMain = {
     let ACTOR_NAME : Text = "AssetsMain";
@@ -20,17 +22,38 @@ actor AssetsMain = {
         return "0.0.1";
     };
 
-    public shared({caller}) func create_asset_from_chunks(chunk_ids: [Nat]) : async () {
-        // todo: call asset canister to create asset
+    public shared({caller}) func create_asset_from_chunks(main_args : Types.CreateAssetMainArgs) : async Result.Result<Types.AssetMin, Text> {
+        let assetsActor = actor (asset_canister_id) : Types.AssetsActor;
+
+        let args : Types.CreateAssetArgs = {
+            chunk_ids = main_args.chunk_ids;
+            content_type = main_args.content_type;
+            principal = caller;
+        };
+
+        let asset = await assetsActor.create_asset_from_chunks(args);
+
+        return asset;
     };
 
     // ------------------------- Canister Management -------------------------
+    public shared (message) func whoami() : async Principal {
+        return message.caller;
+    };
+
+    private func id() : async Principal {
+        return await whoami();
+    };
+
     private func create_asset_canister() : async () {
         let tags = [ACTOR_NAME, "create_asset_canister"];
 
         // create canister
+        let assets_main_canister_id = await id();
+        await Logger.log_event(tags, debug_show(("assets_main_canister_id: ", assets_main_canister_id)));
+
         Cycles.add(CYCLE_AMOUNT);
-        let asset_actor = await Assets.Assets();
+        let asset_actor = await Assets.Assets(assets_main_canister_id);
 
         let principal = Principal.fromActor(asset_actor);
         let asset_canister_id_ = Principal.toText(principal);

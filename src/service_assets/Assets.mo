@@ -1,4 +1,5 @@
 import Array "mo:base/Array";
+import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
 import Rand "mo:base/Random";
@@ -13,7 +14,7 @@ import FileAssetChunks "canister:assets_file_chunks";
 
 import Types "./types";
 
-actor class Assets() = {    
+actor class Assets(controller: Principal) = {    
     private let rr = XorShift.toReader(XorShift.XorShift64(null));
     private let se = Source.Source(rr, 0);
 
@@ -24,15 +25,20 @@ actor class Assets() = {
     };
 
     // ------------------------- Create Asset -------------------------
-    private func get_chunks_to_create_asset(args : Types.CreateAssetArgs) : async Result.Result<Types.Asset, Text> {
+    public shared({caller}) func create_asset_from_chunks(args : Types.CreateAssetArgs) : async Result.Result<Types.AssetMin, Text> {
         var asset_data : [Blob] = [];
         var all_chunks_match_owner : Bool = true;
 
         var created : Int = 0;
         var owner : Principal = args.principal;
         var data_chunks_size : Nat = 0;
+        let asset_id : Text = ULID.toText(se.new());
 
-        // get all chunks and check if onwers match
+        if (controller != caller) {
+            return #err("Not Authorized");
+        };
+
+        // get all chunks and check if owners match
         for (chunk_id in args.chunk_ids.vals()) {
             switch (await FileAssetChunks.get_chunk(chunk_id, args.principal)) {
                 case(#ok chunk){
@@ -63,20 +69,15 @@ actor class Assets() = {
             data_chunks_size = asset_data.size();
         };
 
-        return #ok(asset);
-    };
+        assets.put(asset_id, asset);
 
-    public shared({caller}) func create_asset_from_chunks(args : Types.CreateAssetArgs) : async Result.Result<Types.Asset, Text> {
-        switch (await get_chunks_to_create_asset(args)) {
-            case(#ok asset){
-                let asset_id : Text = ULID.toText(se.new());
-                assets.put(asset_id, asset);
-
-                #ok(asset);
-            };
-            case(#err err){
-                #err(err);
-            };
+        let asset_min : Types.AssetMin = {
+            content_type = asset.content_type;
+            created = asset.created;
+            owner = asset.owner;
+            data_chunks_size = asset.data_chunks_size;
         };
+
+        #ok(asset_min);
     };
 };

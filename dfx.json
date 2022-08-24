@@ -32,7 +32,7 @@
       "main": "src/service_assets/FileAssetChunks.mo",
       "type": "motoko",
       "dependencies": [
-        "logger"
+        "logger", "username"
       ]
     },
     "profile": {

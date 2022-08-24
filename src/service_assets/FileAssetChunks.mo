@@ -8,6 +8,8 @@ import Time "mo:base/Time";
 
 import Debug "mo:base/Debug";
 
+import Username "canister:username";
+
 import Types "./types";
 
 actor FileAssetChunks = {
@@ -19,6 +21,8 @@ actor FileAssetChunks = {
     };
 
     public shared ({caller}) func create_chunk(chunk: Types.Chunk) : async Nat {
+        //TODO: check username to stop spam
+        
         chunk_id_count := chunk_id_count + 1;
 
         let asset_chunk : Types.AssetChunk = {

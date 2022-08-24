@@ -32,6 +32,8 @@ let assets_main_actors = {};
 let assets_actors = {};
 let assets_file_chunks_actors = {};
 
+let chunk_ids = [];
+
 test('AssetsMain.version()', async function (t) {
 	assets_main_actors.mishicat = await get_actor(
 		assets_main_canister_id,
@@ -52,7 +54,7 @@ test('AssetsMain.version()', async function (t) {
 	t.equal(response, '0.0.1');
 });
 
-test('AssetsMain.create_chunk():: upload chunks from file to canister', async function (t) {
+test('FileAssetChunks.create_chunk():: upload chunks from file to canister', async function (t) {
 	const uploadChunk = async ({ chunk, file_name }) => {
 		return assets_file_chunks_actors.mishicat.create_chunk({
 			data: [...chunk],
@@ -79,13 +81,33 @@ test('AssetsMain.create_chunk():: upload chunks from file to canister', async fu
 		);
 	}
 
-	const chunkIds = await Promise.all(promises);
-	console.log('chunkIds: ', chunkIds);
+	chunk_ids = await Promise.all(promises);
+});
 
+test('FileAssetChunks.get_chunk():: initial chunk', async function (t) {
 	const first_chunk = await assets_file_chunks_actors.mishicat.get_chunk(
-		chunkIds[0],
+		chunk_ids[0],
 		mishicat_identity.getPrincipal()
 	);
 
 	console.log('first_chunk: ', first_chunk);
+});
+
+test('Assets.create_asset_from_chunks():: ', async function (t) {
+	const asset_a = await assets_actors.mishicat.create_asset_from_chunks({
+		chunk_ids,
+		content_type: 'image/png',
+		principal: mishicat_identity.getPrincipal()
+	});
+
+	console.log('asset_a: ', asset_a);
+});
+
+test('AssetsMain.create_asset_from_chunks():: ', async function (t) {
+	const asset = await assets_main_actors.mishicat.create_asset_from_chunks({
+		chunk_ids,
+		content_type: 'image/png'
+	});
+
+	console.log('asset: ', asset);
 });

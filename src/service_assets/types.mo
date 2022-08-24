@@ -1,4 +1,5 @@
 import Principal "mo:base/Principal";
+import Result "mo:base/Result";
 
 module {
     public type Chunk = {
@@ -17,6 +18,18 @@ module {
         data_chunks : [Blob];
         owner : Principal;
         data_chunks_size : Nat;
+    };
+
+    public type AssetMin = {
+        content_type : Text;
+        created : Int;
+        owner : Principal;
+        data_chunks_size : Nat;
+    };
+
+    public type CreateAssetMainArgs = {
+        chunk_ids : [Nat];
+        content_type : Text;
     };
 
     public type CreateAssetArgs = {
@@ -57,5 +70,9 @@ module {
     public type StreamingCallbackHttpResponse = {
         body : Blob;
         token: ?StreamingCallbackToken;
+    };
+
+    public type AssetsActor = actor {
+        create_asset_from_chunks : shared (CreateAssetArgs) -> async Result.Result<AssetMin, Text>;
     };
 }
