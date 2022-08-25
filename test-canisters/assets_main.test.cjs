@@ -82,28 +82,37 @@ test('FileAssetChunks.create_chunk():: upload chunks from file to canister', asy
 	}
 
 	chunk_ids = await Promise.all(promises);
+
+	const hasChunkIds = chunk_ids.length > 3;
+	t.equal(hasChunkIds, true);
 });
 
-test('FileAssetChunks.get_chunk():: initial chunk', async function (t) {
-	const first_chunk = await assets_file_chunks_actors.mishicat.get_chunk(
+test('FileAssetChunks.get_chunk():: return #ok=> first chunk', async function (t) {
+	const response = await assets_file_chunks_actors.mishicat.get_chunk(
 		chunk_ids[0],
 		mishicat_identity.getPrincipal()
 	);
 
-	console.log('first_chunk: ', first_chunk);
+	const hasCreatedDate = response.ok.created.toString().length > 5;
+	const hasOwner = response.ok.owner.toString().length > 5;
+	const hasData = response.ok.data.length > 10;
+
+	t.equal(hasCreatedDate, true);
+	t.equal(hasOwner, true);
+	t.equal(hasData, true);
 });
 
-test('Assets.create_asset_from_chunks():: ', async function (t) {
-	const asset_a = await assets_actors.mishicat.create_asset_from_chunks({
+test('Assets.create_asset_from_chunks():: return #err=> Not Authorized', async function (t) {
+	const response = await assets_actors.mishicat.create_asset_from_chunks({
 		chunk_ids,
 		content_type: 'image/png',
 		principal: mishicat_identity.getPrincipal()
 	});
 
-	console.log('asset_a: ', asset_a);
+	t.deepEqual(response.err, 'Not Authorized');
 });
 
-test('AssetsMain.create_asset_from_chunks():: ', async function (t) {
+test('AssetsMain.create_asset_from_chunks():: return #ok=> asset', async function (t) {
 	const asset = await assets_main_actors.mishicat.create_asset_from_chunks({
 		chunk_ids,
 		content_type: 'image/png'
