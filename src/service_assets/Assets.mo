@@ -34,7 +34,8 @@ actor class Assets(controller: Principal) = this {
 
         var created : Int = 0;
         var owner : Principal = args.principal;
-        var data_chunks_size : Nat = 0;
+        var file_name : Text = "";
+        let data_chunks_size : Nat = 0;
         let asset_id : Text = ULID.toText(se.new());
 
         if (controller != caller) {
@@ -53,6 +54,7 @@ actor class Assets(controller: Principal) = this {
 
                     created := chunk.created;
                     owner := chunk.owner;
+                    file_name := chunk.file_name;
                 };
                 case(#err err){
                    //TODO: log error
@@ -73,6 +75,7 @@ actor class Assets(controller: Principal) = this {
             content_type = args.content_type;
             created = created;
             data_chunks = asset_data;
+            file_name = file_name;
             owner = owner;
             data_chunks_size = asset_data.size();
         };
@@ -84,6 +87,7 @@ actor class Assets(controller: Principal) = this {
             canister_id = canister_id;
             content_type = asset.content_type;
             created = asset.created;
+            file_name = file_name;
             owner = asset.owner;
             data_chunks_size = asset.data_chunks_size;
         };
@@ -104,15 +108,17 @@ actor class Assets(controller: Principal) = this {
             };
         };
 
-        
         let asset_id = Utils.get_asset_id(request.url);
 
         switch (assets.get(asset_id)) {
             case (? asset) {
+                let file_name = Text.concat("attachment; filename=", asset.file_name);
+
                 return {
                     body = Blob.toArray(asset.data_chunks[0]);
                     headers = [ ("Content-Type", asset.content_type),
                                 ("accept-ranges", "bytes"),
+                                ("Content-Disposition", file_name),
                                 ("cache-control", "private, max-age=0") ];
                     status_code = 200;
                     streaming_strategy = create_strategy({

@@ -18,6 +18,7 @@ module {
         content_type : Text;
         created : Int;
         data_chunks : [Blob];
+        file_name : Text;
         owner : Principal;
         data_chunks_size : Nat;
     };
@@ -27,6 +28,7 @@ module {
         canister_id : Text;
         content_type : Text;
         created : Int;
+        file_name : Text;
         owner : Principal;
         data_chunks_size : Nat;
     };
