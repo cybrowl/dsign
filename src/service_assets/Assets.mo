@@ -97,16 +97,7 @@ actor class Assets(controller: Principal) = this {
 
     // ------------------------- Get Asset -------------------------
     public shared query({caller}) func http_request(request : Types.HttpRequest) : async Types.HttpResponse {
-        let NOT_FOUND : [Nat8] = Blob.toArray(Text.encodeUtf8("Permission denied. Could not perform this operation"));
-
-        if (request.method != "GET") {
-            return {
-                body = NOT_FOUND;
-                headers = [];
-                status_code = 403;
-                streaming_strategy = null;
-            };
-        };
+        let NOT_FOUND : [Nat8] = Blob.toArray(Text.encodeUtf8("Asset Not Found"));
 
         let asset_id = Utils.get_asset_id(request.url);
 
@@ -172,7 +163,7 @@ actor class Assets(controller: Principal) = this {
     ) : async Types.StreamingCallbackHttpResponse {
 
         switch (assets.get(st.asset_id)) {
-            case (null) throw Error.reject("key not found: " # st.asset_id);
+            case (null) throw Error.reject("asset_id not found: " # st.asset_id);
             case (? asset) {
                 return {
                     token = create_token({
