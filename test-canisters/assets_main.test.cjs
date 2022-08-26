@@ -26,7 +26,7 @@ let mishicat_identity = Ed25519KeyIdentity.generate();
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
-const { generate_figma_asset } = require('../test-utils/utils.cjs');
+const { generate_large_img_asset } = require('../test-utils/utils.cjs');
 
 let assets_main_actors = {};
 let assets_actors = {};
@@ -62,7 +62,7 @@ test('FileAssetChunks.create_chunk():: upload chunks from file to canister', asy
 		});
 	};
 
-	const figma_asset_buffer = generate_figma_asset();
+	const figma_asset_buffer = generate_large_img_asset();
 	const figma_asset_unit8Array = new Uint8Array(figma_asset_buffer);
 
 	const file_name = 'dsign_stage_1.fig';
@@ -83,7 +83,7 @@ test('FileAssetChunks.create_chunk():: upload chunks from file to canister', asy
 
 	chunk_ids = await Promise.all(promises);
 
-	const hasChunkIds = chunk_ids.length > 3;
+	const hasChunkIds = chunk_ids.length > 2;
 	t.equal(hasChunkIds, true);
 });
 
@@ -113,10 +113,18 @@ test('Assets.create_asset_from_chunks():: return #err=> Not Authorized', async f
 });
 
 test('AssetsMain.create_asset_from_chunks():: return #ok=> asset', async function (t) {
-	const asset = await assets_main_actors.mishicat.create_asset_from_chunks({
+	const response = await assets_main_actors.mishicat.create_asset_from_chunks({
 		chunk_ids,
 		content_type: 'image/png'
 	});
 
-	console.log('asset: ', asset);
+	console.log('response: ', response);
+
+	const hasCreatedDate = response.ok.created.toString().length > 5;
+	const hasOwner = response.ok.owner.toString().length > 5;
+	const hasContentType = response.ok.content_type.length > 3;
+
+	t.equal(hasCreatedDate, true);
+	t.equal(hasOwner, true);
+	t.equal(hasContentType, true);
 });

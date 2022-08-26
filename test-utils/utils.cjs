@@ -53,8 +53,15 @@ function generate_figma_asset() {
 	return figma_asset_buffer;
 }
 
+function generate_large_img_asset() {
+	const large_img_asset_buffer = fs.readFileSync('test-utils/images/storm.jpeg');
+
+	return large_img_asset_buffer;
+}
+
 module.exports = {
 	request_image_canister,
 	generate_images,
-	generate_figma_asset
+	generate_figma_asset,
+	generate_large_img_asset
 };

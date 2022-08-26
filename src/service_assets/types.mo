@@ -13,6 +13,8 @@ module {
     };
 
     public type Asset = {
+        id : Text;
+        canister_id : Text;
         content_type : Text;
         created : Int;
         data_chunks : [Blob];
@@ -21,6 +23,8 @@ module {
     };
 
     public type AssetMin = {
+        id : Text;
+        canister_id : Text;
         content_type : Text;
         created : Int;
         owner : Principal;
@@ -50,8 +54,14 @@ module {
     public type HttpResponse = {
         body : [Blob];
         headers : [HeaderField];
-        status_code : Nat8;
+        status_code : Nat16;
         streaming_strategy : ?StreamingStrategy;
+    };
+
+    public type CreateStrategyArgs = {
+        asset_id : Text;
+        chunk_index : Nat;
+        data_chunks_size : Nat;
     };
 
     public type StreamingStrategy = {
@@ -62,8 +72,8 @@ module {
     };
 
     public type StreamingCallbackToken = {
-        key : Text;
-        index : Nat;
+        asset_id : Text;
+        chunk_index : Nat;
         content_encoding : Text;
     };
 

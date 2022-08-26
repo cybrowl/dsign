@@ -1,5 +1,7 @@
 import Array "mo:base/Array";
+import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
+import Error "mo:base/Error";
 import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
 import Rand "mo:base/Random";
@@ -12,9 +14,10 @@ import XorShift "mo:rand/XorShift";
 
 import FileAssetChunks "canister:assets_file_chunks";
 
+import Utils "./utils";
 import Types "./types";
 
-actor class Assets(controller: Principal) = {    
+actor class Assets(controller: Principal) = this {    
     private let rr = XorShift.toReader(XorShift.XorShift64(null));
     private let se = Source.Source(rr, 0);
 
@@ -61,7 +64,12 @@ actor class Assets(controller: Principal) = {
             return #err("All Chunks Must Match Owner");
         };
 
+        let self = Principal.fromActor(this);
+        let canister_id : Text = Principal.toText(self);
+
         let asset : Types.Asset  = {
+            id = asset_id;
+            canister_id = canister_id;
             content_type = args.content_type;
             created = created;
             data_chunks = asset_data;
@@ -72,6 +80,8 @@ actor class Assets(controller: Principal) = {
         assets.put(asset_id, asset);
 
         let asset_min : Types.AssetMin = {
+            id = asset_id;
+            canister_id = canister_id;
             content_type = asset.content_type;
             created = asset.created;
             owner = asset.owner;
@@ -79,5 +89,94 @@ actor class Assets(controller: Principal) = {
         };
 
         #ok(asset_min);
+    };
+
+    // ------------------------- Get Asset -------------------------
+    public shared query({caller}) func http_request(request : Types.HttpRequest) : async Types.HttpResponse {
+        let NOT_FOUND : Blob = Blob.fromArray([0]);
+
+        if (request.method != "GET") {
+            return {
+                body = [NOT_FOUND];
+                headers = [];
+                status_code = 403;
+                streaming_strategy = null;
+            };
+        };
+
+        
+        let asset_id = Utils.get_asset_id(request.url);
+
+        switch (assets.get(asset_id)) {
+            case (? asset) {
+                return {
+                    body = [asset.data_chunks[0]];
+                    headers = [ ("Content-Type", asset.content_type),
+                                ("accept-ranges", "bytes"),
+                                ("cache-control", "private, max-age=0") ];
+                    status_code = 200;
+                    streaming_strategy = create_strategy({
+                        asset_id = asset_id;
+                        chunk_index = 0;
+                        data_chunks_size = asset.data_chunks_size;
+                    });
+                };
+            };
+            case _ {
+                return {
+                    body = [NOT_FOUND];
+                    headers = [];
+                    status_code = 404;
+                    streaming_strategy = null;
+                };
+            };
+        };
+    };
+
+    private func create_strategy(args : Types.CreateStrategyArgs) : ?Types.StreamingStrategy {
+        switch (create_token(args)) {
+            case (null) { null };
+            case (? token) {
+                let self = Principal.fromActor(this);
+                let canister_id : Text = Principal.toText(self);
+                let canister = actor (canister_id) : actor { http_request_streaming_callback : shared () -> async () };
+
+                return ?#Callback({
+                    token;
+                    callback = canister.http_request_streaming_callback;
+                });
+            };
+        };
+    };
+
+    private func create_token(args : Types.CreateStrategyArgs) : ?Types.StreamingCallbackToken {
+        if (args.chunk_index + 1 >= args.data_chunks_size) {
+            null;
+        } else {
+            ?{
+                asset_id = args.asset_id;
+                chunk_index = args.chunk_index + 1;
+                content_encoding = "gzip";
+            };
+        };
+    };
+
+    public shared query({caller}) func http_request_streaming_callback(
+        st : Types.StreamingCallbackToken,
+    ) : async Types.StreamingCallbackHttpResponse {
+
+        switch (assets.get(st.asset_id)) {
+            case (null) throw Error.reject("key not found: " # st.asset_id);
+            case (? asset) {
+                return {
+                    token = create_token({
+                        asset_id = st.asset_id;
+                        chunk_index = st.chunk_index;
+                        data_chunks_size = asset.data_chunks_size;
+                    });
+                    body = asset.data_chunks[st.chunk_index];
+                };
+            };
+        };
     };
 };
