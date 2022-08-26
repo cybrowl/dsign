@@ -52,7 +52,7 @@ module {
     };
 
     public type HttpResponse = {
-        body : [Blob];
+        body : [Nat8];
         headers : [HeaderField];
         status_code : Nat16;
         streaming_strategy : ?StreamingStrategy;
