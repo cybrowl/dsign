@@ -14,21 +14,22 @@ import XorShift "mo:rand/XorShift";
 
 import FileAssetChunks "canister:assets_file_chunks";
 
-import Utils "./utils";
 import Types "./types";
+
+import Utils "./utils";
 
 actor class Assets(controller: Principal) = this {    
     private let rr = XorShift.toReader(XorShift.XorShift64(null));
     private let se = Source.Source(rr, 0);
 
-    private let assets: HashMap.HashMap<Text, Types.Asset> = HashMap.HashMap<Text, Types.Asset>(0, Text.equal, Text.hash);
+    private let assets : HashMap.HashMap<Text, Types.Asset> = HashMap.HashMap<Text, Types.Asset>(0, Text.equal, Text.hash);
 
     public query func version() : async Text {
         return "0.0.1";
     };
 
     // ------------------------- Create Asset -------------------------
-    public shared({caller}) func create_asset_from_chunks(args : Types.CreateAssetArgs) : async Result.Result<Types.AssetMin, Text> {
+    public shared({caller}) func create_asset_from_chunks(args : Types.CreateAssetArgs) : async Result.Result<Text, Text> {
         var asset_data : [Blob] = [];
         var all_chunks_match_owner : Bool = true;
 
@@ -73,6 +74,7 @@ actor class Assets(controller: Principal) = this {
             id = asset_id;
             canister_id = canister_id;
             content_type = args.content_type;
+            is_public = args.is_public;
             created = created;
             data_chunks = asset_data;
             file_name = file_name;
@@ -82,17 +84,13 @@ actor class Assets(controller: Principal) = this {
 
         assets.put(asset_id, asset);
 
-        let asset_min : Types.AssetMin = {
-            id = asset_id;
+        let asset_url = Utils.generate_asset_url({
+            asset_id = asset_id;
             canister_id = canister_id;
-            content_type = asset.content_type;
-            created = asset.created;
-            file_name = file_name;
-            owner = asset.owner;
-            data_chunks_size = asset.data_chunks_size;
-        };
+            is_prod = false;
+        });
 
-        #ok(asset_min);
+        #ok(asset_url);
     };
 
     // ------------------------- Get Asset -------------------------
@@ -148,13 +146,15 @@ actor class Assets(controller: Principal) = this {
 
     private func create_token(args : Types.CreateStrategyArgs) : ?Types.StreamingCallbackToken {
         if (args.chunk_index + 1 >= args.data_chunks_size) {
-            null;
+            return null;
         } else {
-            ?{
+            let token = {
                 asset_id = args.asset_id;
                 chunk_index = args.chunk_index + 1;
                 content_encoding = "gzip";
             };
+
+            return ?token;
         };
     };
 

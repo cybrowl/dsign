@@ -1,3 +1,3 @@
-export ASSETS_MAIN_PRINCIPAL=$(dfx canister id assets_main)
+export SNAP_MAIN_PRINCIPAL=$(dfx canister id snap_main)
 
-dfx deploy assets --argument='(principal "'${ASSETS_MAIN_PRINCIPAL}'")'
+dfx deploy assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'")'

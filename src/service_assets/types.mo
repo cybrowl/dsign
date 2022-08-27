@@ -16,6 +16,7 @@ module {
         id : Text;
         canister_id : Text;
         content_type : Text;
+        is_public : Bool;
         created : Int;
         data_chunks : [Blob];
         file_name : Text;
@@ -23,10 +24,11 @@ module {
         data_chunks_size : Nat;
     };
 
-    public type AssetMin = {
+    public type AssetMeta = {
         id : Text;
         canister_id : Text;
         content_type : Text;
+        is_public : Bool;
         created : Int;
         file_name : Text;
         owner : Principal;
@@ -41,6 +43,7 @@ module {
     public type CreateAssetArgs = {
         chunk_ids : [Nat];
         content_type : Text;
+        is_public : Bool;
         principal : Principal;
     };
 
@@ -85,6 +88,6 @@ module {
     };
 
     public type AssetsActor = actor {
-        create_asset_from_chunks : shared (CreateAssetArgs) -> async Result.Result<AssetMin, Text>;
+        create_asset_from_chunks : shared (CreateAssetArgs) -> async Result.Result<Text, Text>;
     };
 }

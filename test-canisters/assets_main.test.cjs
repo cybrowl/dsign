@@ -6,9 +6,6 @@ global.fetch = fetch;
 
 // Actor Interface
 const {
-	idlFactory: assets_main_interface
-} = require('../.dfx/local/canisters/assets_main/assets_main.did.test.cjs');
-const {
 	idlFactory: assets_interface
 } = require('../.dfx/local/canisters/assets/assets.did.test.cjs');
 const {
@@ -17,7 +14,6 @@ const {
 
 // Canister Ids
 const canister_ids = require('../.dfx/local/canister_ids.json');
-const assets_main_canister_id = canister_ids.assets_main.local;
 const assets_canister_id = canister_ids.assets.local;
 const assets_file_chunks_canister_id = canister_ids.assets_file_chunks.local;
 
@@ -28,19 +24,12 @@ let mishicat_identity = Ed25519KeyIdentity.generate();
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
 const { generate_figma_asset } = require('../test-utils/utils.cjs');
 
-let assets_main_actors = {};
 let assets_actors = {};
 let assets_file_chunks_actors = {};
 
 let chunk_ids = [];
 
 test('AssetsMain.version()', async function (t) {
-	assets_main_actors.mishicat = await get_actor(
-		assets_main_canister_id,
-		assets_main_interface,
-		mishicat_identity
-	);
-
 	assets_actors.mishicat = await get_actor(assets_canister_id, assets_interface, mishicat_identity);
 
 	assets_file_chunks_actors.mishicat = await get_actor(
@@ -48,7 +37,7 @@ test('AssetsMain.version()', async function (t) {
 		assets_file_chunks_interface,
 		mishicat_identity
 	);
-	const response = await assets_main_actors.mishicat.version();
+	const response = await assets_actors.mishicat.version();
 
 	t.equal(typeof response, 'string');
 	t.equal(response, '0.0.1');
@@ -110,21 +99,4 @@ test('Assets.create_asset_from_chunks():: return #err=> Not Authorized', async f
 	});
 
 	t.deepEqual(response.err, 'Not Authorized');
-});
-
-test('AssetsMain.create_asset_from_chunks():: return #ok=> asset', async function (t) {
-	const response = await assets_main_actors.mishicat.create_asset_from_chunks({
-		chunk_ids,
-		content_type: 'application/octet-stream'
-	});
-
-	console.log('response: ', response);
-
-	const hasCreatedDate = response.ok.created.toString().length > 5;
-	const hasOwner = response.ok.owner.toString().length > 5;
-	const hasContentType = response.ok.content_type.length > 3;
-
-	t.equal(hasCreatedDate, true);
-	t.equal(hasOwner, true);
-	t.equal(hasContentType, true);
 });

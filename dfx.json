@@ -14,13 +14,6 @@
       ],
       "type": "assets"
     },
-    "assets_main": {
-      "main": "src/service_assets/AssetsMain.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger", "username", "assets_file_chunks"
-      ]
-    },
     "assets": {
       "main": "src/service_assets/Assets.mo",
       "type": "motoko",
@@ -85,8 +78,10 @@
       "main": "src/service_snaps/SnapMain.mo",
       "type": "motoko",
       "dependencies": [
+        "assets_file_chunks",
         "logger",
-        "snap"
+        "snap",
+        "username"
       ]
     },
     "username": {

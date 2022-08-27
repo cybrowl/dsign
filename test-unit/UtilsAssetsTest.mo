@@ -33,6 +33,23 @@ let success = run([
         assertTrue(Text.equal(asset_id, expected));
     }),
   ]),
+  describe("AssetsUtils.generate_asset_url()", [
+    it("should generate snap image url", do {
+      let canister_id = "qoctq-giaaa-aaaaa-aaaea-cai";
+      let asset_id = "70KKS0195HX5MS56MQVGV02C1Z";
+      let is_prod = true;
+
+      let asset_url = Utils.generate_asset_url({
+        asset_id = asset_id;
+        canister_id = canister_id;
+        is_prod = is_prod;
+      });
+
+      let expected = "https://qoctq-giaaa-aaaaa-aaaea-cai.raw.ic0.app/asset/70KKS0195HX5MS56MQVGV02C1Z";
+
+      assertTrue(Text.equal(asset_url, expected));
+    }),
+  ]),
 ]);
 
 if(success == false){

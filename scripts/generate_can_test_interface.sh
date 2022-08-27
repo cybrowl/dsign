@@ -3,12 +3,6 @@
 # TESTING #
 # NOTE: update file OSX ONLY (Linux remove '')
 
-
-# assets_main
-cp .dfx/local/canisters/assets_main/assets_main.did.js .dfx/local/canisters/assets_main/assets_main.did.test.cjs
-sed -i '' 's/export//g' .dfx/local/canisters/assets_main/assets_main.did.test.cjs
-echo "module.exports = { idlFactory };" >> .dfx/local/canisters/assets_main/assets_main.did.test.cjs
-
 # assets
 cp .dfx/local/canisters/assets/assets.did.js .dfx/local/canisters/assets/assets.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/assets/assets.did.test.cjs

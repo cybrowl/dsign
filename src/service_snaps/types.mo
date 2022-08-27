@@ -4,6 +4,8 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
 
+import AssetTypes "../service_assets/types";
+
 module {
     public type Time = Int;
     public type Username = Text;
@@ -44,15 +46,11 @@ module {
         created: Time;
         creator: Username;
         image_urls: [Text];
-        is_public: Bool;
+        file_asset: AssetTypes.AssetMeta;
         likes: Nat;
         projects: ?[ProjectRef];
         title: Text;
         views: Nat;
-    };
-
-    public type SaveSnapErr = {
-        #UsernameNotFound;
     };
 
     public type CreateSnapErr = {
@@ -77,11 +75,17 @@ module {
         #UserNotFound;
     };
 
+    public type FileAsset = {
+        chunk_ids: [Nat];
+        content_type: Text;
+        is_public: Bool;
+    };
+
     public type CreateSnapArgs = {
         title: Text;
-        is_public: Bool;
         cover_image_location: Nat8;
         images: Images;
+        file_asset: FileAsset;
     };
 
     public type FinalizeSnapArgs = {
@@ -101,7 +105,7 @@ module {
     // Actor Interface
     public type SnapActor = actor {
         delete_snaps : shared ([SnapID]) -> async ();
-        save_snap : shared (CreateSnapArgs, [ImageID], UserPrincipal) -> async Result.Result<Snap, SaveSnapErr>;
+        save_snap : shared (CreateSnapArgs, [ImageID], AssetTypes.AssetMeta, UserPrincipal) -> async Result.Result<Snap, Text>;
         get_all_snaps : query ([SnapID]) -> async [Snap];
         add_img_url_to_snap : shared (ImageUrl, SnapID, UserPrincipal) -> async Result.Result<Snap, AddImgUrlSnapErr>;
     };

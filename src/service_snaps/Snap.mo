@@ -12,6 +12,7 @@ import XorShift "mo:rand/XorShift";
 
 import Username "canister:username";
 
+import AssetTypes "../service_assets/types";
 import Types "./types";
 
 actor class Snap() = this {
@@ -19,7 +20,6 @@ actor class Snap() = this {
     type CreateSnapArgs = Types.CreateSnapArgs;
     type ImagesUrls =  Types.ImagesUrls;
     type ImageUrl =  Types.ImageUrl;
-    type SaveSnapErr = Types.SaveSnapErr;
     type Snap = Types.Snap;
     type SnapID = Types.SnapID;
     type UserPrincipal = Types.UserPrincipal;
@@ -42,7 +42,8 @@ actor class Snap() = this {
     public shared ({caller}) func save_snap(
         args: CreateSnapArgs,
         imageUrls: ImagesUrls, 
-        principal: UserPrincipal) : async Result.Result<Snap, SaveSnapErr> {
+        asset: AssetTypes.AssetMeta,
+        principal: UserPrincipal) : async Result.Result<Snap, Text> {
 
         let snap_id =  ULID.toText(se.new());
         let snap_canister_id =  await get_canister_id();
@@ -53,7 +54,7 @@ actor class Snap() = this {
                 username:= username_;
             };
             case(#err error) {
-                return #err(#UsernameNotFound);
+                return #err("Username Not Found");
             };
         };
 
@@ -64,7 +65,7 @@ actor class Snap() = this {
             created = Time.now();
             creator = username;
             image_urls = imageUrls;
-            is_public = args.is_public;
+            file_asset = asset;
             likes = 0;
             projects = null;
             title = args.title;
@@ -112,7 +113,7 @@ actor class Snap() = this {
                     created = snap.created;
                     creator = snap.creator;
                     image_urls = snap_img_urls.toArray();
-                    is_public = snap.is_public;
+                    file_asset = snap.file_asset;
                     likes = snap.likes;
                     projects = snap.projects;
                     title = snap.title;
