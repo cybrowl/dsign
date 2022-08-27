@@ -7,6 +7,7 @@ import Text "mo:base/Text";
 import AssetTypes "../service_assets/types";
 
 module {
+    public type FileAssetUrl = Text;
     public type Time = Int;
     public type Username = Text;
     public type UserPrincipal = Principal;
@@ -46,7 +47,7 @@ module {
         created: Time;
         creator: Username;
         image_urls: [Text];
-        file_asset: AssetTypes.AssetMeta;
+        file_asset_url: FileAssetUrl;
         likes: Nat;
         projects: ?[ProjectRef];
         title: Text;
@@ -105,7 +106,7 @@ module {
     // Actor Interface
     public type SnapActor = actor {
         delete_snaps : shared ([SnapID]) -> async ();
-        save_snap : shared (CreateSnapArgs, [ImageID], AssetTypes.AssetMeta, UserPrincipal) -> async Result.Result<Snap, Text>;
+        save_snap : shared (CreateSnapArgs, [ImageID], FileAssetUrl, UserPrincipal) -> async Result.Result<Snap, Text>;
         get_all_snaps : query ([SnapID]) -> async [Snap];
         add_img_url_to_snap : shared (ImageUrl, SnapID, UserPrincipal) -> async Result.Result<Snap, AddImgUrlSnapErr>;
     };

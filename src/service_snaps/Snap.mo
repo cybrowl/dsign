@@ -18,6 +18,7 @@ import Types "./types";
 actor class Snap() = this {
     type AddImgUrlSnapErr = Types.AddImgUrlSnapErr;
     type CreateSnapArgs = Types.CreateSnapArgs;
+    type FileAssetUrl = Types.FileAssetUrl;
     type ImagesUrls =  Types.ImagesUrls;
     type ImageUrl =  Types.ImageUrl;
     type Snap = Types.Snap;
@@ -42,7 +43,7 @@ actor class Snap() = this {
     public shared ({caller}) func save_snap(
         args: CreateSnapArgs,
         imageUrls: ImagesUrls, 
-        asset: AssetTypes.AssetMeta,
+        file_asset_url: FileAssetUrl,
         principal: UserPrincipal) : async Result.Result<Snap, Text> {
 
         let snap_id =  ULID.toText(se.new());
@@ -65,7 +66,7 @@ actor class Snap() = this {
             created = Time.now();
             creator = username;
             image_urls = imageUrls;
-            file_asset = asset;
+            file_asset_url = file_asset_url;
             likes = 0;
             projects = null;
             title = args.title;
@@ -113,7 +114,7 @@ actor class Snap() = this {
                     created = snap.created;
                     creator = snap.creator;
                     image_urls = snap_img_urls.toArray();
-                    file_asset = snap.file_asset;
+                    file_asset_url = snap.file_asset_url;
                     likes = snap.likes;
                     projects = snap.projects;
                     title = snap.title;
