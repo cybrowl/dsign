@@ -4,8 +4,6 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
 
-import AssetTypes "../service_assets/types";
-
 module {
     public type FileAssetUrl = Text;
     public type Time = Int;

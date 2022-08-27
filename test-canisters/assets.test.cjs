@@ -29,7 +29,7 @@ let assets_file_chunks_actors = {};
 
 let chunk_ids = [];
 
-test('AssetsMain.version()', async function (t) {
+test('Assets.version()', async function (t) {
 	assets_actors.mishicat = await get_actor(assets_canister_id, assets_interface, mishicat_identity);
 
 	assets_file_chunks_actors.mishicat = await get_actor(
@@ -95,6 +95,7 @@ test('Assets.create_asset_from_chunks():: return #err=> Not Authorized', async f
 	const response = await assets_actors.mishicat.create_asset_from_chunks({
 		chunk_ids,
 		content_type: 'application/octet-stream',
+		is_public: true,
 		principal: mishicat_identity.getPrincipal()
 	});
 

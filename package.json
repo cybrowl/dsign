@@ -10,7 +10,7 @@
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "logs": "npm run generate_test_interface && tape test-utils/debug/debug.test.cjs",
     "preview": "vite preview",
-    "test-am": "npm run generate_test_interface && tape test-canisters/assets_main.test.cjs",
+    "test-a": "npm run generate_test_interface && tape test-canisters/assets.test.cjs",
     "test-all": "bash ./scripts/test-all.sh",
     "test-config": "tape test-env/dfx.config.test.cjs",
     "test-s": "npm run generate_test_interface && tape test-canisters/snap.test.cjs",

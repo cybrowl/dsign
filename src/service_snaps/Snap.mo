@@ -12,7 +12,6 @@ import XorShift "mo:rand/XorShift";
 
 import Username "canister:username";
 
-import AssetTypes "../service_assets/types";
 import Types "./types";
 
 actor class Snap() = this {
