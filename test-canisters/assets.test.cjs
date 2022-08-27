@@ -13,9 +13,10 @@ const {
 } = require('../.dfx/local/canisters/assets_file_chunks/assets_file_chunks.did.test.cjs');
 
 // Canister Ids
-const canister_ids = require('../.dfx/local/canister_ids.json');
-const assets_canister_id = canister_ids.assets.local;
-const assets_file_chunks_canister_id = canister_ids.assets_file_chunks.local;
+const {
+	assets_file_chunks_canister_id,
+	assets_canister_id
+} = require('../test-utils/actor_canister_ids.cjs');
 
 // Identities
 let mishicat_identity = Ed25519KeyIdentity.generate();
