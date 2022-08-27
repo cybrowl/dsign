@@ -29,7 +29,7 @@ actor class Assets(controller: Principal) = this {
     };
 
     // ------------------------- Create Asset -------------------------
-    public shared({caller}) func create_asset_from_chunks(args : Types.CreateAssetArgs) : async Result.Result<Text, Text> {
+    public shared({caller}) func create_asset_from_chunks(args : Types.CreateAssetArgs) : async Result.Result<Types.AssetRef, Text> {
         var asset_data : [Blob] = [];
         var all_chunks_match_owner : Bool = true;
 
@@ -70,27 +70,33 @@ actor class Assets(controller: Principal) = this {
         let self = Principal.fromActor(this);
         let canister_id : Text = Principal.toText(self);
 
-        let asset : Types.Asset  = {
-            id = asset_id;
-            canister_id = canister_id;
-            content_type = args.content_type;
-            is_public = args.is_public;
-            created = created;
-            data_chunks = asset_data;
-            file_name = file_name;
-            owner = owner;
-            data_chunks_size = asset_data.size();
-        };
-
-        assets.put(asset_id, asset);
-
         let asset_url = Utils.generate_asset_url({
             asset_id = asset_id;
             canister_id = canister_id;
             is_prod = false;
         });
 
-        #ok(asset_url);
+        let asset : Types.Asset  = {
+            canister_id = canister_id;
+            content_type = args.content_type;
+            created = created;
+            data_chunks = asset_data;
+            data_chunks_size = asset_data.size();
+            file_name = file_name;
+            id = asset_id;
+            is_public = args.is_public;
+            owner = owner;
+        };
+
+        assets.put(asset_id, asset);
+
+        let asset_ref : Types.AssetRef = {
+            asset_url = asset_url;
+            canister_id = canister_id;
+            id = asset_id;
+        };
+
+        #ok(asset_ref);
     };
 
     // ------------------------- Get Asset -------------------------

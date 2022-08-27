@@ -13,31 +13,21 @@ module {
     };
 
     public type Asset = {
-        id : Text;
         canister_id : Text;
         content_type : Text;
-        is_public : Bool;
         created : Int;
         data_chunks : [Blob];
-        file_name : Text;
-        owner : Principal;
         data_chunks_size : Nat;
-    };
-
-    public type AssetMeta = {
+        file_name : Text;
         id : Text;
-        canister_id : Text;
-        content_type : Text;
         is_public : Bool;
-        created : Int;
-        file_name : Text;
         owner : Principal;
-        data_chunks_size : Nat;
     };
 
-    public type CreateAssetMainArgs = {
-        chunk_ids : [Nat];
-        content_type : Text;
+    public type AssetRef = {
+        asset_url : Text;
+        canister_id : Text;
+        id : Text;
     };
 
     public type CreateAssetArgs = {
@@ -88,6 +78,6 @@ module {
     };
 
     public type AssetsActor = actor {
-        create_asset_from_chunks : shared (CreateAssetArgs) -> async Result.Result<Text, Text>;
+        create_asset_from_chunks : shared (CreateAssetArgs) -> async Result.Result<AssetRef, Text>;
     };
 }

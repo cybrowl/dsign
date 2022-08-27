@@ -5,10 +5,15 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 
 module {
-    public type FileAssetUrl = Text;
     public type Time = Int;
     public type Username = Text;
     public type UserPrincipal = Principal;
+
+    public type AssetRef = {
+        asset_url : Text;
+        canister_id : Text;
+        id : Text;
+    };
 
     // Images
     public type Image = {
@@ -45,7 +50,7 @@ module {
         created: Time;
         creator: Username;
         image_urls: [Text];
-        file_asset_url: FileAssetUrl;
+        file_asset: AssetRef;
         likes: Nat;
         projects: ?[ProjectRef];
         title: Text;
@@ -104,7 +109,7 @@ module {
     // Actor Interface
     public type SnapActor = actor {
         delete_snaps : shared ([SnapID]) -> async ();
-        save_snap : shared (CreateSnapArgs, [ImageID], FileAssetUrl, UserPrincipal) -> async Result.Result<Snap, Text>;
+        save_snap : shared (CreateSnapArgs, [ImageID], AssetRef, UserPrincipal) -> async Result.Result<Snap, Text>;
         get_all_snaps : query ([SnapID]) -> async [Snap];
         add_img_url_to_snap : shared (ImageUrl, SnapID, UserPrincipal) -> async Result.Result<Snap, AddImgUrlSnapErr>;
     };

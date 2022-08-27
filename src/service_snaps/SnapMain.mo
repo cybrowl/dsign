@@ -98,14 +98,14 @@ actor SnapMain {
 
                         //todo: images can probably be moved to assets
                         let image_urls = await snap_images_actor.save_images(args.images);
-                        let file_asset_url = await assets_actor.create_asset_from_chunks(file_asset_args);
+                        let file_asset = await assets_actor.create_asset_from_chunks(file_asset_args);
 
-                        switch(file_asset_url) {
+                        switch(file_asset) {
                             case(#err error) {
                                 return #err(error);
                             };
-                            case(#ok file_asset_url) {
-                                let snap = await snap_actor.save_snap(args, image_urls, file_asset_url, caller);
+                            case(#ok file_asset) {
+                                let snap = await snap_actor.save_snap(args, image_urls, file_asset, caller);
 
                                 switch(snap) {
                                     case(#err error) {
@@ -130,14 +130,14 @@ actor SnapMain {
 
                         // save images and snap
                         let image_urls = await snap_images_actor.save_images(args.images);
-                        let file_asset_url = await assets_actor.create_asset_from_chunks(file_asset_args);
+                        let file_asset = await assets_actor.create_asset_from_chunks(file_asset_args);
 
-                        switch(file_asset_url) {
+                        switch(file_asset) {
                             case(#err error) {
                                 return #err(error);
                             };
-                            case(#ok file_asset_url) {
-                                let snap = await snap_actor.save_snap(args, image_urls, file_asset_url, caller);
+                            case(#ok file_asset) {
+                                let snap = await snap_actor.save_snap(args, image_urls, file_asset, caller);
 
                                 switch(snap) {
                                     case(#err error) {
