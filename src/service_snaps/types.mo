@@ -48,12 +48,12 @@ module {
         canister_id: Text;
         cover_image_location: Nat8;
         created: Time;
-        creator: Username;
+        username: Username;
         image_urls: [Text];
         file_asset: AssetRef;
-        likes: Nat;
         projects: ?[ProjectRef];
         title: Text;
+        likes: Nat;
         views: Nat;
     };
 

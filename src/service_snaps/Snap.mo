@@ -63,7 +63,7 @@ actor class Snap() = this {
             canister_id = snap_canister_id;
             cover_image_location = args.cover_image_location;
             created = Time.now();
-            creator = username;
+            username = username;
             image_urls = imageUrls;
             file_asset = file_asset;
             likes = 0;
@@ -95,7 +95,7 @@ actor class Snap() = this {
         switch(snaps.get(snap_id)) {
             case(?snap) {
 
-                if (Text.notEqual(username, snap.creator)) {
+                if (Text.notEqual(username, snap.username)) {
                     return #err(#UserNotCreator); 
                 };
 
@@ -111,7 +111,7 @@ actor class Snap() = this {
                     canister_id = snap.canister_id;
                     cover_image_location = snap.cover_image_location;
                     created = snap.created;
-                    creator = snap.creator;
+                    username = snap.username;
                     image_urls = snap_img_urls.toArray();
                     file_asset = snap.file_asset;
                     likes = snap.likes;
