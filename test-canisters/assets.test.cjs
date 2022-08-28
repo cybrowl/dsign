@@ -92,6 +92,11 @@ test('FileAssetChunks.get_chunk():: return #ok=> first chunk', async function (t
 	t.equal(hasData, true);
 });
 
+test('FileAssetChunks.delete_chunks():: remove chunks from storage', async function (t) {
+	console.log('chunk_ids: ', chunk_ids);
+	assets_file_chunks_actors.mishicat.delete_chunks(chunk_ids);
+});
+
 test('Assets.create_asset_from_chunks():: return #err=> Not Authorized', async function (t) {
 	const response = await assets_actors.mishicat.create_asset_from_chunks({
 		chunk_ids,

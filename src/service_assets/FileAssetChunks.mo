@@ -3,6 +3,7 @@ import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
 import Nat "mo:base/Nat";
 import Principal "mo:base/Principal";
+import Prim "mo:⛔";
 import Result "mo:base/Result";
 import Time "mo:base/Time";
 
@@ -13,8 +14,8 @@ import Username "canister:username";
 import Types "./types";
 
 actor FileAssetChunks = {
-    private var chunk_id_count: Nat = 0;
-    private let chunks: HashMap.HashMap<Nat, Types.AssetChunk> = HashMap.HashMap<Nat, Types.AssetChunk>(0, Nat.equal, Hash.hash);
+    private var chunk_id_count : Nat = 0;
+    private let chunks : HashMap.HashMap<Nat, Types.AssetChunk> = HashMap.HashMap<Nat, Types.AssetChunk>(0, Nat.equal, Hash.hash);
 
     public query func version() : async Text {
         return "0.0.1";
@@ -37,6 +38,12 @@ actor FileAssetChunks = {
         return chunk_id_count;
     };
 
+    public shared ({caller}) func delete_chunks(chunk_ids: [Nat]) : async () {
+        for (chunk_id in chunk_ids.vals()) {
+            chunks.delete(chunk_id);
+        }
+    };
+
     public query func get_chunk(chunk_id: Nat, principal: Principal) : async Result.Result<Types.AssetChunk, Text> {
         switch (chunks.get(chunk_id)) {
             case (?chunk) {
@@ -52,5 +59,17 @@ actor FileAssetChunks = {
         };
     };
 
-    //TODO: Add a delete_chunks function
+    public query func get_chunks_size() : async Nat {
+        return chunks.size();
+    };
+
+    public query func get_memory_size() : async Nat {
+        let rts_memory_size : Nat = Prim.rts_memory_size();
+        
+        return rts_memory_size;
+    };
+
+    public query func get_heap_size() : async Nat {        
+        return Prim.rts_heap_size();
+    };
 };
