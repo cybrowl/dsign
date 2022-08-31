@@ -82,83 +82,63 @@ actor SnapMain {
             principal = caller;
         };
 
-        // check if user exists
+        // get user snap canister ids
+        var snap_canister_ids : HashMap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>> = HashMap.HashMap(0, Text.equal, Text.hash);
         switch (user_canisters_ref.get(caller)) {
-            case (?snap_canister_ids) {
-                // check if user has current empty snap_canister_id
-                switch (snap_canister_ids.get(snap_canister_id)) {
-                    // canister is not full
-                    case (?snap_ids) {
-                        ignore Logger.log_event(tags, debug_show("current snap_canister_id"));
-
-                        let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
-                        let snap_actor = actor (snap_canister_id) : SnapActor;
-                        let assets_actor = actor (asset_canister_id) : AssetTypes.AssetsActor;
-
-                        //todo: images can probably be moved to assets
-                        let image_urls = await snap_images_actor.save_images(args.images);
-
-                        // create asset from chuncks
-                        var file_asset = {asset_url = ""; canister_id = ""; id = "";};
-                        switch(await assets_actor.create_asset_from_chunks(file_asset_args)) {
-                            case(#err error) {
-                                return #err(error);
-                            };
-                            case(#ok file_asset_) {
-                                file_asset:= file_asset_;
-                            };
-                        };
-
-                        // save snap
-                        switch(await snap_actor.save_snap(args, image_urls, file_asset, caller)) {
-                            case(#err error) {
-                                return #err(error);
-                            };
-                            case(#ok snap) {
-                                snap_ids.add(snap.id);
-                                #ok(snap);
-                            };
-                        };
-                    };
-                    case(_) {
-                        // canister is full / snap_canister_id NOT Found
-                        ignore Logger.log_event(tags, debug_show("canister_full/snap_canister_id_empty"));
-                        let snap_ids = Buffer.Buffer<SnapID>(0);
-
-                        let assets_actor = actor (asset_canister_id) : AssetTypes.AssetsActor;
-                        let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
-                        let snap_actor = actor (snap_canister_id) : SnapActor;
-
-                        // save images and snap
-                        let image_urls = await snap_images_actor.save_images(args.images);
-                        let file_asset = await assets_actor.create_asset_from_chunks(file_asset_args);
-
-                        switch(file_asset) {
-                            case(#err error) {
-                                return #err(error);
-                            };
-                            case(#ok file_asset) {
-                                let snap = await snap_actor.save_snap(args, image_urls, file_asset, caller);
-
-                                switch(snap) {
-                                    case(#err error) {
-                                        return #err(error);
-                                    };
-                                    case(#ok snap) {
-                                        snap_ids.add(snap.id);
-                                        snap_canister_ids.put(snap_canister_id, snap_ids);
-                                        #ok(snap);
-                                    };
-                                };
-                            };
-                        };
-                    };
-                };
+            case (?snap_canister_ids_) {
+                snap_canister_ids := snap_canister_ids_;
             };
             case(_) {
                return #err("User Not Found");
             };
         }; 
+
+        // get snap ids from current canister id
+        var snap_ids = Buffer.Buffer<SnapID>(0);
+        var snap_ids_found = false;
+        switch (snap_canister_ids.get(snap_canister_id)) {
+            case (?snap_ids_) {
+                ignore Logger.log_event(tags, debug_show("snap_ids found for current empty canister"));
+
+                snap_ids := snap_ids_;
+                snap_ids_found := true;
+            };
+            case(_) {
+                ignore Logger.log_event(tags, debug_show("snap_ids NOT found"));
+            };
+        };
+
+        let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
+        let snap_actor = actor (snap_canister_id) : SnapActor;
+        let assets_actor = actor (asset_canister_id) : AssetTypes.AssetsActor;
+
+        //todo: images can probably be moved to assets
+        let image_urls = await snap_images_actor.save_images(args.images);
+
+        // create asset from chuncks
+        var file_asset = {asset_url = ""; canister_id = ""; id = "";};
+        switch(await assets_actor.create_asset_from_chunks(file_asset_args)) {
+            case(#err error) {
+                return #err(error);
+            };
+            case(#ok file_asset_) {
+                file_asset:= file_asset_;
+            };
+        };
+
+        // save snap
+        switch(await snap_actor.save_snap(args, image_urls, file_asset, caller)) {
+            case(#err error) {
+                return #err(error);
+            };
+            case(#ok snap) {
+                snap_ids.add(snap.id);
+                if (snap_ids_found == false) {
+                    snap_canister_ids.put(snap_canister_id, snap_ids);
+                };
+                #ok(snap);
+            };
+        };
     };
 
     //note: this will be deprecated in future when message transmission > 8MB
