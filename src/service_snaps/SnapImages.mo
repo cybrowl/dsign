@@ -24,7 +24,7 @@ actor class SnapImages() = this {
 
     let ACTOR_NAME : Text = "SnapImages";
     let MAX_BYTES = 2_000_000;
-    
+
     private let rr = XorShift.toReader(XorShift.XorShift64(null));
     private let se = Source.Source(rr, 0);
     private var isProduction : Bool = false;
@@ -39,7 +39,7 @@ actor class SnapImages() = this {
     public query func get_canister_id() : async Text {
         return Principal.toText(Principal.fromActor(this));
     };
-        
+
     // note: this will only send one image until messages can transmit data > 2MB
     public shared (msg) func save_images(images: Images) : async ImagesUrls {
         let image_ids = Buffer.Buffer<ImageID>(0);

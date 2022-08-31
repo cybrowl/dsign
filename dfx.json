@@ -28,6 +28,13 @@
         "logger", "username"
       ]
     },
+    "assets_img_staging": {
+      "main": "src/service_assets_img/ImageAssetStaging.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger", "username"
+      ]
+    },
     "profile": {
       "main": "src/service_profile/Profile.mo",
       "type": "motoko",

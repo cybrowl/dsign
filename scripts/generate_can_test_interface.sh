@@ -13,6 +13,11 @@ cp .dfx/local/canisters/assets_file_chunks/assets_file_chunks.did.js .dfx/local/
 sed -i '' 's/export//g' .dfx/local/canisters/assets_file_chunks/assets_file_chunks.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/assets_file_chunks/assets_file_chunks.did.test.cjs
 
+# assets_img_staging
+cp .dfx/local/canisters/assets_img_staging/assets_img_staging.did.js .dfx/local/canisters/assets_img_staging/assets_img_staging.did.test.cjs
+sed -i '' 's/export//g' .dfx/local/canisters/assets_img_staging/assets_img_staging.did.test.cjs
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/assets_img_staging/assets_img_staging.did.test.cjs
+
 # logger
 cp .dfx/local/canisters/logger/logger.did.js .dfx/local/canisters/logger/logger.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/logger/logger.did.test.cjs
