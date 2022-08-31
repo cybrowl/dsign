@@ -45,7 +45,6 @@ actor SnapMain {
     stable var asset_canister_id : Text = "";
 
     // ------------------------- Snaps Management -------------------------
-    // TODO: Call this in the client
     public shared ({caller}) func create_user_snap_storage() : async Bool {
         let tags = [ACTOR_NAME, "create_user_snap_storage"];
 
@@ -98,30 +97,32 @@ actor SnapMain {
 
                         //todo: images can probably be moved to assets
                         let image_urls = await snap_images_actor.save_images(args.images);
-                        let file_asset = await assets_actor.create_asset_from_chunks(file_asset_args);
 
-                        switch(file_asset) {
+                        // create asset from chuncks
+                        var file_asset = {asset_url = ""; canister_id = ""; id = "";};
+                        switch(await assets_actor.create_asset_from_chunks(file_asset_args)) {
                             case(#err error) {
                                 return #err(error);
                             };
-                            case(#ok file_asset) {
-                                let snap = await snap_actor.save_snap(args, image_urls, file_asset, caller);
+                            case(#ok file_asset_) {
+                                file_asset:= file_asset_;
+                            };
+                        };
 
-                                switch(snap) {
-                                    case(#err error) {
-                                        return #err(error);
-                                    };
-                                    case(#ok snap) {
-                                        snap_ids.add(snap.id);
-                                        #ok(snap);
-                                    };
-                                };
+                        // save snap
+                        switch(await snap_actor.save_snap(args, image_urls, file_asset, caller)) {
+                            case(#err error) {
+                                return #err(error);
+                            };
+                            case(#ok snap) {
+                                snap_ids.add(snap.id);
+                                #ok(snap);
                             };
                         };
                     };
                     case(_) {
                         // canister is full / snap_canister_id NOT Found
-                        await Logger.log_event(tags, debug_show("canister_full/snap_canister_id_empty"));
+                        ignore Logger.log_event(tags, debug_show("canister_full/snap_canister_id_empty"));
                         let snap_ids = Buffer.Buffer<SnapID>(0);
 
                         let assets_actor = actor (asset_canister_id) : AssetTypes.AssetsActor;
@@ -218,10 +219,6 @@ actor SnapMain {
     };
 
     // ------------------------- Canister Management -------------------------
-    public query func version() : async Text {
-        return "0.0.2";
-    };
-
     private func create_asset_canister() : async () {
         let tags = [ACTOR_NAME, "create_asset_canister"];
 

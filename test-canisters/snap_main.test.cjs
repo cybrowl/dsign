@@ -66,11 +66,7 @@ test('SnapMain.assign actors()', async function (t) {
 		default_identity
 	);
 
-	const response = await snap_main_actor.mishicat.version();
-	t.equal(typeof response, 'string');
-
 	console.log('=========== Snap Main ===========');
-	console.log('version: ', response);
 });
 
 test('SnapMain.initialize_canisters()', async function (t) {

@@ -31,13 +31,6 @@ actor class Snap() = this {
     stable var snaps_stable_storage : [(SnapID, Snap)] = [];
 
     //TODO: only allow snap_main to accesss write methods
-    public query func version() : async Text {
-        return "0.0.1";
-    };
-
-    public query func get_canister_id() : async Text {
-        return Principal.toText(Principal.fromActor(this));
-    };
 
     public shared ({caller}) func save_snap(
         args: CreateSnapArgs,
@@ -46,7 +39,7 @@ actor class Snap() = this {
         principal: UserPrincipal) : async Result.Result<Snap, Text> {
 
         let snap_id =  ULID.toText(se.new());
-        let snap_canister_id =  await get_canister_id();
+        let snap_canister_id =  Principal.toText(Principal.fromActor(this));
 
         var username = "";
         switch(await Username.get_username_actor(principal)) {

@@ -93,7 +93,6 @@ test('FileAssetChunks.get_chunk():: return #ok=> first chunk', async function (t
 });
 
 test('FileAssetChunks.delete_chunks():: remove chunks from storage', async function (t) {
-	console.log('chunk_ids: ', chunk_ids);
 	assets_file_chunks_actors.mishicat.delete_chunks(chunk_ids);
 });
 
