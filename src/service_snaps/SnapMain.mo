@@ -21,7 +21,6 @@ actor SnapMain {
     type CreateSnapArgs = Types.CreateSnapArgs;
     type CreateSnapErr = Types.CreateSnapErr;
     type DeleteAllSnapsErr = Types.DeleteAllSnapsErr;
-    type FinalizeSnapArgs = Types.FinalizeSnapArgs;
     type GetAllSnapsErr = Types.GetAllSnapsErr;
     type ImageAssetsActor = Types.ImageAssetsActor;
     type Snap = Types.Snap;
@@ -113,7 +112,8 @@ actor SnapMain {
         let assets_actor = actor (asset_canister_id) : AssetTypes.AssetsActor;
 
         // save images
-        var images_ref = [];
+        let image_ref_temp : Types.ImageRef = {canister_id = ""; id = ""; url = ""};
+        var images_ref = [image_ref_temp];
         switch(await image_assets_actor.save_images(args.img_asset_ids, caller)) {
             case(#err error) {
                 return #err(error);
@@ -228,9 +228,11 @@ actor SnapMain {
     private func create_snap_images_canister() : async () {
         let tags = [ACTOR_NAME, "create_snap_images_canister"];
 
+        let snap_main_principal = Principal.fromActor(SnapMain);
+
         // create canister
         Cycles.add(CYCLE_AMOUNT);
-        let image_assets_actor = await ImageAssets.ImageAssets();
+        let image_assets_actor = await ImageAssets.ImageAssets(snap_main_principal);
         let principal = Principal.fromActor(image_assets_actor);
         let snap_images_canister_id_ = Principal.toText(principal);
 

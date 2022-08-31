@@ -18,8 +18,7 @@ actor class Snap() = this {
     type AddImgUrlSnapErr = Types.AddImgUrlSnapErr;
     type CreateSnapArgs = Types.CreateSnapArgs;
     type AssetRef = Types.AssetRef;
-    type ImagesRef =  Types.ImagesRef;
-    type ImageUrl =  Types.ImageUrl;
+    type ImageRef =  Types.ImageRef;
     type Snap = Types.Snap;
     type SnapID = Types.SnapID;
     type UserPrincipal = Types.UserPrincipal;
@@ -34,7 +33,7 @@ actor class Snap() = this {
 
     public shared ({caller}) func save_snap(
         args: CreateSnapArgs,
-        images_ref: ImagesRef, 
+        images_ref: [ImageRef], 
         file_asset: AssetRef,
         principal: UserPrincipal) : async Result.Result<Snap, Text> {
 

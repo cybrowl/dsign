@@ -22,7 +22,6 @@ actor class ImageAssets(controller: Principal) = this {
     type AssetImg = Types.AssetImg;
     type ImageID = Types.ImageID;
     type ImageRef = Types.ImageRef;
-    type ImagesRef =  Types.ImagesRef;
 
     let ACTOR_NAME : Text = "ImageAssets";
     let VERSION : Text = "0.0.1";
@@ -38,7 +37,7 @@ actor class ImageAssets(controller: Principal) = this {
         return VERSION;
     };
 
-    public shared ({caller}) func save_images(img_asset_ids: [Nat], owner: Principal) : async Result.Result<[ImageRef], Text> {
+    public shared ({caller}) func save_images(img_asset_ids: [Nat], owner: Principal) : async Result.Result<[Types.ImageRef], Text> {
         if (controller != caller) {
             return #err("Not Authorized");
         };
@@ -63,14 +62,14 @@ actor class ImageAssets(controller: Principal) = this {
                     };
 
                     images_ref.add(image_ref);
-
-                    return #ok(images_ref.toArray());
                 };
                 case(#err err){
-                   //TODO: log error
+                   return #err(err);
                 };
             };
         };
+
+        return #ok(images_ref.toArray());
     };
 
     // serves the image to the client when requested via image url

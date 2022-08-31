@@ -16,7 +16,6 @@ module {
         url : Text;
     };
     public type ImageID = Text;
-    public type ImagesRef = [ImageRef];
 
     // HTTP
     public type HeaderField = (Text, Text);

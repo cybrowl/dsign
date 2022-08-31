@@ -8,7 +8,6 @@ import Types "./types";
 
 module {
     type ImageID =  Types.ImageID;
-    type ImageUrl = Types.ImageUrl;
     type ImagesUrls = Types.ImagesUrls;
 
     public func get_image_id(url: Text) : Text {
@@ -24,7 +23,7 @@ module {
         return filterBySeparator[0];
     };
 
-    public func generate_snap_image_url(snapImagesCanisterID: Text, imageID: ImageID, isProduction: Bool) : ImageUrl {
+    public func generate_snap_image_url(snapImagesCanisterID: Text, imageID: ImageID, isProduction: Bool) : Text {
         var url = Text.join("", (["https://", snapImagesCanisterID, ".raw.ic0.app", "/snap_image/", imageID].vals()));
 
         if (isProduction == false) {
@@ -35,7 +34,7 @@ module {
     };
 
     public func generate_snap_image_urls(snapImagesCanisterID: Text, imageIds: [ImageID], isProduction: Bool) : ImagesUrls {
-        var image_urls = B.Buffer<ImageUrl>(0);
+        var image_urls = B.Buffer<Text>(0);
 
         for (image_id in imageIds.vals()) {
             var image_url = generate_snap_image_url(snapImagesCanisterID, image_id, isProduction);

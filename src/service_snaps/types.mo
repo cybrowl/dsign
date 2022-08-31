@@ -21,7 +21,6 @@ module {
         id : Text;
         url : Text;
     };
-    public type ImagesRef = [ImageRef];
 
     public type HeaderField = (Text, Text);
 
@@ -48,7 +47,7 @@ module {
         cover_image_location: Nat8;
         created: Time;
         username: Username;
-        image_urls: [ImagesRef];
+        images_ref: [ImageRef];
         file_asset: AssetRef;
         projects: ?[ProjectRef];
         title: Text;
@@ -91,12 +90,6 @@ module {
         file_asset: FileAsset;
     };
 
-    public type FinalizeSnapArgs = {
-        canister_id: Text;
-        snap_id: SnapID;
-        images: Images;
-    };
-
     // Project
     public type ProjectID = Text;
 
@@ -107,12 +100,12 @@ module {
 
     // Actor Interface
     public type SnapActor = actor {
-        save_snap : shared (CreateSnapArgs, ImagesRef, AssetRef, UserPrincipal) -> async Result.Result<Snap, Text>;
+        save_snap : shared (CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, Text>;
         delete_snaps : shared ([SnapID]) -> async ();
         get_all_snaps : query ([SnapID]) -> async [Snap];
     };
 
     public type ImageAssetsActor = actor {
-        save_images : shared ([Nat], Principal) -> async Result.Result<[ImagesRef], Text>;
+        save_images : shared ([Nat], Principal) -> async Result.Result<[ImageRef], Text>;
     };
 };
