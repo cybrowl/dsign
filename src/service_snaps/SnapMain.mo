@@ -10,9 +10,9 @@ import Text "mo:base/Text";
 import Result "mo:base/Result";
 
 import Assets "../service_assets/Assets";
+import ImageAssets "../service_assets_img/ImageAssets";
 import Logger "canister:logger";
 import Snap "Snap";
-import SnapImages "SnapImages";
 
 import Types "./types";
 import AssetTypes "../service_assets/types";
@@ -23,11 +23,11 @@ actor SnapMain {
     type DeleteAllSnapsErr = Types.DeleteAllSnapsErr;
     type FinalizeSnapArgs = Types.FinalizeSnapArgs;
     type GetAllSnapsErr = Types.GetAllSnapsErr;
+    type ImageAssetsActor = Types.ImageAssetsActor;
     type Snap = Types.Snap;
     type SnapActor = Types.SnapActor;
     type SnapCanisterID = Types.SnapCanisterID;
     type SnapID = Types.SnapID;
-    type SnapImagesActor = Types.SnapImagesActor;
     type Username = Types.Username;
     type UserPrincipal = Types.UserPrincipal;
 
@@ -64,8 +64,8 @@ actor SnapMain {
 
     public shared ({caller}) func create_snap(args: CreateSnapArgs) : async Result.Result<Snap, Text> {
         let tags = [ACTOR_NAME, "create_snap"];
-        let has_image = args.images.size() > 0;
-        let too_many_images = args.images.size() > 1;
+        let has_image = args.img_asset_ids.size() > 0;
+        let too_many_images = args.img_asset_ids.size() > 1;
 
         if (has_image == false) {
             return #err("No Image To Save");
@@ -108,12 +108,20 @@ actor SnapMain {
             };
         };
 
-        let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
+        let image_assets_actor = actor (snap_images_canister_id) : ImageAssetsActor;
         let snap_actor = actor (snap_canister_id) : SnapActor;
         let assets_actor = actor (asset_canister_id) : AssetTypes.AssetsActor;
 
-        //todo: images can probably be moved to assets
-        let image_urls = await snap_images_actor.save_images(args.images);
+        // save images
+        var images_ref = [];
+        switch(await image_assets_actor.save_images(args.img_asset_ids, caller)) {
+            case(#err error) {
+                return #err(error);
+            };
+            case(#ok images_ref_) {
+                images_ref:= images_ref_;
+            };
+        };
 
         // create asset from chuncks
         var file_asset = {asset_url = ""; canister_id = ""; id = "";};
@@ -127,7 +135,7 @@ actor SnapMain {
         };
 
         // save snap
-        switch(await snap_actor.save_snap(args, image_urls, file_asset, caller)) {
+        switch(await snap_actor.save_snap(args, images_ref, file_asset, caller)) {
             case(#err error) {
                 return #err(error);
             };
@@ -139,18 +147,6 @@ actor SnapMain {
                 #ok(snap);
             };
         };
-    };
-
-    //note: this will be deprecated in future when message transmission > 8MB
-    public shared ({caller}) func finalize_snap_creation(args: FinalizeSnapArgs) : async () {
-        let tags = [ACTOR_NAME, "finalize_snap_creation"];
-        let snap_images_actor = actor (snap_images_canister_id) : SnapImagesActor;
-        let snap_actor = actor (args.canister_id) : SnapActor;
-
-        let image_urls = await snap_images_actor.save_images(args.images);
-
-        // TODO: only allow 4 images per snap
-        ignore await snap_actor.add_img_url_to_snap(image_urls[0], args.snap_id, caller);
     };
 
     public shared ({caller}) func get_all_snaps() : async Result.Result<[Snap], GetAllSnapsErr> {
@@ -234,8 +230,8 @@ actor SnapMain {
 
         // create canister
         Cycles.add(CYCLE_AMOUNT);
-        let snap_images_actor = await SnapImages.SnapImages();
-        let principal = Principal.fromActor(snap_images_actor);
+        let image_assets_actor = await ImageAssets.ImageAssets();
+        let principal = Principal.fromActor(image_assets_actor);
         let snap_images_canister_id_ = Principal.toText(principal);
 
         snap_images_canister_id := snap_images_canister_id_;

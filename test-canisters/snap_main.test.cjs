@@ -131,13 +131,23 @@ test('SnapMain.create_user_snap_storage()::[snap_main_actor.mishicat]: create in
 // });
 
 test('ImageAssetStaging.create_asset()::[snap_main_actor.mishicat] => ', async function (t) {
-	const args = {
-		data: images[0],
-		file_format: 'png'
-	};
+	let promises = [];
 
-	const response = await assets_img_staging_actors.mishicat.create_asset(args);
-	console.log('response: ', response);
+	images.forEach(async function (image) {
+		const args = {
+			data: image,
+			file_format: 'png'
+		};
+
+		promises.push(assets_img_staging_actors.mishicat.create_asset(args));
+	});
+
+	try {
+		let asset_ids = await Promise.all(promises);
+		console.log('asset_ids: ', asset_ids);
+	} catch (error) {
+		console.log('error: ', error);
+	}
 });
 
 // test('SnapMain.create_snap()::[snap_main_actor.mishicat] => #err - too many images', async function (t) {

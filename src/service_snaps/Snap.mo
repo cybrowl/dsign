@@ -18,7 +18,7 @@ actor class Snap() = this {
     type AddImgUrlSnapErr = Types.AddImgUrlSnapErr;
     type CreateSnapArgs = Types.CreateSnapArgs;
     type AssetRef = Types.AssetRef;
-    type ImagesUrls =  Types.ImagesUrls;
+    type ImagesRef =  Types.ImagesRef;
     type ImageUrl =  Types.ImageUrl;
     type Snap = Types.Snap;
     type SnapID = Types.SnapID;
@@ -34,7 +34,7 @@ actor class Snap() = this {
 
     public shared ({caller}) func save_snap(
         args: CreateSnapArgs,
-        imageUrls: ImagesUrls, 
+        images_ref: ImagesRef, 
         file_asset: AssetRef,
         principal: UserPrincipal) : async Result.Result<Snap, Text> {
 
@@ -57,7 +57,7 @@ actor class Snap() = this {
             cover_image_location = args.cover_image_location;
             created = Time.now();
             username = username;
-            image_urls = imageUrls;
+            images_ref = images_ref;
             file_asset = file_asset;
             likes = 0;
             projects = null;
@@ -70,58 +70,15 @@ actor class Snap() = this {
         return #ok(snap);
     };
 
-    public shared ({caller}) func add_img_url_to_snap(
-        img_url: ImageUrl,
-        snap_id:  SnapID,
-        principal: UserPrincipal) : async Result.Result<Snap, AddImgUrlSnapErr> {
-
-        var username = "";
-        switch(await Username.get_username_actor(principal)) {
-            case(#ok username_) {
-                username:= username_;
-            };
-            case(#err error) {
-                return #err(#UsernameNotFound);
-            };
+    public shared ({caller}) func delete_snaps(snapIds: [SnapID]) : async () {
+        for (snap_id in snapIds.vals()){
+            switch (snaps.get(snap_id)){
+                case null {};
+                case (?snap) {
+                   snaps.delete(snap_id);
+                };
+            }
         };
-
-        switch(snaps.get(snap_id)) {
-            case(?snap) {
-
-                if (Text.notEqual(username, snap.username)) {
-                    return #err(#UserNotCreator); 
-                };
-
-                if (snap.image_urls.size() == 4) {
-                    return #err(#ImgLimitReached); 
-                };
-
-                let snap_img_urls = Buffer.fromArray<Text>(snap.image_urls);
-                snap_img_urls.add(img_url);
-
-                let updated_snap: Snap = {
-                    id = snap.id;
-                    canister_id = snap.canister_id;
-                    cover_image_location = snap.cover_image_location;
-                    created = snap.created;
-                    username = snap.username;
-                    image_urls = snap_img_urls.toArray();
-                    file_asset = snap.file_asset;
-                    likes = snap.likes;
-                    projects = snap.projects;
-                    title = snap.title;
-                    views = snap.views;
-                };
-
-                snaps.put(snap_id, updated_snap);
-
-                return #ok(updated_snap);
-
-            };
-            case(_) {
-                return #err(#SnapNotFound);
-            };
-        };        
     };
 
     public query func get_all_snaps(snapIds: [SnapID]) : async [Snap] {
@@ -133,22 +90,10 @@ actor class Snap() = this {
                 case (?snap) {
                    snaps_list.add(snap); 
                 };
-                
             }
         };
 
         return snaps_list.toArray();
-    };
-
-    public shared ({caller}) func delete_snaps(snapIds: [SnapID]) : async () {
-        for (snap_id in snapIds.vals()){
-            switch (snaps.get(snap_id)){
-                case null {};
-                case (?snap) {
-                   snaps.delete(snap_id);
-                };
-            }
-        };
     };
 
     // ------------------------- System Methods -------------------------

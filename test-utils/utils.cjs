@@ -30,12 +30,14 @@ function generate_images() {
 	const motoko_image_buffer = fs.readFileSync('test-utils/images/motoko.png');
 	const above_2m_image_buffer = fs.readFileSync('test-utils/images/image_above_2mb.png');
 	const nyan_cat_image_buffer = fs.readFileSync('test-utils/images/nyan_cat.gif');
+	// const storm_image_buffer = fs.readFileSync('test-utils/images/storm.jpeg');
 
 	// covert to unit 8 array
 	const mishicat_unit8_array_buffer = new Uint8Array(mishicat_image_buffer);
 	const motoko_unit8_array_buffer = new Uint8Array(motoko_image_buffer);
 	const above_2m_unit8_array_buffer = new Uint8Array(above_2m_image_buffer);
 	const nyan_cat_unit8_array_buffer = new Uint8Array(nyan_cat_image_buffer);
+	// const storm_unit8_array_buffer = new Uint8Array(storm_image_buffer);
 
 	const images = [
 		[...mishicat_unit8_array_buffer],

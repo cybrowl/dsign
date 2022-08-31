@@ -2,8 +2,22 @@ import Array "mo:base/Array";
 import Blob "mo:base/Blob";
 import Buffer "mo:base/Buffer";
 import Iter "mo:base/Iter";
+import Text "mo:base/Text";
 
 module {
+    public func get_image_id(url: Text) : Text {
+        if (url.size() == 0) {
+            return ""
+        };
+
+        let urlSplitByPath : [Text] = Iter.toArray(Text.tokens(url, #char '/'));
+        let lastElem : Text = urlSplitByPath[urlSplitByPath.size() - 1];
+        let filterByQueryString : [Text] = Iter.toArray(Text.tokens(lastElem, #char '?'));
+        let filterBySeparator : [Text] = Iter.toArray(Text.tokens(filterByQueryString[0], #char '&'));
+
+        return filterBySeparator[0];
+    };
+
     public func is_valid_image(img: Blob) : Bool {
         var img_arr = Blob.toArray(img);
         var compare = Buffer.Buffer<Nat8>(0);

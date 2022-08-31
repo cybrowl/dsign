@@ -16,13 +16,12 @@ module {
     };
 
     // Images
-    public type Image = {
-        data: Blob
+    public type ImageRef = {
+        canister_id : Text;
+        id : Text;
+        url : Text;
     };
-    public type ImageID = Text;
-    public type Images = [Image];
-    public type ImagesUrls = [ImageUrl];
-    public type ImageUrl = Text;
+    public type ImagesRef = [ImageRef];
 
     public type HeaderField = (Text, Text);
 
@@ -49,7 +48,7 @@ module {
         cover_image_location: Nat8;
         created: Time;
         username: Username;
-        image_urls: [Text];
+        image_urls: [ImagesRef];
         file_asset: AssetRef;
         projects: ?[ProjectRef];
         title: Text;
@@ -88,7 +87,7 @@ module {
     public type CreateSnapArgs = {
         title: Text;
         cover_image_location: Nat8;
-        images: Images;
+        img_asset_ids: [Nat];
         file_asset: FileAsset;
     };
 
@@ -108,13 +107,12 @@ module {
 
     // Actor Interface
     public type SnapActor = actor {
+        save_snap : shared (CreateSnapArgs, ImagesRef, AssetRef, UserPrincipal) -> async Result.Result<Snap, Text>;
         delete_snaps : shared ([SnapID]) -> async ();
-        save_snap : shared (CreateSnapArgs, [ImageID], AssetRef, UserPrincipal) -> async Result.Result<Snap, Text>;
         get_all_snaps : query ([SnapID]) -> async [Snap];
-        add_img_url_to_snap : shared (ImageUrl, SnapID, UserPrincipal) -> async Result.Result<Snap, AddImgUrlSnapErr>;
     };
 
-    public type SnapImagesActor = actor {
-        save_images : shared (Images) -> async ImagesUrls;
+    public type ImageAssetsActor = actor {
+        save_images : shared ([Nat], Principal) -> async Result.Result<[ImagesRef], Text>;
     };
 };

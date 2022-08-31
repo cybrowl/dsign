@@ -32,7 +32,7 @@
       "main": "src/service_assets_img/ImageAssetStaging.mo",
       "type": "motoko",
       "dependencies": [
-        "logger", "username"
+        "logger"
       ]
     },
     "profile": {
@@ -74,18 +74,12 @@
         "username"
       ]
     },
-    "snap_images": {
-      "main": "src/service_snaps/SnapImages.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger"
-      ]
-    },
     "snap_main": {
       "main": "src/service_snaps/SnapMain.mo",
       "type": "motoko",
       "dependencies": [
         "assets_file_chunks",
+        "assets_img_staging",
         "logger",
         "snap",
         "username"
