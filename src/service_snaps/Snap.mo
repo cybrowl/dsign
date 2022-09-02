@@ -15,7 +15,6 @@ import Username "canister:username";
 import Types "./types";
 
 actor class Snap() = this {
-    type AddImgUrlSnapErr = Types.AddImgUrlSnapErr;
     type CreateSnapArgs = Types.CreateSnapArgs;
     type AssetRef = Types.AssetRef;
     type ImageRef =  Types.ImageRef;

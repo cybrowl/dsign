@@ -64,14 +64,14 @@ actor SnapMain {
     public shared ({caller}) func create_snap(args: CreateSnapArgs) : async Result.Result<Snap, Text> {
         let tags = [ACTOR_NAME, "create_snap"];
         let has_image = args.img_asset_ids.size() > 0;
-        let too_many_images = args.img_asset_ids.size() > 1;
+        let too_many_images = args.img_asset_ids.size() > 4;
 
         if (has_image == false) {
             return #err("No Image To Save");
         };
 
         if (too_many_images == true) {
-            return #err("One Image Max");
+            return #err("Four Images Max");
         };
 
         let file_asset_args : AssetTypes.CreateAssetArgs = {
@@ -111,9 +111,9 @@ actor SnapMain {
         let snap_actor = actor (snap_canister_id) : SnapActor;
         let assets_actor = actor (asset_canister_id) : AssetTypes.AssetsActor;
 
-        // save images
-        let image_ref_temp : Types.ImageRef = {canister_id = ""; id = ""; url = ""};
-        var images_ref = [image_ref_temp];
+        // save images from img_asset_ids
+        let image_ref : Types.ImageRef = {canister_id = ""; id = ""; url = ""};
+        var images_ref = [image_ref];
         switch(await image_assets_actor.save_images(args.img_asset_ids, caller)) {
             case(#err error) {
                 return #err(error);
@@ -123,7 +123,7 @@ actor SnapMain {
             };
         };
 
-        // create asset from chuncks
+        // create asset from chunks
         var file_asset = {asset_url = ""; canister_id = ""; id = "";};
         switch(await assets_actor.create_asset_from_chunks(file_asset_args)) {
             case(#err error) {
@@ -248,21 +248,21 @@ actor SnapMain {
         if (asset_canister_id.size() < 1) {
             await create_asset_canister();
         } else {
-            await Logger.log_event(tags, debug_show(("asset exists: ", asset_canister_id)));
+            await Logger.log_event(tags, debug_show(("asset_canister_id: ", asset_canister_id)));
         };
 
         // create snap canister
         if (snap_canister_id.size() < 1) {
             await create_snap_canister();
         } else {
-            await Logger.log_event(tags, debug_show(("snap exists: ", snap_canister_id)));
+            await Logger.log_event(tags, debug_show(("snap_canister_id: ", snap_canister_id)));
         };
 
         // create snap images canister
         if (snap_images_canister_id.size() < 1) {
             await create_snap_images_canister();
         } else {
-            await Logger.log_event(tags, debug_show(("snap_images exists: ", snap_images_canister_id)));
+            await Logger.log_event(tags, debug_show(("snap_images_canister_id: ", snap_images_canister_id)));
         };
     };
 

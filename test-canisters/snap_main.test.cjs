@@ -27,7 +27,7 @@ let mishicat_identity = Ed25519KeyIdentity.generate();
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
-const { generate_images, generate_figma_asset } = require('../test-utils/utils.cjs');
+const { generate_images } = require('../test-utils/utils.cjs');
 
 let images = generate_images();
 
@@ -83,7 +83,7 @@ test('SnapMain.initialize_canisters()', async function (t) {
 	await snap_main_actor.mishicat.initialize_canisters();
 });
 
-test('Username.create_username()::[username_actors.mishicat]: create first with valid username => #ok - username', async function (t) {
+test('Username.create_username()::[mishicat]: create first with valid username => #ok - username', async function (t) {
 	const username = fake.word();
 
 	const response = await username_actors.mishicat.create_username(username.toLowerCase());
@@ -91,7 +91,7 @@ test('Username.create_username()::[username_actors.mishicat]: create first with 
 	t.equal(response.ok.username, username.toLowerCase());
 });
 
-test('SnapMain.create_user_snap_storage()::[snap_main_actor.mishicat]: create initial storage for snaps => #ok - true', async function (t) {
+test('SnapMain.create_user_snap_storage()::[mishicat]: create initial storage for snaps => #ok - true', async function (t) {
 	const response = await snap_main_actor.mishicat.create_user_snap_storage();
 
 	t.equal(response, true);

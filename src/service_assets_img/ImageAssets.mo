@@ -17,11 +17,17 @@ import Types "./types";
 import Utils "./utils";
 
 actor class ImageAssets(controller: Principal) = this {
+    type AssetImg = Types.AssetImg;
     type HttpRequest = Types.HttpRequest;
     type HttpResponse =  Types.HttpResponse;
-    type AssetImg = Types.AssetImg;
     type ImageID = Types.ImageID;
     type ImageRef = Types.ImageRef;
+
+    type AssetImgErr = {
+        #NotAuthorized;
+        #NotOwnerOfAsset;
+        #AssetNotFound;
+    };
 
     let ACTOR_NAME : Text = "ImageAssets";
     let VERSION : Text = "0.0.1";
@@ -37,9 +43,9 @@ actor class ImageAssets(controller: Principal) = this {
         return VERSION;
     };
 
-    public shared ({caller}) func save_images(img_asset_ids: [Nat], owner: Principal) : async Result.Result<[Types.ImageRef], Text> {
+    public shared ({caller}) func save_images(img_asset_ids: [Nat], owner: Principal) : async Result.Result<[Types.ImageRef], AssetImgErr> {
         if (controller != caller) {
-            return #err("Not Authorized");
+            return #err(#NotAuthorized);
         };
 
         let images_ref = Buffer.Buffer<ImageRef>(0);
@@ -47,11 +53,6 @@ actor class ImageAssets(controller: Principal) = this {
         for (asset_id in img_asset_ids.vals()) {
             switch (await ImageAssetStaging.get_asset(asset_id, owner)) {
                 case(#ok asset){
-
-                    if (asset.owner != owner) {
-                        return #err("Not Authorized");
-                    };
-
                     let image_id : ImageID = ULID.toText(se.new());
                     image_assets.put(image_id, asset);
 
@@ -64,7 +65,14 @@ actor class ImageAssets(controller: Principal) = this {
                     images_ref.add(image_ref);
                 };
                 case(#err err){
-                   return #err(err);
+                    switch(err) {
+                        case(#NotOwnerOfAsset) {
+                            return #err(#NotOwnerOfAsset);
+                        };
+                        case(#AssetNotFound) {
+                            return #err(#AssetNotFound);
+                        };
+                    };
                 };
             };
         };

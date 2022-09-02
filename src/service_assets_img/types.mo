@@ -1,5 +1,7 @@
 module {
     // Images
+    public type ImageID = Text;
+
     public type Img = {
         data : Blob;
         file_format : Text;
@@ -15,7 +17,6 @@ module {
         id : Text;
         url : Text;
     };
-    public type ImageID = Text;
 
     // HTTP
     public type HeaderField = (Text, Text);

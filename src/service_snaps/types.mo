@@ -55,18 +55,18 @@ module {
         views: Nat;
     };
 
+    public type CreateSnapArgs = {
+        title: Text;
+        cover_image_location: Nat8;
+        img_asset_ids: [Nat];
+        file_asset: FileAsset;
+    };
+
     public type CreateSnapErr = {
         #NoImageToSave;
         #OneImageMax;
         #UsernameNotFound;
         #UserNotFound;
-    };
-
-    public type AddImgUrlSnapErr = {
-        #ImgLimitReached;
-        #UserNotCreator;
-        #UsernameNotFound;
-        #SnapNotFound;
     };
 
    public type GetAllSnapsErr = {
@@ -81,13 +81,6 @@ module {
         chunk_ids: [Nat];
         content_type: Text;
         is_public: Bool;
-    };
-
-    public type CreateSnapArgs = {
-        title: Text;
-        cover_image_location: Nat8;
-        img_asset_ids: [Nat];
-        file_asset: FileAsset;
     };
 
     // Project

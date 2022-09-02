@@ -48,11 +48,6 @@ cp .dfx/local/canisters/snap/snap.did.js .dfx/local/canisters/snap/snap.did.test
 sed -i '' 's/export//g' .dfx/local/canisters/snap/snap.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/snap/snap.did.test.cjs
 
-# snap_images
-cp .dfx/local/canisters/snap_images/snap_images.did.js .dfx/local/canisters/snap_images/snap_images.did.test.cjs
-sed -i '' 's/export//g' .dfx/local/canisters/snap_images/snap_images.did.test.cjs
-echo "module.exports = { idlFactory };" >> .dfx/local/canisters/snap_images/snap_images.did.test.cjs
-
 # snap_main
 cp .dfx/local/canisters/snap_main/snap_main.did.js .dfx/local/canisters/snap_main/snap_main.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/snap_main/snap_main.did.test.cjs

@@ -8,12 +8,17 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Time "mo:base/Time";
 
-import Username "canister:username";
-
 import Types "./types";
 import Utils "./utils";
 
 actor ImageAssetStaging = {
+    type AssetImg = Types.AssetImg;
+
+    type AssetImgErr = {
+        #NotOwnerOfAsset;
+        #AssetNotFound;
+    };
+
     private var asset_id_count : Nat = 0;
     private let assets : HashMap.HashMap<Nat, Types.AssetImg> = HashMap.HashMap<Nat, Types.AssetImg>(0, Nat.equal, Hash.hash);
 
@@ -50,17 +55,17 @@ actor ImageAssetStaging = {
         }
     };
 
-    public query func get_asset(asset_id: Nat, principal: Principal) : async Result.Result<Types.AssetImg, Text> {
+    public query func get_asset(asset_id: Nat, owner: Principal) : async Result.Result<AssetImg, AssetImgErr> {
         switch (assets.get(asset_id)) {
             case (?asset) {
-                if (asset.owner != principal) {
-                    return #err("Asset Not Owned By Caller");
+                if (asset.owner != owner) {
+                    return #err(#NotOwnerOfAsset);
                 } else {
                     return #ok(asset);
                 }
             };
             case (_) {
-                return #err("Asset Not Found");
+                return #err(#AssetNotFound);
             };
         };
     };
