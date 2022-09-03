@@ -1,5 +1,6 @@
 import Array "mo:base/Array";
 import Debug "mo:base/Debug";
+import Float "mo:base/Float";
 import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
 import Nat "mo:base/Nat";
@@ -24,6 +25,20 @@ actor ImageAssetStaging = {
 
     public query func version() : async Text {
         return "0.0.1";
+    };
+
+    public query func is_full() : async Bool {
+        let MAX_SIZE_THRESHOLD_MB : Float = 3500;
+
+        let rts_memory_size : Nat = Prim.rts_memory_size();
+        let mem_size : Float = Float.fromInt(rts_memory_size);
+        let memory_in_megabytes =  Float.abs(mem_size * 0.000001);
+
+        if (memory_in_megabytes > MAX_SIZE_THRESHOLD_MB) {
+            return true;
+        } else {
+            return false;
+        }
     };
 
     public shared ({caller}) func create_asset(img: Types.Img) : async Nat {

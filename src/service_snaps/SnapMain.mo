@@ -215,7 +215,6 @@ actor SnapMain {
     private func create_image_assets_canister(snap_main_principal : Principal) : async () {
         let tags = [ACTOR_NAME, "create_image_assets_canister"];
 
-        // create canister
         Cycles.add(CYCLE_AMOUNT);
         let image_assets_actor = await ImageAssets.ImageAssets(snap_main_principal);
         let principal = Principal.fromActor(image_assets_actor);
@@ -228,7 +227,6 @@ actor SnapMain {
     private func create_snap_canister(snap_main_principal : Principal) : async () {
         let tags = [ACTOR_NAME, "create_snap_canister"];
 
-        // create canister
         Cycles.add(CYCLE_AMOUNT);
         let snap_actor = await Snap.Snap(snap_main_principal);
         let principal = Principal.fromActor(snap_actor);

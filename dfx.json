@@ -42,23 +42,6 @@
         "logger"
       ]
     },
-    "profile_avatar_images": {
-      "main": "src/service_profile_avatar/ProfileAvatarImages.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger",
-        "profile",
-        "username"
-      ]
-    },
-    "profile_avatar_main": {
-      "main": "src/service_profile_avatar/ProfileAvatarMain.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger",
-        "profile_avatar_images"
-      ]
-    },
     "project_main": {
       "main": "src/service_projects/ProjectMain.mo",
       "type": "motoko",
