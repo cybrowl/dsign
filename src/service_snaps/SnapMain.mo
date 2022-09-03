@@ -39,9 +39,9 @@ actor SnapMain {
 
     // holds data until filled
     // once filled, a new canister is created and assigned
-    stable var snap_canister_id : Text = "";
-    stable var image_assets_canister_id : Text = "";
     stable var assets_canister_id : Text = "";
+    stable var image_assets_canister_id : Text = "";
+    stable var snap_canister_id : Text = "";
 
     // ------------------------- Snaps Management -------------------------
     public shared ({caller}) func create_user_snap_storage() : async Bool {

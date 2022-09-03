@@ -39,6 +39,7 @@
       "main": "src/service_profile/Profile.mo",
       "type": "motoko",
       "dependencies": [
+        "assets_img_staging",
         "logger"
       ]
     },
