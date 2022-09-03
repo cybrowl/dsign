@@ -40,8 +40,8 @@ actor SnapMain {
     // holds data until filled
     // once filled, a new canister is created and assigned
     stable var snap_canister_id : Text = "";
-    stable var snap_images_canister_id : Text = "";
-    stable var asset_canister_id : Text = "";
+    stable var image_assets_canister_id : Text = "";
+    stable var assets_canister_id : Text = "";
 
     // ------------------------- Snaps Management -------------------------
     public shared ({caller}) func create_user_snap_storage() : async Bool {
@@ -100,9 +100,9 @@ actor SnapMain {
             };
         };
 
-        let image_assets_actor = actor (snap_images_canister_id) : ImageAssetsActor;
+        let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
         let snap_actor = actor (snap_canister_id) : SnapActor;
-        let assets_actor = actor (asset_canister_id) : AssetTypes.AssetsActor;
+        let assets_actor = actor (assets_canister_id) : AssetTypes.AssetsActor;
 
         // save images from img_asset_ids
         let image_ref : Types.ImageRef = {canister_id = ""; id = ""; url = ""};
@@ -200,74 +200,67 @@ actor SnapMain {
     };
 
     // ------------------------- Canister Management -------------------------
-    private func create_asset_canister() : async () {
-        let tags = [ACTOR_NAME, "create_asset_canister"];
-
-        let snap_main_principal = Principal.fromActor(SnapMain);
+    private func create_assets_canister(snap_main_principal : Principal) : async () {
+        let tags = [ACTOR_NAME, "create_assets_canister"];
 
         Cycles.add(CYCLE_AMOUNT);
-        let asset_actor = await Assets.Assets(snap_main_principal);
+        let assets_actor = await Assets.Assets(snap_main_principal);
+        let principal = Principal.fromActor(assets_actor);
 
-        let principal = Principal.fromActor(asset_actor);
-        let asset_canister_id_ = Principal.toText(principal);
+        assets_canister_id := Principal.toText(principal);
 
-        asset_canister_id := asset_canister_id_;
-
-        await Logger.log_event(tags, debug_show(("asset_canister_id: ", asset_canister_id)));
+        await Logger.log_event(tags, debug_show(("assets_canister_id: ", assets_canister_id)));
     };
 
-    private func create_snap_canister() : async () {
-        let tags = [ACTOR_NAME, "create_snap_canister"];
-
-        // create canister
-        Cycles.add(CYCLE_AMOUNT);
-        let snap_actor = await Snap.Snap();
-        let principal = Principal.fromActor(snap_actor);
-        let snap_canister_id_ = Principal.toText(principal);
-
-        snap_canister_id := snap_canister_id_;
-
-        await Logger.log_event(tags, debug_show(("snap_canister_id: ", snap_canister_id)));
-    };
-
-    private func create_snap_images_canister() : async () {
-        let tags = [ACTOR_NAME, "create_snap_images_canister"];
-
-        let snap_main_principal = Principal.fromActor(SnapMain);
+    private func create_image_assets_canister(snap_main_principal : Principal) : async () {
+        let tags = [ACTOR_NAME, "create_image_assets_canister"];
 
         // create canister
         Cycles.add(CYCLE_AMOUNT);
         let image_assets_actor = await ImageAssets.ImageAssets(snap_main_principal);
         let principal = Principal.fromActor(image_assets_actor);
-        let snap_images_canister_id_ = Principal.toText(principal);
 
-        snap_images_canister_id := snap_images_canister_id_;
+        image_assets_canister_id := Principal.toText(principal);
 
-        await Logger.log_event(tags, debug_show(("snap_images_canister_id: ", snap_images_canister_id)));
+        await Logger.log_event(tags, debug_show(("image_assets_canister_id: ", image_assets_canister_id)));
+    };
+
+    private func create_snap_canister(snap_main_principal : Principal) : async () {
+        let tags = [ACTOR_NAME, "create_snap_canister"];
+
+        // create canister
+        Cycles.add(CYCLE_AMOUNT);
+        let snap_actor = await Snap.Snap(snap_main_principal);
+        let principal = Principal.fromActor(snap_actor);
+
+        snap_canister_id := Principal.toText(principal);
+
+        await Logger.log_event(tags, debug_show(("snap_canister_id: ", snap_canister_id)));
     };
 
     public shared (msg) func initialize_canisters() : async ()  {
         let tags = [ACTOR_NAME, "initialize_canisters"];
+        let snap_main_principal = Principal.fromActor(SnapMain);
 
         // create asset canister
-        if (asset_canister_id.size() < 1) {
-            await create_asset_canister();
+        if (assets_canister_id.size() < 1) {
+            await create_assets_canister(snap_main_principal);
         } else {
-            await Logger.log_event(tags, debug_show(("asset_canister_id: ", asset_canister_id)));
+            await Logger.log_event(tags, debug_show(("assets_canister_id: ", assets_canister_id)));
+        };
+
+        // create image assets canister
+        if (image_assets_canister_id.size() < 1) {
+            await create_image_assets_canister(snap_main_principal);
+        } else {
+            await Logger.log_event(tags, debug_show(("image_assets_canister_id: ", image_assets_canister_id)));
         };
 
         // create snap canister
         if (snap_canister_id.size() < 1) {
-            await create_snap_canister();
+            await create_snap_canister(snap_main_principal);
         } else {
             await Logger.log_event(tags, debug_show(("snap_canister_id: ", snap_canister_id)));
-        };
-
-        // create snap images canister
-        if (snap_images_canister_id.size() < 1) {
-            await create_snap_images_canister();
-        } else {
-            await Logger.log_event(tags, debug_show(("snap_images_canister_id: ", snap_images_canister_id)));
         };
     };
 

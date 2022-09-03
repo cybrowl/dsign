@@ -48,6 +48,10 @@ actor Profile = {
         profiles.put(principal, profile);
     };
 
+    public shared func update_profile_avatar() : async () {
+
+    };
+
     // note: this is only invoked from profile_avatar_images.save_image()
     public shared func update_avatar_url(
         avatarCanisterId: Text,

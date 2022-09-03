@@ -14,7 +14,7 @@ import Username "canister:username";
 
 import Types "./types";
 
-actor class Snap() = this {
+actor class Snap(controller : Principal) = this {
     type CreateSnapArgs = Types.CreateSnapArgs;
     type AssetRef = Types.AssetRef;
     type ImageRef =  Types.ImageRef;
