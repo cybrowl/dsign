@@ -11,7 +11,6 @@ import ImageAssets "../service_assets_img/ImageAssets";
 import Logger "canister:logger";
 
 import Types "./types";
-import Utils "./utils";
 
 actor Profile = {
     type AvatarImgUrl = Types.AvatarImgUrl;
@@ -55,7 +54,9 @@ actor Profile = {
         profiles.put(principal, profile);
     };
 
-    public shared func update_profile_avatar() : async () {
+    public shared ({caller}) func update_profile_avatar(img_asset_ids: [Nat]) : async () {
+        let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
+
 
     };
 

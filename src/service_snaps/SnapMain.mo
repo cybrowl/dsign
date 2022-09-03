@@ -107,7 +107,7 @@ actor SnapMain {
         // save images from img_asset_ids
         let image_ref : Types.ImageRef = {canister_id = ""; id = ""; url = ""};
         var images_ref = [image_ref];
-        switch(await image_assets_actor.save_images(args.img_asset_ids, caller)) {
+        switch(await image_assets_actor.save_images(args.img_asset_ids, "snap", caller)) {
             case(#err error) {
                 return #err(error);
             };

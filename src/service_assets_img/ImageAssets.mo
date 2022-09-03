@@ -43,7 +43,7 @@ actor class ImageAssets(controller: Principal) = this {
         return VERSION;
     };
 
-    public shared ({caller}) func save_images(img_asset_ids: [Nat], owner: Principal) : async Result.Result<[Types.ImageRef], AssetImgErr> {
+    public shared ({caller}) func save_images(img_asset_ids: [Nat], asset_type: Text, owner: Principal) : async Result.Result<[Types.ImageRef], AssetImgErr> {
         if (controller != caller) {
             return #err(#NotAuthorized);
         };
@@ -60,7 +60,7 @@ actor class ImageAssets(controller: Principal) = this {
                     let image_ref = {
                         canister_id = canister_id;
                         id = image_id;
-                        url = Utils.generate_snap_image_url(canister_id, image_id, isProduction);
+                        url = Utils.generate_image_url(canister_id, image_id, asset_type, isProduction);
                     };
 
                     images_ref.add(image_ref);

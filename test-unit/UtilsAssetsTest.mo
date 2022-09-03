@@ -34,7 +34,7 @@ let success = run([
     }),
   ]),
   describe("AssetsUtils.generate_asset_url()", [
-    it("should generate snap image url", do {
+    it("should generate asset image url", do {
       let canister_id = "qoctq-giaaa-aaaaa-aaaea-cai";
       let asset_id = "70KKS0195HX5MS56MQVGV02C1Z";
       let is_prod = true;

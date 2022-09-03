@@ -51,11 +51,11 @@ module {
         }
     };
 
-    public func generate_snap_image_url(snapImagesCanisterID: Text, imageID: Text, isProduction: Bool) : Text {
-        var url = Text.join("", (["https://", snapImagesCanisterID, ".raw.ic0.app", "/snap_image/", imageID].vals()));
+    public func generate_image_url(canister_id: Text, image_id: Text, asset_type: Text, isProduction: Bool) : Text {
+        var url = Text.join("", (["https://", canister_id, ".raw.ic0.app", "/image/", asset_type, "/", image_id].vals()));
 
         if (isProduction == false) {
-            url:= Text.join("", (["http://localhost:8000/snap_image/", imageID, "?canisterId=", snapImagesCanisterID].vals()));
+            url:= Text.join("", (["http://localhost:8000/image/", asset_type, "/", image_id, "?canisterId=", canister_id].vals()));
         };
 
         return url;

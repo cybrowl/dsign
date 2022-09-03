@@ -1,4 +1,4 @@
-import Utils  "../src/service_profile_avatar/utils";
+import Utils  "../src/service_assets_img/utils";
 import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
 import Text "mo:base/Text";
@@ -15,33 +15,7 @@ let pending = ActorSpec.pending;
 let run = ActorSpec.run;
 
 let success = run([
-  describe("Avatar.get_username()", [
-    it("should get username when params exist", do {
-      let url = "https://dsign.ic/avatar/heyday?canisterId=qaa6y-5yaaa-aaaaa-aaafa-cai";
-      let username = Utils.get_username(url);
-
-      assertTrue(Text.equal(username, "heyday"));
-    }),
-    it("should get username params don't exist", do {
-      let url = "https://dsign.ic/avatar/heyday";
-      let username = Utils.get_username(url);
-
-      assertTrue(Text.equal(username, "heyday"));
-    }),
-    it("should get username with extra /", do {
-      let url = "https://dsign.ic/avatar/heyday/";
-      let username = Utils.get_username(url);
-
-      assertTrue(Text.equal(username, "heyday"));
-    }),
-    it("should get username with extra /", do {
-      let url = "https://dsign.ic/avatar/heyday&";
-      let username = Utils.get_username(url);
-
-      assertTrue(Text.equal(username, "heyday"));
-    }),
-  ]),
-  describe("Avatar.is_valid_image()", [
+  describe("ImageAssets.is_valid_image()", [
     it("should return true for GIF image", do {
       let gifImage : Blob = Blob.fromArray([71,  73,  70,  56]);
       let isValid = Utils.is_valid_image(gifImage);
@@ -78,6 +52,10 @@ let success = run([
 
       assertFalse(isValid);
     }),
+  ]),
+  describe("ImageAssets.get_image_id()", [
+  ]),
+  describe("ImageAssets.generate_image_url()", [
   ])
 ]);
 
