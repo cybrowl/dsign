@@ -55,7 +55,7 @@ actor Profile = {
     };
 
     public shared ({caller}) func update_profile_avatar(img_asset_ids: [Nat]) : async () {
-        let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
+        // let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
 
 
     };

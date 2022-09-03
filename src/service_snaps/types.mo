@@ -99,6 +99,6 @@ module {
     };
 
     public type ImageAssetsActor = actor {
-        save_images : shared ([Nat], Principal) -> async Result.Result<[ImageRef], Text>;
+        save_images : shared ([Nat], Text, Principal) -> async Result.Result<[ImageRef], Text>;
     };
 };
