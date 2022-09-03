@@ -54,8 +54,44 @@ let success = run([
     }),
   ]),
   describe("ImageAssets.get_image_id()", [
+    it("should return image id [local]", do {
+      let url = "http://localhost:8000/image/snap/77R4744E1K56EFF1GEG31R09EE?canisterId=6cnwd-nyaaa-aaaaa-aabfa-cai";
+      let expected = "77R4744E1K56EFF1GEG31R09EE";
+      let image_id = Utils.get_image_id(url);
+
+      assertTrue(Text.equal(image_id, expected));
+    }),
+    it("should return image id [prod]", do {
+      let url = "https://6cnwd-nyaaa-aaaaa-aabfa-cai.raw.ic0.app/image/snap/77R4744E1K56EFF1GEG31R09EE";
+      let expected = "77R4744E1K56EFF1GEG31R09EE";
+      let image_id = Utils.get_image_id(url);
+
+      assertTrue(Text.equal(image_id, expected));
+    }),
   ]),
   describe("ImageAssets.generate_image_url()", [
+    it("should return image asset url [prod]", do {
+      let canister_id = "6cnwd-nyaaa-aaaaa-aabfa-cai";
+      let image_id = "77R4744E1K56EFF1GEG31R09EE";
+      let asset_type = "snap";
+      let isProduction = true;
+
+      let expected = "https://6cnwd-nyaaa-aaaaa-aabfa-cai.raw.ic0.app/image/snap/77R4744E1K56EFF1GEG31R09EE";
+      let url = Utils.generate_image_url(canister_id, image_id, asset_type, isProduction);
+
+      assertTrue(Text.equal(url, expected));
+    }),
+    it("should return image asset url [local]", do {
+      let canister_id = "6cnwd-nyaaa-aaaaa-aabfa-cai";
+      let image_id = "77R4744E1K56EFF1GEG31R09EE";
+      let asset_type = "snap";
+      let isProduction = false;
+
+      let expected = "http://localhost:8000/image/snap/77R4744E1K56EFF1GEG31R09EE?canisterId=6cnwd-nyaaa-aaaaa-aabfa-cai";
+      let url = Utils.generate_image_url(canister_id, image_id, asset_type, isProduction);
+
+      assertTrue(Text.equal(url, expected));
+    }),
   ])
 ]);
 
