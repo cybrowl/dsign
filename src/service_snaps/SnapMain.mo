@@ -74,13 +74,6 @@ actor SnapMain {
             return #err("Four Images Max");
         };
 
-        let file_asset_args : AssetTypes.CreateAssetArgs = {
-            chunk_ids = args.file_asset.chunk_ids;
-            content_type = args.file_asset.content_type;
-            is_public = args.file_asset.is_public;
-            principal = caller;
-        };
-
         // get user snap canister ids
         var snap_canister_ids : HashMap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>> = HashMap.HashMap(0, Text.equal, Text.hash);
         switch (user_canisters_ref.get(caller)) {
@@ -125,12 +118,24 @@ actor SnapMain {
 
         // create asset from chunks
         var file_asset = {asset_url = ""; canister_id = ""; id = "";};
-        switch(await assets_actor.create_asset_from_chunks(file_asset_args)) {
-            case(#err error) {
-                return #err(error);
-            };
-            case(#ok file_asset_) {
-                file_asset:= file_asset_;
+        switch (args.file_asset) {
+            case null {};
+            case (? fileAsset){
+                let file_asset_args : AssetTypes.CreateAssetArgs = {
+                    chunk_ids = fileAsset.chunk_ids;
+                    content_type = fileAsset.content_type;
+                    is_public = fileAsset.is_public;
+                    principal = caller;
+                };
+
+                switch(await assets_actor.create_asset_from_chunks(file_asset_args)) {
+                    case(#err error) {
+                        return #err(error);
+                    };
+                    case(#ok file_asset_) {
+                        file_asset:= file_asset_;
+                    };
+                };
             };
         };
 

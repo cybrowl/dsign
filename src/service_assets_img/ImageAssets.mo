@@ -53,13 +53,14 @@ actor class ImageAssets(controller: Principal) = this {
         for (asset_id in img_asset_ids.vals()) {
             switch (await ImageAssetStaging.get_asset(asset_id, owner)) {
                 case(#ok asset){
+                    let canister_id = Principal.toText(Principal.fromActor(this));
                     let image_id : ImageID = ULID.toText(se.new());
                     image_assets.put(image_id, asset);
 
                     let image_ref = {
-                        canister_id = Principal.toText(Principal.fromActor(this));
+                        canister_id = canister_id;
                         id = image_id;
-                        url = "";
+                        url = Utils.generate_snap_image_url(canister_id, image_id, isProduction);
                     };
 
                     images_ref.add(image_ref);

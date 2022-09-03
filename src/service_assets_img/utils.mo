@@ -51,5 +51,15 @@ module {
         }
     };
 
+    public func generate_snap_image_url(snapImagesCanisterID: Text, imageID: Text, isProduction: Bool) : Text {
+        var url = Text.join("", (["https://", snapImagesCanisterID, ".raw.ic0.app", "/snap_image/", imageID].vals()));
+
+        if (isProduction == false) {
+            url:= Text.join("", (["http://localhost:8000/snap_image/", imageID, "?canisterId=", snapImagesCanisterID].vals()));
+        };
+
+        return url;
+    };
+
     func isEq(a: Nat8, b: Nat8): Bool { a == b };
 }

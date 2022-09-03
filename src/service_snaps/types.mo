@@ -47,7 +47,7 @@ module {
         cover_image_location: Nat8;
         created: Time;
         username: Username;
-        images_ref: [ImageRef];
+        images: [ImageRef];
         file_asset: AssetRef;
         projects: ?[ProjectRef];
         title: Text;
@@ -59,7 +59,7 @@ module {
         title: Text;
         cover_image_location: Nat8;
         img_asset_ids: [Nat];
-        file_asset: FileAsset;
+        file_asset: ?FileAsset;
     };
 
     public type CreateSnapErr = {

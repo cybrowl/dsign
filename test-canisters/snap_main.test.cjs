@@ -38,6 +38,7 @@ let username_actors = {};
 
 let created_snap = {};
 let chunk_ids = [];
+let asset_ids = [];
 
 test('SnapMain.assign actors()', async function (t) {
 	console.log('snap_main_canister_id: ', snap_main_canister_id);
@@ -143,29 +144,28 @@ test('ImageAssetStaging.create_asset()::[snap_main_actor.mishicat] => ', async f
 	});
 
 	try {
-		let asset_ids = await Promise.all(promises);
+		asset_ids = await Promise.all(promises);
 		console.log('asset_ids: ', asset_ids);
 	} catch (error) {
 		console.log('error: ', error);
 	}
 });
 
-// test('SnapMain.create_snap()::[snap_main_actor.mishicat] => #err - too many images', async function (t) {
-// 	let create_args = {
-// 		title: 'mobile',
-// 		cover_image_location: 1,
-// 		images: [{ data: images[0] }, { data: images[1] }],
-// 		file_asset: {
-// 			chunk_ids: chunk_ids,
-// 			content_type: 'application/octet-stream',
-// 			is_public: true
-// 		}
-// 	};
+test('SnapMain.create_snap()::[snap_main_actor.mishicat] => ', async function (t) {
+	let create_args = {
+		title: 'Mobile Example',
+		cover_image_location: 1,
+		img_asset_ids: asset_ids,
+		file_asset: []
+	};
 
-// 	const response = await snap_main_actor.mishicat.create_snap(create_args);
+	const response = await snap_main_actor.mishicat.create_snap(create_args);
 
-// 	t.equals(response.err, 'One Image Max');
-// });
+	console.info('response: ', response);
+	console.log('images: ', response.ok.images);
+
+	// t.equals(response.err, 'One Image Max');
+});
 
 // test('SnapMain.create_snap()', async function (t) {
 // 	let create_args = {
@@ -187,30 +187,8 @@ test('ImageAssetStaging.create_asset()::[snap_main_actor.mishicat] => ', async f
 // 	t.deepEqual(response.ok.image_urls.length, 1);
 // });
 
-// test('SnapMain.finalize_snap_creation()', async function (t) {
-// 	let snap_creation_promises = [];
+test('SnapMain.get_all_snaps()', async function (t) {
+	const response = await snap_main_actor.mishicat.get_all_snaps();
 
-// 	for (const image of images) {
-// 		let snap_temp = {
-// 			canister_id: created_snap.canister_id,
-// 			snap_id: created_snap.id,
-// 			images: [{ data: image }]
-// 		};
-
-// 		snap_creation_promises.push(snap_main_actor.mishicat.finalize_snap_creation(snap_temp));
-// 	}
-
-// 	const responses = await Promise.all(snap_creation_promises);
-// });
-
-// test('SnapMain.get_all_snaps()', async function (t) {
-// 	const response = await snap_main_actor.mishicat.get_all_snaps();
-
-// 	console.info('get_all_snaps: ', response.ok);
-// });
-
-// test('SnapMain.get_all_snaps()', async function (t) {
-// 	const response = await snap_main_actor.mishicat.get_all_snaps();
-
-// 	console.info('get_all_snaps: ', response.ok);
-// });
+	console.info('get_all_snaps: ', response.ok);
+});
