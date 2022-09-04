@@ -11,6 +11,4 @@ npm run test-p
 
 # snaps
 npm run test-sm
-npm run test-si
-npm run test-s
 

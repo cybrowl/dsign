@@ -40,9 +40,7 @@ let created_snap = {};
 let chunk_ids = [];
 let asset_ids = [];
 
-test('SnapMain.assign actors()', async function (t) {
-	console.log('snap_main_canister_id: ', snap_main_canister_id);
-
+test('Setup Actors', async function (t) {
 	assets_file_chunks_actors.mishicat = await get_actor(
 		assets_file_chunks_canister_id,
 		assets_file_chunks_interface,
