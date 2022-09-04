@@ -14,13 +14,6 @@
       ],
       "type": "assets"
     },
-    "assets": {
-      "main": "src/service_assets/Assets.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger", "assets_file_chunks"
-      ]
-    },
     "assets_file_chunks": {
       "main": "src/service_assets/FileAssetChunks.mo",
       "type": "motoko",
@@ -50,14 +43,6 @@
         "logger"
       ]
     },
-    "snap": {
-      "main": "src/service_snaps/Snap.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger",
-        "username"
-      ]
-    },
     "snap_main": {
       "main": "src/service_snaps/SnapMain.mo",
       "type": "motoko",
@@ -65,7 +50,6 @@
         "assets_file_chunks",
         "assets_img_staging",
         "logger",
-        "snap",
         "username"
       ]
     },
@@ -80,6 +64,28 @@
     "logger": {
       "main": "src/service_logger/logger.mo",
       "type": "motoko"
+    },
+    "test_assets": {
+      "main": "src/service_assets/Assets.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger", "assets_file_chunks"
+      ]
+    },
+    "test_image_assets": {
+      "main": "src/service_assets_img/ImageAssets.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger", "assets_img_staging"
+      ]
+    },
+    "test_snap": {
+      "main": "src/service_snaps/Snap.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger",
+        "username"
+      ]
     }
   },
   "defaults": {

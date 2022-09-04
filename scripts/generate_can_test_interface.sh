@@ -3,11 +3,6 @@
 # TESTING #
 # NOTE: update file OSX ONLY (Linux remove '')
 
-# assets
-cp .dfx/local/canisters/assets/assets.did.js .dfx/local/canisters/assets/assets.did.test.cjs
-sed -i '' 's/export//g' .dfx/local/canisters/assets/assets.did.test.cjs
-echo "module.exports = { idlFactory };" >> .dfx/local/canisters/assets/assets.did.test.cjs
-
 # assets_file_chunks
 cp .dfx/local/canisters/assets_file_chunks/assets_file_chunks.did.js .dfx/local/canisters/assets_file_chunks/assets_file_chunks.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/assets_file_chunks/assets_file_chunks.did.test.cjs
@@ -33,11 +28,6 @@ echo "module.exports = { idlFactory };" >> .dfx/local/canisters/profile/profile.
 # sed -i '' 's/export//g' .dfx/local/canisters/project_main/project_main.did.test.cjs
 # echo "module.exports = { idlFactory };" >> .dfx/local/canisters/project_main/project_main.did.test.cjs
 
-# snap
-cp .dfx/local/canisters/snap/snap.did.js .dfx/local/canisters/snap/snap.did.test.cjs
-sed -i '' 's/export//g' .dfx/local/canisters/snap/snap.did.test.cjs
-echo "module.exports = { idlFactory };" >> .dfx/local/canisters/snap/snap.did.test.cjs
-
 # snap_main
 cp .dfx/local/canisters/snap_main/snap_main.did.js .dfx/local/canisters/snap_main/snap_main.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/snap_main/snap_main.did.test.cjs
@@ -47,3 +37,18 @@ echo "module.exports = { idlFactory };" >> .dfx/local/canisters/snap_main/snap_m
 cp .dfx/local/canisters/username/username.did.js .dfx/local/canisters/username/username.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/username/username.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/username/username.did.test.cjs
+
+# test_assets
+cp .dfx/local/canisters/test_assets/test_assets.did.js .dfx/local/canisters/test_assets/test_assets.did.test.cjs
+sed -i '' 's/export//g' .dfx/local/canisters/test_assets/test_assets.did.test.cjs
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/test_assets/test_assets.did.test.cjs
+
+# test_image_assets
+cp .dfx/local/canisters/test_image_assets/test_image_assets.did.js .dfx/local/canisters/test_image_assets/test_image_assets.did.test.cjs
+sed -i '' 's/export//g' .dfx/local/canisters/test_image_assets/test_image_assets.did.test.cjs
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/test_image_assets/test_image_assets.did.test.cjs
+
+# test_snap
+cp .dfx/local/canisters/test_snap/test_snap.did.js .dfx/local/canisters/test_snap/test_snap.did.test.cjs
+sed -i '' 's/export//g' .dfx/local/canisters/test_snap/test_snap.did.test.cjs
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/test_snap/test_snap.did.test.cjs

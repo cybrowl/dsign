@@ -8,10 +8,6 @@
 
 	import { createActor as create_actor_username, actor_username } from '../store/actor_username';
 	import { createActor as create_actor_profile, actor_profile } from '../store/actor_profile';
-	import {
-		createActor as create_actor_profile_avatar_main,
-		actor_profile_avatar_main
-	} from '../store/actor_profile_avatar_main';
 	import { createActor as create_actor_snap_main, actor_snap_main } from '../store/actor_snap_main';
 
 	import { auth_client } from '../store/auth_client';
@@ -41,11 +37,6 @@
 				actor: create_actor_profile()
 			}));
 
-			actor_profile_avatar_main.update(() => ({
-				loggedIn: false,
-				actor: create_actor_profile_avatar_main()
-			}));
-
 			actor_snap_main.update(() => ({
 				loggedIn: false,
 				actor: create_actor_snap_main()
@@ -68,15 +59,6 @@
 		actor_profile.update(() => ({
 			loggedIn: true,
 			actor: create_actor_profile({
-				agentOptions: {
-					identity: $auth_client.getIdentity()
-				}
-			})
-		}));
-
-		actor_profile_avatar_main.update(() => ({
-			loggedIn: true,
-			actor: create_actor_profile_avatar_main({
 				agentOptions: {
 					identity: $auth_client.getIdentity()
 				}

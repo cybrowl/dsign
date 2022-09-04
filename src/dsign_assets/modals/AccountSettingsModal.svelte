@@ -5,10 +5,6 @@
 
 	import { createActor as create_actor_username, actor_username } from '../store/actor_username';
 	import { createActor as create_actor_profile, actor_profile } from '../store/actor_profile';
-	import {
-		createActor as create_actor_profile_avatar_main,
-		actor_profile_avatar_main
-	} from '../store/actor_profile_avatar_main';
 
 	import { auth_client } from '../store/auth_client';
 	import { isAccountSettingsModalVisible } from '../store/modal';
@@ -24,7 +20,7 @@
 			data: [...imageAsUnit8ArrayBuffer]
 		};
 
-		await $actor_profile_avatar_main.actor.save_image(avatar);
+		// await $actor_profile_avatar_main.actor.save_image(avatar);
 		let {
 			ok: { profile }
 		} = await $actor_profile.actor.get_profile();
@@ -57,15 +53,6 @@
 		actor_profile.update(() => ({
 			loggedIn: false,
 			actor: create_actor_profile({
-				agentOptions: {
-					identity: $auth_client.getIdentity()
-				}
-			})
-		}));
-
-		actor_profile_avatar_main.update(() => ({
-			loggedIn: false,
-			actor: create_actor_profile_avatar_main({
 				agentOptions: {
 					identity: $auth_client.getIdentity()
 				}

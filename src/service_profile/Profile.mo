@@ -56,7 +56,9 @@ actor Profile = {
 
     public shared ({caller}) func update_profile_avatar(img_asset_ids: [Nat]) : async () {
         // let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
-
+        // todo: get avatar image canister_id and asset_id
+        // if they don't have an id, create one and add the image to it
+        
 
     };
 

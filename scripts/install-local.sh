@@ -4,9 +4,11 @@
 dfx deploy username
 export USERNAME_ID=$(dfx canister id username)
 
-# profile_avatar
-dfx deploy profile_avatar_images
-dfx deploy profile_avatar_main
+# asset chunks
+dfx deploy assets_file_chunks
+
+# image asset staging
+dfx deploy assets_img_staging
 
 # profile
 dfx deploy profile
@@ -15,16 +17,18 @@ export PROFILE_ID=$(dfx canister id profile)
 # projects
 dfx deploy project_main
 
-# snaps
-dfx deploy snap_images
-dfx deploy snap
-dfx deploy snap_main
-export SNAP_MAIN_ID=$(dfx canister id snap_main)
-
 # logger
 dfx deploy logger
 
+# snaps
+dfx deploy snap_main
+export SNAP_MAIN_ID=$(dfx canister id snap_main)
+
 # front end
 dfx deploy dsign_assets
+
+# test canisters
+dfx deploy test_assets --argument='(principal "'${SNAP_MAIN_ID}'")'
+dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_ID}'")'
 
 # killall dfx replica nodemanager
