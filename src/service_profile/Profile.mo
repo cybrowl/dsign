@@ -110,7 +110,15 @@ actor Profile = {
                 };
             };
         } else {
-            return #ok("pending");
+            let img_avatar_canister_id = profile.avatar.canister_id;
+            let stored_asset_id = profile.avatar.id;
+
+            let image_assets_actor = actor (img_avatar_canister_id) : ImageAssetsActor;
+
+            let asset_id = img_asset_ids[0];
+            ignore image_assets_actor.update_image(asset_id, stored_asset_id, "avatar", caller);
+
+            return #ok("updated avatar");
         };
     };
 

@@ -44,7 +44,11 @@ actor class ImageAssets(controller: Principal) = this {
         return VERSION;
     };
 
-    public shared ({caller}) func save_images(img_asset_ids: [Nat], asset_type: Text, owner: Principal) : async Result.Result<[Types.ImageRef], AssetImgErr> {
+    public shared ({caller}) func save_images(
+        img_asset_ids: [Nat],
+        asset_type: Text,
+        owner: Principal
+    ) : async Result.Result<[Types.ImageRef], AssetImgErr> {
         let tags = [ACTOR_NAME, "save_images"];
 
         if (controller != caller) {
@@ -87,6 +91,48 @@ actor class ImageAssets(controller: Principal) = this {
 
         ignore ImageAssetStaging.delete_assets(img_asset_ids, owner);
         return #ok(images_ref.toArray());
+    };
+
+    public shared ({caller}) func update_image(
+        asset_id: Nat,
+        stored_asset_id: Text,
+        asset_type: Text,
+        owner: Principal
+    ) : async Result.Result<Types.ImageRef, AssetImgErr> {
+        let tags = [ACTOR_NAME, "update_image"];
+
+        if (controller != caller) {
+            return #err(#NotAuthorized);
+        };
+
+        switch (await ImageAssetStaging.get_asset(asset_id, owner)) {
+            case(#ok asset){
+                let canister_id = Principal.toText(Principal.fromActor(this));
+                image_assets.put(stored_asset_id, asset);
+
+                let image_ref = {
+                    canister_id = canister_id;
+                    id = stored_asset_id;
+                    url = Utils.generate_image_url(canister_id, stored_asset_id, asset_type, isProduction);
+                };
+
+                return #ok(image_ref);
+            };
+            case(#err err){
+                switch(err) {
+                    case(#NotOwnerOfAsset) {
+
+                        ignore Logger.log_event(tags, debug_show("NotOwnerOfAsset"));
+                        return #err(#NotOwnerOfAsset);
+                    };
+                    case(#AssetNotFound) {
+
+                        ignore Logger.log_event(tags, debug_show("AssetNotFound"));
+                        return #err(#AssetNotFound);
+                    };
+                };
+            };
+        };
     };
 
     // serves the image to the client when requested via image url
