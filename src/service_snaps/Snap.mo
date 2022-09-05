@@ -30,7 +30,7 @@ actor class Snap(controller : Principal) = this {
 
     //TODO: only allow snap_main to accesss write methods
 
-    public shared ({caller}) func save_snap(
+    public shared ({caller}) func create_snap(
         args: CreateSnapArgs,
         images_ref: [ImageRef], 
         file_asset: AssetRef,

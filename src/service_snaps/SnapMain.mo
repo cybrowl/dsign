@@ -144,7 +144,7 @@ actor SnapMain {
         };
 
         // save snap
-        switch(await snap_actor.save_snap(args, images_ref, file_asset, caller)) {
+        switch(await snap_actor.create_snap(args, images_ref, file_asset, caller)) {
             case(#err err) {
                 return #err(#ErrorCall(debug_show(err)));
             };
