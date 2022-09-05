@@ -64,9 +64,10 @@ module {
 
     public type CreateSnapErr = {
         #NoImageToSave;
-        #OneImageMax;
+        #FourImagesMax;
         #UsernameNotFound;
         #UserNotFound;
+        #ErrorCall: Text;
     };
 
    public type GetAllSnapsErr = {
@@ -98,7 +99,12 @@ module {
         get_all_snaps : query ([SnapID]) -> async [Snap];
     };
 
+    type AssetImgErr = {
+        #NotAuthorized;
+        #NotOwnerOfAsset;
+        #AssetNotFound;
+    };
     public type ImageAssetsActor = actor {
-        save_images : shared ([Nat], Text, Principal) -> async Result.Result<[ImageRef], Text>;
+        save_images : shared ([Nat], Text, Principal) -> async Result.Result<[ImageRef], AssetImgErr>;
     };
 };

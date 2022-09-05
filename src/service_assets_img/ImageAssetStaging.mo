@@ -16,8 +16,8 @@ actor ImageAssetStaging = {
     type AssetImg = Types.AssetImg;
 
     type AssetImgErr = {
-        #NotOwnerOfAsset;
         #AssetNotFound;
+        #NotOwnerOfAsset;
     };
 
     private var asset_id_count : Nat = 0;

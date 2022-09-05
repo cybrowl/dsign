@@ -11,6 +11,7 @@ import Text "mo:base/Text";
 import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
+import Logger "canister:logger";
 import ImageAssetStaging "canister:assets_img_staging";
 
 import Types "./types";
@@ -44,6 +45,8 @@ actor class ImageAssets(controller: Principal) = this {
     };
 
     public shared ({caller}) func save_images(img_asset_ids: [Nat], asset_type: Text, owner: Principal) : async Result.Result<[Types.ImageRef], AssetImgErr> {
+        let tags = [ACTOR_NAME, "save_images"];
+
         if (controller != caller) {
             return #err(#NotAuthorized);
         };
@@ -68,9 +71,13 @@ actor class ImageAssets(controller: Principal) = this {
                 case(#err err){
                     switch(err) {
                         case(#NotOwnerOfAsset) {
+
+                            ignore Logger.log_event(tags, debug_show("NotOwnerOfAsset"));
                             return #err(#NotOwnerOfAsset);
                         };
                         case(#AssetNotFound) {
+
+                            ignore Logger.log_event(tags, debug_show("AssetNotFound"));
                             return #err(#AssetNotFound);
                         };
                     };

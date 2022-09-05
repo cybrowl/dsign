@@ -49,6 +49,8 @@ actor SnapMain {
 
         switch (user_canisters_ref.get(caller)) {
             case (?snap_canister_ids) {
+                ignore Logger.log_event(tags, "exists, user_snap_storage");
+
                 return false;
             };
             case (_) {
@@ -56,22 +58,24 @@ actor SnapMain {
 
                 user_canisters_ref.put(caller, empty_snap_canister_id_storage);
 
+                ignore Logger.log_event(tags, "created, user_snap_storage");
+
                 return true;
             };
         };
     };
 
-    public shared ({caller}) func create_snap(args: CreateSnapArgs) : async Result.Result<Snap, Text> {
+    public shared ({caller}) func create_snap(args: CreateSnapArgs) : async Result.Result<Snap, CreateSnapErr> {
         let tags = [ACTOR_NAME, "create_snap"];
         let has_image = args.img_asset_ids.size() > 0;
         let too_many_images = args.img_asset_ids.size() > 4;
 
         if (has_image == false) {
-            return #err("No Image To Save");
+            return #err(#NoImageToSave);
         };
 
         if (too_many_images == true) {
-            return #err("Four Images Max");
+            return #err(#FourImagesMax);
         };
 
         // get user snap canister ids
@@ -81,9 +85,9 @@ actor SnapMain {
                 snap_canister_ids := snap_canister_ids_;
             };
             case(_) {
-               return #err("User Not Found");
+               return #err(#UserNotFound);
             };
-        }; 
+        };
 
         // get snap ids from current canister id
         var snap_ids = Buffer.Buffer<SnapID>(0);
@@ -108,8 +112,8 @@ actor SnapMain {
         let image_ref : Types.ImageRef = {canister_id = ""; id = ""; url = ""};
         var images_ref = [image_ref];
         switch(await image_assets_actor.save_images(args.img_asset_ids, "snap", caller)) {
-            case(#err error) {
-                return #err(error);
+            case(#err err) {
+                return #err(#ErrorCall(debug_show(err)));
             };
             case(#ok images_ref_) {
                 images_ref:= images_ref_;
@@ -129,8 +133,8 @@ actor SnapMain {
                 };
 
                 switch(await assets_actor.create_asset_from_chunks(file_asset_args)) {
-                    case(#err error) {
-                        return #err(error);
+                    case(#err err) {
+                        return #err(#ErrorCall(debug_show(err)));
                     };
                     case(#ok file_asset_) {
                         file_asset:= file_asset_;
@@ -141,8 +145,8 @@ actor SnapMain {
 
         // save snap
         switch(await snap_actor.save_snap(args, images_ref, file_asset, caller)) {
-            case(#err error) {
-                return #err(error);
+            case(#err err) {
+                return #err(#ErrorCall(debug_show(err)));
             };
             case(#ok snap) {
                 snap_ids.add(snap.id);
@@ -228,7 +232,7 @@ actor SnapMain {
         let tags = [ACTOR_NAME, "initialize_canisters"];
         let snap_main_principal = Principal.fromActor(SnapMain);
 
-        // create asset canister
+        // create assets canister
         if (assets_canister_id.size() < 1) {
             await create_assets_canister(snap_main_principal);
 
@@ -258,7 +262,7 @@ actor SnapMain {
 
     // ------------------------- System Methods -------------------------
     system func preupgrade() {
-        var anon_principal = Principal.fromText("");
+        var anon_principal = Principal.fromText("2vxsx-fae");
         user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
 
         var i = 0;
@@ -290,7 +294,7 @@ actor SnapMain {
         };
 
         user_canisters_ref := user_canisters_ref_temp;
-        var anon_principal = Principal.fromText("");
+        var anon_principal = Principal.fromText("2vxsx-fae");
         user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
     };
 };

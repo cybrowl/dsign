@@ -165,6 +165,32 @@ test('SnapMain[mishicat].create_snap(): should create snap => #ok - snap', async
 	// t.equals(response.err, 'One Image Max');
 });
 
+test('SnapMain[mishicat].create_snap(): should return error => #err - No Image To Save', async function (t) {
+	let create_args = {
+		title: 'Error No Image To Save',
+		cover_image_location: 1,
+		img_asset_ids: [],
+		file_asset: []
+	};
+
+	const response = await snap_main_actor.mishicat.create_snap(create_args);
+
+	console.info('response: ', response);
+});
+
+test('SnapMain[mishicat].create_snap(): should return error => #err - AssetNotFound', async function (t) {
+	let create_args = {
+		title: 'Error AssetNotFound',
+		cover_image_location: 1,
+		img_asset_ids: [69],
+		file_asset: []
+	};
+
+	const response = await snap_main_actor.mishicat.create_snap(create_args);
+
+	console.info('response: ', response);
+});
+
 // test('SnapMain.create_snap()', async function (t) {
 // 	let create_args = {
 // 		title: 'one image',
