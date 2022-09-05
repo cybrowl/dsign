@@ -24,7 +24,7 @@
 
 			// save to local storage every time
 			local_storage_profile.set({
-				avatar_url: get(profile, 'avatar_url', ''),
+				avatar_url: get(profile, 'avatar.url', ''),
 				username: get(profile, 'username', '')
 			});
 		} catch (error) {

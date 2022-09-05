@@ -6,6 +6,10 @@
 	import ProfileAvatar from './ProfileAvatar.svelte';
 	import { isSnapCreationModalVisible } from '../store/modal';
 
+	import {
+		createActor as create_actor_assets_img_staging,
+		actor_assets_img_staging
+	} from '../store/actor_assets_img_staging';
 	import { createActor as create_actor_username, actor_username } from '../store/actor_username';
 	import { createActor as create_actor_profile, actor_profile } from '../store/actor_profile';
 	import { createActor as create_actor_snap_main, actor_snap_main } from '../store/actor_snap_main';
@@ -27,6 +31,11 @@
 		if (isAuthenticated) {
 			handleAuth();
 		} else {
+			actor_assets_img_staging.update(() => ({
+				loggedIn: false,
+				actor: create_actor_assets_img_staging()
+			}));
+
 			actor_username.update(() => ({
 				loggedIn: false,
 				actor: create_actor_username()
@@ -47,6 +56,15 @@
 	});
 
 	function handleAuth() {
+		actor_assets_img_staging.update(() => ({
+			loggedIn: true,
+			actor: create_actor_assets_img_staging({
+				agentOptions: {
+					identity: $auth_client.getIdentity()
+				}
+			})
+		}));
+
 		actor_username.update(() => ({
 			loggedIn: true,
 			actor: create_actor_username({

@@ -3,6 +3,10 @@
 	import get from 'lodash/get.js';
 	import Modal from 'dsign-components/components/Modal.svelte';
 
+	import {
+		createActor as create_actor_assets_img_staging,
+		actor_assets_img_staging
+	} from '../store/actor_assets_img_staging';
 	import { createActor as create_actor_username, actor_username } from '../store/actor_username';
 	import { createActor as create_actor_profile, actor_profile } from '../store/actor_profile';
 
@@ -16,17 +20,20 @@
 		const selectedFile = files[0];
 
 		const imageAsUnit8ArrayBuffer = new Uint8Array(await selectedFile.arrayBuffer());
-		const avatar = {
-			data: [...imageAsUnit8ArrayBuffer]
+		const create_asset_args = {
+			data: [...imageAsUnit8ArrayBuffer],
+			file_format: selectedFile.type
 		};
 
-		// await $actor_profile_avatar_main.actor.save_image(avatar);
+		let img_asset_id = await $actor_assets_img_staging.actor.create_asset(create_asset_args);
+		await $actor_profile.actor.update_profile_avatar([img_asset_id]);
+
 		let {
 			ok: { profile }
 		} = await $actor_profile.actor.get_profile();
 
 		local_storage_profile.set({
-			avatar_url: get(profile, 'avatar_url', '') + '&' + Math.floor(Math.random() * 100),
+			avatar_url: get(profile, 'avatar.url', '') + '&' + Math.floor(Math.random() * 100),
 			username: get(profile, 'username', ''),
 			website: ''
 		});
@@ -40,6 +47,15 @@
 
 	async function handleLogOut() {
 		await $auth_client.logout();
+
+		actor_assets_img_staging.update(() => ({
+			loggedIn: false,
+			actor: create_actor_assets_img_staging({
+				agentOptions: {
+					identity: $auth_client.getIdentity()
+				}
+			})
+		}));
 
 		actor_username.update(() => ({
 			loggedIn: false,
