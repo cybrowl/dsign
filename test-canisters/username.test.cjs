@@ -25,7 +25,9 @@ const { getActor: get_actor } = require('../test-utils/actor.cjs');
 
 let username_actors = {};
 
-test('Username.assign actors()', async function (t) {
+test('Setup Actors)', async function (t) {
+	console.log('=========== Username ===========');
+
 	username_actors.mishicat = await get_actor(
 		username_canister_id,
 		username_interface,
@@ -45,27 +47,23 @@ test('Username.assign actors()', async function (t) {
 		username_interface,
 		anonymous_identity
 	);
-	const response = await username_actors.mishicat.version();
-
-	console.log('=========== Username ===========');
-	console.log('version: ', response);
 });
 
 // get_username
-test('Username.get_username()::[username_actors.mishicat]: no username created => #err - UserNotFound', async function (t) {
+test('Username[mishicat].get_username(): no username created => #err - UserNotFound', async function (t) {
 	const response = await username_actors.mishicat.get_username();
 
 	t.deepEqual(response.err, { UserNotFound: null });
 });
 
-test('Username.get_username()::[username_actors.motoko]: no username created => #err - UserNotFound', async function (t) {
+test('Username[motoko].get_username(): no username created => #err - UserNotFound', async function (t) {
 	const response = await username_actors.motoko.get_username();
 
 	t.deepEqual(response.err, { UserNotFound: null });
 });
 
 // create_username
-test('Username.create_username()::[username_actors.anonymous] with anon identity => #err - UserAnonymous', async function (t) {
+test('Username[anonymous].create_username(): with anon identity => #err - UserAnonymous', async function (t) {
 	const username = fake.word();
 
 	const response = await username_actors.anonymous.create_username(username.toLowerCase());
@@ -73,7 +71,7 @@ test('Username.create_username()::[username_actors.anonymous] with anon identity
 	t.deepEqual(response.err, { UserAnonymous: null });
 });
 
-test('Username.create_username()::[username_actors.mishicat] with invalid username => #err - UsernameInvalid', async function (t) {
+test('Username[mishicat].create_username(): with invalid username => #err - UsernameInvalid', async function (t) {
 	const username = fake.word();
 
 	const response = await username_actors.mishicat.create_username(username);
@@ -81,7 +79,7 @@ test('Username.create_username()::[username_actors.mishicat] with invalid userna
 	t.deepEqual(response.err, { UsernameInvalid: null });
 });
 
-test('Username.create_username()::[username_actors.mishicat]: with taken username => #err - UsernameTaken', async function (t) {
+test('Username[mishicat].create_username(): with taken username => #err - UsernameTaken', async function (t) {
 	const username = fake.word();
 
 	const createdUsername = await username_actors.mishicat.create_username(username.toLowerCase());
@@ -91,7 +89,7 @@ test('Username.create_username()::[username_actors.mishicat]: with taken usernam
 	t.deepEqual(response.err, { UsernameTaken: null });
 });
 
-test('Username.create_username()::[username_actors.motoko]: create first with valid username => #ok - username', async function (t) {
+test('Username[motoko].create_username(): create first with valid username => #ok - username', async function (t) {
 	const username = fake.word();
 
 	const response = await username_actors.motoko.create_username(username.toLowerCase());
@@ -99,7 +97,7 @@ test('Username.create_username()::[username_actors.motoko]: create first with va
 	t.equal(response.ok.username, username.toLowerCase());
 });
 
-test('Username.create_username()::[username_actors.motoko]: create second with new valid username => #err - UserHasUsername', async function (t) {
+test('Username[motoko].create_username(): create second with new valid username => #err - UserHasUsername', async function (t) {
 	const username = fake.word();
 
 	const response = await username_actors.motoko.create_username(username.toLowerCase());
@@ -108,7 +106,7 @@ test('Username.create_username()::[username_actors.motoko]: create second with n
 });
 
 // update_username
-test('Username.update_username()::[username_actors.anonymous] with anon identity => #err - UserAnonymous', async function (t) {
+test('Username[anonymous].update_username(): with anon identity => #err - UserAnonymous', async function (t) {
 	const username = fake.word();
 
 	const response = await username_actors.anonymous.update_username(username.toLowerCase());
@@ -116,7 +114,7 @@ test('Username.update_username()::[username_actors.anonymous] with anon identity
 	t.deepEqual(response.err, { UserAnonymous: null });
 });
 
-test('Username.update_username()::[username_actors.motoko] with invalid username => #err - UsernameInvalid', async function (t) {
+test('Username[motoko].update_username(): with invalid username => #err - UsernameInvalid', async function (t) {
 	const username = fake.word();
 
 	const response = await username_actors.motoko.update_username(username);
@@ -124,7 +122,7 @@ test('Username.update_username()::[username_actors.motoko] with invalid username
 	t.deepEqual(response.err, { UsernameInvalid: null });
 });
 
-test('Username.update_username()::[username_actors.motoko] with taken username => #err - UsernameTaken', async function (t) {
+test('Username[motoko].update_username(): with taken username => #err - UsernameTaken', async function (t) {
 	const username = 'mishicat';
 	await username_actors.bot.create_username(username);
 
@@ -133,7 +131,7 @@ test('Username.update_username()::[username_actors.motoko] with taken username =
 	t.deepEqual(response.err, { UsernameTaken: null });
 });
 
-test('Username.update_username()::[username_actors.motoko] with taken username => #ok - username', async function (t) {
+test('Username[motoko].update_username(): with taken username => #ok - username', async function (t) {
 	const username = fake.word();
 
 	const response = await username_actors.motoko.update_username(username.toLowerCase());
@@ -142,14 +140,14 @@ test('Username.update_username()::[username_actors.motoko] with taken username =
 });
 
 // get_username
-test('Username.get_username()::[username_actors.mishicat]: user has username => #ok - username', async function (t) {
+test('Username[mishicat].get_username(): user has username => #ok - username', async function (t) {
 	const response = await username_actors.mishicat.get_username();
 	const hasUsername = response.ok.username.length > 1;
 
 	t.equal(hasUsername, true);
 });
 
-test('Username.get_username()::[username_actors.motoko]: user has username => #ok - username', async function (t) {
+test('Username[motoko].get_username(): user has username => #ok - username', async function (t) {
 	const response = await username_actors.motoko.get_username();
 	const hasUsername = response.ok.username.length > 1;
 
