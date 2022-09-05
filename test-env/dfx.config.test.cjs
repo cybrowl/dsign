@@ -8,19 +8,21 @@ test('DFX Config: generateCanisterAliases()', async function (t) {
 		'local-canister-ids': '/Users/cyberowl/Projects/dsign/.dfx/local/canister_ids.json',
 		$IDLdsign_assets:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/dsign_assets.did.js',
+		$IDLassets_file_chunks:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/assets_file_chunks/assets_file_chunks.did.js',
+		$IDLassets_img_staging:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/assets_img_staging/assets_img_staging.did.js',
 		$IDLprofile: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile/profile.did.js',
-		$IDLprofile_avatar_images:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile_avatar_images/profile_avatar_images.did.js',
-		$IDLprofile_avatar_main:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile_avatar_main/profile_avatar_main.did.js',
 		$IDLproject_main:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/project_main/project_main.did.js',
-		$IDLsnap: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/snap/snap.did.js',
-		$IDLsnap_images:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/snap_images/snap_images.did.js',
 		$IDLsnap_main: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/snap_main/snap_main.did.js',
 		$IDLusername: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/username/username.did.js',
-		$IDLlogger: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/logger/logger.did.js'
+		$IDLlogger: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/logger/logger.did.js',
+		$IDLtest_assets:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_assets/test_assets.did.js',
+		$IDLtest_image_assets:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_image_assets/test_image_assets.did.js',
+		$IDLtest_snap: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_snap/test_snap.did.js'
 	};
 
 	t.deepEqual(aliases, expected);
