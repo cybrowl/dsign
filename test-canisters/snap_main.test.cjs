@@ -114,7 +114,7 @@ test('SnapMain[mishicat].create_user_snap_storage(): should create initial stora
 test('SnapMain[mishicat].create_snap(): should return error => #err - NoImageToSave', async function (t) {
 	let create_args = {
 		title: 'Error NoImageToSave',
-		cover_image_location: 1,
+		image_cover_location: 1,
 		img_asset_ids: [],
 		file_asset: []
 	};
@@ -127,7 +127,7 @@ test('SnapMain[mishicat].create_snap(): should return error => #err - NoImageToS
 test('SnapMain[mishicat].create_snap(): should return error => #err - FourImagesMax', async function (t) {
 	let create_args = {
 		title: 'Mobile Example',
-		cover_image_location: 1,
+		image_cover_location: 1,
 		img_asset_ids: [1, 2, 3, 4, 5],
 		file_asset: []
 	};
@@ -140,7 +140,7 @@ test('SnapMain[mishicat].create_snap(): should return error => #err - FourImages
 test('SnapMain[mishicat].create_snap(): should return error => #err - AssetNotFound', async function (t) {
 	let create_args = {
 		title: 'Error AssetNotFound',
-		cover_image_location: 1,
+		image_cover_location: 1,
 		img_asset_ids: [10000000],
 		file_asset: []
 	};
@@ -164,7 +164,6 @@ test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - 
 
 	try {
 		img_asset_ids = await Promise.all(promises);
-		console.log('asset_ids: ', img_asset_ids);
 	} catch (error) {
 		console.log('error: ', error);
 	}
@@ -187,7 +186,7 @@ test('SnapMain[motoko].create_user_snap_storage(): should create initial storage
 test('SnapMain[motoko].create_snap(): should return error => #err - NotOwnerOfAsset', async function (t) {
 	let create_args = {
 		title: 'NotOwnerOfAsset Example',
-		cover_image_location: 1,
+		image_cover_location: 1,
 		img_asset_ids: img_asset_ids,
 		file_asset: []
 	};
@@ -210,7 +209,7 @@ test('ImageAssetStaging[mishicat].get_asset(): should return asset => #ok - asse
 test('SnapMain[mishicat].create_snap(): should create snap without file asset => #ok - snap', async function (t) {
 	let create_args = {
 		title: 'Mobile Example',
-		cover_image_location: 1,
+		image_cover_location: 1,
 		img_asset_ids: img_asset_ids,
 		file_asset: []
 	};
@@ -265,7 +264,7 @@ test('ImageAssetStaging[mishicat].get_asset(): should return asset => #err - ass
 // test('SnapMain.create_snap()', async function (t) {
 // 	let create_args = {
 // 		title: 'one image',
-// 		cover_image_location: 1,
+// 		image_cover_location: 1,
 // 		images: [{ data: images[0] }],
 // 		file_asset: {
 // 			chunk_ids: chunk_ids,

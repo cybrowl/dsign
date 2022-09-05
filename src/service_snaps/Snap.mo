@@ -50,17 +50,19 @@ actor class Snap(controller : Principal) = this {
         };
 
         let snap : Snap = {
-            id = snap_id;
             canister_id = snap_canister_id;
-            cover_image_location = args.cover_image_location;
             created = Time.now();
-            username = username;
-            images = images_ref;
             file_asset = file_asset;
-            likes = 0;
+            id = snap_id;
+            image_cover_location = args.image_cover_location;
+            images = images_ref;
             projects = null;
             title = args.title;
-            views = 0;
+            username = username;
+            metrics = {
+                likes = 0;
+                views = 0;
+            };
         };
 
         snaps.put(snap_id, snap);
