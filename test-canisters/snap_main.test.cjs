@@ -24,6 +24,7 @@ const {
 // Identities
 const { default_identity } = require('../test-utils/identities/identity.cjs');
 let mishicat_identity = Ed25519KeyIdentity.generate();
+let motoko_identity = Ed25519KeyIdentity.generate();
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
@@ -60,6 +61,13 @@ test('Setup Actors', async function (t) {
 		snap_main_interface,
 		mishicat_identity
 	);
+
+	snap_main_actor.motoko = await get_actor(
+		snap_main_canister_id,
+		snap_main_interface,
+		motoko_identity
+	);
+
 	snap_main_actor.default = await get_actor(
 		snap_main_canister_id,
 		snap_main_interface,
@@ -71,6 +79,13 @@ test('Setup Actors', async function (t) {
 		username_interface,
 		mishicat_identity
 	);
+
+	username_actors.motoko = await get_actor(
+		username_canister_id,
+		username_interface,
+		motoko_identity
+	);
+
 	username_actors.default = await get_actor(
 		username_canister_id,
 		username_interface,
@@ -94,6 +109,106 @@ test('SnapMain[mishicat].create_user_snap_storage(): should create initial stora
 	const response = await snap_main_actor.mishicat.create_user_snap_storage();
 
 	t.equal(response, true);
+});
+
+test('SnapMain[mishicat].create_snap(): should return error => #err - NoImageToSave', async function (t) {
+	let create_args = {
+		title: 'Error NoImageToSave',
+		cover_image_location: 1,
+		img_asset_ids: [],
+		file_asset: []
+	};
+
+	const response = await snap_main_actor.mishicat.create_snap(create_args);
+
+	t.deepEqual(response.err, { NoImageToSave: null });
+});
+
+test('SnapMain[mishicat].create_snap(): should return error => #err - FourImagesMax', async function (t) {
+	let create_args = {
+		title: 'Mobile Example',
+		cover_image_location: 1,
+		img_asset_ids: [1, 2, 3, 4, 5],
+		file_asset: []
+	};
+
+	const response = await snap_main_actor.mishicat.create_snap(create_args);
+
+	t.deepEqual(response.err, { FourImagesMax: null });
+});
+
+test('SnapMain[mishicat].create_snap(): should return error => #err - AssetNotFound', async function (t) {
+	let create_args = {
+		title: 'Error AssetNotFound',
+		cover_image_location: 1,
+		img_asset_ids: [10000000],
+		file_asset: []
+	};
+
+	const response = await snap_main_actor.mishicat.create_snap(create_args);
+
+	t.deepEqual(response.err, { ErrorCall: '#AssetNotFound' });
+});
+
+test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function (t) {
+	let promises = [];
+
+	images.forEach(async function (image) {
+		const args = {
+			data: image,
+			file_format: 'png'
+		};
+
+		promises.push(assets_img_staging_actors.mishicat.create_asset(args));
+	});
+
+	try {
+		img_asset_ids = await Promise.all(promises);
+		console.log('asset_ids: ', img_asset_ids);
+	} catch (error) {
+		console.log('error: ', error);
+	}
+});
+
+test('Username[motoko].create_username(): should create username => #ok - username', async function (t) {
+	const username = fake.word();
+
+	const response = await username_actors.motoko.create_username(username.toLowerCase());
+
+	t.equal(response.ok.username, username.toLowerCase());
+});
+
+test('SnapMain[motoko].create_user_snap_storage(): should create initial storage for snaps => #ok - true', async function (t) {
+	const response = await snap_main_actor.motoko.create_user_snap_storage();
+
+	t.equal(response, true);
+});
+
+test('SnapMain[motoko].create_snap(): should return error => #err - NotOwnerOfAsset', async function (t) {
+	let create_args = {
+		title: 'NotOwnerOfAsset Example',
+		cover_image_location: 1,
+		img_asset_ids: img_asset_ids,
+		file_asset: []
+	};
+
+	const response = await snap_main_actor.motoko.create_snap(create_args);
+
+	t.deepEqual(response.err, { ErrorCall: '#NotOwnerOfAsset' });
+});
+
+test('SnapMain[mishicat].create_snap(): should create snap => #ok - snap', async function (t) {
+	let create_args = {
+		title: 'Mobile Example',
+		cover_image_location: 1,
+		img_asset_ids: img_asset_ids,
+		file_asset: []
+	};
+
+	const response = await snap_main_actor.mishicat.create_snap(create_args);
+
+	console.info('response: ', response);
+	console.log('images: ', response.ok.images);
 });
 
 // test('FileAssetChunks.create_chunk():: upload chunks from file to canister', async function (t) {
@@ -128,68 +243,6 @@ test('SnapMain[mishicat].create_user_snap_storage(): should create initial stora
 // 	const hasChunkIds = chunk_ids.length > 2;
 // 	t.equal(hasChunkIds, true);
 // });
-
-test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function (t) {
-	let promises = [];
-
-	images.forEach(async function (image) {
-		const args = {
-			data: image,
-			file_format: 'png'
-		};
-
-		promises.push(assets_img_staging_actors.mishicat.create_asset(args));
-	});
-
-	try {
-		img_asset_ids = await Promise.all(promises);
-		console.log('asset_ids: ', img_asset_ids);
-	} catch (error) {
-		console.log('error: ', error);
-	}
-});
-
-test('SnapMain[mishicat].create_snap(): should create snap => #ok - snap', async function (t) {
-	let create_args = {
-		title: 'Mobile Example',
-		cover_image_location: 1,
-		img_asset_ids: img_asset_ids,
-		file_asset: []
-	};
-
-	const response = await snap_main_actor.mishicat.create_snap(create_args);
-
-	console.info('response: ', response);
-	console.log('images: ', response.ok.images);
-
-	// t.equals(response.err, 'One Image Max');
-});
-
-test('SnapMain[mishicat].create_snap(): should return error => #err - No Image To Save', async function (t) {
-	let create_args = {
-		title: 'Error No Image To Save',
-		cover_image_location: 1,
-		img_asset_ids: [],
-		file_asset: []
-	};
-
-	const response = await snap_main_actor.mishicat.create_snap(create_args);
-
-	console.info('response: ', response);
-});
-
-test('SnapMain[mishicat].create_snap(): should return error => #err - AssetNotFound', async function (t) {
-	let create_args = {
-		title: 'Error AssetNotFound',
-		cover_image_location: 1,
-		img_asset_ids: [69],
-		file_asset: []
-	};
-
-	const response = await snap_main_actor.mishicat.create_snap(create_args);
-
-	console.info('response: ', response);
-});
 
 // test('SnapMain.create_snap()', async function (t) {
 // 	let create_args = {
