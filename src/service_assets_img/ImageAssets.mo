@@ -85,6 +85,7 @@ actor class ImageAssets(controller: Principal) = this {
             };
         };
 
+        ignore ImageAssetStaging.delete_assets(img_asset_ids, owner);
         return #ok(images_ref.toArray());
     };
 

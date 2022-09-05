@@ -124,7 +124,7 @@ actor SnapMain {
         var file_asset = {asset_url = ""; canister_id = ""; id = "";};
         switch (args.file_asset) {
             case null {};
-            case (? fileAsset){
+            case (?fileAsset){
                 let file_asset_args : AssetTypes.CreateAssetArgs = {
                     chunk_ids = fileAsset.chunk_ids;
                     content_type = fileAsset.content_type;

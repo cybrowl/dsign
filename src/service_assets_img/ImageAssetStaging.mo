@@ -64,9 +64,16 @@ actor ImageAssetStaging = {
         return asset_id_count;
     };
 
-    public shared ({caller}) func delete_assets(asset_ids: [Nat]) : async () {
+    public shared ({caller}) func delete_assets(asset_ids: [Nat], owner: Principal) : async () {
         for (asset_id in asset_ids.vals()) {
-            assets.delete(asset_id);
+            switch (assets.get(asset_id)) {
+                case (?asset) {
+                    if (asset.owner == owner) {
+                        assets.delete(asset_id);
+                    };
+                };
+                case (_) {};
+            };
         }
     };
 

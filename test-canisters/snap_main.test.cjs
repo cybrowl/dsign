@@ -197,7 +197,17 @@ test('SnapMain[motoko].create_snap(): should return error => #err - NotOwnerOfAs
 	t.deepEqual(response.err, { ErrorCall: '#NotOwnerOfAsset' });
 });
 
-test('SnapMain[mishicat].create_snap(): should create snap => #ok - snap', async function (t) {
+test('ImageAssetStaging[mishicat].get_asset(): should return asset => #ok - asset', async function (t) {
+	const response = await assets_img_staging_actors.mishicat.get_asset(
+		img_asset_ids[0],
+		mishicat_identity.getPrincipal()
+	);
+
+	let has_asset = response.ok.created.toString().length > 0;
+	t.equal(has_asset, true);
+});
+
+test('SnapMain[mishicat].create_snap(): should create snap without file asset => #ok - snap', async function (t) {
 	let create_args = {
 		title: 'Mobile Example',
 		cover_image_location: 1,
@@ -211,6 +221,14 @@ test('SnapMain[mishicat].create_snap(): should create snap => #ok - snap', async
 	console.log('images: ', response.ok.images);
 });
 
+test('ImageAssetStaging[mishicat].get_asset(): should return asset => #err - asset', async function (t) {
+	const response = await assets_img_staging_actors.mishicat.get_asset(
+		img_asset_ids[0],
+		mishicat_identity.getPrincipal()
+	);
+
+	t.deepEqual(response.err, { AssetNotFound: null });
+});
 // test('FileAssetChunks.create_chunk():: upload chunks from file to canister', async function (t) {
 // 	const uploadChunk = async ({ chunk, file_name }) => {
 // 		return assets_file_chunks_actors.mishicat.create_chunk({
