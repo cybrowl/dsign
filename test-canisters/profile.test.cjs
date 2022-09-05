@@ -84,7 +84,30 @@ test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - 
 	}
 });
 
-test('Profile[mishicat].update_profile_avatar(): with image => #ok - ', async function (t) {
+test('Profile[mishicat].update_profile_avatar(): with image => #ok - avatar_url', async function (t) {
+	const response = await profile_actor.mishicat.update_profile_avatar(img_asset_ids);
+
+	console.log('response', response);
+});
+
+test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function (t) {
+	try {
+		img_asset_ids = [];
+
+		const args = {
+			data: images[1],
+			file_format: 'png'
+		};
+
+		let image_id = await assets_img_staging_actors.mishicat.create_asset(args);
+
+		img_asset_ids.push(image_id);
+	} catch (error) {
+		console.log('error: ', error);
+	}
+});
+
+test('Profile[mishicat].update_profile_avatar(): with new image => #ok - updated avatar', async function (t) {
 	const response = await profile_actor.mishicat.update_profile_avatar(img_asset_ids);
 
 	console.log('response', response);
