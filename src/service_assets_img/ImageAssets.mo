@@ -116,6 +116,7 @@ actor class ImageAssets(controller: Principal) = this {
                     url = Utils.generate_image_url(canister_id, stored_asset_id, asset_type, isProduction);
                 };
 
+                ignore ImageAssetStaging.delete_assets([asset_id], owner);
                 return #ok(image_ref);
             };
             case(#err err){
