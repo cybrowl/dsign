@@ -67,8 +67,13 @@ actor SnapMain {
 
     public shared ({caller}) func create_snap(args: CreateSnapArgs) : async Result.Result<Snap, CreateSnapErr> {
         let tags = [ACTOR_NAME, "create_snap"];
+        let is_anonymous = Principal.isAnonymous(caller);
         let has_image = args.img_asset_ids.size() > 0;
         let too_many_images = args.img_asset_ids.size() > 4;
+
+        if (is_anonymous == true) {
+            return #err(#UserAnonymous);
+        };
 
         if (has_image == false) {
             return #err(#NoImageToSave);
