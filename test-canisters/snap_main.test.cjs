@@ -38,9 +38,11 @@ let username_actors = {};
 
 let created_snap = {};
 let chunk_ids = [];
-let asset_ids = [];
+let img_asset_ids = [];
 
 test('Setup Actors', async function (t) {
+	console.log('=========== Snap Main ===========');
+
 	assets_file_chunks_actors.mishicat = await get_actor(
 		assets_file_chunks_canister_id,
 		assets_file_chunks_interface,
@@ -74,15 +76,13 @@ test('Setup Actors', async function (t) {
 		username_interface,
 		default_identity
 	);
-
-	console.log('=========== Snap Main ===========');
 });
 
-test('SnapMain.initialize_canisters()', async function (t) {
+test('SnapMain[mishicat].initialize_canisters()', async function (t) {
 	await snap_main_actor.mishicat.initialize_canisters();
 });
 
-test('Username.create_username()::[mishicat]: create first with valid username => #ok - username', async function (t) {
+test('Username[mishicat].create_username(): should create username => #ok - username', async function (t) {
 	const username = fake.word();
 
 	const response = await username_actors.mishicat.create_username(username.toLowerCase());
@@ -90,7 +90,7 @@ test('Username.create_username()::[mishicat]: create first with valid username =
 	t.equal(response.ok.username, username.toLowerCase());
 });
 
-test('SnapMain.create_user_snap_storage()::[mishicat]: create initial storage for snaps => #ok - true', async function (t) {
+test('SnapMain[mishicat].create_user_snap_storage(): should create initial storage for snaps => #ok - true', async function (t) {
 	const response = await snap_main_actor.mishicat.create_user_snap_storage();
 
 	t.equal(response, true);
@@ -129,7 +129,7 @@ test('SnapMain.create_user_snap_storage()::[mishicat]: create initial storage fo
 // 	t.equal(hasChunkIds, true);
 // });
 
-test('ImageAssetStaging.create_asset()::[snap_main_actor.mishicat] => ', async function (t) {
+test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function (t) {
 	let promises = [];
 
 	images.forEach(async function (image) {
@@ -142,18 +142,18 @@ test('ImageAssetStaging.create_asset()::[snap_main_actor.mishicat] => ', async f
 	});
 
 	try {
-		asset_ids = await Promise.all(promises);
-		console.log('asset_ids: ', asset_ids);
+		img_asset_ids = await Promise.all(promises);
+		console.log('asset_ids: ', img_asset_ids);
 	} catch (error) {
 		console.log('error: ', error);
 	}
 });
 
-test('SnapMain.create_snap()::[snap_main_actor.mishicat] => ', async function (t) {
+test('SnapMain[mishicat].create_snap(): should create snap => #ok - snap', async function (t) {
 	let create_args = {
 		title: 'Mobile Example',
 		cover_image_location: 1,
-		img_asset_ids: asset_ids,
+		img_asset_ids: img_asset_ids,
 		file_asset: []
 	};
 
@@ -185,8 +185,8 @@ test('SnapMain.create_snap()::[snap_main_actor.mishicat] => ', async function (t
 // 	t.deepEqual(response.ok.image_urls.length, 1);
 // });
 
-test('SnapMain.get_all_snaps()', async function (t) {
-	const response = await snap_main_actor.mishicat.get_all_snaps();
+// test('SnapMain.get_all_snaps()', async function (t) {
+// 	const response = await snap_main_actor.mishicat.get_all_snaps();
 
-	console.info('get_all_snaps: ', response.ok);
-});
+// 	console.info('get_all_snaps: ', response.ok);
+// });

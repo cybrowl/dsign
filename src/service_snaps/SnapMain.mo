@@ -201,39 +201,27 @@ actor SnapMain {
 
     // ------------------------- Canister Management -------------------------
     private func create_assets_canister(snap_main_principal : Principal) : async () {
-        let tags = [ACTOR_NAME, "create_assets_canister"];
-
         Cycles.add(CYCLE_AMOUNT);
         let assets_actor = await Assets.Assets(snap_main_principal);
         let principal = Principal.fromActor(assets_actor);
 
         assets_canister_id := Principal.toText(principal);
-
-        await Logger.log_event(tags, debug_show(("assets_canister_id: ", assets_canister_id)));
     };
 
     private func create_image_assets_canister(snap_main_principal : Principal) : async () {
-        let tags = [ACTOR_NAME, "create_image_assets_canister"];
-
         Cycles.add(CYCLE_AMOUNT);
         let image_assets_actor = await ImageAssets.ImageAssets(snap_main_principal);
         let principal = Principal.fromActor(image_assets_actor);
 
         image_assets_canister_id := Principal.toText(principal);
-
-        await Logger.log_event(tags, debug_show(("image_assets_canister_id: ", image_assets_canister_id)));
     };
 
     private func create_snap_canister(snap_main_principal : Principal) : async () {
-        let tags = [ACTOR_NAME, "create_snap_canister"];
-
         Cycles.add(CYCLE_AMOUNT);
         let snap_actor = await Snap.Snap(snap_main_principal);
         let principal = Principal.fromActor(snap_actor);
 
         snap_canister_id := Principal.toText(principal);
-
-        await Logger.log_event(tags, debug_show(("snap_canister_id: ", snap_canister_id)));
     };
 
     public shared (msg) func initialize_canisters() : async ()  {
@@ -243,22 +231,28 @@ actor SnapMain {
         // create asset canister
         if (assets_canister_id.size() < 1) {
             await create_assets_canister(snap_main_principal);
+
+            ignore Logger.log_event(tags, debug_show(("created, assets_canister_id: ", assets_canister_id)));
         } else {
-            await Logger.log_event(tags, debug_show(("assets_canister_id: ", assets_canister_id)));
+            ignore Logger.log_event(tags, debug_show(("exists, assets_canister_id: ", assets_canister_id)));
         };
 
         // create image assets canister
         if (image_assets_canister_id.size() < 1) {
             await create_image_assets_canister(snap_main_principal);
+
+            ignore Logger.log_event(tags, debug_show(("created, image_assets_canister_id: ", image_assets_canister_id)));
         } else {
-            await Logger.log_event(tags, debug_show(("image_assets_canister_id: ", image_assets_canister_id)));
+            ignore Logger.log_event(tags, debug_show(("exists, image_assets_canister_id: ", image_assets_canister_id)));
         };
 
         // create snap canister
         if (snap_canister_id.size() < 1) {
             await create_snap_canister(snap_main_principal);
+
+            ignore Logger.log_event(tags, debug_show(("created, snap_canister_id: ", snap_canister_id)));
         } else {
-            await Logger.log_event(tags, debug_show(("snap_canister_id: ", snap_canister_id)));
+            ignore Logger.log_event(tags, debug_show(("exists, snap_canister_id: ", snap_canister_id)));
         };
     };
 
