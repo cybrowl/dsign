@@ -16,13 +16,14 @@ import Snap "Snap";
 
 import Types "./types";
 import AssetTypes "../service_assets/types";
+import ImgAssetTypes "../service_assets_img/types";
 
 actor SnapMain {
     type CreateSnapArgs = Types.CreateSnapArgs;
     type CreateSnapErr = Types.CreateSnapErr;
     type DeleteAllSnapsErr = Types.DeleteAllSnapsErr;
     type GetAllSnapsErr = Types.GetAllSnapsErr;
-    type ImageAssetsActor = Types.ImageAssetsActor;
+    type ImageAssetsActor = ImgAssetTypes.ImageAssetsActor;
     type Snap = Types.Snap;
     type SnapActor = Types.SnapActor;
     type SnapCanisterID = Types.SnapCanisterID;

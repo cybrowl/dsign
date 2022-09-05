@@ -101,13 +101,4 @@ module {
         delete_snaps : shared ([SnapID]) -> async ();
         get_all_snaps : query ([SnapID]) -> async [Snap];
     };
-
-    type AssetImgErr = {
-        #NotAuthorized;
-        #NotOwnerOfAsset;
-        #AssetNotFound;
-    };
-    public type ImageAssetsActor = actor {
-        save_images : shared ([Nat], Text, Principal) -> async Result.Result<[ImageRef], AssetImgErr>;
-    };
 };

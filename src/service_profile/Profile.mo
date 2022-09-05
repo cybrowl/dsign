@@ -11,11 +11,12 @@ import ImageAssets "../service_assets_img/ImageAssets";
 import Logger "canister:logger";
 
 import Types "./types";
+import ImgAssetTypes "../service_assets_img/types";
 
 actor Profile = {
-    type AvatarImgUrl = Types.AvatarImgUrl;
+    type ImageAssetsActor = ImgAssetTypes.ImageAssetsActor;
     type Profile = Types.Profile;
-    type ProfileError = Types.ProfileError;
+    type ProfileErr = Types.ProfileErr;
     type ProfileOk = Types.ProfileOk;
     type Username = Types.Username;
     type UserPrincipal =  Types.UserPrincipal;
@@ -32,7 +33,7 @@ actor Profile = {
         return "0.0.1";
     };
 
-    public query ({caller}) func get_profile() : async Result.Result<ProfileOk, ProfileError> {
+    public query ({caller}) func get_profile() : async Result.Result<ProfileOk, ProfileErr> {
         switch (profiles.get(caller)) {
             case (null) {
                 #err(#ProfileNotFound)
@@ -45,8 +46,15 @@ actor Profile = {
 
     // note: this is only invoked from username.create_username()
     public shared func create_profile(principal: UserPrincipal, username: Username) : async () {
+
+        // TODO: only username should be able to call this
         let profile : Profile = {
-            avatar_url = "";
+            avatar = {
+                id = "";
+                canister_id = "";
+                url = "";
+                exists = false;
+            };
             created = Time.now();
             username = username;
         };
@@ -54,12 +62,56 @@ actor Profile = {
         profiles.put(principal, profile);
     };
 
-    public shared ({caller}) func update_profile_avatar(img_asset_ids: [Nat]) : async () {
-        // let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
-        // todo: get avatar image canister_id and asset_id
-        // if they don't have an id, create one and add the image to it
-        
+    public shared ({caller}) func update_profile_avatar(img_asset_ids: [Nat]) : async Result.Result<Text, ProfileErr> {
+        var profile = {
+            avatar = {
+                id = "";
+                canister_id = "";
+                url = "";
+                exists = false;
+            };
+            created = Time.now();
+            username = "";
+        };
 
+        switch(profiles.get(caller)) {
+            case (null) {
+                return #err(#ProfileNotFound)
+            };
+            case (?profile_) {
+                profile:= profile_;
+            };
+        };
+
+        if (profile.avatar.exists == false) {
+            let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
+
+            switch(await image_assets_actor.save_images(img_asset_ids, "avatar", caller)) {
+                case (#err err) {
+                    return #err(#ErrorCall(debug_show(err)));
+                };
+                case (#ok images) {
+                    let image = images[0];
+
+                    let profile_modified = {
+                        avatar = {
+                            id = image.id;
+                            canister_id = image.canister_id;
+                            url = image.url;
+                            exists = true;
+                        };
+                        created = profile.created;
+                        username = profile.username;
+                    };
+
+                    profiles.put(caller, profile_modified);
+
+                    return #ok(profile_modified.avatar.url);
+                };
+            };
+        } else {
+            return #ok("pending");
+        };
     };
 
     // ------------------------- Canister Management -------------------------

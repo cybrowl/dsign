@@ -1,3 +1,5 @@
+import Result "mo:base/Result";
+
 module {
     // Images
     public type ImageID = Text;
@@ -30,5 +32,15 @@ module {
         body : Blob;
         headers : [HeaderField];
         status_code : Nat16;
+    };
+
+    // Actor Interface
+    type AssetImgErr = {
+        #NotAuthorized;
+        #NotOwnerOfAsset;
+        #AssetNotFound;
+    };
+    public type ImageAssetsActor = actor {
+        save_images : shared ([Nat], Text, Principal) -> async Result.Result<[ImageRef], AssetImgErr>;
     };
 }

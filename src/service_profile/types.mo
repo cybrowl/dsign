@@ -2,14 +2,17 @@ import Principal "mo:base/Principal";
 
 // service_profile
 module {
-    public type Time = Int;
     public type Username = Text;
     public type UserPrincipal = Principal;
-    public type AvatarImgUrl = Text;
 
     public type Profile = {
-        avatar_url: Text;
-        created: Time;
+        avatar: {
+            id: Text;
+            canister_id: Text;
+            url: Text;
+            exists: Bool;
+        };
+        created: Int;
         username: Username;
     };
 
@@ -17,7 +20,8 @@ module {
         profile: Profile;
     };
 
-    public type ProfileError = {
+    public type ProfileErr = {
         #ProfileNotFound;
+        #ErrorCall: Text;
     };
 }
