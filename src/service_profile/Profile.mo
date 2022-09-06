@@ -146,6 +146,7 @@ actor Profile = {
             await Logger.log_event(tags, debug_show(("image_assets_canister_id: ", image_assets_canister_id)));
         };
     };
+
     // ------------------------- System Methods -------------------------
     system func preupgrade() {
         profiles_stable_storage := Iter.toArray(profiles.entries());

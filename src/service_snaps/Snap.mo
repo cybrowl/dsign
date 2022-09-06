@@ -34,13 +34,13 @@ actor class Snap(controller : Principal) = this {
         args: CreateSnapArgs,
         images_ref: [ImageRef], 
         file_asset: AssetRef,
-        principal: UserPrincipal) : async Result.Result<Snap, Text> {
+        owner: UserPrincipal) : async Result.Result<Snap, Text> {
 
         let snap_id =  ULID.toText(se.new());
         let snap_canister_id =  Principal.toText(Principal.fromActor(this));
 
         var username = "";
-        switch(await Username.get_username_actor(principal)) {
+        switch(await Username.get_username_actor(owner)) {
             case(#ok username_) {
                 username:= username_;
             };
@@ -60,6 +60,7 @@ actor class Snap(controller : Principal) = this {
             tags = null;
             title = args.title;
             username = username;
+            owner = owner;
             metrics = {
                 likes = 0;
                 views = 0;

@@ -161,6 +161,8 @@ actor SnapMain {
                 if (snap_ids_found == false) {
                     snap_canister_ids.put(snap_canister_id, snap_ids);
                 };
+
+                //TODO: remove owner from snap
                 #ok(snap);
             };
         };

@@ -34,6 +34,7 @@ module {
         tags: ?[Text];
         title: Text;
         username: Username;
+        owner: Principal;
         metrics: {
             likes: Nat;
             views: Nat;
