@@ -188,7 +188,7 @@ actor SnapMain {
                 return #ok(all_snaps.toArray());
             };
             case (_) {
-                #err(#UserNotFound)
+                #err(#UserNotFound(true))
             };
         };
     };

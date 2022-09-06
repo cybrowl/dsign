@@ -62,7 +62,7 @@ module {
     };
 
    public type GetAllSnapsErr = {
-        #UserNotFound;
+        #UserNotFound: Bool;
     };
 
     public type DeleteAllSnapsErr = {
