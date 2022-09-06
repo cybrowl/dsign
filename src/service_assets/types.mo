@@ -25,9 +25,9 @@ module {
     };
 
     public type AssetRef = {
-        asset_url : Text;
         canister_id : Text;
         id : Text;
+        url : Text;
     };
 
     public type CreateAssetArgs = {

@@ -127,7 +127,7 @@ actor SnapMain {
         };
 
         // create asset from chunks
-        var file_asset = {asset_url = ""; canister_id = ""; id = "";};
+        var file_asset = {canister_id = ""; id = ""; url = "";};
         switch (args.file_asset) {
             case null {};
             case (?fileAsset){

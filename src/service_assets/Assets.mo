@@ -91,7 +91,7 @@ actor class Assets(controller: Principal) = this {
         assets.put(asset_id, asset);
 
         let asset_ref : Types.AssetRef = {
-            asset_url = asset_url;
+            url = asset_url;
             canister_id = canister_id;
             id = asset_id;
         };

@@ -10,9 +10,9 @@ module {
     public type UserPrincipal = Principal;
 
     public type AssetRef = {
-        asset_url : Text;
-        canister_id : Text;
-        id : Text;
+        canister_id: Text;
+        id: Text;
+        url: Text;
     };
 
     // Images
@@ -49,6 +49,7 @@ module {
         image_cover_location: Nat8;
         images: [ImageRef];
         projects: ?[ProjectRef];
+        tags: ?[Text];
         title: Text;
         username: Username;
         metrics: {

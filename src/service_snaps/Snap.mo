@@ -57,6 +57,7 @@ actor class Snap(controller : Principal) = this {
             image_cover_location = args.image_cover_location;
             images = images_ref;
             projects = null;
+            tags = null;
             title = args.title;
             username = username;
             metrics = {
