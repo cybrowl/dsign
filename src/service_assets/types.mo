@@ -28,6 +28,7 @@ module {
         canister_id : Text;
         id : Text;
         url : Text;
+        is_public : Bool;
     };
 
     public type CreateAssetArgs = {

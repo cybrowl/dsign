@@ -16,14 +16,16 @@ import Snap "Snap";
 
 import Types "./types";
 import AssetTypes "../service_assets/types";
-import ImgAssetTypes "../service_assets_img/types";
 
 actor SnapMain {
+    type AssetsActor = Types.AssetsActor;
+    type CreateAssetArgs = Types.CreateAssetArgs;
     type CreateSnapArgs = Types.CreateSnapArgs;
     type CreateSnapErr = Types.CreateSnapErr;
     type DeleteAllSnapsErr = Types.DeleteAllSnapsErr;
     type GetAllSnapsErr = Types.GetAllSnapsErr;
-    type ImageAssetsActor = ImgAssetTypes.ImageAssetsActor;
+    type ImageAssetsActor = Types.ImageAssetsActor;
+    type ImageRef = Types.ImageRef;
     type Snap = Types.Snap;
     type SnapActor = Types.SnapActor;
     type SnapCanisterID = Types.SnapCanisterID;
@@ -112,10 +114,10 @@ actor SnapMain {
 
         let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
         let snap_actor = actor (snap_canister_id) : SnapActor;
-        let assets_actor = actor (assets_canister_id) : AssetTypes.AssetsActor;
+        let assets_actor = actor (assets_canister_id) : AssetsActor;
 
         // save images from img_asset_ids
-        let image_ref : Types.ImageRef = {canister_id = ""; id = ""; url = ""};
+        let image_ref : ImageRef = {canister_id = ""; id = ""; url = ""};
         var images_ref = [image_ref];
         switch(await image_assets_actor.save_images(args.img_asset_ids, "snap", caller)) {
             case(#err err) {
@@ -127,11 +129,11 @@ actor SnapMain {
         };
 
         // create asset from chunks
-        var file_asset = {canister_id = ""; id = ""; url = "";};
+        var file_asset = {canister_id = ""; id = ""; url = ""; is_public = false};
         switch (args.file_asset) {
             case null {};
             case (?fileAsset){
-                let file_asset_args : AssetTypes.CreateAssetArgs = {
+                let file_asset_args : CreateAssetArgs = {
                     chunk_ids = fileAsset.chunk_ids;
                     content_type = fileAsset.content_type;
                     is_public = fileAsset.is_public;

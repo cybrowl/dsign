@@ -94,6 +94,7 @@ actor class Assets(controller: Principal) = this {
             url = asset_url;
             canister_id = canister_id;
             id = asset_id;
+            is_public = args.is_public;
         };
 
         #ok(asset_ref);

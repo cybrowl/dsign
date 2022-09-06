@@ -4,42 +4,24 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
 
+import AssetTypes "../service_assets/types";
+import ImgAssetTypes "../service_assets_img/types";
+
 module {
     public type Time = Int;
     public type Username = Text;
     public type UserPrincipal = Principal;
 
-    public type AssetRef = {
-        canister_id: Text;
-        id: Text;
-        url: Text;
-    };
+    public type ImageRef = ImgAssetTypes.ImageRef;
+    public type ImageAssetsActor = ImgAssetTypes.ImageAssetsActor;
 
-    // Images
-    public type ImageRef = {
-        canister_id : Text;
-        id : Text;
-        url : Text;
-    };
-
-    public type HeaderField = (Text, Text);
-
-    public type HttpRequest = {
-        url : Text;
-        method : Text;
-        headers : [HeaderField];
-    };
-
-    public type HttpResponse = {
-        body : Blob;
-        headers : [HeaderField];
-        status_code : Nat16;
-    };
+    public type AssetRef = AssetTypes.AssetRef;
+    public type AssetsActor = AssetTypes.AssetsActor;
+    public type CreateAssetArgs = AssetTypes.CreateAssetArgs;
 
     // Snap
     public type SnapCanisterID = Text;
     public type SnapID = Text;
-    public type SnapImagesCanisterID = Text;
 
     public type Snap = {
         canister_id: Text;
@@ -56,6 +38,12 @@ module {
             likes: Nat;
             views: Nat;
         };
+    };
+
+    public type FileAsset = {
+        chunk_ids: [Nat];
+        content_type: Text;
+        is_public: Bool;
     };
 
     public type CreateSnapArgs = {
@@ -80,12 +68,6 @@ module {
 
     public type DeleteAllSnapsErr = {
         #UserNotFound;
-    };
-
-    public type FileAsset = {
-        chunk_ids: [Nat];
-        content_type: Text;
-        is_public: Bool;
     };
 
     // Project
