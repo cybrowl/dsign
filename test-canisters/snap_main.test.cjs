@@ -215,9 +215,6 @@ test('SnapMain[mishicat].create_snap(): should create snap without file asset =>
 	};
 
 	const response = await snap_main_actor.mishicat.create_snap(create_args);
-
-	console.info('response: ', response);
-	console.log('images: ', response.ok.images);
 });
 
 test('ImageAssetStaging[mishicat].get_asset(): should return asset => #err - asset', async function (t) {
@@ -282,9 +279,6 @@ test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - 
 });
 
 test('SnapMain[mishicat].create_snap(): with file and images => #ok - snap', async function (t) {
-	console.log('chunk_ids: ', chunk_ids);
-	console.log('img_asset_ids: ', img_asset_ids);
-
 	let create_args = {
 		title: 'File Asset Example',
 		image_cover_location: 1,
@@ -299,12 +293,8 @@ test('SnapMain[mishicat].create_snap(): with file and images => #ok - snap', asy
 	};
 
 	const response = await snap_main_actor.mishicat.create_snap(create_args);
-
-	console.log('response: ', response);
 });
 
 test('SnapMain.get_all_snaps()', async function (t) {
 	const response = await snap_main_actor.mishicat.get_all_snaps();
-
-	console.info('get_all_snaps: ', response.ok);
 });

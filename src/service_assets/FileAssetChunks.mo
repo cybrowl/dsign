@@ -38,9 +38,16 @@ actor FileAssetChunks = {
         return chunk_id_count;
     };
 
-    public shared ({caller}) func delete_chunks(chunk_ids: [Nat]) : async () {
+    public shared ({caller}) func delete_chunks(chunk_ids: [Nat], owner: Principal) : async () {
         for (chunk_id in chunk_ids.vals()) {
-            chunks.delete(chunk_id);
+            switch (chunks.get(chunk_id)) {
+                case (?chunk) {
+                    if (chunk.owner == owner) {
+                        chunks.delete(chunk_id);
+                    };
+                };
+                case (_) {};
+            };
         }
     };
 
@@ -59,17 +66,11 @@ actor FileAssetChunks = {
         };
     };
 
-    public query func get_chunks_size() : async Nat {
-        return chunks.size();
-    };
-
-    public query func get_memory_size() : async Nat {
-        let rts_memory_size : Nat = Prim.rts_memory_size();
-        
-        return rts_memory_size;
-    };
-
-    public query func get_heap_size() : async Nat {        
-        return Prim.rts_heap_size();
+    public query func health() : async Types.Health {
+        return {
+            chunks_size = chunks.size();
+            memory = Prim.rts_memory_size();
+            heap = Prim.rts_heap_size();
+        };
     };
 };

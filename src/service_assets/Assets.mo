@@ -90,6 +90,8 @@ actor class Assets(controller: Principal) = this {
 
         assets.put(asset_id, asset);
 
+        ignore FileAssetChunks.delete_chunks(args.chunk_ids, owner);
+
         let asset_ref : Types.AssetRef = {
             url = asset_url;
             canister_id = canister_id;

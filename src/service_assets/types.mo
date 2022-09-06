@@ -54,6 +54,12 @@ module {
         streaming_strategy : ?StreamingStrategy;
     };
 
+    public type Health = {
+        memory : Nat;
+        heap : Nat;
+        chunks_size : Nat;
+    };
+
     public type CreateStrategyArgs = {
         asset_id : Text;
         chunk_index : Nat;
