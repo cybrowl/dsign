@@ -40,17 +40,15 @@ module {
         };
     };
 
-    public type FileAsset = {
-        chunk_ids: [Nat];
-        content_type: Text;
-        is_public: Bool;
-    };
-
     public type CreateSnapArgs = {
         title: Text;
         image_cover_location: Nat8;
         img_asset_ids: [Nat];
-        file_asset: ?FileAsset;
+        file_asset: ?{
+            is_public: Bool;
+            content_type: Text;
+            chunk_ids: [Nat];
+        };
     };
 
     public type CreateSnapErr = {

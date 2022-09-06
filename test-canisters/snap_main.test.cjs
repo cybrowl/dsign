@@ -28,7 +28,7 @@ let motoko_identity = Ed25519KeyIdentity.generate();
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
-const { generate_images } = require('../test-utils/utils.cjs');
+const { generate_images, generate_figma_asset } = require('../test-utils/utils.cjs');
 
 let images = generate_images();
 
@@ -228,61 +228,83 @@ test('ImageAssetStaging[mishicat].get_asset(): should return asset => #err - ass
 
 	t.deepEqual(response.err, { AssetNotFound: null });
 });
-// test('FileAssetChunks.create_chunk():: upload chunks from file to canister', async function (t) {
-// 	const uploadChunk = async ({ chunk, file_name }) => {
-// 		return assets_file_chunks_actors.mishicat.create_chunk({
-// 			data: [...chunk],
-// 			file_name: file_name
-// 		});
-// 	};
 
-// 	const figma_asset_buffer = generate_figma_asset();
-// 	const figma_asset_unit8Array = new Uint8Array(figma_asset_buffer);
+test('FileAssetChunks[mishicat].create_chunk(): upload chunks from file to canister => chunk_id', async function (t) {
+	const uploadChunk = async ({ chunk, file_name }) => {
+		return assets_file_chunks_actors.mishicat.create_chunk({
+			data: [...chunk],
+			file_name: file_name
+		});
+	};
 
-// 	const file_name = 'dsign_stage_1.fig';
+	const figma_asset_buffer = generate_figma_asset();
+	const figma_asset_unit8Array = new Uint8Array(figma_asset_buffer);
 
-// 	const promises = [];
-// 	const chunkSize = 2000000;
+	const file_name = 'dsign_stage_1.fig';
 
-// 	for (let start = 0; start < figma_asset_unit8Array.length; start += chunkSize) {
-// 		const chunk = figma_asset_unit8Array.slice(start, start + chunkSize);
+	const promises = [];
+	const chunkSize = 2000000;
 
-// 		promises.push(
-// 			uploadChunk({
-// 				file_name,
-// 				chunk
-// 			})
-// 		);
-// 	}
+	for (let start = 0; start < figma_asset_unit8Array.length; start += chunkSize) {
+		const chunk = figma_asset_unit8Array.slice(start, start + chunkSize);
 
-// 	chunk_ids = await Promise.all(promises);
+		promises.push(
+			uploadChunk({
+				file_name,
+				chunk
+			})
+		);
+	}
 
-// 	const hasChunkIds = chunk_ids.length > 2;
-// 	t.equal(hasChunkIds, true);
-// });
+	chunk_ids = await Promise.all(promises);
 
-// test('SnapMain.create_snap()', async function (t) {
-// 	let create_args = {
-// 		title: 'one image',
-// 		image_cover_location: 1,
-// 		images: [{ data: images[0] }],
-// 		file_asset: {
-// 			chunk_ids: chunk_ids,
-// 			content_type: 'application/octet-stream',
-// 			is_public: true
-// 		}
-// 	};
+	const hasChunkIds = chunk_ids.length > 2;
+	t.equal(hasChunkIds, true);
+});
 
-// 	const response = await snap_main_actor.mishicat.create_snap(create_args);
-// 	created_snap = response.ok;
+test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function (t) {
+	let promises = [];
 
-// 	console.log('created_snap: ', created_snap);
+	images.forEach(async function (image) {
+		const args = {
+			data: image,
+			file_format: 'png'
+		};
 
-// 	t.deepEqual(response.ok.image_urls.length, 1);
-// });
+		promises.push(assets_img_staging_actors.mishicat.create_asset(args));
+	});
 
-// test('SnapMain.get_all_snaps()', async function (t) {
-// 	const response = await snap_main_actor.mishicat.get_all_snaps();
+	try {
+		img_asset_ids = await Promise.all(promises);
+	} catch (error) {
+		console.log('error: ', error);
+	}
+});
 
-// 	console.info('get_all_snaps: ', response.ok);
-// });
+test('SnapMain[mishicat].create_snap(): with file and images => #ok - snap', async function (t) {
+	console.log('chunk_ids: ', chunk_ids);
+	console.log('img_asset_ids: ', img_asset_ids);
+
+	let create_args = {
+		title: 'File Asset Example',
+		image_cover_location: 1,
+		img_asset_ids: img_asset_ids,
+		file_asset: [
+			{
+				is_public: true,
+				content_type: 'application/octet-stream',
+				chunk_ids: chunk_ids
+			}
+		]
+	};
+
+	const response = await snap_main_actor.mishicat.create_snap(create_args);
+
+	console.log('response: ', response);
+});
+
+test('SnapMain.get_all_snaps()', async function (t) {
+	const response = await snap_main_actor.mishicat.get_all_snaps();
+
+	console.info('get_all_snaps: ', response.ok);
+});
