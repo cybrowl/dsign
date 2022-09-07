@@ -4,40 +4,107 @@
 	import Modal from 'dsign-components/components/Modal.svelte';
 
 	import { actor_snap_main, snap_store } from '../store/actor_snap_main';
-
+	import { actor_assets_file_chunks } from '../store/actor_assets_file_chunks';
+	import { actor_assets_img_staging } from '../store/actor_assets_img_staging';
 	import { isSnapCreationModalVisible } from '../store/modal';
 
 	function handleCloseModal() {
 		isSnapCreationModalVisible.update((isSnapCreationModalVisible) => !isSnapCreationModalVisible);
 	}
 
-	async function handleSnapCreation(e) {
-		const snap = get(e, 'detail');
+	async function commitImgAssetsToStaging(images) {
+		let promises = [];
 
-		const first_image = snap.images.shift();
+		console.log('images', images);
 
-		const created_snap_res = await $actor_snap_main.actor.create_snap({
-			...snap,
-			images: [{ data: first_image }]
+		images.forEach(async function (image) {
+			const args = {
+				data: image,
+				file_format: 'png'
+			};
+
+			promises.push($actor_assets_img_staging.actor.create_asset(args));
 		});
 
-		const snap_creation_promises = [];
+		try {
+			return await Promise.all(promises);
+		} catch (error) {
+			console.log('error: ', error);
+			return [];
+		}
+	}
 
-		for (const image of snap.images) {
-			snap_creation_promises.push(
-				$actor_snap_main.actor.finalize_snap_creation({
-					canister_id: created_snap_res.ok.canister_id,
-					snap_id: created_snap_res.ok.id,
-					images: [{ data: image }]
+	async function commitFileAssetChunks(snap) {
+		const uploadChunk = async ({ chunk, file_name }) => {
+			return $actor_assets_file_chunks.actor.create_chunk({
+				data: [...chunk],
+				file_name: file_name
+			});
+		};
+
+		const file_name = snap.file.name || '';
+
+		const promises = [];
+
+		const chunkSize = 2000000;
+
+		for (let start = 0; start < snap.file_array_buffer.length; start += chunkSize) {
+			const chunk = snap.file_array_buffer.slice(start, start + chunkSize);
+
+			promises.push(
+				uploadChunk({
+					file_name,
+					chunk
 				})
 			);
 		}
 
-		Promise.all(snap_creation_promises).then(async () => {
-			const all_snaps = await $actor_snap_main.actor.get_all_snaps();
+		let chunk_ids = await Promise.all(promises);
 
-			snap_store.set({ isFetching: false, snaps: [...all_snaps.ok] });
+		return [
+			{
+				is_public: snap.is_public,
+				content_type: snap.file.type,
+				chunk_ids: chunk_ids
+			}
+		];
+	}
+
+	async function handleSnapCreation(e) {
+		const snap = get(e, 'detail');
+		let img_asset_ids = [];
+		let file_asset = [];
+
+		img_asset_ids = await commitImgAssetsToStaging(snap.images);
+
+		let has_invalid_img = false;
+
+		img_asset_ids.forEach(function (val) {
+			if (val == 0) {
+				has_invalid_img = true;
+			}
 		});
+
+		if (snap.file !== null) {
+			file_asset = await commitFileAssetChunks(snap);
+		}
+
+		const create_snap_args = {
+			title: snap.title,
+			image_cover_location: snap.cover_image_location,
+			img_asset_ids: img_asset_ids,
+			file_asset
+		};
+
+		console.log('create_snap_args', create_snap_args);
+
+		const created_snap_res = await $actor_snap_main.actor.create_snap(create_snap_args);
+
+		console.log('created_snap_res', created_snap_res);
+
+		const all_snaps = await $actor_snap_main.actor.get_all_snaps();
+
+		snap_store.set({ isFetching: false, snaps: [...all_snaps.ok] });
 	}
 </script>
 

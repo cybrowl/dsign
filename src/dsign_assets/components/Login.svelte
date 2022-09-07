@@ -7,6 +7,10 @@
 	import { isSnapCreationModalVisible } from '../store/modal';
 
 	import {
+		createActor as create_actor_assets_file_chunks,
+		actor_assets_file_chunks
+	} from '../store/actor_assets_file_chunks';
+	import {
 		createActor as create_actor_assets_img_staging,
 		actor_assets_img_staging
 	} from '../store/actor_assets_img_staging';
@@ -31,6 +35,11 @@
 		if (isAuthenticated) {
 			handleAuth();
 		} else {
+			actor_assets_file_chunks.update(() => ({
+				loggedIn: false,
+				actor: create_actor_assets_file_chunks()
+			}));
+
 			actor_assets_img_staging.update(() => ({
 				loggedIn: false,
 				actor: create_actor_assets_img_staging()
@@ -56,6 +65,15 @@
 	});
 
 	function handleAuth() {
+		actor_assets_file_chunks.update(() => ({
+			loggedIn: true,
+			actor: create_actor_assets_file_chunks({
+				agentOptions: {
+					identity: $auth_client.getIdentity()
+				}
+			})
+		}));
+
 		actor_assets_img_staging.update(() => ({
 			loggedIn: true,
 			actor: create_actor_assets_img_staging({

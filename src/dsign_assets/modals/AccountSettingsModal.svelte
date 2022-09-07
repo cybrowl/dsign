@@ -4,6 +4,10 @@
 	import Modal from 'dsign-components/components/Modal.svelte';
 
 	import {
+		createActor as create_actor_assets_file_chunks,
+		actor_assets_file_chunks
+	} from '../store/actor_assets_file_chunks';
+	import {
 		createActor as create_actor_assets_img_staging,
 		actor_assets_img_staging
 	} from '../store/actor_assets_img_staging';
@@ -51,6 +55,15 @@
 
 	async function handleLogOut() {
 		await $auth_client.logout();
+
+		actor_assets_file_chunks.update(() => ({
+			loggedIn: false,
+			actor: create_actor_assets_file_chunks({
+				agentOptions: {
+					identity: $auth_client.getIdentity()
+				}
+			})
+		}));
 
 		actor_assets_img_staging.update(() => ({
 			loggedIn: false,
