@@ -8,8 +8,12 @@
 	import { actor_assets_img_staging } from '../store/actor_assets_img_staging';
 	import { isSnapCreationModalVisible } from '../store/modal';
 
-	function handleCloseModal() {
+	function handleCloseModal(all_snaps) {
 		isSnapCreationModalVisible.update((isSnapCreationModalVisible) => !isSnapCreationModalVisible);
+
+		setTimeout(function () {
+			snap_store.set({ isFetching: false, snaps: [...all_snaps.ok] });
+		}, 2000);
 	}
 
 	async function commitImgAssetsToStaging(images) {
@@ -75,6 +79,13 @@
 		let img_asset_ids = [];
 		let file_asset = [];
 
+		snap_store.update(({ snaps }) => {
+			return {
+				isFetching: true,
+				snaps: snaps
+			};
+		});
+
 		img_asset_ids = await commitImgAssetsToStaging(snap.images);
 
 		let has_invalid_img = false;
@@ -96,21 +107,27 @@
 			file_asset
 		};
 
-		console.log('create_snap_args', create_snap_args);
-
 		const created_snap_res = await $actor_snap_main.actor.create_snap(create_snap_args);
-
-		console.log('created_snap_res', created_snap_res);
 
 		const all_snaps = await $actor_snap_main.actor.get_all_snaps();
 
-		snap_store.set({ isFetching: false, snaps: [...all_snaps.ok] });
+		handleCloseModal(all_snaps);
 	}
 </script>
 
 <Modal on:closeModal={handleCloseModal}>
-	<SnapCreation on:create_snap={handleSnapCreation} />
+	{#if $snap_store.isFetching === true}
+		<div class="loadingSnapCreation">
+			<h1>Publishing...</h1>
+		</div>
+	{:else}
+		<SnapCreation on:create_snap={handleSnapCreation} />
+	{/if}
 </Modal>
 
 <style>
+	.loadingSnapCreation {
+		height: 200px;
+		width: 200px;
+	}
 </style>
