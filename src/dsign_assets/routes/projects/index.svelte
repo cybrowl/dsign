@@ -24,7 +24,7 @@
 	import { page_navigation } from '../../store/page_navigation';
 
 	let isAuthenticated = false;
-	let isEditMode = false;
+	let isEditActive = false;
 
 	onMount(async () => {
 		let authClient = await AuthClient.create();
@@ -52,26 +52,28 @@
 		}
 
 		if (isAuthenticated) {
-			const response = await $actor_snap_main.actor.get_all_snaps();
-
-			if (response.ok) {
-				snap_store.set({ isFetching: false, snaps: [...response.ok] });
-
-				local_storage_projects.set({ all_snaps_count: response.ok.length || 1 });
-			} else {
-				if (response.err['UserNotFound'] === true) {
-					await $actor_snap_main.actor.create_user_snap_storage();
-				}
-			}
+			await getAllSnaps();
 		} else {
 			window.location.href = '/';
 		}
 	});
 
-	function handleToggleEditMode(e) {
-		const isEditActive = get(e, 'detail');
+	async function getAllSnaps() {
+		const response = await $actor_snap_main.actor.get_all_snaps();
 
-		isEditMode = isEditActive;
+		if (response.ok) {
+			snap_store.set({ isFetching: false, snaps: [...response.ok] });
+
+			local_storage_projects.set({ all_snaps_count: response.ok.length || 1 });
+		} else {
+			if (response.err['UserNotFound'] === true) {
+				await $actor_snap_main.actor.create_user_snap_storage();
+			}
+		}
+	}
+
+	function handleToggleEditMode(e) {
+		isEditActive = get(e, 'detail');
 
 		snap_store.update(({ snaps }) => {
 			const new_all_snaps = snaps.map((snap) => {
@@ -86,6 +88,19 @@
 				snaps: [...new_all_snaps]
 			};
 		});
+	}
+
+	async function handleDeleteSnaps(e) {
+		const selected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === true);
+		const unselected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === false);
+		const selected_snaps_ids = selected_snaps.map((snap) => snap.id);
+
+		snap_store.set({ isFetching: false, snaps: unselected_snaps });
+
+		handleToggleEditMode({ detail: false });
+
+		await $actor_snap_main.actor.delete_snaps(selected_snaps_ids);
+		await getAllSnaps();
 	}
 </script>
 
@@ -117,7 +132,11 @@
 					self-end justify-between items-center"
 		>
 			<ProjectsTabs isSnapsSelected={true} />
-			<ProjectEditActionsBar on:toggleEditMode={handleToggleEditMode} />
+			<ProjectEditActionsBar
+				{isEditActive}
+				on:toggleEditMode={handleToggleEditMode}
+				on:clickRemove={handleDeleteSnaps}
+			/>
 		</div>
 	{/if}
 
@@ -150,7 +169,7 @@
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
 		>
 			{#each $snap_store.snaps as snap}
-				<SnapCard {snap} {isEditMode} />
+				<SnapCard {snap} isEditMode={isEditActive} />
 			{/each}
 		</div>
 	{/if}

@@ -136,6 +136,14 @@ actor class ImageAssets(controller: Principal) = this {
         };
     };
 
+    public shared({caller}) func delete_image(image_id: Text) : async () {
+        if (controller != caller) {
+            return ();
+        };
+
+        image_assets.delete(image_id);
+    };
+
     // serves the image to the client when requested via image url
     public shared query func http_request(req : HttpRequest) : async HttpResponse {
         let NOT_FOUND : Blob = Blob.fromArray([0]);

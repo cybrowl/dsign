@@ -199,13 +199,11 @@ actor SnapMain {
         switch (user_canisters_ref.get(caller)) {
             case (?snap_canister_ids) {
                 for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
-                    //todo: delete snapIds in snap_ids
-
                     let snap_actor = actor (canister_id) : SnapActor;
                     await snap_actor.delete_snaps(snapIds);
                 };
 
-                return #ok("");
+                return #ok("delete_snaps");
             };
             case (_) {
                 #err(#UserNotFound)
