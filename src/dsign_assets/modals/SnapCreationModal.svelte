@@ -1,5 +1,8 @@
 <script>
+	import { onDestroy } from 'svelte';
+
 	import SnapCreation from 'dsign-components/components/SnapCreation.svelte';
+	import SnapCreationPublishing from 'dsign-components/components/SnapCreationPublishing.svelte';
 	import get from 'lodash/get.js';
 	import Modal from 'dsign-components/components/Modal.svelte';
 
@@ -8,12 +11,14 @@
 	import { actor_assets_img_staging } from '../store/actor_assets_img_staging';
 	import { isSnapCreationModalVisible } from '../store/modal';
 
+	let is_publishing = false;
+
+	onDestroy(() => (is_publishing = false));
+
 	function handleCloseModal(all_snaps) {
 		isSnapCreationModalVisible.update((isSnapCreationModalVisible) => !isSnapCreationModalVisible);
 
-		setTimeout(function () {
-			snap_store.set({ isFetching: false, snaps: [...all_snaps.ok] });
-		}, 2000);
+		snap_store.set({ isFetching: false, snaps: [...all_snaps.ok] });
 	}
 
 	async function commitImgAssetsToStaging(images) {
@@ -79,12 +84,7 @@
 		let img_asset_ids = [];
 		let file_asset = [];
 
-		snap_store.update(({ snaps }) => {
-			return {
-				isFetching: true,
-				snaps: snaps
-			};
-		});
+		is_publishing = true;
 
 		img_asset_ids = await commitImgAssetsToStaging(snap.images);
 
@@ -115,19 +115,17 @@
 	}
 </script>
 
-<Modal on:closeModal={handleCloseModal}>
-	{#if $snap_store.isFetching === true}
-		<div class="loadingSnapCreation">
-			<h1>Publishing...</h1>
-		</div>
+<Modal
+	on:closeModal={handleCloseModal}
+	modalHeaderVisible={!is_publishing}
+	isModalLocked={is_publishing}
+>
+	{#if is_publishing === true}
+		<SnapCreationPublishing />
 	{:else}
 		<SnapCreation on:create_snap={handleSnapCreation} />
 	{/if}
 </Modal>
 
 <style>
-	.loadingSnapCreation {
-		height: 200px;
-		width: 200px;
-	}
 </style>

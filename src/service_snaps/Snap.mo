@@ -36,6 +36,10 @@ actor class Snap(controller : Principal) = this {
         file_asset: AssetRef,
         owner: UserPrincipal) : async Result.Result<Snap, Text> {
 
+        if (controller != caller) {
+            return #err("Unauthorized");
+        };
+
         let snap_id =  ULID.toText(se.new());
         let snap_canister_id =  Principal.toText(Principal.fromActor(this));
 
@@ -73,11 +77,17 @@ actor class Snap(controller : Principal) = this {
     };
 
     public shared ({caller}) func delete_snaps(snapIds: [SnapID]) : async () {
+        if (controller != caller) {
+            return null;
+        };
+
         for (snap_id in snapIds.vals()){
             switch (snaps.get(snap_id)){
                 case null {};
                 case (?snap) {
-                   snaps.delete(snap_id);
+                    // TODO: delete snap images
+                    // TODO: delete snap file
+                    snaps.delete(snap_id);
                 };
             }
         };

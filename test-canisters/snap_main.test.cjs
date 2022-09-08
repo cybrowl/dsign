@@ -297,4 +297,6 @@ test('SnapMain[mishicat].create_snap(): with file and images => #ok - snap', asy
 
 test('SnapMain.get_all_snaps()', async function (t) {
 	const response = await snap_main_actor.mishicat.get_all_snaps();
+
+	console.log('response: ', response);
 });
