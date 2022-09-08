@@ -13,12 +13,15 @@ import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
 import FileAssetChunks "canister:assets_file_chunks";
+import Logger "canister:logger";
 
 import Types "./types";
 
 import Utils "./utils";
 
 actor class Assets(controller: Principal) = this {    
+    let ACTOR_NAME : Text = "Assets";
+
     private let rr = XorShift.toReader(XorShift.XorShift64(null));
     private let se = Source.Source(rr, 0);
 
@@ -100,6 +103,17 @@ actor class Assets(controller: Principal) = this {
         };
 
         #ok(asset_ref);
+    };
+
+    public shared({caller}) func delete_asset(asset_id: Text) : async () {
+        let tags = [ACTOR_NAME, "delete_asset"];
+
+        if (controller != caller) {
+            return ();
+        };
+
+        ignore Logger.log_event(tags, debug_show("asset", asset_id));
+        assets.delete(asset_id);
     };
 
     // ------------------------- Get Asset -------------------------

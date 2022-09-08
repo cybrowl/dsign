@@ -18,7 +18,9 @@
 	function handleCloseModal(all_snaps) {
 		isSnapCreationModalVisible.update((isSnapCreationModalVisible) => !isSnapCreationModalVisible);
 
-		snap_store.set({ isFetching: false, snaps: [...all_snaps.ok] });
+		if (all_snaps && all_snaps.ok) {
+			snap_store.set({ isFetching: false, snaps: [...all_snaps.ok] });
+		}
 	}
 
 	async function commitImgAssetsToStaging(images) {

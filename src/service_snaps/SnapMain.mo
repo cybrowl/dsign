@@ -216,9 +216,16 @@ actor SnapMain {
                     let snaps = await snap_actor.get_all_snaps(snapIds);
 
                     for (snap in snaps.vals()) {
+                        if (Text.size(snap.file_asset.canister_id) > 1) {
+                            let assets_actor = actor (snap.file_asset.canister_id) : AssetsActor;
+                            ignore assets_actor.delete_asset(snap.file_asset.id);
+                        };
+
                         for (image in snap.images.vals()){
-                            let image_assets_actor = actor (image.canister_id) : ImageAssetsActor;
-                            ignore image_assets_actor.delete_image(image.id);
+                            if (Text.size(image.canister_id) > 1) {
+                                let image_assets_actor = actor (image.canister_id) : ImageAssetsActor;
+                                ignore image_assets_actor.delete_image(image.id);
+                            };
                         };
                     };
  

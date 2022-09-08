@@ -86,5 +86,6 @@ module {
 
     public type AssetsActor = actor {
         create_asset_from_chunks : shared (CreateAssetArgs) -> async Result.Result<AssetRef, Text>;
+        delete_asset : shared (Text) -> async ();
     };
 }
