@@ -137,10 +137,13 @@ actor class ImageAssets(controller: Principal) = this {
     };
 
     public shared({caller}) func delete_image(image_id: Text) : async () {
+        let tags = [ACTOR_NAME, "delete_image"];
+
         if (controller != caller) {
             return ();
         };
 
+        ignore Logger.log_event(tags, debug_show("image", image_id));
         image_assets.delete(image_id);
     };
 

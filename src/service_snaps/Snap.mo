@@ -16,9 +16,7 @@ import Types "./types";
 
 actor class Snap(controller : Principal) = this {
     type AssetRef = Types.AssetRef;
-    type AssetsActor = Types.AssetsActor;
     type CreateSnapArgs = Types.CreateSnapArgs;
-    type ImageAssetsActor = Types.ImageAssetsActor;
     type ImageRef =  Types.ImageRef;
     type Snap = Types.Snap;
     type SnapID = Types.SnapID;
@@ -87,12 +85,6 @@ actor class Snap(controller : Principal) = this {
             switch (snaps.get(snap_id)){
                 case null {};
                 case (?snap) {
-                    for (image in snap.images.vals()){
-                        let image_assets_actor = actor (image.canister_id) : ImageAssetsActor;
-                        ignore image_assets_actor.delete_image(image.id);
-                    };
-
-                    // TODO: delete snap file
                     snaps.delete(snap_id);
                 };
             }

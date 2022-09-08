@@ -47,6 +47,18 @@ actor SnapMain {
     stable var snap_canister_id : Text = "";
 
     // ------------------------- Snaps Management -------------------------
+    public query func get_principal() : async UserPrincipal {
+        return Principal.fromText("qsgjb-riaaa-aaaaa-aaaga-cai");
+    };
+
+    public query func test_principals(principal: Principal) : async Bool {
+        if (Principal.fromText("qsgjb-riaaa-aaaaa-aaaga-cai") == principal) {
+            return true;
+        } else {
+            return false;
+        };
+    };
+
     public shared ({caller}) func create_user_snap_storage() : async Bool {
         let tags = [ACTOR_NAME, "create_user_snap_storage"];
 
@@ -200,6 +212,16 @@ actor SnapMain {
             case (?snap_canister_ids) {
                 for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
                     let snap_actor = actor (canister_id) : SnapActor;
+
+                    let snaps = await snap_actor.get_all_snaps(snapIds);
+
+                    for (snap in snaps.vals()) {
+                        for (image in snap.images.vals()){
+                            let image_assets_actor = actor (image.canister_id) : ImageAssetsActor;
+                            ignore image_assets_actor.delete_image(image.id);
+                        };
+                    };
+ 
                     await snap_actor.delete_snaps(snapIds);
                 };
 

@@ -24,8 +24,6 @@
 	async function commitImgAssetsToStaging(images) {
 		let promises = [];
 
-		console.log('images', images);
-
 		images.forEach(async function (image) {
 			const args = {
 				data: image,

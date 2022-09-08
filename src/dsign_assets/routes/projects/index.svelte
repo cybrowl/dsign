@@ -61,6 +61,8 @@
 	async function getAllSnaps() {
 		const response = await $actor_snap_main.actor.get_all_snaps();
 
+		console.log('snaps: ', response.ok);
+
 		if (response.ok) {
 			snap_store.set({ isFetching: false, snaps: [...response.ok] });
 
