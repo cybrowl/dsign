@@ -1,11 +1,23 @@
 {
+  "assets_file_chunks": {
+    "ic": "jfpyd-maaaa-aaaag-aatxq-cai"
+  },
+  "assets_img_staging": {
+    "ic": "jlnvl-xqaaa-aaaag-aatwq-cai"
+  },
   "dsign_assets": {
     "ic": "kqlfj-siaaa-aaaag-aaawq-cai"
+  },
+  "logger": {
+    "ic": "jaypp-oiaaa-aaaag-aaa6q-cai"
   },
   "profile": {
     "ic": "kxkd5-7qaaa-aaaag-aaawa-cai"
   },
-  "logger": {
-    "ic": "jaypp-oiaaa-aaaag-aaa6q-cai"
+  "snap_main": {
+    "ic": "lyswl-7iaaa-aaaag-aatya-cai"
+  },
+  "username": {
+    "ic": "jco6x-byaaa-aaaag-aatxa-cai"
   }
 }
