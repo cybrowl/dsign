@@ -97,6 +97,14 @@ test('SnapMain[mishicat].initialize_canisters()', async function (t) {
 	await snap_main_actor.mishicat.initialize_canisters();
 });
 
+test('Username[mishicat].get_child_controllers(): ', async function (t) {
+	const response = await snap_main_actor.mishicat.get_child_controllers(
+		'uesr6-yqaaa-aaaaa-aaa6q-cai'
+	);
+	console.log('response: ', response);
+	// console.log('response.settings.controllers: ', response.settings.controllers);
+});
+
 test('Username[mishicat].create_username(): should create username => #ok - username', async function (t) {
 	const username = fake.word();
 

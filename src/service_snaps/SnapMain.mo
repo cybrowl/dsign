@@ -15,7 +15,6 @@ import Logger "canister:logger";
 import Snap "Snap";
 
 import Types "./types";
-import AssetTypes "../service_assets/types";
 
 actor SnapMain {
     type AssetsActor = Types.AssetsActor;
@@ -24,6 +23,8 @@ actor SnapMain {
     type CreateSnapErr = Types.CreateSnapErr;
     type DeleteAllSnapsErr = Types.DeleteAllSnapsErr;
     type GetAllSnapsErr = Types.GetAllSnapsErr;
+    type ICInterface = Types.ICInterface;
+    type ICInterfaceStatusResponse = Types.ICInterfaceStatusResponse;
     type ImageAssetsActor = Types.ImageAssetsActor;
     type ImageRef = Types.ImageRef;
     type Snap = Types.Snap;
@@ -46,19 +47,9 @@ actor SnapMain {
     stable var image_assets_canister_id : Text = "";
     stable var snap_canister_id : Text = "";
 
+    private let ic : ICInterface = actor "aaaaa-aa";
+
     // ------------------------- Snaps Management -------------------------
-    public query func get_principal() : async UserPrincipal {
-        return Principal.fromText("qsgjb-riaaa-aaaaa-aaaga-cai");
-    };
-
-    public query func test_principals(principal: Principal) : async Bool {
-        if (Principal.fromText("qsgjb-riaaa-aaaaa-aaaga-cai") == principal) {
-            return true;
-        } else {
-            return false;
-        };
-    };
-
     public shared ({caller}) func create_user_snap_storage() : async Bool {
         let tags = [ACTOR_NAME, "create_user_snap_storage"];
 
@@ -124,9 +115,9 @@ actor SnapMain {
             };
         };
 
+        let assets_actor = actor (assets_canister_id) : AssetsActor;
         let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
         let snap_actor = actor (snap_canister_id) : SnapActor;
-        let assets_actor = actor (assets_canister_id) : AssetsActor;
 
         // save images from img_asset_ids
         let image_ref : ImageRef = {canister_id = ""; id = ""; url = ""};
@@ -295,6 +286,29 @@ actor SnapMain {
         } else {
             ignore Logger.log_event(tags, debug_show(("exists, snap_canister_id: ", snap_canister_id)));
         };
+    };
+
+    public shared func get_child_status(canister_id : Text) : async ICInterfaceStatusResponse {
+        let principal : Principal = Principal.fromText(canister_id);
+
+        await ic.canister_status({canister_id = principal});
+    };
+
+    public shared func get_child_controllers(canister_id : Text) : async Text {
+        let principal : Principal = Principal.fromText(canister_id);
+
+        let response = await ic.canister_status({canister_id = principal});
+        
+        return debug_show(response.settings.controllers);
+    };
+
+    public shared ({caller}) func install_code(canister_id: Principal, arg: Blob, wasm_module: Blob) : async () {
+        await ic.install_code({
+            arg = arg;
+            wasm_module = wasm_module;
+            mode = #upgrade;
+            canister_id = canister_id;
+        });
     };
 
     // ------------------------- System Methods -------------------------

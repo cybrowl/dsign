@@ -109,6 +109,8 @@
 
 		const created_snap_res = await $actor_snap_main.actor.create_snap(create_snap_args);
 
+		console.log('created_snap_res', created_snap_res);
+
 		const all_snaps = await $actor_snap_main.actor.get_all_snaps();
 
 		handleCloseModal(all_snaps);

@@ -6,6 +6,7 @@ import Text "mo:base/Text";
 
 import AssetTypes "../service_assets/types";
 import ImgAssetTypes "../service_assets_img/types";
+import ICInterfaceTypes "../types/ic.types";
 
 module {
     public type Time = Int;
@@ -18,6 +19,8 @@ module {
     public type AssetRef = AssetTypes.AssetRef;
     public type AssetsActor = AssetTypes.AssetsActor;
     public type CreateAssetArgs = AssetTypes.CreateAssetArgs;
+    public type ICInterface = ICInterfaceTypes.Self;
+    public type ICInterfaceStatusResponse = ICInterfaceTypes.StatusResponse;
 
     // Snap
     public type SnapCanisterID = Text;
