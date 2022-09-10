@@ -8,8 +8,11 @@ const sha256 = require('sha256');
 const fs = require('fs');
 const Path = require('path');
 
-const { snap_main_interface } = require('../test-utils/actor_interface.cjs');
-const { snap_main_canister_id } = require('../test-utils/actor_canister_ids.cjs');
+const { snap_main_interface, profile_interface } = require('../test-utils/actor_interface.cjs');
+const {
+	snap_main_canister_id,
+	profile_canister_id
+} = require('../test-utils/actor_canister_ids.cjs');
 const canister_ids = require('../canister_ids.json');
 
 const parseIdentity = (keyPath) => {
@@ -68,6 +71,8 @@ const get_actor = async (canisterId, can_interface, is_prod) => {
 };
 
 const installCode = async () => {
+	console.log('Installing canisters...');
+
 	let canisters = [
 		{
 			local: {
@@ -98,27 +103,56 @@ const installCode = async () => {
 					[Principal.fromText(canister_ids['snap_main'].ic), true]
 				)
 			}
+		},
+		{
+			local: {
+				name: 'profile',
+				description: 'upgrades child canister test_image_assets',
+				is_prod: false,
+				canister_id: profile_canister_id,
+				can_interface: profile_interface,
+				child_canister_text: 'tlwi3-3aaaa-aaaaa-aaapq-cai',
+				child_canister_principal: Principal.fromText('tlwi3-3aaaa-aaaaa-aaapq-cai'),
+				wasm: get_wasm('test_image_assets'),
+				arg: IDL.encode([IDL.Principal, IDL.Bool], [Principal.fromText(profile_canister_id), false])
+			},
+			prod: {
+				name: 'profile',
+				description: 'upgrades child canister test_image_assets',
+				is_prod: true,
+				canister_id: canister_ids['profile'].ic,
+				can_interface: profile_interface,
+				child_canister_text: 'lewm2-iiaaa-aaaag-aat2a-cai',
+				child_canister_principal: Principal.fromText('lewm2-iiaaa-aaaag-aat2a-cai'),
+				wasm: get_wasm_prod('test_image_assets'),
+				arg: IDL.encode(
+					[IDL.Principal, IDL.Bool],
+					[Principal.fromText(canister_ids['profile'].ic), true]
+				)
+			}
 		}
 	];
 
-	console.log('Installing canisters...');
-	let snap_main = canisters[0].local;
+	// let snap_main = canisters[0].local;
+	let profile = canisters[1].prod;
 
-	console.log('snap_main: ', snap_main);
+	// const actor = await get_actor(snap_main.canister_id, snap_main.can_interface, snap_main.is_prod);
 
-	const actor = await get_actor(snap_main.canister_id, snap_main.can_interface, snap_main.is_prod);
+	// const res_2 = await actor.install_code(
+	// 	snap_main.child_canister_principal,
+	// 	[...snap_main.arg],
+	// 	snap_main.wasm
+	// );
 
-	const res = await actor.get_child_controllers(snap_main.child_canister_text);
+	const actor = await get_actor(profile.canister_id, profile.can_interface, profile.is_prod);
 
-	console.log('res: ', res);
-
-	const res_2 = await actor.install_code(
-		snap_main.child_canister_principal,
-		[...snap_main.arg],
-		snap_main.wasm
+	const res = await actor.install_code(
+		profile.child_canister_principal,
+		[...profile.arg],
+		profile.wasm
 	);
 
-	console.log('res_2: ', res_2);
+	console.log('res: ', res);
 };
 
 const init = async () => {
