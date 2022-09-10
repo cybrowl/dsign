@@ -19,7 +19,7 @@ import Types "./types";
 
 import Utils "./utils";
 
-actor class Assets(controller: Principal) = this {    
+actor class Assets(controller: Principal, is_prod: Bool) = this {    
     let ACTOR_NAME : Text = "Assets";
 
     private let rr = XorShift.toReader(XorShift.XorShift64(null));
@@ -76,7 +76,7 @@ actor class Assets(controller: Principal) = this {
         let asset_url = Utils.generate_asset_url({
             asset_id = asset_id;
             canister_id = canister_id;
-            is_prod = false;
+            is_prod = is_prod;
         });
 
         let asset : Types.Asset  = {
