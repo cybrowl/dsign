@@ -242,7 +242,7 @@ actor SnapMain {
 
     private func create_image_assets_canister(snap_main_principal : Principal) : async () {
         Cycles.add(CYCLE_AMOUNT);
-        let image_assets_actor = await ImageAssets.ImageAssets(snap_main_principal);
+        let image_assets_actor = await ImageAssets.ImageAssets(snap_main_principal, false);
         let principal = Principal.fromActor(image_assets_actor);
 
         image_assets_canister_id := Principal.toText(principal);

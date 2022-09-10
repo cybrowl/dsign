@@ -13,6 +13,11 @@ const get_wasm = (name) => {
 	return [...new Uint8Array(buffer)];
 };
 
+const get_wasm_prod = (name) => {
+	const buffer = readFileSync(`${process.cwd()}/.dfx/ic/canisters/${name}/${name}.wasm`);
+	return [...new Uint8Array(buffer)];
+};
+
 const get_actor = async (canisterId, can_interface, is_prod) => {
 	const host = is_prod ? `https://${canisterId}.ic0.app/` : `http://127.0.0.1:8000`;
 
@@ -39,7 +44,10 @@ const installCode = async () => {
 				can_interface: snap_main_interface,
 				child_canister_principal: Principal.fromText('7bb7f-zaaaa-aaaaa-aabdq-cai'),
 				wasm: get_wasm('test_image_assets'),
-				arg: IDL.encode([IDL.Principal], [Principal.fromText(snap_main_canister_id)])
+				arg: IDL.encode(
+					[IDL.Principal, IDL.Bool],
+					[Principal.fromText(snap_main_canister_id), false]
+				)
 			},
 			prod: {
 				name: 'snap_main',
@@ -48,12 +56,16 @@ const installCode = async () => {
 				canister_id: canister_ids['snap_main'].ic,
 				can_interface: snap_main_interface,
 				child_canister_principal: Principal.fromText('lwq3d-eyaaa-aaaag-aatza-cai'),
-				wasm: get_wasm('test_image_assets'),
-				arg: IDL.encode([IDL.Principal], [Principal.fromText(canister_ids['snap_main'].ic)])
+				wasm: get_wasm_prod('test_image_assets'),
+				arg: IDL.encode(
+					[IDL.Principal, IDL.Bool],
+					[Principal.fromText(canister_ids['snap_main'].ic), true]
+				)
 			}
 		}
 	];
 
+	console.log('Installing canisters...');
 	let snap_main = canisters[0].prod;
 
 	console.log('snap_main: ', snap_main);

@@ -17,7 +17,7 @@ import ImageAssetStaging "canister:assets_img_staging";
 import Types "./types";
 import Utils "./utils";
 
-actor class ImageAssets(controller: Principal) = this {
+actor class ImageAssets(controller: Principal, is_prod: Bool) = this {
     type AssetImg = Types.AssetImg;
     type HttpRequest = Types.HttpRequest;
     type HttpResponse =  Types.HttpResponse;
@@ -31,11 +31,10 @@ actor class ImageAssets(controller: Principal) = this {
     };
 
     let ACTOR_NAME : Text = "ImageAssets";
-    let VERSION : Nat = 3;
+    let VERSION : Nat = 2;
 
     private let rr = XorShift.toReader(XorShift.XorShift64(null));
     private let se = Source.Source(rr, 0);
-    private var isProduction : Bool = false;
 
     var image_assets : HashMap.HashMap<ImageID, AssetImg> = HashMap.HashMap(0, Text.equal, Text.hash);
     stable var image_assets_stable_storage : [(ImageID, AssetImg)] = [];
@@ -67,7 +66,7 @@ actor class ImageAssets(controller: Principal) = this {
                     let image_ref = {
                         canister_id = canister_id;
                         id = image_id;
-                        url = Utils.generate_image_url(canister_id, image_id, asset_type, isProduction);
+                        url = Utils.generate_image_url(canister_id, image_id, asset_type, is_prod);
                     };
 
                     images_ref.add(image_ref);
@@ -113,7 +112,7 @@ actor class ImageAssets(controller: Principal) = this {
                 let image_ref = {
                     canister_id = canister_id;
                     id = stored_asset_id;
-                    url = Utils.generate_image_url(canister_id, stored_asset_id, asset_type, isProduction);
+                    url = Utils.generate_image_url(canister_id, stored_asset_id, asset_type, is_prod);
                 };
 
                 ignore ImageAssetStaging.delete_assets([asset_id], owner);

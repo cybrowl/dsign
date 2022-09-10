@@ -127,7 +127,7 @@ actor Profile = {
         let tags = [ACTOR_NAME, "create_image_assets_canister"];
 
         Cycles.add(CYCLE_AMOUNT);
-        let image_assets_actor = await ImageAssets.ImageAssets(profile_principal);
+        let image_assets_actor = await ImageAssets.ImageAssets(profile_principal, true);
         let principal = Principal.fromActor(image_assets_actor);
 
         image_assets_canister_id := Principal.toText(principal);
