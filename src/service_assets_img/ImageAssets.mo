@@ -31,7 +31,7 @@ actor class ImageAssets(controller: Principal) = this {
     };
 
     let ACTOR_NAME : Text = "ImageAssets";
-    let VERSION : Text = "0.0.1";
+    let VERSION : Nat = 3;
 
     private let rr = XorShift.toReader(XorShift.XorShift64(null));
     private let se = Source.Source(rr, 0);
@@ -40,7 +40,7 @@ actor class ImageAssets(controller: Principal) = this {
     var image_assets : HashMap.HashMap<ImageID, AssetImg> = HashMap.HashMap(0, Text.equal, Text.hash);
     stable var image_assets_stable_storage : [(ImageID, AssetImg)] = [];
 
-    public query func version() : async Text {
+    public query func version() : async Nat {
         return VERSION;
     };
 

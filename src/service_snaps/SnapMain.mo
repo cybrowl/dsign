@@ -303,6 +303,9 @@ actor SnapMain {
     };
 
     public shared ({caller}) func install_code(canister_id: Principal, arg: Blob, wasm_module: Blob) : async () {
+
+        Debug.print(debug_show(Principal.toText(caller)));
+
         await ic.install_code({
             arg = arg;
             wasm_module = wasm_module;

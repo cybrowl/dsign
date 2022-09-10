@@ -5,11 +5,7 @@ const fetch = require('node-fetch');
 const { HttpAgent, Actor } = require('@dfinity/agent');
 
 const { snap_main_interface } = require('../test-utils/actor_interface.cjs');
-// Canister Ids
-const {
-	snap_main_canister_id,
-	test_image_assets_canister_id
-} = require('../test-utils/actor_canister_ids.cjs');
+const { snap_main_canister_id } = require('../test-utils/actor_canister_ids.cjs');
 
 const get_wasm = (name) => {
 	const buffer = readFileSync(`${process.cwd()}/.dfx/local/canisters/${name}/${name}.wasm`);
@@ -34,9 +30,9 @@ const installCode = async () => {
 				name: 'snap_main',
 				canister_id: snap_main_canister_id,
 				can_interface: snap_main_interface,
-				child_canister_principal: Principal.fromText(test_image_assets_canister_id),
-				wasm: get_wasm('snap_main'),
-				arg: IDL.encode([IDL.Text], [snap_main_canister_id])
+				child_canister_principal: Principal.fromText('7bb7f-zaaaa-aaaaa-aabdq-cai'),
+				wasm: get_wasm('test_image_assets'),
+				arg: IDL.encode([IDL.Principal], [Principal.fromText(snap_main_canister_id)])
 			}
 		}
 	];
@@ -46,8 +42,6 @@ const installCode = async () => {
 	console.log('snap_main: ', snap_main);
 
 	const actor = await get_actor(snap_main.canister_id, snap_main.can_interface);
-
-	console.log('actor: ', actor);
 
 	await actor.install_code(snap_main.child_canister_principal, [...snap_main.arg], snap_main.wasm);
 };
