@@ -19,6 +19,7 @@ module {
     public type AssetRef = AssetTypes.AssetRef;
     public type AssetsActor = AssetTypes.AssetsActor;
     public type CreateAssetArgs = AssetTypes.CreateAssetArgs;
+
     public type ICInterface = ICInterfaceTypes.Self;
     public type ICInterfaceStatusResponse = ICInterfaceTypes.StatusResponse;
 

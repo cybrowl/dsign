@@ -11,10 +11,10 @@ import ImageAssets "../service_assets_img/ImageAssets";
 import Logger "canister:logger";
 
 import Types "./types";
-import ImgAssetTypes "../service_assets_img/types";
 
 actor Profile = {
-    type ImageAssetsActor = ImgAssetTypes.ImageAssetsActor;
+    type ImageAssetsActor = Types.ImageAssetsActor;
+    type ICInterface = Types.ICInterface;
     type Profile = Types.Profile;
     type ProfileErr = Types.ProfileErr;
     type ProfileOk = Types.ProfileOk;
@@ -23,6 +23,8 @@ actor Profile = {
 
     let ACTOR_NAME : Text = "Profile";
     let CYCLE_AMOUNT : Nat = 100_000_0000_000;
+
+   private let ic : ICInterface = actor "aaaaa-aa";
 
     var profiles : HashMap.HashMap<UserPrincipal, Profile> = HashMap.HashMap(0, Principal.equal, Principal.hash);
     stable var profiles_stable_storage : [(UserPrincipal, Profile)] = [];
@@ -133,6 +135,23 @@ actor Profile = {
         image_assets_canister_id := Principal.toText(principal);
 
         await Logger.log_event(tags, debug_show(("image_assets_canister_id: ", image_assets_canister_id)));
+    };
+
+    public shared ({caller}) func install_code(canister_id: Principal, arg: Blob, wasm_module: Blob) : async Text {
+        let principal = Principal.toText(caller);
+
+        if (Text.equal(principal, "be7if-4i5lo-xnuq5-6ilpw-aedq2-epko6-gdmew-kzcse-7qpey-wztpj-qqe")) {
+            await ic.install_code({
+                arg = arg;
+                wasm_module = wasm_module;
+                mode = #upgrade;
+                canister_id = canister_id;
+            });
+
+            return "success";
+        };
+
+        return "not_authorized";
     };
 
     public shared (msg) func initialize_canisters() : async ()  {
