@@ -106,6 +106,36 @@ const installCode = async () => {
 		},
 		{
 			local: {
+				name: 'snap_main',
+				description: 'upgrades child canister test_assets',
+				is_prod: false,
+				canister_id: snap_main_canister_id,
+				can_interface: snap_main_interface,
+				child_canister_text: '7gazr-uyaaa-aaaaa-aabda-cai',
+				child_canister_principal: Principal.fromText('7gazr-uyaaa-aaaaa-aabda-cai'),
+				wasm: get_wasm('test_assets'),
+				arg: IDL.encode(
+					[IDL.Principal, IDL.Bool],
+					[Principal.fromText(snap_main_canister_id), false]
+				)
+			},
+			prod: {
+				name: 'snap_main',
+				description: 'upgrades child canister test_assets',
+				is_prod: true,
+				canister_id: canister_ids['snap_main'].ic,
+				can_interface: snap_main_interface,
+				child_canister_text: 'l7tq7-sqaaa-aaaag-aatyq-cai',
+				child_canister_principal: Principal.fromText('l7tq7-sqaaa-aaaag-aatyq-cai'),
+				wasm: get_wasm_prod('test_assets'),
+				arg: IDL.encode(
+					[IDL.Principal, IDL.Bool],
+					[Principal.fromText(canister_ids['snap_main'].ic), true]
+				)
+			}
+		},
+		{
+			local: {
 				name: 'profile',
 				description: 'upgrades child canister test_image_assets',
 				is_prod: false,
@@ -133,24 +163,24 @@ const installCode = async () => {
 		}
 	];
 
-	// let snap_main = canisters[0].local;
-	let profile = canisters[1].prod;
+	let snap_main = canisters[1].prod;
+	// let profile = canisters[2].prod;
 
-	// const actor = await get_actor(snap_main.canister_id, snap_main.can_interface, snap_main.is_prod);
-
-	// const res_2 = await actor.install_code(
-	// 	snap_main.child_canister_principal,
-	// 	[...snap_main.arg],
-	// 	snap_main.wasm
-	// );
-
-	const actor = await get_actor(profile.canister_id, profile.can_interface, profile.is_prod);
+	const actor = await get_actor(snap_main.canister_id, snap_main.can_interface, snap_main.is_prod);
 
 	const res = await actor.install_code(
-		profile.child_canister_principal,
-		[...profile.arg],
-		profile.wasm
+		snap_main.child_canister_principal,
+		[...snap_main.arg],
+		snap_main.wasm
 	);
+
+	// const actor = await get_actor(profile.canister_id, profile.can_interface, profile.is_prod);
+
+	// const res = await actor.install_code(
+	// 	profile.child_canister_principal,
+	// 	[...profile.arg],
+	// 	profile.wasm
+	// );
 
 	console.log('res: ', res);
 };

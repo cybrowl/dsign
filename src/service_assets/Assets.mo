@@ -27,8 +27,8 @@ actor class Assets(controller: Principal, is_prod: Bool) = this {
 
     private let assets : HashMap.HashMap<Text, Types.Asset> = HashMap.HashMap<Text, Types.Asset>(0, Text.equal, Text.hash);
 
-    public query func version() : async Text {
-        return "0.0.1";
+    public query func version() : async Nat {
+        return 2;
     };
 
     // ------------------------- Create Asset -------------------------
