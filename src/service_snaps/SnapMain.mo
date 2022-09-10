@@ -303,13 +303,21 @@ actor SnapMain {
         return debug_show(response.settings.controllers, caller);
     };
 
-    public shared ({caller}) func install_code(canister_id: Principal, arg: Blob, wasm_module: Blob) : async () {
-        await ic.install_code({
-            arg = arg;
-            wasm_module = wasm_module;
-            mode = #upgrade;
-            canister_id = canister_id;
-        });
+    public shared ({caller}) func install_code(canister_id: Principal, arg: Blob, wasm_module: Blob) : async Text {
+        let principal = Principal.toText(caller);
+
+        if (Text.equal(principal, "be7if-4i5lo-xnuq5-6ilpw-aedq2-epko6-gdmew-kzcse-7qpey-wztpj-qqe")) {
+            await ic.install_code({
+                arg = arg;
+                wasm_module = wasm_module;
+                mode = #upgrade;
+                canister_id = canister_id;
+            });
+
+            return "success";
+        };
+
+        return "not_authorized";
     };
 
     // ------------------------- System Methods -------------------------

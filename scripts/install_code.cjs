@@ -76,6 +76,7 @@ const installCode = async () => {
 				is_prod: false,
 				canister_id: snap_main_canister_id,
 				can_interface: snap_main_interface,
+				child_canister_text: '7bb7f-zaaaa-aaaaa-aabdq-cai',
 				child_canister_principal: Principal.fromText('7bb7f-zaaaa-aaaaa-aabdq-cai'),
 				wasm: get_wasm('test_image_assets'),
 				arg: IDL.encode(
@@ -89,6 +90,7 @@ const installCode = async () => {
 				is_prod: true,
 				canister_id: canister_ids['snap_main'].ic,
 				can_interface: snap_main_interface,
+				child_canister_text: 'lwq3d-eyaaa-aaaag-aatza-cai',
 				child_canister_principal: Principal.fromText('lwq3d-eyaaa-aaaag-aatza-cai'),
 				wasm: get_wasm_prod('test_image_assets'),
 				arg: IDL.encode(
@@ -106,11 +108,17 @@ const installCode = async () => {
 
 	const actor = await get_actor(snap_main.canister_id, snap_main.can_interface, snap_main.is_prod);
 
-	const res = await actor.get_child_controllers('7bb7f-zaaaa-aaaaa-aabdq-cai');
+	const res = await actor.get_child_controllers(snap_main.child_canister_text);
 
 	console.log('res: ', res);
 
-	// await actor.install_code(snap_main.child_canister_principal, [...snap_main.arg], snap_main.wasm);
+	const res_2 = await actor.install_code(
+		snap_main.child_canister_principal,
+		[...snap_main.arg],
+		snap_main.wasm
+	);
+
+	console.log('res_2: ', res_2);
 };
 
 const init = async () => {
