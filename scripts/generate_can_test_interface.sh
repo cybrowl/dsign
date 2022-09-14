@@ -23,10 +23,10 @@ cp .dfx/local/canisters/profile/profile.did.js .dfx/local/canisters/profile/prof
 sed -i '' 's/export//g' .dfx/local/canisters/profile/profile.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/profile/profile.did.test.cjs
 
-# # project_main
-# cp .dfx/local/canisters/project_main/project_main.did.js .dfx/local/canisters/project_main/project_main.did.test.cjs
-# sed -i '' 's/export//g' .dfx/local/canisters/project_main/project_main.did.test.cjs
-# echo "module.exports = { idlFactory };" >> .dfx/local/canisters/project_main/project_main.did.test.cjs
+# project_main
+cp .dfx/local/canisters/project_main/project_main.did.js .dfx/local/canisters/project_main/project_main.did.test.cjs
+sed -i '' 's/export//g' .dfx/local/canisters/project_main/project_main.did.test.cjs
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/project_main/project_main.did.test.cjs
 
 # snap_main
 cp .dfx/local/canisters/snap_main/snap_main.did.js .dfx/local/canisters/snap_main/snap_main.did.test.cjs

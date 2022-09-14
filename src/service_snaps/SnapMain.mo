@@ -196,6 +196,8 @@ actor SnapMain {
         };
     };
 
+    //todo: get all snaps from project
+
     public shared ({caller}) func delete_snaps(snapIds: [SnapID]) : async Result.Result<Text, DeleteAllSnapsErr> {
         let tags = [ACTOR_NAME, "delete_snaps"];
 

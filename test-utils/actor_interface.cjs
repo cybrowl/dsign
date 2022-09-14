@@ -8,6 +8,9 @@ const {
 	idlFactory: profile_interface
 } = require('../.dfx/local/canisters/profile/profile.did.test.cjs');
 const {
+	idlFactory: project_main_interface
+} = require('../.dfx/local/canisters/project_main/project_main.did.test.cjs');
+const {
 	idlFactory: snap_main_interface
 } = require('../.dfx/local/canisters/snap_main/snap_main.did.test.cjs');
 const {
@@ -24,6 +27,7 @@ module.exports = {
 	assets_file_chunks_interface,
 	assets_img_staging_interface,
 	profile_interface,
+	project_main_interface,
 	snap_main_interface,
 	test_assets_interface,
 	test_image_assets_interface,

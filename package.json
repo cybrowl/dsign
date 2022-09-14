@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "dsign",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -15,6 +15,7 @@
     "test-ta": "npm run generate_test_interface && tape test-canisters/test_assets.test.cjs",
     "test-sm": "npm run generate_test_interface && tape test-canisters/snap_main.test.cjs",
     "test-p": "npm run generate_test_interface && tape test-canisters/profile.test.cjs",
+    "test-pm": "npm run generate_test_interface && tape test-canisters/project_main.test.cjs",
     "test-u": "npm run generate_test_interface && tape test-canisters/username.test.cjs",
     "watch": "vite dev"
   },

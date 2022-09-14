@@ -6,6 +6,7 @@ import Text "mo:base/Text";
 
 import AssetTypes "../service_assets/types";
 import ImgAssetTypes "../service_assets_img/types";
+import ProjectTypes "../service_projects/types";
 import ICInterfaceTypes "../types/ic.types";
 
 module {
@@ -19,6 +20,8 @@ module {
     public type AssetRef = AssetTypes.AssetRef;
     public type AssetsActor = AssetTypes.AssetsActor;
     public type CreateAssetArgs = AssetTypes.CreateAssetArgs;
+
+    public type Project = ProjectTypes.Project;
 
     public type ICInterface = ICInterfaceTypes.Self;
     public type ICInterfaceStatusResponse = ICInterfaceTypes.StatusResponse;
@@ -34,7 +37,7 @@ module {
         id: SnapID;
         image_cover_location: Nat8;
         images: [ImageRef];
-        projects: ?[ProjectRef];
+        project: ?Project;
         tags: ?[Text];
         title: Text;
         username: Username;
@@ -65,20 +68,12 @@ module {
         #ErrorCall: Text;
     };
 
-   public type GetAllSnapsErr = {
+    public type GetAllSnapsErr = {
         #UserNotFound: Bool;
     };
 
     public type DeleteAllSnapsErr = {
         #UserNotFound;
-    };
-
-    // Project
-    public type ProjectID = Text;
-
-    public type ProjectRef = {
-        id: ProjectID;
-        name: Text;
     };
 
     // Actor Interface
