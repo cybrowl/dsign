@@ -40,7 +40,8 @@
       "main": "src/service_projects/ProjectMain.mo",
       "type": "motoko",
       "dependencies": [
-        "logger"
+        "logger",
+        "username"
       ]
     },
     "snap_main": {

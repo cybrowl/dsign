@@ -1,7 +1,6 @@
-import Buffer "mo:base/Buffer";
 import Int "mo:base/Int";
-import Nat "mo:base/Nat";
 import Principal "mo:base/Principal";
+import Result "mo:base/Result";
 import Text "mo:base/Text";
 
 module {
@@ -17,11 +16,12 @@ module {
 
     public type Project = {
         id: Text;
+        canister_id: Text;
         created: Time;
         username: Text;
         owner: Principal;
         name: Text;
-        snaps: [SnapRef];
+        snaps: ?[SnapRef];
     };
 
     public type CreateProjectErr = {
@@ -29,5 +29,10 @@ module {
         #UserNotFound;
         #NotImplemented;
         #ErrorCall: Text;
+    };
+
+    // Actor Interface
+    public type ProjectActor = actor {
+        create_project : shared (Text, ?[SnapRef], UserPrincipal) -> async Result.Result<Project, Text>;
     };
 };

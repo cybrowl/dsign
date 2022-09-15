@@ -14,6 +14,7 @@ import Types "./types";
 actor ProjectMain {
     type CreateProjectErr = Types.CreateProjectErr;
     type Project = Types.Project;
+    type ProjectActor = Types.ProjectActor;
     type ProjectCanisterID = Types.ProjectCanisterID;
     type ProjectID = Types.ProjectID;
     type SnapRef = Types.SnapRef;
@@ -29,8 +30,31 @@ actor ProjectMain {
     stable var project_canister_id : Text = "";
 
     // ------------------------- Project Management -------------------------
-    public shared ({caller}) func create_project(title : Text, snaps: ?[SnapRef]) : async Result.Result<Project, CreateProjectErr> {
+    public shared ({caller}) func create_user_project_storage() : async Bool {
+        let tags = [ACTOR_NAME, "create_user_project_storage"];
+
+        switch (user_canisters_ref.get(caller)) {
+            case (?project_canister_ids) {
+                ignore Logger.log_event(tags, "exists, user_project_storage");
+
+                return false;
+            };
+            case (_) {
+                var empty_project_canister_id_storage : HashMap.HashMap<ProjectCanisterID, Buffer.Buffer<ProjectID>> = HashMap.HashMap(0, Text.equal, Text.hash);
+
+                user_canisters_ref.put(caller, empty_project_canister_id_storage);
+
+                ignore Logger.log_event(tags, "created, user_project_storage");
+
+                return true;
+            };
+        };
+    };
+
+    public shared ({caller}) func create_project(name : Text, snaps: ?[SnapRef]) : async Result.Result<Project, CreateProjectErr> {
         let tags = [ACTOR_NAME, "create_project"];
+
+        //todo: args security checks
 
         // get user project canister ids
         var project_canister_ids : HashMap.HashMap<ProjectCanisterID, Buffer.Buffer<ProjectID>> = HashMap.HashMap(0, Text.equal, Text.hash);
@@ -58,7 +82,23 @@ actor ProjectMain {
             };
         };
 
-        #err(#NotImplemented);
+        let project_actor = actor (project_canister_id) : ProjectActor;
+
+        // save project
+        switch(await project_actor.create_project(name, snaps, caller)) {
+            case(#err err) {
+                return #err(#ErrorCall(debug_show(err)));
+            };
+            case(#ok project) {
+                project_ids.add(project.id);
+                if (project_ids_found == false) {
+                    project_canister_ids.put(project_canister_id, project_ids);
+                };
+
+                //TODO: remove owner from project
+                #ok(project);
+            };
+        };
     };
 
     // delete projects
@@ -68,6 +108,8 @@ actor ProjectMain {
     // move snaps from project
 
     // delete snaps from project
+
+    // get all projects
 
     // ------------------------- Canister Management -------------------------
     public query func version() : async Nat {
