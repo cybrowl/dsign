@@ -21,7 +21,7 @@ actor SnapMain {
     type CreateAssetArgs = Types.CreateAssetArgs;
     type CreateSnapArgs = Types.CreateSnapArgs;
     type CreateSnapErr = Types.CreateSnapErr;
-    type DeleteAllSnapsErr = Types.DeleteAllSnapsErr;
+    type DeleteSnapsErr = Types.DeleteSnapsErr;
     type GetAllSnapsErr = Types.GetAllSnapsErr;
     type ICInterface = Types.ICInterface;
     type ICInterfaceStatusResponse = Types.ICInterfaceStatusResponse;
@@ -198,7 +198,7 @@ actor SnapMain {
 
     //todo: get all snaps from project
 
-    public shared ({caller}) func delete_snaps(snapIds: [SnapID]) : async Result.Result<Text, DeleteAllSnapsErr> {
+    public shared ({caller}) func delete_snaps(snapIds: [SnapID]) : async Result.Result<Text, DeleteSnapsErr> {
         let tags = [ACTOR_NAME, "delete_snaps"];
 
         switch (user_canisters_ref.get(caller)) {

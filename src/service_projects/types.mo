@@ -31,8 +31,13 @@ module {
         #ErrorCall: Text;
     };
 
+    public type DeleteProjectsErr = {
+        #UserNotFound;
+    };
+
     // Actor Interface
     public type ProjectActor = actor {
         create_project : shared (Text, ?[SnapRef], UserPrincipal) -> async Result.Result<Project, Text>;
+        delete_projects : shared ([ProjectID]) -> async ();
     };
 };

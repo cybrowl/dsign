@@ -72,7 +72,7 @@ module {
         #UserNotFound: Bool;
     };
 
-    public type DeleteAllSnapsErr = {
+    public type DeleteSnapsErr = {
         #UserNotFound;
     };
 

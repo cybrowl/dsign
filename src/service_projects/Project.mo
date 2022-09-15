@@ -74,6 +74,21 @@ actor class Project(controller: Principal, is_prod: Bool) = this {
         return #ok(project);
     };
 
+    public shared ({caller}) func delete_projects(projectIds: [ProjectID]) : async () {
+        if (controller != caller) {
+            return ();
+        };
+
+        for (project_id in projectIds.vals()){
+            switch (projects.get(project_id)){
+                case null {};
+                case (?project) {
+                    projects.delete(project_id);
+                };
+            }
+        };
+    };
+
     // ------------------------- Canister Management -------------------------
     public query func version() : async Nat {
         return Version;

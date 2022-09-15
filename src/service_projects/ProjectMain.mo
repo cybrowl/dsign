@@ -13,6 +13,7 @@ import Types "./types";
 
 actor ProjectMain {
     type CreateProjectErr = Types.CreateProjectErr;
+    type DeleteProjectsErr = Types.DeleteProjectsErr;
     type Project = Types.Project;
     type ProjectActor = Types.ProjectActor;
     type ProjectCanisterID = Types.ProjectCanisterID;
@@ -101,13 +102,30 @@ actor ProjectMain {
         };
     };
 
-    // delete projects
+    public shared ({caller}) func delete_projects(projectIds: [ProjectID]) : async Result.Result<Text, DeleteProjectsErr> {
+        let tags = [ACTOR_NAME, "delete_projects"];
 
-    // update project
+        switch (user_canisters_ref.get(caller)) {
+            case (?project_canister_ids) {
+                for ((canister_id, project_ids) in project_canister_ids.entries()) {
+                    let project_actor = actor (canister_id) : ProjectActor;
+
+                    ignore project_actor.delete_projects(projectIds);
+                };
+
+                return #ok("delete_projects");
+            };
+            case (_) {
+                #err(#UserNotFound)
+            };
+        };
+    };
+
+    // delete snaps from project
 
     // move snaps from project
 
-    // delete snaps from project
+    // update project
 
     // get all projects
 
