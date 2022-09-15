@@ -21,7 +21,7 @@ module {
         username: Text;
         owner: Principal;
         name: Text;
-        snaps: ?[SnapRef];
+        snaps: [SnapRef];
     };
 
     public type CreateProjectErr = {

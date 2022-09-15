@@ -62,5 +62,14 @@ test('ProjectMain[mishicat].create_project(): with valid args => #ok - project',
 	const snaps = [{ id: 'xxx', canister_id: 'yyy' }];
 	let response = await project_main_actor.mishicat.create_project('Mishicat NFT', [snaps]);
 
-	console.log('response', response);
+	console.log('response', response.ok);
+	console.log('snaps', response.ok.snaps);
+});
+
+test('ProjectMain[mishicat].create_project(): with no snaps => #ok - project', async function (t) {
+	const snaps = [];
+	let response = await project_main_actor.mishicat.create_project('Mishicat NFT', snaps);
+
+	console.log('response', response.ok);
+	console.log('snaps', response.ok.snaps);
 });

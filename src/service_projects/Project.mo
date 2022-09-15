@@ -50,6 +50,15 @@ actor class Project(controller: Principal, is_prod: Bool) = this {
             };
         };
 
+        var snaps : [SnapRef] = [];
+        switch(snap_refs) {
+            case(?snaps_) {
+                snaps := snaps_;
+            };
+            case(null) {
+            };
+        };
+
         let project : Project = {
             id = project_id;
             canister_id = project_canister_id;
@@ -57,7 +66,7 @@ actor class Project(controller: Principal, is_prod: Bool) = this {
             username = username;
             owner = owner;
             name = name;
-            snaps = snap_refs;
+            snaps = snaps;
         };
 
         projects.put(project_id, project);
