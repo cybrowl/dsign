@@ -22,13 +22,13 @@ dfx deploy logger
 
 # snaps
 dfx deploy snap_main
-export SNAP_MAIN_ID=$(dfx canister id snap_main)
+export SNAP_MAIN_PRINCIPAL=$(dfx canister id snap_main)
 
 # front end
 dfx deploy dsign_assets
 
 # test canisters
-dfx deploy test_assets --argument='(principal "'${SNAP_MAIN_ID}'")'
-dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_ID}'")'
+dfx deploy test_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
+dfx deploy test_image_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
 
 # killall dfx replica nodemanager

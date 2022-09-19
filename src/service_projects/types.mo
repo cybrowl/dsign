@@ -39,5 +39,6 @@ module {
     public type ProjectActor = actor {
         create_project : shared (Text, ?[SnapRef], UserPrincipal) -> async Result.Result<Project, Text>;
         delete_projects : shared ([ProjectID]) -> async ();
+        get_projects : query ([ProjectID]) -> async [Project];
     };
 };

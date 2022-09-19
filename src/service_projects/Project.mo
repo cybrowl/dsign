@@ -89,6 +89,21 @@ actor class Project(controller: Principal, is_prod: Bool) = this {
         };
     };
 
+    public query func get_projects(projectIds: [ProjectID]) : async [Project] {
+        var projects_list = Buffer.Buffer<Project>(0);
+
+        for (project_id in projectIds.vals()){
+            switch (projects.get(project_id)){
+                case null {};
+                case (?project) {
+                   projects_list.add(project); 
+                };
+            }
+        };
+
+        return projects_list.toArray();
+    };
+
     // ------------------------- Canister Management -------------------------
     public query func version() : async Nat {
         return Version;

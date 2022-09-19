@@ -61,15 +61,21 @@ test('ProjectMain[mishicat].create_user_project_storage(): should create initial
 test('ProjectMain[mishicat].create_project(): with valid args => #ok - project', async function (t) {
 	const snaps = [{ id: 'xxx', canister_id: 'yyy' }];
 	let response = await project_main_actor.mishicat.create_project('Mishicat NFT', [snaps]);
-
-	console.log('response', response.ok);
-	console.log('snaps', response.ok.snaps);
 });
 
 test('ProjectMain[mishicat].create_project(): with no snaps => #ok - project', async function (t) {
 	const snaps = [];
 	let response = await project_main_actor.mishicat.create_project('Mishicat NFT', snaps);
+});
 
-	console.log('response', response.ok);
-	console.log('snaps', response.ok.snaps);
+test('ProjectMain[mishicat].get_projects(): ', async function (t) {
+	const snaps = [];
+	let create_response = await project_main_actor.mishicat.create_project('Deleted Project', snaps);
+	let delete_response = await project_main_actor.mishicat.delete_projects([create_response.ok.id]);
+
+	console.log('create_response', create_response);
+	console.log('delete_response', delete_response);
+
+	let get_response = await project_main_actor.mishicat.get_projects();
+	console.log('get_response', get_response.ok);
 });

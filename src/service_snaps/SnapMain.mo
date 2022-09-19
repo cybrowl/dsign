@@ -177,7 +177,6 @@ actor SnapMain {
         switch (user_canisters_ref.get(caller)) {
             case (?snap_canister_ids) {
                 let all_snaps = Buffer.Buffer<Snap>(0);
-                let can_ids = Iter.toArray(snap_canister_ids.entries());
 
                 for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
                     let snap_actor = actor (canister_id) : SnapActor;

@@ -23,7 +23,7 @@ actor ProjectMain {
 
     let ACTOR_NAME : Text = "ProjectMain";
     let CYCLE_AMOUNT : Nat = 100_000_0000_000;
-    let Version : Nat = 1;
+    let VERSION : Nat = 1;
 
     var user_canisters_ref : HashMap.HashMap<UserPrincipal, HashMap.HashMap<ProjectCanisterID, Buffer.Buffer<ProjectID>>> = HashMap.HashMap(0, Principal.equal, Principal.hash);
     stable var user_canisters_ref_storage : [var (UserPrincipal, [(ProjectCanisterID, [ProjectID])])] = [var];
@@ -128,10 +128,33 @@ actor ProjectMain {
     // update project
 
     // get all projects
+    public shared ({caller}) func get_projects() : async Result.Result<[Project], Text> {
+        let tags = [ACTOR_NAME, "get_projects"];
+
+        switch (user_canisters_ref.get(caller)) {
+            case (?project_canister_ids) {
+                let all_projects = Buffer.Buffer<Project>(0);
+
+                for ((canister_id, project_ids) in project_canister_ids.entries()) {
+                    let project_actor = actor (canister_id) : ProjectActor;
+                    let projects = await project_actor.get_projects(project_ids.toArray());
+
+                    for (project in projects.vals()) {
+                        all_projects.add(project);
+                    };
+                };
+
+                return #ok(all_projects.toArray());
+            };
+            case (_) {
+                return #err("user not found");
+            };
+        };
+    };
 
     // ------------------------- Canister Management -------------------------
     public query func version() : async Nat {
-        return Version;
+        return VERSION;
     };
 
     private func create_project_canister(project_main_principal : Principal, is_prod : Bool) : async () {
