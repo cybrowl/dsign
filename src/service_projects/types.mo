@@ -55,9 +55,9 @@ module {
 
     // Actor Interface
     public type ProjectActor = actor {
-        create_project : shared (Text, ?[SnapRef], UserPrincipal) -> async Result.Result<Project, Text>;
+        create_project : shared (Text, ?[SnapRef], UserPrincipal) -> async Result.Result<Project, CreateProjectErr>;
         delete_projects : shared ([ProjectID]) -> async ();
-        delete_snaps_from_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Text, Text>;
+        delete_snaps_from_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Text, DeleteSnapsFromProjectErr>;
         get_projects : query ([ProjectID]) -> async [Project];
     };
 };

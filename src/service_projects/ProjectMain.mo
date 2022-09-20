@@ -4,6 +4,7 @@ import Buffer "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
@@ -230,5 +231,41 @@ actor ProjectMain {
                 ignore Logger.log_event(tags, debug_show(("arg, project_canister_id: ", project_canister_id)));
             };
         };
+    };
+
+    // ------------------------- System Methods -------------------------
+    system func preupgrade() {
+        var anon_principal = Principal.fromText("2vxsx-fae");
+        user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
+
+        var i = 0;
+        for ((user_principal, canister_ids) in user_canisters_ref.entries()) {
+            var canisters : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(0, Text.equal, Text.hash);
+
+            for ((canister_id, id) in canister_ids.entries()) {
+                canisters.put(canister_id, id);
+            };
+
+            user_canisters_ref_storage[i] := (user_principal, Iter.toArray(canisters.entries()));
+            i += 1;
+        };
+    };
+
+    system func postupgrade() {
+        var user_canisters_ref_temp : HashMap.HashMap<UserPrincipal, HashMap.HashMap<ProjectCanisterID, [ProjectID]>> = HashMap.HashMap(0, Principal.equal, Principal.hash);
+
+        for ((user_principal, project_canister_ids) in user_canisters_ref_storage.vals()) {
+            var canisters : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(0, Text.equal, Text.hash);
+
+            for ((project_canister_id, project_ids) in project_canister_ids.vals()) {
+                canisters.put(project_canister_id, project_ids);
+            };
+
+            user_canisters_ref_temp.put(user_principal, canisters);
+        };
+
+        user_canisters_ref := user_canisters_ref_temp;
+        var anon_principal = Principal.fromText("2vxsx-fae");
+        user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
     };
 };
