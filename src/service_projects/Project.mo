@@ -1,7 +1,5 @@
-import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
-import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Source "mo:ulid/Source";
@@ -15,12 +13,15 @@ import Username "canister:username";
 import Types "./types";
 
 actor class Project(controller: Principal, is_prod: Bool) = this {
+    type CreateProjectErr = Types.CreateProjectErr;
+    type DeleteSnapsFromProjectErr = Types.DeleteSnapsFromProjectErr;
     type Project = Types.Project;
     type ProjectID = Types.ProjectID;
     type SnapRef = Types.SnapRef;
     type UserPrincipal = Types.UserPrincipal;
 
-    let Version : Nat = 1;
+    let ACTOR_NAME : Text = "Project";
+    let VERSION : Nat = 1;
 
     private let rr = XorShift.toReader(XorShift.XorShift64(null));
     private let se = Source.Source(rr, 0);
@@ -31,10 +32,10 @@ actor class Project(controller: Principal, is_prod: Bool) = this {
     public shared ({caller}) func create_project(
         name: Text,
         snap_refs: ?[SnapRef],
-        owner: UserPrincipal) : async Result.Result<Project, Text> {
+        owner: UserPrincipal) : async Result.Result<Project, CreateProjectErr> {
 
         if (controller != caller) {
-            return #err("Unauthorized");
+            return #err(#NotAuthorized);
         };
 
         let project_id =  ULID.toText(se.new());
@@ -46,7 +47,7 @@ actor class Project(controller: Principal, is_prod: Bool) = this {
                 username:= username_;
             };
             case(#err error) {
-                return #err("Username Not Found");
+                return #err(#UsernameNotFound);
             };
         };
 
@@ -89,6 +90,54 @@ actor class Project(controller: Principal, is_prod: Bool) = this {
         };
     };
 
+    public shared ({caller}) func delete_snaps_from_project(
+        snaps: [SnapRef],
+        project_id: ProjectID,
+        owner: Principal) : async Result.Result<Text, DeleteSnapsFromProjectErr> {
+
+        let tags = [ACTOR_NAME, "delete_snaps_from_project"];
+
+        if (controller != caller) {
+            return #err(#NotAuthorized);
+        };
+
+        // remove snaps from project
+        switch (projects.get(project_id)) {
+            case null {
+                return #err(#ProjectNotFound);
+            };
+            case (?project) {
+                if (project.owner != owner) {
+                    return #err(#NotOwner);
+                };
+
+                let snaps_kept = Buffer.Buffer<SnapRef>(0);
+
+                for (snap in snaps.vals()) {
+                    for (project_snap in project.snaps.vals()) {
+                        if (snap.id != project_snap.id) {
+                            snaps_kept.add(project_snap);
+                        };
+                    };
+                };
+
+                let project_updated : Project = {
+                    id = project.id;
+                    canister_id = project.canister_id;
+                    created = project.created;
+                    username = project.username;
+                    owner = project.owner;
+                    name = project.name;
+                    snaps = snaps_kept.toArray();
+                };
+
+                projects.put(project_id, project_updated);
+
+                return #ok("Snaps Deleted");
+            };
+        };
+    };
+
     public query func get_projects(projectIds: [ProjectID]) : async [Project] {
         var projects_list = Buffer.Buffer<Project>(0);
 
@@ -106,6 +155,6 @@ actor class Project(controller: Principal, is_prod: Bool) = this {
 
     // ------------------------- Canister Management -------------------------
     public query func version() : async Nat {
-        return Version;
+        return VERSION;
     };
 };

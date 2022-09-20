@@ -30,8 +30,10 @@ module {
     };
 
     public type CreateProjectErr = {
+        #NotAuthorized;
         #UserAnonymous;
         #UserNotFound;
+        #UsernameNotFound;
         #NotImplemented;
         #ErrorCall: Text;
     };
@@ -40,10 +42,22 @@ module {
         #UserNotFound;
     };
 
+    public type DeleteSnapsFromProjectErr = {
+        #NotAuthorized;
+        #NotOwner;
+        #ProjectNotFound;
+        #ErrorCall: Text;
+    };
+
+    public type GetProjectsErr = {
+        #UserNotFound;
+    };
+
     // Actor Interface
     public type ProjectActor = actor {
         create_project : shared (Text, ?[SnapRef], UserPrincipal) -> async Result.Result<Project, Text>;
         delete_projects : shared ([ProjectID]) -> async ();
+        delete_snaps_from_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Text, Text>;
         get_projects : query ([ProjectID]) -> async [Project];
     };
 };

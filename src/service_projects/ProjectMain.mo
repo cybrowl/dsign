@@ -16,6 +16,8 @@ import Types "./types";
 actor ProjectMain {
     type CreateProjectErr = Types.CreateProjectErr;
     type DeleteProjectsErr = Types.DeleteProjectsErr;
+    type DeleteSnapsFromProjectErr = Types.DeleteSnapsFromProjectErr;
+    type GetProjectsErr = Types.GetProjectsErr;
     type Project = Types.Project;
     type ProjectActor = Types.ProjectActor;
     type ProjectCanisterID = Types.ProjectCanisterID;
@@ -120,7 +122,7 @@ actor ProjectMain {
                     project_canister_ids.put(canister_id, project_ids_exclude_deleted);
                 };
 
-                return #ok("delete_projects");
+                return #ok("Deleted Projects");
             };
             case (_) {
                 #err(#UserNotFound)
@@ -128,19 +130,26 @@ actor ProjectMain {
         };
     };
 
-    // public shared ({caller}) func delete_snaps_from_project(snaps: [SnapRef], project_ref: ProjectRef) : async Result.Result<Text, Text> {
-    //     let tags = [ACTOR_NAME, "delete_snaps_from_project"];
+    public shared ({caller}) func delete_snaps_from_project(snaps: [SnapRef], project_ref: ProjectRef) : async Result.Result<Text, DeleteSnapsFromProjectErr> {
+        let tags = [ACTOR_NAME, "delete_snaps_from_project"];
 
-    //     for (snap in snaps.vals()) {
+        let project_actor = actor (project_ref.canister_id) : ProjectActor;
 
-    //     };
-    // };
+        switch(await project_actor.delete_snaps_from_project(snaps, project_ref.id, caller)) {
+            case(#err err) {
+                return #err(#ErrorCall(debug_show(err)));
+            };
+            case(#ok _) {
+                return #ok("Deleted Snaps From Project");
+            };
+        };
+    };
 
     // move snaps from project
 
     // update project
 
-    public shared ({caller}) func get_projects() : async Result.Result<[Project], Text> {
+    public shared ({caller}) func get_projects() : async Result.Result<[Project], GetProjectsErr> {
         let tags = [ACTOR_NAME, "get_projects"];
 
         switch (user_canisters_ref.get(caller)) {
@@ -159,7 +168,7 @@ actor ProjectMain {
                 return #ok(all_projects.toArray());
             };
             case (_) {
-                return #err("user not found");
+                return #err(#UserNotFound);
             };
         };
     };
