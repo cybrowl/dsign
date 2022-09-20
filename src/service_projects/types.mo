@@ -14,6 +14,11 @@ module {
         canister_id: Text;
     };
 
+    public type ProjectRef = {
+        id: Text;
+        canister_id: Text;
+    };
+
     public type Project = {
         id: Text;
         canister_id: Text;

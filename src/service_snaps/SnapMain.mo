@@ -171,32 +171,6 @@ actor SnapMain {
         };
     };
 
-    public shared ({caller}) func get_all_snaps() : async Result.Result<[Snap], GetAllSnapsErr> {
-        let tags = [ACTOR_NAME, "get_all_snaps"];
-
-        switch (user_canisters_ref.get(caller)) {
-            case (?snap_canister_ids) {
-                let all_snaps = Buffer.Buffer<Snap>(0);
-
-                for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
-                    let snap_actor = actor (canister_id) : SnapActor;
-                    let snaps = await snap_actor.get_all_snaps(snap_ids.toArray());
-
-                    for (snap in snaps.vals()) {
-                        all_snaps.add(snap);
-                    };
-                };
-
-                return #ok(all_snaps.toArray());
-            };
-            case (_) {
-                #err(#UserNotFound(true))
-            };
-        };
-    };
-
-    //todo: get all snaps from project
-
     public shared ({caller}) func delete_snaps(snapIds: [SnapID]) : async Result.Result<Text, DeleteSnapsErr> {
         let tags = [ACTOR_NAME, "delete_snaps"];
 
@@ -222,6 +196,8 @@ actor SnapMain {
                     };
  
                     await snap_actor.delete_snaps(snapIds);
+
+                    //todo: remove snap ids from snap_canister_ids
                 };
 
                 return #ok("delete_snaps");
@@ -231,6 +207,32 @@ actor SnapMain {
             };
         };
     };
+
+    public shared ({caller}) func get_all_snaps() : async Result.Result<[Snap], GetAllSnapsErr> {
+        let tags = [ACTOR_NAME, "get_all_snaps"];
+
+        switch (user_canisters_ref.get(caller)) {
+            case (?snap_canister_ids) {
+                let all_snaps = Buffer.Buffer<Snap>(0);
+
+                for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
+                    let snap_actor = actor (canister_id) : SnapActor;
+                    let snaps = await snap_actor.get_all_snaps(snap_ids.toArray());
+
+                    for (snap in snaps.vals()) {
+                        all_snaps.add(snap);
+                    };
+                };
+
+                return #ok(all_snaps.toArray());
+            };
+            case (_) {
+                #err(#UserNotFound(true))
+            };
+        };
+    };
+
+    //todo: get all snaps from project
 
     // ------------------------- Canister Management -------------------------
     private func create_assets_canister(snap_main_principal : Principal, is_prod : Bool) : async () {

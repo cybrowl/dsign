@@ -77,5 +77,8 @@ test('ProjectMain[mishicat].get_projects(): ', async function (t) {
 	console.log('delete_response', delete_response);
 
 	let get_response = await project_main_actor.mishicat.get_projects();
+	let get_ids_response = await project_main_actor.mishicat.get_project_ids();
+
 	console.log('get_response', get_response.ok);
+	console.log('get_ids_response', get_ids_response.ok);
 });
