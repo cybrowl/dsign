@@ -159,7 +159,7 @@ actor ProjectMain {
 		};
 	};
 
-	// move snaps from project
+	// move snaps to project
 
 	// update project
 
