@@ -36,6 +36,7 @@ actor SnapMain {
 
 	let ACTOR_NAME : Text = "SnapMain";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
+	let VERSION : Nat = 1;
 
 	// Snap Data
 	var user_canisters_ref : HashMap.HashMap<UserPrincipal, HashMap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>>> = HashMap.HashMap(
@@ -250,6 +251,10 @@ actor SnapMain {
 	//todo: get all snaps from project
 
 	// ------------------------- Canister Management -------------------------
+	public query func version() : async Nat {
+		return VERSION;
+	};
+
 	private func create_assets_canister(snap_main_principal : Principal, is_prod : Bool) : async () {
 		Cycles.add(CYCLE_AMOUNT);
 		let assets_actor = await Assets.Assets(snap_main_principal, is_prod);

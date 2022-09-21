@@ -257,6 +257,9 @@ actor ProjectMain {
 
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
+		var anon_principal = Principal.fromText("2vxsx-fae");
+		user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
+
 		var index = 0;
 		for ((user_principal, project_ids_storage) in user_canisters_ref.entries()) {
 

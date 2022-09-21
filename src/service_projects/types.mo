@@ -26,7 +26,7 @@ module {
 		canister_id : Text;
 		created : Time;
 		username : Text;
-		owner : Principal;
+		owner : UserPrincipal;
 		name : Text;
 		snaps : [SnapRef];
 	};

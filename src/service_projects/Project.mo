@@ -94,7 +94,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 	public shared ({ caller }) func delete_snaps_from_project(
 		snaps : [SnapRef],
 		project_id : ProjectID,
-		owner : Principal
+		owner : UserPrincipal
 	) : async Result.Result<Text, DeleteSnapsFromProjectErr> {
 
 		let tags = [ACTOR_NAME, "delete_snaps_from_project"];

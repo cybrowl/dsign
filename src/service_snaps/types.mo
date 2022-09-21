@@ -22,6 +22,8 @@ module {
 	public type CreateAssetArgs = AssetTypes.CreateAssetArgs;
 
 	public type Project = ProjectTypes.Project;
+	public type ProjectActor = ProjectTypes.ProjectActor;
+	public type ProjectRef = ProjectTypes.ProjectRef;
 
 	public type ICInterface = ICInterfaceTypes.Self;
 	public type ICInterfaceStatusResponse = ICInterfaceTypes.StatusResponse;
@@ -30,6 +32,11 @@ module {
 	public type SnapCanisterID = Text;
 	public type SnapID = Text;
 
+	public type SnapRef = {
+		id : Text;
+		canister_id : Text;
+	};
+
 	public type Snap = {
 		canister_id : Text;
 		created : Time;
@@ -37,7 +44,7 @@ module {
 		id : SnapID;
 		image_cover_location : Nat8;
 		images : [ImageRef];
-		project : ?Project;
+		project : Project;
 		tags : ?[Text];
 		title : Text;
 		username : Username;
@@ -81,5 +88,6 @@ module {
 		create_snap : shared (CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, Text>;
 		delete_snaps : shared ([SnapID]) -> async ();
 		get_all_snaps : query ([SnapID]) -> async [Snap];
+		update_snap_project : shared ([SnapRef], ProjectRef) -> async ();
 	};
 };

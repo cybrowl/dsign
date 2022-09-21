@@ -18,9 +18,16 @@ actor class Snap(controller : Principal) = this {
 	type AssetRef = Types.AssetRef;
 	type CreateSnapArgs = Types.CreateSnapArgs;
 	type ImageRef = Types.ImageRef;
+	type Project = Types.Project;
+	type ProjectActor = Types.ProjectActor;
+	type ProjectRef = Types.ProjectRef;
 	type Snap = Types.Snap;
 	type SnapID = Types.SnapID;
+	type SnapRef = Types.SnapRef;
 	type UserPrincipal = Types.UserPrincipal;
+
+	let ACTOR_NAME : Text = "Snap";
+	let VERSION : Nat = 1;
 
 	private let rr = XorShift.toReader(XorShift.XorShift64(null));
 	private let se = Source.Source(rr, 0);
@@ -61,7 +68,15 @@ actor class Snap(controller : Principal) = this {
 			id = snap_id;
 			image_cover_location = args.image_cover_location;
 			images = images_ref;
-			project = null;
+			project = {
+				canister_id = "";
+				created = Time.now();
+				id = "";
+				name = "";
+				owner = owner;
+				snaps = [];
+				username = "";
+			};
 			tags = null;
 			title = args.title;
 			username = username;
@@ -105,6 +120,51 @@ actor class Snap(controller : Principal) = this {
 		};
 
 		return snaps_list.toArray();
+	};
+
+	public shared ({ caller }) func update_snap_project(
+		snaps_ref : [SnapRef],
+		project_ref : ProjectRef
+	) : async () {
+		let project_actor = actor (project_ref.canister_id) : ProjectActor;
+		var projects = await project_actor.get_projects([project_ref.id]);
+
+		if (projects.size() < 1) {
+			return ();
+		};
+
+		let project : Project = projects[0];
+
+		for (snap_ref in snaps_ref.vals()) {
+			switch (snaps.get(snap_ref.id)) {
+				case (null) {};
+				case (?snap) {
+					if (snap.owner == project.owner) {
+						let update_snap : Snap = {
+							canister_id = snap.canister_id;
+							created = snap.created;
+							file_asset = snap.file_asset;
+							id = snap.id;
+							image_cover_location = snap.image_cover_location;
+							images = snap.images;
+							project = project;
+							tags = snap.tags;
+							title = snap.title;
+							username = snap.username;
+							owner = snap.owner;
+							metrics = snap.metrics;
+						};
+
+						snaps.put(snap.id, update_snap);
+					};
+				};
+			};
+		};
+	};
+
+	// ------------------------- Canister Management -------------------------
+	public query func version() : async Nat {
+		return VERSION;
 	};
 
 	// ------------------------- System Methods -------------------------
