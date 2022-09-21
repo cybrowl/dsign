@@ -56,6 +56,12 @@ test('Setup Actors', async function (t) {
 		mishicat_identity
 	);
 
+	assets_img_staging_actors.default = await get_actor(
+		assets_img_staging_canister_id,
+		assets_img_staging_interface,
+		default_identity
+	);
+
 	snap_main_actor.mishicat = await get_actor(
 		snap_main_canister_id,
 		snap_main_interface,
@@ -95,14 +101,6 @@ test('Setup Actors', async function (t) {
 
 test('SnapMain[mishicat].initialize_canisters()', async function (t) {
 	await snap_main_actor.mishicat.initialize_canisters();
-});
-
-test('Username[mishicat].get_child_controllers(): ', async function (t) {
-	const response = await snap_main_actor.mishicat.get_child_controllers(
-		'uesr6-yqaaa-aaaaa-aaa6q-cai'
-	);
-	console.log('response: ', response);
-	// console.log('response.settings.controllers: ', response.settings.controllers);
 });
 
 test('Username[mishicat].create_username(): should create username => #ok - username', async function (t) {
@@ -305,6 +303,53 @@ test('SnapMain[mishicat].create_snap(): with file and images => #ok - snap', asy
 
 test('SnapMain.get_all_snaps()', async function (t) {
 	const response = await snap_main_actor.mishicat.get_all_snaps();
+
+	console.log('response: ', response);
+});
+
+// Default User
+test('Username[default].create_username(): should create username => #ok - username', async function (t) {
+	const username = fake.word();
+
+	const response = await username_actors.default.create_username(username.toLowerCase());
+
+	t.equal(response.ok.username, username.toLowerCase());
+});
+
+test('SnapMain[default].create_user_snap_storage(): should create initial storage for snaps => #ok - true', async function (t) {
+	const response = await snap_main_actor.default.create_user_snap_storage();
+
+	t.equal(response, true);
+});
+
+test('ImageAssetStaging[default].create_asset(): should create images => #ok - img_asset_ids', async function (t) {
+	let promises = [];
+
+	images.forEach(async function (image) {
+		const args = {
+			data: image,
+			file_format: 'png'
+		};
+
+		promises.push(assets_img_staging_actors.default.create_asset(args));
+	});
+
+	try {
+		img_asset_ids = await Promise.all(promises);
+	} catch (error) {
+		console.log('error: ', error);
+	}
+});
+
+test('SnapMain[default].create_snap(): should create snap without file asset => #ok - snap', async function (t) {
+	let create_args = {
+		title: 'Mobile Example',
+		image_cover_location: 1,
+		img_asset_ids: img_asset_ids,
+		file_asset: []
+	};
+
+	const response = await snap_main_actor.default.create_snap(create_args);
 
 	console.log('response: ', response);
 });

@@ -13,14 +13,15 @@ import XorShift "mo:rand/XorShift";
 import Username "canister:username";
 
 import Types "./types";
+import ProjectTypes "../service_projects/types";
 
 actor class Snap(controller : Principal) = this {
 	type AssetRef = Types.AssetRef;
 	type CreateSnapArgs = Types.CreateSnapArgs;
 	type ImageRef = Types.ImageRef;
-	type Project = Types.Project;
-	type ProjectActor = Types.ProjectActor;
-	type ProjectRef = Types.ProjectRef;
+	type Project = ProjectTypes.Project;
+	type ProjectActor = ProjectTypes.ProjectActor;
+	type ProjectRef = ProjectTypes.ProjectRef;
 	type Snap = Types.Snap;
 	type SnapID = Types.SnapID;
 	type SnapRef = Types.SnapRef;
