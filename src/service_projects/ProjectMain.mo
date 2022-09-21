@@ -15,257 +15,300 @@ import Project "Project";
 import Types "./types";
 
 actor ProjectMain {
-    type CreateProjectErr = Types.CreateProjectErr;
-    type DeleteProjectsErr = Types.DeleteProjectsErr;
-    type DeleteSnapsFromProjectErr = Types.DeleteSnapsFromProjectErr;
-    type GetProjectsErr = Types.GetProjectsErr;
-    type Project = Types.Project;
-    type ProjectActor = Types.ProjectActor;
-    type ProjectCanisterID = Types.ProjectCanisterID;
-    type ProjectID = Types.ProjectID;
-    type ProjectRef = Types.ProjectRef;
-    type SnapRef = Types.SnapRef;
-    type UserPrincipal = Types.UserPrincipal;
+	type CreateProjectErr = Types.CreateProjectErr;
+	type DeleteProjectsErr = Types.DeleteProjectsErr;
+	type DeleteSnapsFromProjectErr = Types.DeleteSnapsFromProjectErr;
+	type GetProjectsErr = Types.GetProjectsErr;
+	type Project = Types.Project;
+	type ProjectActor = Types.ProjectActor;
+	type ProjectCanisterID = Types.ProjectCanisterID;
+	type ProjectID = Types.ProjectID;
+	type ProjectRef = Types.ProjectRef;
+	type SnapRef = Types.SnapRef;
+	type UserPrincipal = Types.UserPrincipal;
 
-    let ACTOR_NAME : Text = "ProjectMain";
-    let CYCLE_AMOUNT : Nat = 100_000_0000_000;
-    let VERSION : Nat = 1;
+	let ACTOR_NAME : Text = "ProjectMain";
+	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
+	let VERSION : Nat = 1;
 
-    var user_canisters_ref : HashMap.HashMap<UserPrincipal, HashMap.HashMap<ProjectCanisterID, [ProjectID]>> = HashMap.HashMap(0, Principal.equal, Principal.hash);
-    stable var user_canisters_ref_storage : [var (UserPrincipal, [(ProjectCanisterID, [ProjectID])])] = [var];
+	var user_canisters_ref : HashMap.HashMap<UserPrincipal, HashMap.HashMap<ProjectCanisterID, [ProjectID]>> = HashMap.HashMap(
+		0,
+		Principal.equal,
+		Principal.hash
+	);
+	stable var user_canisters_ref_storage : [var (UserPrincipal, [(ProjectCanisterID, [ProjectID])])] = [var];
 
-    stable var project_canister_id : Text = "";
+	stable var project_canister_id : Text = "";
 
-    // ------------------------- Project Management -------------------------
-    public shared ({caller}) func create_user_project_storage() : async Bool {
-        let tags = [ACTOR_NAME, "create_user_project_storage"];
+	// ------------------------- Project Management -------------------------
+	public shared ({ caller }) func create_user_project_storage() : async Bool {
+		let tags = [ACTOR_NAME, "create_user_project_storage"];
 
-        switch (user_canisters_ref.get(caller)) {
-            case (?project_canister_ids) {
-                ignore Logger.log_event(tags, "exists, user_project_storage");
+		switch (user_canisters_ref.get(caller)) {
+			case (?project_canister_ids) {
+				ignore Logger.log_event(tags, "exists, user_project_storage");
 
-                return false;
-            };
-            case (_) {
-                var empty_project_canister_id_storage : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(0, Text.equal, Text.hash);
+				return false;
+			};
+			case (_) {
+				var empty_project_canister_id_storage : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(
+					0,
+					Text.equal,
+					Text.hash
+				);
 
-                user_canisters_ref.put(caller, empty_project_canister_id_storage);
+				user_canisters_ref.put(caller, empty_project_canister_id_storage);
 
-                ignore Logger.log_event(tags, "created, user_project_storage");
+				ignore Logger.log_event(tags, "created, user_project_storage");
 
-                return true;
-            };
-        };
-    };
+				return true;
+			};
+		};
+	};
 
-    public shared ({caller}) func create_project(name : Text, snaps: ?[SnapRef]) : async Result.Result<Project, CreateProjectErr> {
-        let tags = [ACTOR_NAME, "create_project"];
+	public shared ({ caller }) func create_project(name : Text, snaps : ?[SnapRef]) : async Result.Result<Project, CreateProjectErr> {
+		let tags = [ACTOR_NAME, "create_project"];
 
-        //todo: args security checks
+		//todo: args security checks
 
-        // get user project canister ids
-        var project_canister_ids : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(0, Text.equal, Text.hash);
-        switch (user_canisters_ref.get(caller)) {
-            case (?project_canister_ids_) {
-                project_canister_ids := project_canister_ids_;
-            };
-            case(_) {
-               return #err(#UserNotFound);
-            };
-        };
+		// get user project canister ids
+		var project_canister_ids : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(
+			0,
+			Text.equal,
+			Text.hash
+		);
 
-        // get project ids from current canister id
-        var project_ids = Buffer.Buffer<ProjectID>(0);
-        var project_ids_found = false;
-        switch (project_canister_ids.get(project_canister_id)) {
-            case (?project_ids_) {
-                ignore Logger.log_event(tags, debug_show("project_ids found for current empty canister"));
+		switch (user_canisters_ref.get(caller)) {
+			case (?project_canister_ids_) {
+				project_canister_ids := project_canister_ids_;
+			};
+			case (_) {
+				return #err(#UserNotFound);
+			};
+		};
 
-                project_ids := Buffer.fromArray(project_ids_);
-                project_ids_found := true;
-            };
-            case(_) {
-                ignore Logger.log_event(tags, debug_show("project_ids NOT found"));
-            };
-        };
+		// get project ids from current canister id
+		var project_ids = Buffer.Buffer<ProjectID>(0);
+		var project_ids_found = false;
+		switch (project_canister_ids.get(project_canister_id)) {
+			case (?project_ids_) {
+				ignore Logger.log_event(
+					tags,
+					debug_show ("project_ids found for current empty canister")
+				);
 
-        let project_actor = actor (project_canister_id) : ProjectActor;
+				project_ids := Buffer.fromArray(project_ids_);
+				project_ids_found := true;
+			};
+			case (_) {
+				ignore Logger.log_event(tags, debug_show ("project_ids NOT found"));
+			};
+		};
 
-        // save project
-        switch(await project_actor.create_project(name, snaps, caller)) {
-            case(#err err) {
-                return #err(#ErrorCall(debug_show(err)));
-            };
-            case(#ok project) {
-                project_ids.add(project.id);
-                project_canister_ids.put(project_canister_id, project_ids.toArray());
+		let project_actor = actor (project_canister_id) : ProjectActor;
 
-                //TODO: remove owner from project
-                #ok(project);
-            };
-        };
-    };
+		// save project
+		switch (await project_actor.create_project(name, snaps, caller)) {
+			case (#err err) {
+				return #err(#ErrorCall(debug_show (err)));
+			};
+			case (#ok project) {
+				project_ids.add(project.id);
+				project_canister_ids.put(project_canister_id, project_ids.toArray());
 
-    public shared ({caller}) func delete_projects(projectIds: [ProjectID]) : async Result.Result<Text, DeleteProjectsErr> {
-        let tags = [ACTOR_NAME, "delete_projects"];
+				//TODO: remove owner from project
+				#ok(project);
+			};
+		};
+	};
 
-        switch (user_canisters_ref.get(caller)) {
-            case (?project_canister_ids) {
-                for ((canister_id, project_ids) in project_canister_ids.entries()) {
-                    let project_actor = actor (canister_id) : ProjectActor;
+	public shared ({ caller }) func delete_projects(projectIds : [ProjectID]) : async Result.Result<Text, DeleteProjectsErr> {
+		let tags = [ACTOR_NAME, "delete_projects"];
 
-                    ignore project_actor.delete_projects(projectIds);
+		switch (user_canisters_ref.get(caller)) {
+			case (?project_canister_ids) {
+				for ((canister_id, project_ids) in project_canister_ids.entries()) {
+					let project_actor = actor (canister_id) : ProjectActor;
 
-                    let project_ids_exclude_deleted = Array.filter(project_ids, func (project_id : ProjectID) : Bool {
-                        return Arr.contains(projectIds, project_id, Text.notEqual);
-                    });
+					ignore project_actor.delete_projects(projectIds);
 
-                    project_canister_ids.put(canister_id, project_ids_exclude_deleted);
-                };
+					let project_ids_exclude_deleted = Array.filter(
+						project_ids,
+						func(project_id : ProjectID) : Bool {
+							return Arr.contains(projectIds, project_id, Text.notEqual);
+						}
+					);
 
-                return #ok("Deleted Projects");
-            };
-            case (_) {
-                #err(#UserNotFound)
-            };
-        };
-    };
+					project_canister_ids.put(canister_id, project_ids_exclude_deleted);
+				};
 
-    public shared ({caller}) func delete_snaps_from_project(snaps: [SnapRef], project_ref: ProjectRef) : async Result.Result<Text, DeleteSnapsFromProjectErr> {
-        let tags = [ACTOR_NAME, "delete_snaps_from_project"];
+				return #ok("Deleted Projects");
+			};
+			case (_) {
+				#err(#UserNotFound);
+			};
+		};
+	};
 
-        let project_actor = actor (project_ref.canister_id) : ProjectActor;
+	public shared ({ caller }) func delete_snaps_from_project(
+		snaps : [SnapRef],
+		project_ref : ProjectRef
+	) : async Result.Result<Text, DeleteSnapsFromProjectErr> {
+		let tags = [ACTOR_NAME, "delete_snaps_from_project"];
 
-        switch(await project_actor.delete_snaps_from_project(snaps, project_ref.id, caller)) {
-            case(#err err) {
-                return #err(#ErrorCall(debug_show(err)));
-            };
-            case(#ok _) {
-                return #ok("Deleted Snaps From Project");
-            };
-        };
-    };
+		let project_actor = actor (project_ref.canister_id) : ProjectActor;
 
-    // move snaps from project
+		switch (await project_actor.delete_snaps_from_project(snaps, project_ref.id, caller)) {
+			case (#err err) {
+				return #err(#ErrorCall(debug_show (err)));
+			};
+			case (#ok _) {
+				return #ok("Deleted Snaps From Project");
+			};
+		};
+	};
 
-    // update project
+	// move snaps from project
 
-    public shared ({caller}) func get_projects() : async Result.Result<[Project], GetProjectsErr> {
-        let tags = [ACTOR_NAME, "get_projects"];
+	// update project
 
-        switch (user_canisters_ref.get(caller)) {
-            case (?project_canister_ids) {
-                let all_projects = Buffer.Buffer<Project>(0);
+	public shared ({ caller }) func get_projects() : async Result.Result<[Project], GetProjectsErr> {
+		let tags = [ACTOR_NAME, "get_projects"];
 
-                for ((canister_id, project_ids) in project_canister_ids.entries()) {
-                    let project_actor = actor (canister_id) : ProjectActor;
-                    let projects = await project_actor.get_projects(project_ids);
+		switch (user_canisters_ref.get(caller)) {
+			case (?project_canister_ids) {
+				let all_projects = Buffer.Buffer<Project>(0);
 
-                    for (project in projects.vals()) {
-                        all_projects.add(project);
-                    };
-                };
+				for ((canister_id, project_ids) in project_canister_ids.entries()) {
+					let project_actor = actor (canister_id) : ProjectActor;
+					let projects = await project_actor.get_projects(project_ids);
 
-                return #ok(all_projects.toArray());
-            };
-            case (_) {
-                return #err(#UserNotFound);
-            };
-        };
-    };
+					for (project in projects.vals()) {
+						all_projects.add(project);
+					};
+				};
 
-    public shared ({caller}) func get_project_ids() : async Result.Result<[ProjectID], Text> {
-        let tags = [ACTOR_NAME, "get_project_ids"];
+				return #ok(all_projects.toArray());
+			};
+			case (_) {
+				return #err(#UserNotFound);
+			};
+		};
+	};
 
-        switch (user_canisters_ref.get(caller)) {
-            case (?project_canister_ids) {
-                let all_project_ids = Buffer.Buffer<ProjectID>(0);
+	public shared ({ caller }) func get_project_ids() : async Result.Result<[ProjectID], Text> {
+		let tags = [ACTOR_NAME, "get_project_ids"];
 
-                for ((canister_id, project_ids) in project_canister_ids.entries()) {
-                    for (project_id in project_ids.vals()) {
-                        all_project_ids.add(project_id);
-                    };
-                };
+		switch (user_canisters_ref.get(caller)) {
+			case (?project_canister_ids) {
+				let all_project_ids = Buffer.Buffer<ProjectID>(0);
 
-                return #ok(all_project_ids.toArray());
-            };
-            case (_) {
-                return #err("user not found");
-            };
-        };
-    };
+				for ((canister_id, project_ids) in project_canister_ids.entries()) {
+					for (project_id in project_ids.vals()) {
+						all_project_ids.add(project_id);
+					};
+				};
 
-    // ------------------------- Canister Management -------------------------
-    public query func version() : async Nat {
-        return VERSION;
-    };
+				return #ok(all_project_ids.toArray());
+			};
+			case (_) {
+				return #err("user not found");
+			};
+		};
+	};
 
-    private func create_project_canister(project_main_principal : Principal, is_prod : Bool) : async () {
-        Cycles.add(CYCLE_AMOUNT);
-        let project_actor = await Project.Project(project_main_principal, is_prod);
-        let principal = Principal.fromActor(project_actor);
+	// ------------------------- Canister Management -------------------------
+	public query func version() : async Nat {
+		return VERSION;
+	};
 
-        project_canister_id := Principal.toText(principal);
-    };
+	private func create_project_canister(project_main_principal : Principal, is_prod : Bool) : async () {
+		Cycles.add(CYCLE_AMOUNT);
+		let project_actor = await Project.Project(project_main_principal, is_prod);
+		let principal = Principal.fromActor(project_actor);
 
-    public shared (msg) func initialize_canisters(projectCanisterId : ?Text) : async ()  {
-        let tags = [ACTOR_NAME, "initialize_canisters"];
-        let project_main_principal = Principal.fromActor(ProjectMain);
-        let is_prod = Text.equal(Principal.toText(project_main_principal), "lyswl-7iaaa-aaaag-aatya-cai");
+		project_canister_id := Principal.toText(principal);
+	};
 
-        if (project_canister_id.size() > 1) {
-            ignore Logger.log_event(tags, debug_show(("project_canister_id already set: ", project_canister_id)));
+	public shared (msg) func initialize_canisters(projectCanisterId : ?Text) : async () {
+		let tags = [ACTOR_NAME, "initialize_canisters"];
+		let project_main_principal = Principal.fromActor(ProjectMain);
+		let is_prod = Text.equal(
+			Principal.toText(project_main_principal),
+			"lyswl-7iaaa-aaaag-aatya-cai"
+		);
 
-            return ();
-        };
+		if (project_canister_id.size() > 1) {
+			ignore Logger.log_event(
+				tags,
+				debug_show (("project_canister_id already set: ", project_canister_id))
+			);
 
-        switch (projectCanisterId) {
-            case (null) {
-                ignore Logger.log_event(tags, debug_show("no arg, creating project_canister_id"));
+			return ();
+		};
 
-                await create_project_canister(project_main_principal, is_prod);
-            };
-            case (?projectCanisterId_) {
-                project_canister_id := projectCanisterId_;
+		switch (projectCanisterId) {
+			case (null) {
+				ignore Logger.log_event(tags, debug_show ("no arg, creating project_canister_id"));
 
-                ignore Logger.log_event(tags, debug_show(("arg, project_canister_id: ", project_canister_id)));
-            };
-        };
-    };
+				await create_project_canister(project_main_principal, is_prod);
+			};
+			case (?projectCanisterId_) {
+				project_canister_id := projectCanisterId_;
 
-    // ------------------------- System Methods -------------------------
-    system func preupgrade() {
-        var anon_principal = Principal.fromText("2vxsx-fae");
-        user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
+				ignore Logger.log_event(
+					tags,
+					debug_show (("arg, project_canister_id: ", project_canister_id))
+				);
+			};
+		};
+	};
 
-        var i = 0;
-        for ((user_principal, canister_ids) in user_canisters_ref.entries()) {
-            var canisters : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(0, Text.equal, Text.hash);
+	// ------------------------- System Methods -------------------------
+	system func preupgrade() {
+		var anon_principal = Principal.fromText("2vxsx-fae");
+		user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
 
-            for ((canister_id, id) in canister_ids.entries()) {
-                canisters.put(canister_id, id);
-            };
+		var i = 0;
+		for ((user_principal, canister_ids) in user_canisters_ref.entries()) {
+			var canisters : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(
+				0,
+				Text.equal,
+				Text.hash
+			);
 
-            user_canisters_ref_storage[i] := (user_principal, Iter.toArray(canisters.entries()));
-            i += 1;
-        };
-    };
+			for ((canister_id, id) in canister_ids.entries()) {
+				canisters.put(canister_id, id);
+			};
 
-    system func postupgrade() {
-        var user_canisters_ref_temp : HashMap.HashMap<UserPrincipal, HashMap.HashMap<ProjectCanisterID, [ProjectID]>> = HashMap.HashMap(0, Principal.equal, Principal.hash);
+			user_canisters_ref_storage[i] := (user_principal, Iter.toArray(canisters.entries()));
+			i += 1;
+		};
+	};
 
-        for ((user_principal, project_canister_ids) in user_canisters_ref_storage.vals()) {
-            var canisters : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(0, Text.equal, Text.hash);
+	system func postupgrade() {
+		var user_canisters_ref_temp : HashMap.HashMap<UserPrincipal, HashMap.HashMap<ProjectCanisterID, [ProjectID]>> = HashMap.HashMap(
+			0,
+			Principal.equal,
+			Principal.hash
+		);
 
-            for ((project_canister_id, project_ids) in project_canister_ids.vals()) {
-                canisters.put(project_canister_id, project_ids);
-            };
+		for ((user_principal, project_canister_ids) in user_canisters_ref_storage.vals()) {
+			var canisters : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(
+				0,
+				Text.equal,
+				Text.hash
+			);
 
-            user_canisters_ref_temp.put(user_principal, canisters);
-        };
+			for ((project_canister_id, project_ids) in project_canister_ids.vals()) {
+				canisters.put(project_canister_id, project_ids);
+			};
 
-        user_canisters_ref := user_canisters_ref_temp;
-        var anon_principal = Principal.fromText("2vxsx-fae");
-        user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
-    };
+			user_canisters_ref_temp.put(user_principal, canisters);
+		};
+
+		user_canisters_ref := user_canisters_ref_temp;
+		var anon_principal = Principal.fromText("2vxsx-fae");
+		user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
+	};
 };
