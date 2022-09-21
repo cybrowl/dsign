@@ -291,6 +291,7 @@ actor ProjectMain {
 		};
 
 		user_canisters_ref := user_canisters_ref_temp;
+
 		var anon_principal = Principal.fromText("2vxsx-fae");
 		user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
 	};
