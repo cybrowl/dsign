@@ -1,5 +1,6 @@
 import Buffer "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Source "mo:ulid/Source";
@@ -157,5 +158,20 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	// ------------------------- System Methods -------------------------
+	system func preupgrade() {
+		projects_stable_storage := Iter.toArray(projects.entries());
+	};
+
+	system func postupgrade() {
+		projects := HashMap.fromIter<ProjectID, Project>(
+			projects_stable_storage.vals(),
+			0,
+			Text.equal,
+			Text.hash
+		);
+		projects_stable_storage := [];
 	};
 };

@@ -1,3 +1,4 @@
+import HashMap "mo:base/HashMap";
 import Int "mo:base/Int";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
@@ -8,6 +9,7 @@ module {
 	public type UserPrincipal = Principal;
 	public type ProjectCanisterID = Text;
 	public type ProjectID = Text;
+	public type ProjectIDStorage = HashMap.HashMap<ProjectCanisterID, [ProjectID]>;
 
 	public type SnapRef = {
 		id : Text;

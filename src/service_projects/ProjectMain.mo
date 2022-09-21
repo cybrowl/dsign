@@ -23,6 +23,7 @@ actor ProjectMain {
 	type ProjectActor = Types.ProjectActor;
 	type ProjectCanisterID = Types.ProjectCanisterID;
 	type ProjectID = Types.ProjectID;
+	type ProjectIDStorage = Types.ProjectIDStorage;
 	type ProjectRef = Types.ProjectRef;
 	type SnapRef = Types.SnapRef;
 	type UserPrincipal = Types.UserPrincipal;
@@ -31,7 +32,7 @@ actor ProjectMain {
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
 	let VERSION : Nat = 1;
 
-	var user_canisters_ref : HashMap.HashMap<UserPrincipal, HashMap.HashMap<ProjectCanisterID, [ProjectID]>> = HashMap.HashMap(
+	var user_canisters_ref : HashMap.HashMap<UserPrincipal, ProjectIDStorage> = HashMap.HashMap(
 		0,
 		Principal.equal,
 		Principal.hash
@@ -51,13 +52,13 @@ actor ProjectMain {
 				return false;
 			};
 			case (_) {
-				var empty_project_canister_id_storage : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(
+				var project_ids_storage : ProjectIDStorage = HashMap.HashMap(
 					0,
 					Text.equal,
 					Text.hash
 				);
 
-				user_canisters_ref.put(caller, empty_project_canister_id_storage);
+				user_canisters_ref.put(caller, project_ids_storage);
 
 				ignore Logger.log_event(tags, "created, user_project_storage");
 
@@ -71,31 +72,21 @@ actor ProjectMain {
 
 		//todo: args security checks
 
-		// get user project canister ids
-		var project_canister_ids : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(
-			0,
-			Text.equal,
-			Text.hash
-		);
-
+		var user_project_ids_storage : ProjectIDStorage = HashMap.HashMap(0, Text.equal, Text.hash);
 		switch (user_canisters_ref.get(caller)) {
-			case (?project_canister_ids_) {
-				project_canister_ids := project_canister_ids_;
+			case (?user_project_ids_storage_) {
+				user_project_ids_storage := user_project_ids_storage_;
 			};
 			case (_) {
 				return #err(#UserNotFound);
 			};
 		};
 
-		// get project ids from current canister id
 		var project_ids = Buffer.Buffer<ProjectID>(0);
 		var project_ids_found = false;
-		switch (project_canister_ids.get(project_canister_id)) {
+		switch (user_project_ids_storage.get(project_canister_id)) {
 			case (?project_ids_) {
-				ignore Logger.log_event(
-					tags,
-					debug_show ("project_ids found for current empty canister")
-				);
+				ignore Logger.log_event(tags, debug_show ("project_ids found"));
 
 				project_ids := Buffer.fromArray(project_ids_);
 				project_ids_found := true;
@@ -114,7 +105,7 @@ actor ProjectMain {
 			};
 			case (#ok project) {
 				project_ids.add(project.id);
-				project_canister_ids.put(project_canister_id, project_ids.toArray());
+				user_project_ids_storage.put(project_canister_id, project_ids.toArray());
 
 				//TODO: remove owner from project
 				#ok(project);
@@ -266,45 +257,37 @@ actor ProjectMain {
 
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
-		var anon_principal = Principal.fromText("2vxsx-fae");
-		user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
+		var index = 0;
+		for ((user_principal, project_ids_storage) in user_canisters_ref.entries()) {
 
-		var i = 0;
-		for ((user_principal, canister_ids) in user_canisters_ref.entries()) {
-			var canisters : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(
-				0,
-				Text.equal,
-				Text.hash
+			user_canisters_ref_storage[index] := (
+				user_principal,
+				Iter.toArray(project_ids_storage.entries())
 			);
 
-			for ((canister_id, id) in canister_ids.entries()) {
-				canisters.put(canister_id, id);
-			};
-
-			user_canisters_ref_storage[i] := (user_principal, Iter.toArray(canisters.entries()));
-			i += 1;
+			index += 1;
 		};
 	};
 
 	system func postupgrade() {
-		var user_canisters_ref_temp : HashMap.HashMap<UserPrincipal, HashMap.HashMap<ProjectCanisterID, [ProjectID]>> = HashMap.HashMap(
+		var user_canisters_ref_temp : HashMap.HashMap<UserPrincipal, ProjectIDStorage> = HashMap.HashMap(
 			0,
 			Principal.equal,
 			Principal.hash
 		);
 
-		for ((user_principal, project_canister_ids) in user_canisters_ref_storage.vals()) {
-			var canisters : HashMap.HashMap<ProjectCanisterID, [ProjectID]> = HashMap.HashMap(
+		for ((user_principal, project_ids_storage) in user_canisters_ref_storage.vals()) {
+			var project_ids_storage_temp : ProjectIDStorage = HashMap.HashMap(
 				0,
 				Text.equal,
 				Text.hash
 			);
 
-			for ((project_canister_id, project_ids) in project_canister_ids.vals()) {
-				canisters.put(project_canister_id, project_ids);
+			for ((project_canister_id, project_ids) in project_ids_storage.vals()) {
+				project_ids_storage_temp.put(project_canister_id, project_ids);
 			};
 
-			user_canisters_ref_temp.put(user_principal, canisters);
+			user_canisters_ref_temp.put(user_principal, project_ids_storage_temp);
 		};
 
 		user_canisters_ref := user_canisters_ref_temp;
