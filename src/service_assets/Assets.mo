@@ -1,5 +1,6 @@
 import Array "mo:base/Array";
 import Blob "mo:base/Blob";
+import Buffer "mo:base/Buffer";
 import Debug "mo:base/Debug";
 import Error "mo:base/Error";
 import HashMap "mo:base/HashMap";
@@ -19,184 +20,178 @@ import Types "./types";
 
 import Utils "./utils";
 
-actor class Assets(controller: Principal, is_prod: Bool) = this {    
-    let ACTOR_NAME : Text = "Assets";
+actor class Assets(controller : Principal, is_prod : Bool) = this {
+	let ACTOR_NAME : Text = "Assets";
 
-    private let rr = XorShift.toReader(XorShift.XorShift64(null));
-    private let se = Source.Source(rr, 0);
+	private let rr = XorShift.toReader(XorShift.XorShift64(null));
+	private let se = Source.Source(rr, 0);
 
-    private let assets : HashMap.HashMap<Text, Types.Asset> = HashMap.HashMap<Text, Types.Asset>(0, Text.equal, Text.hash);
+	private let assets : HashMap.HashMap<Text, Types.Asset> = HashMap.HashMap<Text, Types.Asset>(
+		0,
+		Text.equal,
+		Text.hash
+	);
 
-    public query func version() : async Nat {
-        return 2;
-    };
+	public query func version() : async Nat {
+		return 2;
+	};
 
-    // ------------------------- Create Asset -------------------------
-    public shared({caller}) func create_asset_from_chunks(args : Types.CreateAssetArgs) : async Result.Result<Types.AssetRef, Text> {
-        var asset_data : [Blob] = [];
-        var all_chunks_match_owner : Bool = true;
+	// ------------------------- Create Asset -------------------------
+	public shared ({ caller }) func create_asset_from_chunks(args : Types.CreateAssetArgs) : async Result.Result<Types.AssetRef, Text> {
+		var asset_data = Buffer.Buffer<Blob>(0);
+		var all_chunks_match_owner : Bool = true;
 
-        var created : Int = 0;
-        var owner : Principal = args.principal;
-        var file_name : Text = "";
-        let data_chunks_size : Nat = 0;
-        let asset_id : Text = ULID.toText(se.new());
+		var created : Int = 0;
+		var owner : Principal = args.principal;
+		var file_name : Text = "";
+		let data_chunks_size : Nat = 0;
+		let asset_id : Text = ULID.toText(se.new());
 
-        if (controller != caller) {
-            return #err("Not Authorized");
-        };
+		if (controller != caller) {
+			return #err("Not Authorized");
+		};
 
-        // get all chunks and check if owners match
-        for (chunk_id in args.chunk_ids.vals()) {
-            switch (await FileAssetChunks.get_chunk(chunk_id, args.principal)) {
-                case(#ok chunk){
-                    asset_data := Array.append<Blob>(asset_data, [chunk.data]);
+		// get all chunks and check if owners match
+		for (chunk_id in args.chunk_ids.vals()) {
+			switch (await FileAssetChunks.get_chunk(chunk_id, args.principal)) {
+				case (#ok chunk) {
 
-                    if (owner != chunk.owner) {
-                        all_chunks_match_owner := false;
-                    };
+					asset_data.add(chunk.data);
 
-                    created := chunk.created;
-                    owner := chunk.owner;
-                    file_name := chunk.file_name;
-                };
-                case(#err err){
-                   //TODO: log error
-                };
-            };
-        };
+					if (owner != chunk.owner) {
+						all_chunks_match_owner := false;
+					};
 
-        if (all_chunks_match_owner == false) {
-            return #err("All Chunks Must Match Owner");
-        };
+					created := chunk.created;
+					owner := chunk.owner;
+					file_name := chunk.file_name;
+				};
+				case (#err err) {
+					//TODO: log error
+				};
+			};
+		};
 
-        let self = Principal.fromActor(this);
-        let canister_id : Text = Principal.toText(self);
+		if (all_chunks_match_owner == false) {
+			return #err("All Chunks Must Match Owner");
+		};
 
-        let asset_url = Utils.generate_asset_url({
-            asset_id = asset_id;
-            canister_id = canister_id;
-            is_prod = is_prod;
-        });
+		let self = Principal.fromActor(this);
+		let canister_id : Text = Principal.toText(self);
 
-        let asset : Types.Asset  = {
-            canister_id = canister_id;
-            content_type = args.content_type;
-            created = created;
-            data_chunks = asset_data;
-            data_chunks_size = asset_data.size();
-            file_name = file_name;
-            id = asset_id;
-            is_public = args.is_public;
-            owner = owner;
-        };
+		let asset_url = Utils.generate_asset_url({ asset_id = asset_id; canister_id = canister_id; is_prod = is_prod });
 
-        assets.put(asset_id, asset);
+		let asset : Types.Asset = {
+			canister_id = canister_id;
+			content_type = args.content_type;
+			created = created;
+			data_chunks = asset_data.toArray();
+			data_chunks_size = asset_data.size();
+			file_name = file_name;
+			id = asset_id;
+			is_public = args.is_public;
+			owner = owner;
+		};
 
-        ignore FileAssetChunks.delete_chunks(args.chunk_ids, owner);
+		assets.put(asset_id, asset);
 
-        let asset_ref : Types.AssetRef = {
-            url = asset_url;
-            canister_id = canister_id;
-            id = asset_id;
-            is_public = args.is_public;
-        };
+		ignore FileAssetChunks.delete_chunks(args.chunk_ids, owner);
 
-        #ok(asset_ref);
-    };
+		let asset_ref : Types.AssetRef = {
+			url = asset_url;
+			canister_id = canister_id;
+			id = asset_id;
+			is_public = args.is_public;
+		};
 
-    public shared({caller}) func delete_asset(asset_id: Text) : async () {
-        let tags = [ACTOR_NAME, "delete_asset"];
+		#ok(asset_ref);
+	};
 
-        if (controller != caller) {
-            return ();
-        };
+	public shared ({ caller }) func delete_asset(asset_id : Text) : async () {
+		let tags = [ACTOR_NAME, "delete_asset"];
 
-        ignore Logger.log_event(tags, debug_show("asset", asset_id));
-        assets.delete(asset_id);
-    };
+		if (controller != caller) {
+			return ();
+		};
 
-    // ------------------------- Get Asset -------------------------
-    public shared query({caller}) func http_request(request : Types.HttpRequest) : async Types.HttpResponse {
-        let NOT_FOUND : [Nat8] = Blob.toArray(Text.encodeUtf8("Asset Not Found"));
+		ignore Logger.log_event(tags, debug_show ("asset", asset_id));
+		assets.delete(asset_id);
+	};
 
-        let asset_id = Utils.get_asset_id(request.url);
+	// ------------------------- Get Asset -------------------------
+	public shared query ({ caller }) func http_request(request : Types.HttpRequest) : async Types.HttpResponse {
+		let NOT_FOUND : [Nat8] = Blob.toArray(Text.encodeUtf8("Asset Not Found"));
 
-        switch (assets.get(asset_id)) {
-            case (? asset) {
-                let file_name = Text.concat("attachment; filename=", asset.file_name);
+		let asset_id = Utils.get_asset_id(request.url);
 
-                return {
-                    body = Blob.toArray(asset.data_chunks[0]);
-                    headers = [ ("Content-Type", asset.content_type),
-                                ("accept-ranges", "bytes"),
-                                ("Content-Disposition", file_name),
-                                ("cache-control", "private, max-age=0") ];
-                    status_code = 200;
-                    streaming_strategy = create_strategy({
-                        asset_id = asset_id;
-                        chunk_index = 0;
-                        data_chunks_size = asset.data_chunks_size;
-                    });
-                };
-            };
-            case _ {
-                return {
-                    body = NOT_FOUND;
-                    headers = [];
-                    status_code = 404;
-                    streaming_strategy = null;
-                };
-            };
-        };
-    };
+		switch (assets.get(asset_id)) {
+			case (?asset) {
+				let file_name = Text.concat("attachment; filename=", asset.file_name);
 
-    private func create_strategy(args : Types.CreateStrategyArgs) : ?Types.StreamingStrategy {
-        switch (create_token(args)) {
-            case (null) { null };
-            case (? token) {
-                let self = Principal.fromActor(this);
-                let canister_id : Text = Principal.toText(self);
-                let canister = actor (canister_id) : actor { http_request_streaming_callback : shared () -> async () };
+				return {
+					body = Blob.toArray(asset.data_chunks[0]);
+					headers = [
+						("Content-Type", asset.content_type),
+						("accept-ranges", "bytes"),
+						("Content-Disposition", file_name),
+						("cache-control", "private, max-age=0")
+					];
+					status_code = 200;
+					streaming_strategy = create_strategy({ asset_id = asset_id; chunk_index = 0; data_chunks_size = asset.data_chunks_size });
+				};
+			};
+			case _ {
+				return {
+					body = NOT_FOUND;
+					headers = [];
+					status_code = 404;
+					streaming_strategy = null;
+				};
+			};
+		};
+	};
 
-                return ?#Callback({
-                    token;
-                    callback = canister.http_request_streaming_callback;
-                });
-            };
-        };
-    };
+	private func create_strategy(args : Types.CreateStrategyArgs) : ?Types.StreamingStrategy {
+		switch (create_token(args)) {
+			case (null) { null };
+			case (?token) {
+				let self = Principal.fromActor(this);
+				let canister_id : Text = Principal.toText(self);
+				let canister = actor (canister_id) : actor {
+					http_request_streaming_callback : shared () -> async ();
+				};
 
-    private func create_token(args : Types.CreateStrategyArgs) : ?Types.StreamingCallbackToken {
-        if (args.chunk_index + 1 >= args.data_chunks_size) {
-            return null;
-        } else {
-            let token = {
-                asset_id = args.asset_id;
-                chunk_index = args.chunk_index + 1;
-                content_encoding = "gzip";
-            };
+				return ?#Callback({ token; callback = canister.http_request_streaming_callback });
+			};
+		};
+	};
 
-            return ?token;
-        };
-    };
+	private func create_token(args : Types.CreateStrategyArgs) : ?Types.StreamingCallbackToken {
+		if (args.chunk_index + 1 >= args.data_chunks_size) {
+			return null;
+		} else {
+			let token = {
+				asset_id = args.asset_id;
+				chunk_index = args.chunk_index + 1;
+				content_encoding = "gzip";
+			};
 
-    public shared query({caller}) func http_request_streaming_callback(
-        st : Types.StreamingCallbackToken,
-    ) : async Types.StreamingCallbackHttpResponse {
+			return ?token;
+		};
+	};
 
-        switch (assets.get(st.asset_id)) {
-            case (null) throw Error.reject("asset_id not found: " # st.asset_id);
-            case (? asset) {
-                return {
-                    token = create_token({
-                        asset_id = st.asset_id;
-                        chunk_index = st.chunk_index;
-                        data_chunks_size = asset.data_chunks_size;
-                    });
-                    body = asset.data_chunks[st.chunk_index];
-                };
-            };
-        };
-    };
+	public shared query ({ caller }) func http_request_streaming_callback(
+		st : Types.StreamingCallbackToken
+	) : async Types.StreamingCallbackHttpResponse {
+
+		switch (assets.get(st.asset_id)) {
+			case (null) throw Error.reject("asset_id not found: " # st.asset_id);
+			case (?asset) {
+				return {
+					token = create_token({ asset_id = st.asset_id; chunk_index = st.chunk_index; data_chunks_size = asset.data_chunks_size });
+					body = asset.data_chunks[st.chunk_index];
+				};
+			};
+		};
+	};
 };

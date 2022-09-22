@@ -2,90 +2,90 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 
 module {
-    public type Chunk = {
-        data : Blob;
-        file_name : Text;
-    };
+	public type Chunk = {
+		data : Blob;
+		file_name : Text;
+	};
 
-    public type AssetChunk = Chunk and {
-        created : Int;
-        owner : Principal;
-    };
+	public type AssetChunk = Chunk and {
+		created : Int;
+		owner : Principal;
+	};
 
-    public type Asset = {
-        canister_id : Text;
-        content_type : Text;
-        created : Int;
-        data_chunks : [Blob];
-        data_chunks_size : Nat;
-        file_name : Text;
-        id : Text;
-        is_public : Bool;
-        owner : Principal;
-    };
+	public type Asset = {
+		canister_id : Text;
+		content_type : Text;
+		created : Int;
+		data_chunks : [Blob];
+		data_chunks_size : Nat;
+		file_name : Text;
+		id : Text;
+		is_public : Bool;
+		owner : Principal;
+	};
 
-    public type AssetRef = {
-        canister_id : Text;
-        id : Text;
-        url : Text;
-        is_public : Bool;
-    };
+	public type AssetRef = {
+		canister_id : Text;
+		id : Text;
+		url : Text;
+		is_public : Bool;
+	};
 
-    public type CreateAssetArgs = {
-        chunk_ids : [Nat];
-        content_type : Text;
-        is_public : Bool;
-        principal : Principal;
-    };
+	public type CreateAssetArgs = {
+		chunk_ids : [Nat];
+		content_type : Text;
+		is_public : Bool;
+		principal : Principal;
+	};
 
-    public type HeaderField = (Text, Text);
+	public type HeaderField = (Text, Text);
 
-    public type HttpRequest = {
-        url : Text;
-        method : Text;
-        body : Blob;
-        headers : [HeaderField];
-    };
+	public type HttpRequest = {
+		url : Text;
+		method : Text;
+		body : Blob;
+		headers : [HeaderField];
+	};
 
-    public type HttpResponse = {
-        body : [Nat8];
-        headers : [HeaderField];
-        status_code : Nat16;
-        streaming_strategy : ?StreamingStrategy;
-    };
+	public type HttpResponse = {
+		body : [Nat8];
+		headers : [HeaderField];
+		status_code : Nat16;
+		streaming_strategy : ?StreamingStrategy;
+	};
 
-    public type Health = {
-        memory : Nat;
-        heap : Nat;
-        chunks_size : Nat;
-    };
+	public type Health = {
+		memory : Nat;
+		heap : Nat;
+		chunks_size : Nat;
+	};
 
-    public type CreateStrategyArgs = {
-        asset_id : Text;
-        chunk_index : Nat;
-        data_chunks_size : Nat;
-    };
+	public type CreateStrategyArgs = {
+		asset_id : Text;
+		chunk_index : Nat;
+		data_chunks_size : Nat;
+	};
 
-    public type StreamingStrategy = {
-        #Callback : {
-            token : StreamingCallbackToken;
-            callback : shared () -> async ();
-        };
-    };
+	public type StreamingStrategy = {
+		#Callback : {
+			token : StreamingCallbackToken;
+			callback : shared () -> async ();
+		};
+	};
 
-    public type StreamingCallbackToken = {
-        asset_id : Text;
-        chunk_index : Nat;
-        content_encoding : Text;
-    };
+	public type StreamingCallbackToken = {
+		asset_id : Text;
+		chunk_index : Nat;
+		content_encoding : Text;
+	};
 
-    public type StreamingCallbackHttpResponse = {
-        body : Blob;
-        token: ?StreamingCallbackToken;
-    };
+	public type StreamingCallbackHttpResponse = {
+		body : Blob;
+		token : ?StreamingCallbackToken;
+	};
 
-    public type AssetsActor = actor {
-        create_asset_from_chunks : shared (CreateAssetArgs) -> async Result.Result<AssetRef, Text>;
-        delete_asset : shared (Text) -> async ();
-    };
-}
+	public type AssetsActor = actor {
+		create_asset_from_chunks : shared (CreateAssetArgs) -> async Result.Result<AssetRef, Text>;
+		delete_asset : shared (Text) -> async ();
+	};
+};
