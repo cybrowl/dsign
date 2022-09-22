@@ -32,6 +32,7 @@ actor SnapMain {
 	type Snap = Types.Snap;
 	type SnapActor = Types.SnapActor;
 	type SnapCanisterID = Types.SnapCanisterID;
+	type SnapIDStorage = Types.SnapIDStorage;
 	type SnapID = Types.SnapID;
 	type Username = Types.Username;
 	type UserPrincipal = Types.UserPrincipal;
@@ -40,8 +41,7 @@ actor SnapMain {
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
 	let VERSION : Nat = 1;
 
-	// Snap Data
-	var user_canisters_ref : HashMap.HashMap<UserPrincipal, HashMap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>>> = HashMap.HashMap(
+	var user_canisters_ref : HashMap.HashMap<UserPrincipal, SnapIDStorage> = HashMap.HashMap(
 		0,
 		Principal.equal,
 		Principal.hash
@@ -67,13 +67,13 @@ actor SnapMain {
 				return false;
 			};
 			case (_) {
-				var empty_snap_canister_id_storage : HashMap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>> = HashMap.HashMap(
+				var snap_ids_storage : SnapIDStorage = HashMap.HashMap(
 					0,
 					Text.equal,
 					Text.hash
 				);
 
-				user_canisters_ref.put(caller, empty_snap_canister_id_storage);
+				user_canisters_ref.put(caller, snap_ids_storage);
 
 				ignore Logger.log_event(tags, "created, user_snap_storage");
 
@@ -100,15 +100,10 @@ actor SnapMain {
 			return #err(#FourImagesMax);
 		};
 
-		// get user snap canister ids
-		var snap_canister_ids : HashMap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>> = HashMap.HashMap(
-			0,
-			Text.equal,
-			Text.hash
-		);
+		var user_snap_ids_storage : SnapIDStorage = HashMap.HashMap(0, Text.equal, Text.hash);
 		switch (user_canisters_ref.get(caller)) {
-			case (?snap_canister_ids_) {
-				snap_canister_ids := snap_canister_ids_;
+			case (?user_snap_ids_storage_) {
+				user_snap_ids_storage := user_snap_ids_storage_;
 			};
 			case (_) {
 				return #err(#UserNotFound);
@@ -118,14 +113,14 @@ actor SnapMain {
 		// get snap ids from current canister id
 		var snap_ids = Buffer.Buffer<SnapID>(0);
 		var snap_ids_found = false;
-		switch (snap_canister_ids.get(snap_canister_id)) {
+		switch (user_snap_ids_storage.get(snap_canister_id)) {
 			case (?snap_ids_) {
 				ignore Logger.log_event(
 					tags,
-					debug_show ("snap_ids found for current empty canister")
+					debug_show ("snap_ids found")
 				);
 
-				snap_ids := snap_ids_;
+				snap_ids := Buffer.fromArray(snap_ids_);
 				snap_ids_found := true;
 			};
 			case (_) {
@@ -184,7 +179,7 @@ actor SnapMain {
 			case (#ok snap) {
 				snap_ids.add(snap.id);
 				if (snap_ids_found == false) {
-					snap_canister_ids.put(snap_canister_id, snap_ids);
+					user_snap_ids_storage.put(snap_canister_id, snap_ids.toArray());
 				};
 
 				//TODO: remove owner from snap
@@ -197,9 +192,12 @@ actor SnapMain {
 		let tags = [ACTOR_NAME, "delete_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
-			case (?snap_canister_ids) {
-				for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
+			case (?user_snap_ids_storage) {
+				for ((canister_id, snap_ids) in user_snap_ids_storage.entries()) {
 					let snap_actor = actor (canister_id) : SnapActor;
+
+					//todo: make sure user owns the snap_ids
+					// all snapIds exist in snap_ids
 
 					let snaps = await snap_actor.get_all_snaps(snapIds);
 
@@ -230,6 +228,23 @@ actor SnapMain {
 		};
 	};
 
+	// public shared ({ caller }) func update_snap_project(
+	// 	snaps_ref : [SnapRef],
+	// 	project_ref : ProjectRef
+	// ) : async Result.Result<Text, Text> {
+	// 	switch (user_canisters_ref.get(caller)) {
+	// 		case (?snap_canister_ids) {
+	// 			//todo: make sure user owns the snap_ids
+
+	// 			let snap_actor = actor (snap.canister_id) : SnapActor;
+	// 			ignore snap_actor.update_snap_project([snap_ref], project_ref);
+	// 		};
+	// 		case (_) {
+	// 			#err(#UserNotFound);
+	// 		};
+	// 	};
+	// };
+
 	public shared ({ caller }) func get_all_snaps() : async Result.Result<[Snap], GetAllSnapsErr> {
 		let tags = [ACTOR_NAME, "get_all_snaps"];
 
@@ -239,7 +254,7 @@ actor SnapMain {
 
 				for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
 					let snap_actor = actor (canister_id) : SnapActor;
-					let snaps = await snap_actor.get_all_snaps(snap_ids.toArray());
+					let snaps = await snap_actor.get_all_snaps(snap_ids);
 
 					for (snap in snaps.vals()) {
 						all_snaps.add(snap);
@@ -374,47 +389,41 @@ actor SnapMain {
 		var anon_principal = Principal.fromText("2vxsx-fae");
 		user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
 
-		var i = 0;
-		for ((user_principal, snap_canister_ids) in user_canisters_ref.entries()) {
-			var canisters : HashMap.HashMap<SnapCanisterID, [SnapID]> = HashMap.HashMap(
-				0,
-				Text.equal,
-				Text.hash
+		var index = 0;
+		for ((user_principal, snap_ids_storage) in user_canisters_ref.entries()) {
+
+			user_canisters_ref_storage[index] := (
+				user_principal,
+				Iter.toArray(snap_ids_storage.entries())
 			);
 
-			for ((snap_canister_id, snap_ids) in snap_canister_ids.entries()) {
-				var snap_ids_array = snap_ids.toArray();
-				canisters.put(snap_canister_id, snap_ids_array);
-			};
-
-			user_canisters_ref_storage[i] := (user_principal, Iter.toArray(canisters.entries()));
-			i += 1;
+			index += 1;
 		};
 	};
 
 	system func postupgrade() {
-		var user_canisters_ref_temp : HashMap.HashMap<UserPrincipal, HashMap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>>> = HashMap.HashMap(
+		var user_canisters_ref_temp : HashMap.HashMap<UserPrincipal, SnapIDStorage> = HashMap.HashMap(
 			0,
 			Principal.equal,
 			Principal.hash
 		);
 
-		for ((user_principal, snap_canister_ids) in user_canisters_ref_storage.vals()) {
-			var canisters : HashMap.HashMap<SnapCanisterID, Buffer.Buffer<SnapID>> = HashMap.HashMap(
+		for ((user_principal, snap_ids_storage) in user_canisters_ref_storage.vals()) {
+			var snap_ids_storage_temp : SnapIDStorage = HashMap.HashMap(
 				0,
 				Text.equal,
 				Text.hash
 			);
 
-			for ((snap_canister_id, snap_ids) in snap_canister_ids.vals()) {
-				var snap_ids_buffer : Buffer.Buffer<SnapID> = Buffer.fromArray(snap_ids);
-				canisters.put(snap_canister_id, snap_ids_buffer);
+			for ((snap_canister_id, snap_ids) in snap_ids_storage.vals()) {
+				snap_ids_storage_temp.put(snap_canister_id, snap_ids);
 			};
 
-			user_canisters_ref_temp.put(user_principal, canisters);
+			user_canisters_ref_temp.put(user_principal, snap_ids_storage_temp);
 		};
 
 		user_canisters_ref := user_canisters_ref_temp;
+
 		var anon_principal = Principal.fromText("2vxsx-fae");
 		user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
 	};

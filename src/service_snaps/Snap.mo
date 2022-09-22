@@ -111,12 +111,16 @@ actor class Snap(controller : Principal) = this {
 	public shared ({ caller }) func update_snap_project(
 		snaps_ref : [SnapRef],
 		project_ref : ProjectRef
-	) : async () {
+	) : async Result.Result<Text, Text> {
 		let project_actor = actor (project_ref.canister_id) : ProjectActor;
 		var projects = await project_actor.get_projects([project_ref.id]);
 
+		if (controller != caller) {
+			return #err("Unauthorized");
+		};
+
 		if (projects.size() < 1) {
-			return ();
+			return #err("No Project Found");
 		};
 
 		let project : Project = projects[0];
@@ -146,6 +150,8 @@ actor class Snap(controller : Principal) = this {
 				};
 			};
 		};
+
+		#ok("Updated Snap Project");
 	};
 
 	public query func get_all_snaps(snapIds : [SnapID]) : async [Snap] {

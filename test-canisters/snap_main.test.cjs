@@ -103,7 +103,7 @@ test('SnapMain[mishicat].initialize_canisters()', async function (t) {
 	await snap_main_actor.mishicat.initialize_canisters();
 });
 
-test('Username[mishicat].create_username(): should create username => #ok - username', async function (t) {
+test('Username[mishicat].create_username(): with valid username => #ok - username', async function (t) {
 	const username = fake.word();
 
 	const response = await username_actors.mishicat.create_username(username.toLowerCase());
@@ -117,7 +117,7 @@ test('SnapMain[mishicat].create_user_snap_storage(): should create initial stora
 	t.equal(response, true);
 });
 
-test('SnapMain[mishicat].create_snap(): should return error => #err - NoImageToSave', async function (t) {
+test('SnapMain[mishicat].create_snap(): with no image => #err - NoImageToSave', async function (t) {
 	let create_args = {
 		title: 'Error NoImageToSave',
 		image_cover_location: 1,
@@ -130,7 +130,7 @@ test('SnapMain[mishicat].create_snap(): should return error => #err - NoImageToS
 	t.deepEqual(response.err, { NoImageToSave: null });
 });
 
-test('SnapMain[mishicat].create_snap(): should return error => #err - FourImagesMax', async function (t) {
+test('SnapMain[mishicat].create_snap(): with more than 4 images => #err - FourImagesMax', async function (t) {
 	let create_args = {
 		title: 'Mobile Example',
 		image_cover_location: 1,
@@ -143,7 +143,7 @@ test('SnapMain[mishicat].create_snap(): should return error => #err - FourImages
 	t.deepEqual(response.err, { FourImagesMax: null });
 });
 
-test('SnapMain[mishicat].create_snap(): should return error => #err - AssetNotFound', async function (t) {
+test('SnapMain[mishicat].create_snap(): with invalid img asset ref => #err - AssetNotFound', async function (t) {
 	let create_args = {
 		title: 'Error AssetNotFound',
 		image_cover_location: 1,
@@ -156,7 +156,7 @@ test('SnapMain[mishicat].create_snap(): should return error => #err - AssetNotFo
 	t.deepEqual(response.err, { ErrorCall: '#AssetNotFound' });
 });
 
-test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function (t) {
+test('ImageAssetStaging[mishicat].create_asset(): with image and valid identity => #ok - img_asset_ids', async function (t) {
 	let promises = [];
 
 	images.forEach(async function (image) {
@@ -175,7 +175,7 @@ test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - 
 	}
 });
 
-test('Username[motoko].create_username(): should create username => #ok - username', async function (t) {
+test('Username[motoko].create_username(): with valid username => #ok - username', async function (t) {
 	const username = fake.word();
 
 	const response = await username_actors.motoko.create_username(username.toLowerCase());
@@ -189,7 +189,7 @@ test('SnapMain[motoko].create_user_snap_storage(): should create initial storage
 	t.equal(response, true);
 });
 
-test('SnapMain[motoko].create_snap(): should return error => #err - NotOwnerOfAsset', async function (t) {
+test('SnapMain[motoko].create_snap(): with invalid asset owner => #err - NotOwnerOfAsset', async function (t) {
 	let create_args = {
 		title: 'NotOwnerOfAsset Example',
 		image_cover_location: 1,
@@ -202,7 +202,7 @@ test('SnapMain[motoko].create_snap(): should return error => #err - NotOwnerOfAs
 	t.deepEqual(response.err, { ErrorCall: '#NotOwnerOfAsset' });
 });
 
-test('ImageAssetStaging[mishicat].get_asset(): should return asset => #ok - asset', async function (t) {
+test('ImageAssetStaging[mishicat].get_asset(): with image and valid identity => #ok - img_asset_ids', async function (t) {
 	const response = await assets_img_staging_actors.mishicat.get_asset(
 		img_asset_ids[0],
 		mishicat_identity.getPrincipal()
@@ -212,7 +212,7 @@ test('ImageAssetStaging[mishicat].get_asset(): should return asset => #ok - asse
 	t.equal(has_asset, true);
 });
 
-test('SnapMain[mishicat].create_snap(): should create snap without file asset => #ok - snap', async function (t) {
+test('SnapMain[mishicat].create_snap(): without file asset => #ok - snap', async function (t) {
 	let create_args = {
 		title: 'Mobile Example',
 		image_cover_location: 1,
@@ -221,6 +221,8 @@ test('SnapMain[mishicat].create_snap(): should create snap without file asset =>
 	};
 
 	const response = await snap_main_actor.mishicat.create_snap(create_args);
+
+	console.log('response: ', response);
 });
 
 test('ImageAssetStaging[mishicat].get_asset(): should return asset => #err - asset', async function (t) {
@@ -299,6 +301,8 @@ test('SnapMain[mishicat].create_snap(): with file and images => #ok - snap', asy
 	};
 
 	const response = await snap_main_actor.mishicat.create_snap(create_args);
+
+	console.log('response: ', response);
 });
 
 test('SnapMain.get_all_snaps()', async function (t) {

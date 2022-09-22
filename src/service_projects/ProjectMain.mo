@@ -122,6 +122,8 @@ actor ProjectMain {
 				for ((canister_id, project_ids) in project_canister_ids.entries()) {
 					let project_actor = actor (canister_id) : ProjectActor;
 
+					//todo: make sure user owns the project_ids
+
 					ignore project_actor.delete_projects(projectIds);
 
 					let project_ids_exclude_deleted = Array.filter(

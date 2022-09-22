@@ -74,21 +74,6 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 			snaps = snaps;
 		};
 
-		let project_ref = {
-			id = project_id;
-			canister_id = project_canister_id;
-		};
-
-		for (snap in snaps.vals()) {
-			let snap_ref = {
-				id = snap.id;
-				canister_id = snap.canister_id;
-			};
-
-			let snap_actor = actor (snap.canister_id) : SnapActor;
-			ignore snap_actor.update_snap_project([snap_ref], project_ref);
-		};
-
 		projects.put(project_id, project);
 
 		return #ok(project);

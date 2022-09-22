@@ -1,3 +1,4 @@
+import HashMap "mo:base/HashMap";
 import Int "mo:base/Int";
 import Nat "mo:base/Nat";
 import Principal "mo:base/Principal";
@@ -31,6 +32,7 @@ module {
 	// Snap
 	public type SnapCanisterID = Text;
 	public type SnapID = Text;
+	public type SnapIDStorage = HashMap.HashMap<SnapCanisterID, [SnapID]>;
 
 	public type SnapRef = {
 		id : Text;
