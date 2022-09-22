@@ -22,6 +22,8 @@ test('DFX Config: generateCanisterAliases()', async function (t) {
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_assets/test_assets.did.js',
 		$IDLtest_image_assets:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_image_assets/test_image_assets.did.js',
+		$IDLtest_project:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_project/test_project.did.js',
 		$IDLtest_snap: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_snap/test_snap.did.js'
 	};
 
