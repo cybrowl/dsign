@@ -178,9 +178,7 @@ actor SnapMain {
 			};
 			case (#ok snap) {
 				snap_ids.add(snap.id);
-				if (snap_ids_found == false) {
-					user_snap_ids_storage.put(snap_canister_id, snap_ids.toArray());
-				};
+				user_snap_ids_storage.put(snap_canister_id, snap_ids.toArray());
 
 				//TODO: remove owner from snap
 				#ok(snap);
@@ -249,12 +247,17 @@ actor SnapMain {
 		let tags = [ACTOR_NAME, "get_all_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
-			case (?snap_canister_ids) {
+			case (?user_snap_ids_storage) {
 				let all_snaps = Buffer.Buffer<Snap>(0);
 
-				for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
+				for ((canister_id, snap_ids) in user_snap_ids_storage.entries()) {
 					let snap_actor = actor (canister_id) : SnapActor;
 					let snaps = await snap_actor.get_all_snaps(snap_ids);
+
+					ignore Logger.log_event(
+						tags,
+						debug_show ("snap_ids: ", snap_ids)
+					);
 
 					for (snap in snaps.vals()) {
 						all_snaps.add(snap);
