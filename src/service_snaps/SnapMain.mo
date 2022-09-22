@@ -10,7 +10,9 @@ import Text "mo:base/Text";
 import Result "mo:base/Result";
 
 import Assets "../service_assets/Assets";
+import FileAssetChunks "canister:assets_file_chunks";
 import ImageAssets "../service_assets_img/ImageAssets";
+import ImageAssetStaging "canister:assets_img_staging";
 import Logger "canister:logger";
 import Snap "Snap";
 
@@ -144,6 +146,8 @@ actor SnapMain {
 			};
 			case (#ok images_ref_) {
 				images_ref := images_ref_;
+
+				ignore ImageAssetStaging.delete_assets(args.img_asset_ids, caller);
 			};
 		};
 
@@ -165,6 +169,8 @@ actor SnapMain {
 					};
 					case (#ok file_asset_) {
 						file_asset := file_asset_;
+
+						ignore FileAssetChunks.delete_chunks(fileAsset.chunk_ids, caller);
 					};
 				};
 			};
