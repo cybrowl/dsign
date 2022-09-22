@@ -8,6 +8,7 @@ const {
 	assets_img_staging_interface,
 	project_main_interface,
 	snap_main_interface,
+	test_project_interface,
 	username_interface
 } = require('../test-utils/actor_interface.cjs');
 
@@ -16,6 +17,7 @@ const {
 	assets_img_staging_canister_id,
 	project_main_canister_id,
 	snap_main_canister_id,
+	test_project_canister_id,
 	username_canister_id
 } = require('../test-utils/actor_canister_ids.cjs');
 
@@ -32,6 +34,7 @@ let images = generate_images();
 let assets_img_staging_actors = {};
 let snap_main_actor = {};
 let project_main_actor = {};
+let project_actor = {};
 let username_actors = {};
 
 let project_with_snaps = null;
@@ -79,10 +82,44 @@ test('Setup Actors', async function (t) {
 		project_main_interface,
 		default_identity
 	);
+
+	project_actor.mishicat = await get_actor(
+		test_project_canister_id,
+		test_project_interface,
+		mishicat_identity
+	);
 });
 
 test('ProjectMain[mishicat].initialize_canisters()', async function (t) {
-	let response = await project_main_actor.mishicat.initialize_canisters([]);
+	let response = await project_main_actor.mishicat.initialize_canisters([test_project_canister_id]);
+
+	console.log('project_canister_ids: ', response, test_project_canister_id);
+});
+
+test('Project[mishicat].create_project(): with wrong caller => #err - NotAuthorized', async function (t) {
+	const response = await project_actor.mishicat.create_project(
+		'Test',
+		[],
+		mishicat_identity.getPrincipal()
+	);
+
+	t.deepEqual(response.err, { NotAuthorized: null });
+});
+
+test('Project[mishicat].delete_projects(): with wrong caller => #err - NotAuthorized', async function (t) {
+	const response = await project_actor.mishicat.delete_projects(['xxx']);
+
+	t.deepEqual(response.err, { NotAuthorized: null });
+});
+
+test('Project[mishicat].delete_snaps_from_project(): with wrong caller => #err - NotAuthorized', async function (t) {
+	const response = await project_actor.mishicat.delete_snaps_from_project(
+		[{ id: 'xxx', canister_id: 'xxx' }],
+		'yyy',
+		mishicat_identity.getPrincipal()
+	);
+
+	t.deepEqual(response.err, { NotAuthorized: null });
 });
 
 test('Username[mishicat].create_username(): should create username => #ok - username', async function (t) {

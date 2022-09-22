@@ -16,6 +16,7 @@ import SnapTypes "../service_snaps/types";
 
 actor class Project(controller : Principal, is_prod : Bool) = this {
 	type CreateProjectErr = Types.CreateProjectErr;
+	type DeleteProjectsErr = Types.DeleteProjectsErr;
 	type DeleteSnapsFromProjectErr = Types.DeleteSnapsFromProjectErr;
 	type Project = Types.Project;
 	type ProjectID = Types.ProjectID;
@@ -93,9 +94,9 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 		return #ok(project);
 	};
 
-	public shared ({ caller }) func delete_projects(projectIds : [ProjectID]) : async () {
+	public shared ({ caller }) func delete_projects(projectIds : [ProjectID]) : async Result.Result<(), DeleteProjectsErr> {
 		if (controller != caller) {
-			return ();
+			return #err(#NotAuthorized);
 		};
 
 		for (project_id in projectIds.vals()) {
@@ -106,6 +107,8 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 				};
 			};
 		};
+
+		return #ok(());
 	};
 
 	public shared ({ caller }) func delete_snaps_from_project(
@@ -139,6 +142,8 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 						};
 					};
 				};
+
+				// todo: remove project from snaps that are removed from project
 
 				let project_updated : Project = {
 					id = project.id;

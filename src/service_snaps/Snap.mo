@@ -108,21 +108,6 @@ actor class Snap(controller : Principal) = this {
 		};
 	};
 
-	public query func get_all_snaps(snapIds : [SnapID]) : async [Snap] {
-		var snaps_list = Buffer.Buffer<Snap>(0);
-
-		for (snap_id in snapIds.vals()) {
-			switch (snaps.get(snap_id)) {
-				case null {};
-				case (?snap) {
-					snaps_list.add(snap);
-				};
-			};
-		};
-
-		return snaps_list.toArray();
-	};
-
 	public shared ({ caller }) func update_snap_project(
 		snaps_ref : [SnapRef],
 		project_ref : ProjectRef
@@ -161,6 +146,21 @@ actor class Snap(controller : Principal) = this {
 				};
 			};
 		};
+	};
+
+	public query func get_all_snaps(snapIds : [SnapID]) : async [Snap] {
+		var snaps_list = Buffer.Buffer<Snap>(0);
+
+		for (snap_id in snapIds.vals()) {
+			switch (snaps.get(snap_id)) {
+				case null {};
+				case (?snap) {
+					snaps_list.add(snap);
+				};
+			};
+		};
+
+		return snaps_list.toArray();
 	};
 
 	// ------------------------- Canister Management -------------------------

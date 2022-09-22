@@ -41,6 +41,7 @@ module {
 	};
 
 	public type DeleteProjectsErr = {
+		#NotAuthorized;
 		#UserNotFound;
 	};
 

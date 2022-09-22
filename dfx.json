@@ -80,6 +80,14 @@
         "logger", "assets_img_staging"
       ]
     },
+    "test_project": {
+      "main": "src/service_projects/Project.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger",
+        "username"
+      ]
+    },
     "test_snap": {
       "main": "src/service_snaps/Snap.mo",
       "type": "motoko",

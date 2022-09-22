@@ -222,7 +222,7 @@ actor ProjectMain {
 		project_canister_id := Principal.toText(principal);
 	};
 
-	public shared (msg) func initialize_canisters(projectCanisterId : ?Text) : async () {
+	public shared (msg) func initialize_canisters(projectCanisterId : ?Text) : async Text {
 		let tags = [ACTOR_NAME, "initialize_canisters"];
 		let project_main_principal = Principal.fromActor(ProjectMain);
 		let is_prod = Text.equal(
@@ -236,7 +236,7 @@ actor ProjectMain {
 				debug_show (("project_canister_id already set: ", project_canister_id))
 			);
 
-			return ();
+			return project_canister_id;
 		};
 
 		switch (projectCanisterId) {
@@ -254,6 +254,8 @@ actor ProjectMain {
 				);
 			};
 		};
+
+		return project_canister_id;
 	};
 
 	// ------------------------- System Methods -------------------------
