@@ -29,20 +29,6 @@ actor ImageAssetStaging = {
 
 	let VERSION : Nat = 3;
 
-	public query func is_full() : async Bool {
-		let MAX_SIZE_THRESHOLD_MB : Float = 3500;
-
-		let rts_memory_size : Nat = Prim.rts_memory_size();
-		let mem_size : Float = Float.fromInt(rts_memory_size);
-		let memory_in_megabytes = Float.abs(mem_size * 0.000001);
-
-		if (memory_in_megabytes > MAX_SIZE_THRESHOLD_MB) {
-			return true;
-		} else {
-			return false;
-		};
-	};
-
 	public shared ({ caller }) func create_asset(img : Types.Img) : async Nat {
 		//TODO: check username to stop spam
 
@@ -104,6 +90,20 @@ actor ImageAssetStaging = {
 			assets_size = assets.size();
 			memory = Prim.rts_memory_size();
 			heap = Prim.rts_heap_size();
+		};
+	};
+
+	public query func is_full() : async Bool {
+		let MAX_SIZE_THRESHOLD_MB : Float = 3500;
+
+		let rts_memory_size : Nat = Prim.rts_memory_size();
+		let mem_size : Float = Float.fromInt(rts_memory_size);
+		let memory_in_megabytes = Float.abs(mem_size * 0.000001);
+
+		if (memory_in_megabytes > MAX_SIZE_THRESHOLD_MB) {
+			return true;
+		} else {
+			return false;
 		};
 	};
 };
