@@ -1,13 +1,12 @@
 import Array "mo:base/Array";
+import Debug "mo:base/Debug";
 import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
 import Nat "mo:base/Nat";
-import Principal "mo:base/Principal";
 import Prim "mo:⛔";
+import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Time "mo:base/Time";
-
-import Debug "mo:base/Debug";
 
 import Username "canister:username";
 
@@ -20,10 +19,7 @@ actor FileAssetChunks = {
 		Nat.equal,
 		Hash.hash
 	);
-
-	public query func version() : async Text {
-		return "0.0.1";
-	};
+	let VERSION : Nat = 3;
 
 	public shared ({ caller }) func create_chunk(chunk : Types.Chunk) : async Nat {
 		//TODO: check username to stop spam
@@ -68,6 +64,11 @@ actor FileAssetChunks = {
 				return #err("Chunk Not Found");
 			};
 		};
+	};
+
+	// ------------------------- Canister Management -------------------------
+	public query func version() : async Nat {
+		return VERSION;
 	};
 
 	public query func health() : async Types.Health {

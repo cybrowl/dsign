@@ -3,7 +3,7 @@ export PROJECT_MAIN_PRINCIPAL=$(dfx canister id project_main)
 
 dfx deploy test_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
 dfx deploy test_image_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
-# dfx deploy test_project --argument='(principal "'${PROJECT_MAIN_PRINCIPAL}'", false)'
+dfx deploy test_project --argument='(principal "'${PROJECT_MAIN_PRINCIPAL}'", false)'
 
 dfx canister call test_assets version
 dfx canister call test_image_assets version

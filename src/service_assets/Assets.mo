@@ -4,6 +4,7 @@ import Buffer "mo:base/Buffer";
 import Debug "mo:base/Debug";
 import Error "mo:base/Error";
 import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Rand "mo:base/Random";
 import Result "mo:base/Result";
@@ -22,19 +23,17 @@ import Utils "./utils";
 
 actor class Assets(controller : Principal, is_prod : Bool) = this {
 	let ACTOR_NAME : Text = "Assets";
+	let VERSION : Nat = 3;
 
 	private let rr = XorShift.toReader(XorShift.XorShift64(null));
 	private let se = Source.Source(rr, 0);
 
-	private let assets : HashMap.HashMap<Text, Types.Asset> = HashMap.HashMap<Text, Types.Asset>(
+	private var assets : HashMap.HashMap<Text, Types.Asset> = HashMap.HashMap<Text, Types.Asset>(
 		0,
 		Text.equal,
 		Text.hash
 	);
-
-	public query func version() : async Nat {
-		return 2;
-	};
+	stable var assets_stable_storage : [(Text, Types.Asset)] = [];
 
 	// ------------------------- Create Asset -------------------------
 	public shared ({ caller }) func create_asset_from_chunks(args : Types.CreateAssetArgs) : async Result.Result<Types.AssetRef, Text> {
@@ -193,5 +192,25 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 				};
 			};
 		};
+	};
+
+	// ------------------------- Canister Management -------------------------
+	public query func version() : async Nat {
+		return VERSION;
+	};
+
+	// ------------------------- System Methods -------------------------
+	system func preupgrade() {
+		assets_stable_storage := Iter.toArray(assets.entries());
+	};
+
+	system func postupgrade() {
+		assets := HashMap.fromIter<Text, Types.Asset>(
+			assets_stable_storage.vals(),
+			0,
+			Text.equal,
+			Text.hash
+		);
+		assets_stable_storage := [];
 	};
 };

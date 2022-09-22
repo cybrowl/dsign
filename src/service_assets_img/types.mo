@@ -20,6 +20,12 @@ module {
 		url : Text;
 	};
 
+	public type Health = {
+		memory : Nat;
+		heap : Nat;
+		assets_size : Nat;
+	};
+
 	// HTTP
 	public type HeaderField = (Text, Text);
 	public type HttpRequest = {

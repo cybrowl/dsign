@@ -98,4 +98,12 @@ actor ImageAssetStaging = {
 	public query func version() : async Nat {
 		return VERSION;
 	};
+
+	public query func health() : async Types.Health {
+		return {
+			assets_size = assets.size();
+			memory = Prim.rts_memory_size();
+			heap = Prim.rts_heap_size();
+		};
+	};
 };
