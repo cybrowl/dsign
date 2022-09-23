@@ -17,6 +17,7 @@ import Logger "canister:logger";
 import Snap "Snap";
 
 import Types "./types";
+import Utils "../utils/utils";
 
 actor SnapMain {
 	type AssetsActor = Types.AssetsActor;
@@ -29,11 +30,14 @@ actor SnapMain {
 	type ICInterfaceStatusResponse = Types.ICInterfaceStatusResponse;
 	type ImageAssetsActor = Types.ImageAssetsActor;
 	type ImageRef = Types.ImageRef;
+	type InitArgs = Types.InitArgs;
+	type ProjectRef = Types.ProjectRef;
 	type Snap = Types.Snap;
 	type SnapActor = Types.SnapActor;
 	type SnapCanisterID = Types.SnapCanisterID;
-	type SnapIDStorage = Types.SnapIDStorage;
 	type SnapID = Types.SnapID;
+	type SnapIDStorage = Types.SnapIDStorage;
+	type SnapRef = Types.SnapRef;
 	type Username = Types.Username;
 	type UserPrincipal = Types.UserPrincipal;
 
@@ -53,6 +57,7 @@ actor SnapMain {
 	stable var assets_canister_id : Text = "";
 	stable var image_assets_canister_id : Text = "";
 	stable var snap_canister_id : Text = "";
+	stable var project_main_canister_id : Text = "";
 
 	private let ic : ICInterface = actor "aaaaa-aa";
 
@@ -191,9 +196,12 @@ actor SnapMain {
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_snap_ids_storage) {
-				// get all ids
+				let my_ids = Utils.get_all_ids(user_snap_ids_storage);
+				let matches = Utils.all_ids_match(my_ids, snap_ids_delete);
 
-				// all snap_ids_delete exist in snap_ids
+				if (matches.all_match == false) {
+					return #err(#SnapIdsDoNotMatch);
+				};
 
 				for ((canister_id, snap_ids) in user_snap_ids_storage.entries()) {
 					let snap_actor = actor (canister_id) : SnapActor;
@@ -219,23 +227,6 @@ actor SnapMain {
 				};
 
 				return #ok("delete_snaps");
-			};
-			case (_) {
-				#err(#UserNotFound);
-			};
-		};
-	};
-
-	public shared ({ caller }) func update_snap_project(
-		snaps_ref : [SnapRef],
-		project_ref : ProjectRef
-	) : async Result.Result<Text, Text> {
-		switch (user_canisters_ref.get(caller)) {
-			case (?user_snap_ids_storage) {
-				//todo: make sure user owns the snap_ids
-
-				let snap_actor = actor (snap.canister_id) : SnapActor;
-				ignore snap_actor.update_snap_project([snap_ref], project_ref);
 			};
 			case (_) {
 				#err(#UserNotFound);
@@ -295,25 +286,52 @@ actor SnapMain {
 		image_assets_canister_id := Principal.toText(principal);
 	};
 
-	private func create_snap_canister(snap_main_principal : Principal) : async () {
+	private func create_snap_canister(
+		snap_main_principal : Principal,
+		project_main_principal : Principal
+	) : async () {
 		Cycles.add(CYCLE_AMOUNT);
-		let snap_actor = await Snap.Snap(snap_main_principal);
-		let principal = Principal.fromActor(snap_actor);
+		let snap_actor = await Snap.Snap(
+			snap_main_principal,
+			project_main_principal
+		);
 
+		let principal = Principal.fromActor(snap_actor);
 		snap_canister_id := Principal.toText(principal);
 	};
 
-	public shared (msg) func initialize_canisters() : async () {
+	public shared (msg) func initialize_canisters(args : InitArgs) : async () {
 		let tags = [ACTOR_NAME, "initialize_canisters"];
 		let snap_main_principal = Principal.fromActor(SnapMain);
+
 		let is_prod = Text.equal(
 			Principal.toText(snap_main_principal),
 			"lyswl-7iaaa-aaaag-aatya-cai"
 		);
 
+		if (project_main_canister_id.size() < 1) {
+			switch (args.project_main_canister_id) {
+				case (null) {
+					project_main_canister_id := "";
+				};
+				case (?project_main_canister_id_) {
+					project_main_canister_id := project_main_canister_id_;
+				};
+			};
+		};
+
+		let project_main_principal = Principal.fromText(project_main_canister_id);
+
 		// create assets canister
 		if (assets_canister_id.size() < 1) {
-			await create_assets_canister(snap_main_principal, is_prod);
+			switch (args.assets_canister_id) {
+				case (null) {
+					await create_assets_canister(snap_main_principal, is_prod);
+				};
+				case (?assets_canister_id_) {
+					assets_canister_id := assets_canister_id_;
+				};
+			};
 
 			ignore Logger.log_event(
 				tags,
@@ -328,7 +346,14 @@ actor SnapMain {
 
 		// create image assets canister
 		if (image_assets_canister_id.size() < 1) {
-			await create_image_assets_canister(snap_main_principal, is_prod);
+			switch (args.image_assets_canister_id) {
+				case (null) {
+					await create_image_assets_canister(snap_main_principal, is_prod);
+				};
+				case (?image_assets_canister_id_) {
+					image_assets_canister_id := image_assets_canister_id_;
+				};
+			};
 
 			ignore Logger.log_event(
 				tags,
@@ -343,7 +368,14 @@ actor SnapMain {
 
 		// create snap canister
 		if (snap_canister_id.size() < 1) {
-			await create_snap_canister(snap_main_principal);
+			switch (args.snap_canister_id) {
+				case (null) {
+					await create_snap_canister(snap_main_principal, project_main_principal);
+				};
+				case (?snap_canister_id_) {
+					snap_canister_id := snap_canister_id_;
+				};
+			};
 
 			ignore Logger.log_event(
 				tags,

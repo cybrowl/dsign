@@ -43,12 +43,15 @@ module {
 	public type DeleteProjectsErr = {
 		#NotAuthorized;
 		#UserNotFound;
+		#ProjectIdsDoNotMatch;
 	};
 
 	public type DeleteSnapsFromProjectErr = {
 		#NotAuthorized;
 		#NotOwner;
 		#ProjectNotFound;
+		#ProjectIdsDoNotMatch;
+		#UserNotFound;
 		#ErrorCall : Text;
 	};
 

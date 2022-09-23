@@ -17,6 +17,7 @@ const {
 const {
 	assets_file_chunks_canister_id,
 	assets_img_staging_canister_id,
+	project_main_canister_id,
 	snap_main_canister_id,
 	username_canister_id
 } = require('../test-utils/actor_canister_ids.cjs');
@@ -100,7 +101,12 @@ test('Setup Actors', async function (t) {
 });
 
 test('SnapMain[mishicat].initialize_canisters()', async function (t) {
-	await snap_main_actor.mishicat.initialize_canisters();
+	await snap_main_actor.mishicat.initialize_canisters({
+		assets_canister_id: [],
+		image_assets_canister_id: [],
+		snap_canister_id: [],
+		project_main_canister_id: [project_main_canister_id]
+	});
 });
 
 test('Username[mishicat].create_username(): with valid username => #ok - username', async function (t) {

@@ -15,7 +15,7 @@ import Username "canister:username";
 import Types "./types";
 import ProjectTypes "../service_projects/types";
 
-actor class Snap(controller : Principal) = this {
+actor class Snap(controller : Principal, project_main_principal : Principal) = this {
 	type AssetRef = Types.AssetRef;
 	type CreateSnapArgs = Types.CreateSnapArgs;
 	type ImageRef = Types.ImageRef;
@@ -115,7 +115,8 @@ actor class Snap(controller : Principal) = this {
 		let project_actor = actor (project_ref.canister_id) : ProjectActor;
 		var projects = await project_actor.get_projects([project_ref.id]);
 
-		if (controller != caller) {
+		// check to make sure project main is the caller
+		if (project_main_principal != caller) {
 			return #err("Unauthorized");
 		};
 

@@ -14,6 +14,8 @@ import Logger "canister:logger";
 import Project "Project";
 
 import Types "./types";
+import SnapTypes "../service_snaps/types";
+import Utils "../utils/utils";
 
 actor ProjectMain {
 	type CreateProjectErr = Types.CreateProjectErr;
@@ -26,6 +28,7 @@ actor ProjectMain {
 	type ProjectID = Types.ProjectID;
 	type ProjectIDStorage = Types.ProjectIDStorage;
 	type ProjectRef = Types.ProjectRef;
+	type SnapActor = SnapTypes.SnapActor;
 	type SnapRef = Types.SnapRef;
 	type UserPrincipal = Types.UserPrincipal;
 
@@ -108,32 +111,54 @@ actor ProjectMain {
 				project_ids.add(project.id);
 				user_project_ids_storage.put(project_canister_id, project_ids.toArray());
 
+				// add project to snaps
+				for (snap in project.snaps.vals()) {
+					let snap_ref = {
+						id = snap.id;
+						canister_id = snap.canister_id;
+					};
+
+					let project_ref = {
+						id = project.id;
+						canister_id = project.canister_id;
+					};
+
+					let snap_actor = actor (snap.canister_id) : SnapActor;
+					ignore snap_actor.update_snap_project([snap_ref], project_ref);
+					// todo: this should be delete project ref in snap
+				};
+
 				//TODO: remove owner from project
 				#ok(project);
 			};
 		};
 	};
 
-	public shared ({ caller }) func delete_projects(projectIds : [ProjectID]) : async Result.Result<Text, DeleteProjectsErr> {
+	public shared ({ caller }) func delete_projects(project_ids_delete : [ProjectID]) : async Result.Result<Text, DeleteProjectsErr> {
 		let tags = [ACTOR_NAME, "delete_projects"];
 
 		switch (user_canisters_ref.get(caller)) {
-			case (?project_canister_ids) {
-				for ((canister_id, project_ids) in project_canister_ids.entries()) {
+			case (?user_project_ids_storage) {
+				let my_ids = Utils.get_all_ids(user_project_ids_storage);
+				let matches = Utils.all_ids_match(my_ids, project_ids_delete);
+
+				if (matches.all_match == false) {
+					return #err(#ProjectIdsDoNotMatch);
+				};
+
+				for ((canister_id, project_ids) in user_project_ids_storage.entries()) {
 					let project_actor = actor (canister_id) : ProjectActor;
 
-					//todo: make sure user owns the project_ids
-
-					ignore project_actor.delete_projects(projectIds);
+					ignore project_actor.delete_projects(project_ids_delete);
 
 					let project_ids_exclude_deleted = Array.filter(
 						project_ids,
 						func(project_id : ProjectID) : Bool {
-							return Arr.contains(projectIds, project_id, Text.notEqual);
+							return Arr.contains(project_ids_delete, project_id, Text.notEqual);
 						}
 					);
 
-					project_canister_ids.put(canister_id, project_ids_exclude_deleted);
+					user_project_ids_storage.put(canister_id, project_ids_exclude_deleted);
 				};
 
 				return #ok("Deleted Projects");
@@ -150,14 +175,29 @@ actor ProjectMain {
 	) : async Result.Result<Text, DeleteSnapsFromProjectErr> {
 		let tags = [ACTOR_NAME, "delete_snaps_from_project"];
 
-		let project_actor = actor (project_ref.canister_id) : ProjectActor;
+		switch (user_canisters_ref.get(caller)) {
+			case (?user_project_ids_storage) {
+				let my_ids = Utils.get_all_ids(user_project_ids_storage);
+				let matches = Utils.all_ids_match(my_ids, [project_ref.id]);
 
-		switch (await project_actor.delete_snaps_from_project(snaps, project_ref.id, caller)) {
-			case (#err err) {
-				return #err(#ErrorCall(debug_show (err)));
+				if (matches.all_match == false) {
+					return #err(#ProjectIdsDoNotMatch);
+				};
+
+				let project_actor = actor (project_ref.canister_id) : ProjectActor;
+
+				switch (await project_actor.delete_snaps_from_project(snaps, project_ref.id, caller)) {
+					case (#err err) {
+						return #err(#ErrorCall(debug_show (err)));
+					};
+					case (#ok _) {
+						// todo: the front end needs to handle removing the snaps
+						return #ok("Deleted Snaps From Project");
+					};
+				};
 			};
-			case (#ok _) {
-				return #ok("Deleted Snaps From Project");
+			case (_) {
+				#err(#UserNotFound);
 			};
 		};
 	};

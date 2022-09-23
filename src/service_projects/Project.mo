@@ -12,7 +12,6 @@ import XorShift "mo:rand/XorShift";
 import Username "canister:username";
 
 import Types "./types";
-import SnapTypes "../service_snaps/types";
 
 actor class Project(controller : Principal, is_prod : Bool) = this {
 	type CreateProjectErr = Types.CreateProjectErr;
@@ -20,7 +19,6 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 	type DeleteSnapsFromProjectErr = Types.DeleteSnapsFromProjectErr;
 	type Project = Types.Project;
 	type ProjectID = Types.ProjectID;
-	type SnapActor = SnapTypes.SnapActor;
 	type SnapRef = Types.SnapRef;
 	type UserPrincipal = Types.UserPrincipal;
 
