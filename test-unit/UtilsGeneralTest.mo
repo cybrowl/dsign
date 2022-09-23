@@ -41,6 +41,44 @@ let success = run(
 					}
 				)
 			]
+		),
+		describe(
+			"UtilsGeneral.all_ids_match()",
+			[
+				it(
+					"should match all ids",
+					do {
+						let my_ids = ["a", "b", "c", "d"];
+						let ids_to_match = ["a", "b"];
+
+						let response = Utils.all_ids_match(my_ids, ids_to_match);
+
+						assertTrue(response.all_match);
+					}
+				),
+				it(
+					"should match some ids",
+					do {
+						let my_ids = ["a", "b", "c", "d"];
+						let ids_to_match = ["a", "z"];
+
+						let response = Utils.all_ids_match(my_ids, ids_to_match);
+
+						assertFalse(response.all_match);
+					}
+				),
+				it(
+					"should match some ids",
+					do {
+						let my_ids = ["a", "b", "c", "d"];
+						let ids_to_match = ["a", "b", "c", "d", "e"];
+
+						let response = Utils.all_ids_match(my_ids, ids_to_match);
+
+						assertFalse(response.all_match);
+					}
+				)
+			]
 		)
 	]
 );
