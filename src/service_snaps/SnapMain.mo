@@ -186,18 +186,18 @@ actor SnapMain {
 		};
 	};
 
-	public shared ({ caller }) func delete_snaps(snapIds : [SnapID]) : async Result.Result<Text, DeleteSnapsErr> {
+	public shared ({ caller }) func delete_snaps(snap_ids_delete : [SnapID]) : async Result.Result<Text, DeleteSnapsErr> {
 		let tags = [ACTOR_NAME, "delete_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_snap_ids_storage) {
+				// get all ids
+
+				// all snap_ids_delete exist in snap_ids
+
 				for ((canister_id, snap_ids) in user_snap_ids_storage.entries()) {
 					let snap_actor = actor (canister_id) : SnapActor;
-
-					//todo: make sure user owns the snap_ids
-					// all snapIds exist in snap_ids
-
-					let snaps = await snap_actor.get_all_snaps(snapIds);
+					let snaps = await snap_actor.get_all_snaps(snap_ids_delete);
 
 					for (snap in snaps.vals()) {
 						if (Text.size(snap.file_asset.canister_id) > 1) {
@@ -213,7 +213,7 @@ actor SnapMain {
 						};
 					};
 
-					await snap_actor.delete_snaps(snapIds);
+					await snap_actor.delete_snaps(snap_ids_delete);
 
 					//todo: remove snap ids from snap_canister_ids
 				};
@@ -226,22 +226,22 @@ actor SnapMain {
 		};
 	};
 
-	// public shared ({ caller }) func update_snap_project(
-	// 	snaps_ref : [SnapRef],
-	// 	project_ref : ProjectRef
-	// ) : async Result.Result<Text, Text> {
-	// 	switch (user_canisters_ref.get(caller)) {
-	// 		case (?snap_canister_ids) {
-	// 			//todo: make sure user owns the snap_ids
+	public shared ({ caller }) func update_snap_project(
+		snaps_ref : [SnapRef],
+		project_ref : ProjectRef
+	) : async Result.Result<Text, Text> {
+		switch (user_canisters_ref.get(caller)) {
+			case (?user_snap_ids_storage) {
+				//todo: make sure user owns the snap_ids
 
-	// 			let snap_actor = actor (snap.canister_id) : SnapActor;
-	// 			ignore snap_actor.update_snap_project([snap_ref], project_ref);
-	// 		};
-	// 		case (_) {
-	// 			#err(#UserNotFound);
-	// 		};
-	// 	};
-	// };
+				let snap_actor = actor (snap.canister_id) : SnapActor;
+				ignore snap_actor.update_snap_project([snap_ref], project_ref);
+			};
+			case (_) {
+				#err(#UserNotFound);
+			};
+		};
+	};
 
 	public shared ({ caller }) func get_all_snaps() : async Result.Result<[Snap], GetAllSnapsErr> {
 		let tags = [ACTOR_NAME, "get_all_snaps"];
