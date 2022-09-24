@@ -23,6 +23,7 @@ module {
 	public type CreateAssetArgs = AssetTypes.CreateAssetArgs;
 
 	public type Project = ProjectTypes.Project;
+	public type ProjectPublic = ProjectTypes.ProjectPublic;
 	public type ProjectActor = ProjectTypes.ProjectActor;
 	public type ProjectRef = ProjectTypes.ProjectRef;
 
@@ -37,6 +38,23 @@ module {
 	public type SnapRef = {
 		id : Text;
 		canister_id : Text;
+	};
+
+	public type SnapPublic = {
+		canister_id : Text;
+		created : Time;
+		file_asset : AssetRef;
+		id : SnapID;
+		image_cover_location : Nat8;
+		images : [ImageRef];
+		project : ProjectPublic;
+		tags : ?[Text];
+		title : Text;
+		username : Username;
+		metrics : {
+			likes : Nat;
+			views : Nat;
+		};
 	};
 
 	public type Snap = {
@@ -97,7 +115,7 @@ module {
 	public type SnapActor = actor {
 		create_snap : shared (CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, Text>;
 		delete_snaps : shared ([SnapID]) -> async ();
-		get_all_snaps : query ([SnapID]) -> async [Snap];
 		update_snap_project : shared ([SnapRef], ProjectRef) -> async ();
+		get_all_snaps : query ([SnapID]) -> async [SnapPublic];
 	};
 };

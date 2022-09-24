@@ -21,6 +21,15 @@ module {
 		canister_id : Text;
 	};
 
+	public type ProjectPublic = {
+		id : Text;
+		canister_id : Text;
+		created : Time;
+		username : Text;
+		name : Text;
+		snaps : [SnapRef];
+	};
+
 	public type Project = {
 		id : Text;
 		canister_id : Text;

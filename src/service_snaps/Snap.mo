@@ -23,6 +23,7 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 	type ProjectActor = ProjectTypes.ProjectActor;
 	type ProjectRef = ProjectTypes.ProjectRef;
 	type Snap = Types.Snap;
+	type SnapPublic = Types.SnapPublic;
 	type SnapID = Types.SnapID;
 	type SnapRef = Types.SnapRef;
 	type UserPrincipal = Types.UserPrincipal;
@@ -155,14 +156,29 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 		#ok("Updated Snap Project");
 	};
 
-	public query func get_all_snaps(snapIds : [SnapID]) : async [Snap] {
-		var snaps_list = Buffer.Buffer<Snap>(0);
+	public query func get_all_snaps(snapIds : [SnapID]) : async [SnapPublic] {
+		var snaps_list = Buffer.Buffer<SnapPublic>(0);
 
 		for (snap_id in snapIds.vals()) {
 			switch (snaps.get(snap_id)) {
 				case null {};
 				case (?snap) {
-					snaps_list.add(snap);
+
+					let snap_public : SnapPublic = {
+						canister_id = snap.canister_id;
+						created = snap.created;
+						file_asset = snap.file_asset;
+						id = snap.id;
+						image_cover_location = snap.image_cover_location;
+						images = snap.images;
+						project = snap.project;
+						tags = snap.tags;
+						title = snap.title;
+						username = snap.username;
+						metrics = snap.metrics;
+					};
+
+					snaps_list.add(snap_public);
 				};
 			};
 		};

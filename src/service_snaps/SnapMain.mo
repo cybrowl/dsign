@@ -37,6 +37,7 @@ actor SnapMain {
 	type SnapCanisterID = Types.SnapCanisterID;
 	type SnapID = Types.SnapID;
 	type SnapIDStorage = Types.SnapIDStorage;
+	type SnapPublic = Types.SnapPublic;
 	type SnapRef = Types.SnapRef;
 	type Username = Types.Username;
 	type UserPrincipal = Types.UserPrincipal;
@@ -87,7 +88,7 @@ actor SnapMain {
 		};
 	};
 
-	public shared ({ caller }) func create_snap(args : CreateSnapArgs) : async Result.Result<Snap, CreateSnapErr> {
+	public shared ({ caller }) func create_snap(args : CreateSnapArgs) : async Result.Result<Text, CreateSnapErr> {
 		let tags = [ACTOR_NAME, "create_snap"];
 		let is_anonymous = Principal.isAnonymous(caller);
 		let has_image = args.img_asset_ids.size() > 0;
@@ -185,8 +186,7 @@ actor SnapMain {
 				snap_ids.add(snap.id);
 				user_snap_ids_storage.put(snap_canister_id, snap_ids.toArray());
 
-				//TODO: remove owner from snap
-				#ok(snap);
+				#ok("Created Snap");
 			};
 		};
 	};
@@ -234,12 +234,12 @@ actor SnapMain {
 		};
 	};
 
-	public shared ({ caller }) func get_all_snaps() : async Result.Result<[Snap], GetAllSnapsErr> {
+	public shared ({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], GetAllSnapsErr> {
 		let tags = [ACTOR_NAME, "get_all_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_snap_ids_storage) {
-				let all_snaps = Buffer.Buffer<Snap>(0);
+				let all_snaps = Buffer.Buffer<SnapPublic>(0);
 
 				for ((canister_id, snap_ids) in user_snap_ids_storage.entries()) {
 					let snap_actor = actor (canister_id) : SnapActor;
