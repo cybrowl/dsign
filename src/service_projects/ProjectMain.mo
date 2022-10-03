@@ -1,5 +1,4 @@
 import Array "mo:base/Array";
-import Arr "mo:array/Array";
 import Buffer "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
@@ -151,14 +150,12 @@ actor ProjectMain {
 
 					ignore project_actor.delete_projects(project_ids_delete);
 
-					let project_ids_exclude_deleted = Array.filter(
+					let project_ids_not_deleted = Utils.get_non_exluded_ids(
 						project_ids,
-						func(project_id : ProjectID) : Bool {
-							return Arr.contains(project_ids_delete, project_id, Text.notEqual);
-						}
+						project_ids_delete
 					);
 
-					user_project_ids_storage.put(canister_id, project_ids_exclude_deleted);
+					user_project_ids_storage.put(canister_id, project_ids_not_deleted);
 				};
 
 				return #ok("Deleted Projects");

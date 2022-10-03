@@ -18,70 +18,84 @@ let run = ActorSpec.run;
 type SnapCanisterID = Text;
 type SnapID = Text;
 
-let success = run(
-	[
-		describe(
-			"UtilsGeneral.get_all_ids()",
-			[
-				it(
-					"should get all ids",
-					do {
-						var snap_ids_storage : HashMap.HashMap<SnapCanisterID, [SnapID]> = HashMap.HashMap(
-							0,
-							Text.equal,
-							Text.hash
-						);
+let success = run([
+	describe(
+		"UtilsGeneral.get_all_ids()",
+		[
+			it(
+				"should get all ids",
+				do {
+					var snap_ids_storage : HashMap.HashMap<SnapCanisterID, [SnapID]> = HashMap.HashMap(
+						0,
+						Text.equal,
+						Text.hash
+					);
 
-						snap_ids_storage.put("xxx", ["x", "p", "y"]);
-						snap_ids_storage.put("yyy", ["a", "b", "c"]);
+					snap_ids_storage.put("xxx", ["x", "p", "y"]);
+					snap_ids_storage.put("yyy", ["a", "b", "c"]);
 
-						let response = Utils.get_all_ids(snap_ids_storage);
+					let response = Utils.get_all_ids(snap_ids_storage);
 
-						assertTrue(Array.equal(response, ["a", "b", "c", "x", "p", "y"], Text.equal));
-					}
-				)
-			]
-		),
-		describe(
-			"UtilsGeneral.all_ids_match()",
-			[
-				it(
-					"should match all ids",
-					do {
-						let my_ids = ["a", "b", "c", "d"];
-						let ids_to_match = ["a", "b"];
+					assertTrue(Array.equal(response, ["a", "b", "c", "x", "p", "y"], Text.equal));
+				}
+			)
+		]
+	),
+	describe(
+		"UtilsGeneral.all_ids_match()",
+		[
+			it(
+				"should match all ids",
+				do {
+					let my_ids = ["a", "b", "c", "d"];
+					let ids_to_match = ["a", "b"];
 
-						let response = Utils.all_ids_match(my_ids, ids_to_match);
+					let response = Utils.all_ids_match(my_ids, ids_to_match);
 
-						assertTrue(response.all_match);
-					}
-				),
-				it(
-					"should match some ids",
-					do {
-						let my_ids = ["a", "b", "c", "d"];
-						let ids_to_match = ["a", "z"];
+					assertTrue(response.all_match);
+				}
+			),
+			it(
+				"should match some ids",
+				do {
+					let my_ids = ["a", "b", "c", "d"];
+					let ids_to_match = ["a", "z"];
 
-						let response = Utils.all_ids_match(my_ids, ids_to_match);
+					let response = Utils.all_ids_match(my_ids, ids_to_match);
 
-						assertFalse(response.all_match);
-					}
-				),
-				it(
-					"should match some ids",
-					do {
-						let my_ids = ["a", "b", "c", "d"];
-						let ids_to_match = ["a", "b", "c", "d", "e"];
+					assertFalse(response.all_match);
+				}
+			),
+			it(
+				"should match some ids",
+				do {
+					let my_ids = ["a", "b", "c", "d"];
+					let ids_to_match = ["a", "b", "c", "d", "e"];
 
-						let response = Utils.all_ids_match(my_ids, ids_to_match);
+					let response = Utils.all_ids_match(my_ids, ids_to_match);
 
-						assertFalse(response.all_match);
-					}
-				)
-			]
-		)
-	]
-);
+					assertFalse(response.all_match);
+				}
+			)
+		]
+	),
+	describe(
+		"UtilsGeneral.get_non_exluded_ids()",
+		[
+			it(
+				"should get non_exluded_ids",
+				do {
+					let ids = ["a", "b", "c", "d"];
+					let ids_to_exclude = ["a", "b"];
+
+					let response = Utils.get_non_exluded_ids(ids, ids_to_exclude);
+
+					assertTrue(Array.equal(response, ["c", "d"], Text.equal));
+				}
+			)
+		]
+	)
+]);
 
 if (success == false) {
 	Debug.trap("Tests failed");

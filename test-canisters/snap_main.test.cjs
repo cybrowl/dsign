@@ -311,10 +311,49 @@ test('SnapMain[mishicat].create_snap(): with file and images => #ok - snap', asy
 	t.deepEqual(response.ok, 'Created Snap');
 });
 
-test('SnapMain.get_all_snaps()', async function (t) {
-	const response = await snap_main_actor.mishicat.get_all_snaps();
+test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function (t) {
+	let promises = [];
 
-	console.log('response: ', response.ok);
-	console.log('response.ok.file_asset[0]: ', response.ok[0].file_asset);
-	console.log('response.ok.file_asset[1]: ', response.ok[1].file_asset);
+	images.forEach(async function (image) {
+		const args = {
+			data: image,
+			file_format: 'png'
+		};
+
+		promises.push(assets_img_staging_actors.mishicat.create_asset(args));
+	});
+
+	try {
+		img_asset_ids = await Promise.all(promises);
+	} catch (error) {
+		console.log('error: ', error);
+	}
+});
+
+test('SnapMain[mishicat].create_snap(): without file asset => #ok - snap', async function (t) {
+	let create_args = {
+		title: 'Delete Example',
+		image_cover_location: 1,
+		img_asset_ids: img_asset_ids,
+		file_asset: []
+	};
+
+	const response = await snap_main_actor.mishicat.create_snap(create_args);
+
+	t.deepEqual(response.ok, 'Created Snap');
+});
+
+test('SnapMain[mishicat].delete_snaps(): with valid id => #ok - "delete_snaps"', async function (t) {
+	const snap_ids = await snap_main_actor.mishicat.get_snap_ids();
+	const response = await snap_main_actor.mishicat.delete_snaps([snap_ids.ok[2]]);
+
+	console.log('response: ', response);
+});
+
+test('SnapMain.get_all_snaps()', async function (t) {
+	const all_snaps = await snap_main_actor.mishicat.get_all_snaps();
+	const snap_ids = await snap_main_actor.mishicat.get_snap_ids();
+
+	console.log('all_snaps: ', all_snaps.ok);
+	console.log('snap_ids: ', snap_ids.ok);
 });

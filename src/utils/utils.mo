@@ -1,4 +1,5 @@
 import Arr "mo:array/Array";
+import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
@@ -43,4 +44,22 @@ module {
 
 		return matches;
 	};
+
+	public func get_non_exluded_ids(ids : [Text], ids_to_exclude : [Text]) : [Text] {
+		let non_exluded_ids = Array.filter(
+			ids,
+			func(id : Text) : Bool {
+				let found = Arr.contains(ids_to_exclude, id, Text.equal);
+
+				if (found) {
+					return false;
+				} else {
+					return true;
+				};
+			}
+		);
+
+		return non_exluded_ids;
+	};
+
 };

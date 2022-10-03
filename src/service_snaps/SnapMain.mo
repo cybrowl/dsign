@@ -1,5 +1,4 @@
 import Array "mo:base/Array";
-import Arr "mo:array/Array";
 import Buffer "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
@@ -224,14 +223,12 @@ actor SnapMain {
 
 					await snap_actor.delete_snaps(snap_ids_delete);
 
-					let snap_ids_exclude_deleted = Array.filter(
+					let snap_ids_not_deleted = Utils.get_non_exluded_ids(
 						snap_ids,
-						func(snap_id : SnapID) : Bool {
-							return Arr.contains(snap_ids_delete, snap_id, Text.notEqual);
-						}
+						snap_ids_delete
 					);
 
-					user_snap_ids_storage.put(canister_id, snap_ids_exclude_deleted);
+					user_snap_ids_storage.put(canister_id, snap_ids_not_deleted);
 				};
 
 				return #ok("delete_snaps");
