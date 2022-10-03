@@ -70,7 +70,7 @@ actor ProjectMain {
 		};
 	};
 
-	public shared({ caller }) func create_project(name : Text, snaps : ?[SnapRef]) : async Result.Result<Project, CreateProjectErr> {
+	public shared({ caller }) func create_project(name : Text, snaps : ?[SnapRef]) : async Result.Result<Text, CreateProjectErr> {
 		let tags = [ACTOR_NAME, "create_project"];
 
 		//todo: args security checks
@@ -117,18 +117,11 @@ actor ProjectMain {
 						canister_id = snap.canister_id;
 					};
 
-					let project_ref = {
-						id = project.id;
-						canister_id = project.canister_id;
-					};
-
 					let snap_actor = actor (snap.canister_id) : SnapActor;
-					ignore snap_actor.update_snap_project([snap_ref], project_ref);
-					// todo: this should be delete project ref in snap
+					ignore snap_actor.update_snap_project([snap_ref], project);
 				};
 
-				//TODO: remove owner from project
-				#ok(project);
+				#ok("Created Project");
 			};
 		};
 	};

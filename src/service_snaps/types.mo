@@ -47,7 +47,7 @@ module {
 		id : SnapID;
 		image_cover_location : Nat8;
 		images : [ImageRef];
-		project : ProjectPublic;
+		project : ?ProjectPublic;
 		tags : ?[Text];
 		title : Text;
 		username : Username;
@@ -64,7 +64,7 @@ module {
 		id : SnapID;
 		image_cover_location : Nat8;
 		images : [ImageRef];
-		project : Project;
+		project : ?Project;
 		tags : ?[Text];
 		title : Text;
 		username : Username;
@@ -113,9 +113,9 @@ module {
 
 	// Actor Interface
 	public type SnapActor = actor {
-		create_snap : shared (CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, Text>;
-		delete_snaps : shared ([SnapID]) -> async ();
-		update_snap_project : shared ([SnapRef], ProjectRef) -> async ();
+		create_snap : shared(CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, Text>;
+		delete_snaps : shared([SnapID]) -> async ();
+		update_snap_project : shared([SnapRef], ?Project) -> async ();
 		get_all_snaps : query ([SnapID]) -> async [SnapPublic];
 	};
 };

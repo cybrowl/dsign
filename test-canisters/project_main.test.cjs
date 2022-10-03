@@ -40,7 +40,6 @@ let username_actors = {};
 let project_with_snaps = null;
 let project_no_snaps = null;
 let img_asset_ids = [];
-let created_snap = {};
 
 test('Setup Actors', async function (t) {
 	console.log('=========== Project Main ===========');
@@ -96,6 +95,7 @@ test('ProjectMain[mishicat].initialize_canisters()', async function (t) {
 	console.log('project_canister_ids: ', response, test_project_canister_id);
 });
 
+// NOT AUTHORIZED
 test('Project[mishicat].create_project(): with wrong caller => #err - NotAuthorized', async function (t) {
 	const response = await project_actor.mishicat.create_project(
 		'Test',
@@ -122,6 +122,7 @@ test('Project[mishicat].delete_snaps_from_project(): with wrong caller => #err -
 	t.deepEqual(response.err, { NotAuthorized: null });
 });
 
+// CREATE SNAP
 test('Username[mishicat].create_username(): should create username => #ok - username', async function (t) {
 	const username = fake.word();
 
@@ -168,6 +169,7 @@ test('SnapMain[mishicat].create_snap(): should create snap without file asset =>
 	t.deepEqual(response, { ok: 'Created Snap' });
 });
 
+// CREATE PROJECT
 test('ProjectMain[mishicat].create_user_project_storage(): should create initial storage for projects => #ok - true', async function (t) {
 	const response = await project_main_actor.mishicat.create_user_project_storage();
 
@@ -175,41 +177,51 @@ test('ProjectMain[mishicat].create_user_project_storage(): should create initial
 });
 
 test('ProjectMain[mishicat].create_project(): with snap => #ok - project', async function (t) {
-	const response = await snap_main_actor.mishicat.get_all_snaps();
-	const snap = response.ok[0];
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const snap = all_snaps[0];
 
 	const snaps = [{ id: snap.id, canister_id: snap.canister_id }];
-	const created_project = await project_main_actor.mishicat.create_project('Mishicat NFT', [snaps]);
+	const response = await project_main_actor.mishicat.create_project('Mishicat NFT', [snaps]);
 
-	console.log('created_project: ', created_project);
+	t.deepEqual(response.ok, 'Created Project');
 });
 
 test('ProjectMain[mishicat].create_project(): with no snaps => #ok - project', async function (t) {
 	const snaps = [];
-	project_no_snaps = await project_main_actor.mishicat.create_project('Mishicat NFT', snaps);
+	const response = await project_main_actor.mishicat.create_project('Mishicat NFT', snaps);
 
-	t.equal(project_no_snaps.ok.name, 'Mishicat NFT');
-	t.equal(project_no_snaps.ok.snaps.length, 0);
+	t.deepEqual(response.ok, 'Created Project');
 });
 
-test('ProjectMain[mishicat].get_projects(): ', async function (t) {
-	let get_response = await project_main_actor.mishicat.get_projects();
-	let get_ids_response = await project_main_actor.mishicat.get_project_ids();
+test('ProjectMain[mishicat].get_projects(): should have both projects', async function (t) {
+	let { ok: projects } = await project_main_actor.mishicat.get_projects();
+	let first_project = projects[0];
+	let second_project = projects[1];
 
-	console.log('get_response: ', get_response);
-	console.log('get_ids_response: ', get_ids_response);
+	t.deepEqual(first_project.name, 'Mishicat NFT');
+	t.deepEqual(second_project.name, 'Mishicat NFT');
+	t.equal(projects.length, 2);
+	t.equal(first_project.snaps.length, 1);
+	t.equal(second_project.snaps.length, 0);
 });
 
-test('SnapMain.get_all_snaps()', async function (t) {
-	const response = await snap_main_actor.mishicat.get_all_snaps();
+test('SnapMain[mishicat].get_all_snaps(): should have project as part of snap', async function (t) {
+	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const project = snaps[0].project;
 
-	console.log('response: ', response.ok);
-	console.log('response.ok[0].project: ', response.ok[0].project);
+	t.equal(project.name, 'Mishicat NFT');
+	t.equal(project.snaps.length, 1);
+	t.equal(project.id.length > 0, true);
 });
 
-test('ProjectMain[mishicat].delete_snaps_from_project(): ', async function (t) {
-	const snap = project_with_snaps.snaps[0];
-	const snaps = [
+test('ProjectMain[mishicat].delete_snaps_from_project(): should delete snaps from project', async function (t) {
+	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const project = snaps[0].project;
+	const snap = snaps[0];
+
+	console.log('snaps: ', snaps);
+
+	const snaps_delete = [
 		{
 			id: snap.id,
 			canister_id: snap.canister_id
@@ -217,25 +229,34 @@ test('ProjectMain[mishicat].delete_snaps_from_project(): ', async function (t) {
 	];
 
 	const project_ref = {
-		id: project_with_snaps.id,
-		canister_id: project_with_snaps.canister_id
+		id: project.id,
+		canister_id: project.canister_id
 	};
 
-	let response = await project_main_actor.mishicat.delete_snaps_from_project(snaps, project_ref);
+	let response = await project_main_actor.mishicat.delete_snaps_from_project(
+		snaps_delete,
+		project_ref
+	);
+	let { ok: projects } = await project_main_actor.mishicat.get_projects();
+	const { ok: snaps_after_delete } = await snap_main_actor.mishicat.get_all_snaps();
+
+	console.log('response: ', response);
+	console.log('projects: ', projects);
+	console.log('snaps_after_delete: ', snaps_after_delete);
 
 	t.equal(response.ok, 'Deleted Snaps From Project');
 });
 
-test('ProjectMain[mishicat].delete_projects(): ', async function (t) {
-	const snaps = [];
-	let create_response = await project_main_actor.mishicat.create_project('Deleted Project', snaps);
-	let delete_response = await project_main_actor.mishicat.delete_projects([create_response.ok.id]);
-});
+// test('ProjectMain[mishicat].delete_projects(): ', async function (t) {
+// 	const snaps = [];
+// 	let create_response = await project_main_actor.mishicat.create_project('Deleted Project', snaps);
+// 	let delete_response = await project_main_actor.mishicat.delete_projects([create_response.ok.id]);
+// });
 
-test('ProjectMain[mishicat].get_projects(): ', async function (t) {
-	let get_response = await project_main_actor.mishicat.get_projects();
-	let get_ids_response = await project_main_actor.mishicat.get_project_ids();
+// test('ProjectMain[mishicat].get_projects(): ', async function (t) {
+// 	let get_response = await project_main_actor.mishicat.get_projects();
+// 	let get_ids_response = await project_main_actor.mishicat.get_project_ids();
 
-	console.log('get_response', get_response.ok);
-	console.log('get_ids_response', get_ids_response.ok);
-});
+// 	console.log('get_response', get_response.ok);
+// 	console.log('get_ids_response', get_ids_response.ok);
+// });
