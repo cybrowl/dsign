@@ -158,7 +158,7 @@ test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - 
 
 test('SnapMain[mishicat].create_snap(): should create snap without file asset => #ok - snap', async function (t) {
 	let create_args = {
-		title: 'Mobile Example',
+		title: 'Snap One',
 		image_cover_location: 1,
 		img_asset_ids: img_asset_ids,
 		file_asset: []
@@ -181,25 +181,26 @@ test('ProjectMain[mishicat].create_project(): with snap => #ok - project', async
 	const snap = all_snaps[0];
 
 	const snaps = [{ id: snap.id, canister_id: snap.canister_id }];
-	const response = await project_main_actor.mishicat.create_project('Mishicat NFT', [snaps]);
+	const response = await project_main_actor.mishicat.create_project('Project One', [snaps]);
 
 	t.deepEqual(response.ok, 'Created Project');
 });
 
 test('ProjectMain[mishicat].create_project(): with no snaps => #ok - project', async function (t) {
 	const snaps = [];
-	const response = await project_main_actor.mishicat.create_project('Mishicat NFT', snaps);
+	const response = await project_main_actor.mishicat.create_project('Project Two', snaps);
 
 	t.deepEqual(response.ok, 'Created Project');
 });
 
 test('ProjectMain[mishicat].get_projects(): should have both projects', async function (t) {
 	let { ok: projects } = await project_main_actor.mishicat.get_projects();
+
 	let first_project = projects[0];
 	let second_project = projects[1];
 
-	t.deepEqual(first_project.name, 'Mishicat NFT');
-	t.deepEqual(second_project.name, 'Mishicat NFT');
+	t.deepEqual(first_project.name, 'Project One');
+	t.deepEqual(second_project.name, 'Project Two');
 	t.equal(projects.length, 2);
 	t.equal(first_project.snaps.length, 1);
 	t.equal(second_project.snaps.length, 0);
@@ -207,19 +208,17 @@ test('ProjectMain[mishicat].get_projects(): should have both projects', async fu
 
 test('SnapMain[mishicat].get_all_snaps(): should have project as part of snap', async function (t) {
 	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
-	const project = snaps[0].project;
+	const project = snaps[0].project[0];
 
-	t.equal(project.name, 'Mishicat NFT');
+	t.equal(project.name, 'Project One');
 	t.equal(project.snaps.length, 1);
 	t.equal(project.id.length > 0, true);
 });
 
 test('ProjectMain[mishicat].delete_snaps_from_project(): should delete snaps from project', async function (t) {
 	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
-	const project = snaps[0].project;
+	const project = snaps[0].project[0];
 	const snap = snaps[0];
-
-	console.log('snaps: ', snaps);
 
 	const snaps_delete = [
 		{
@@ -240,23 +239,25 @@ test('ProjectMain[mishicat].delete_snaps_from_project(): should delete snaps fro
 	let { ok: projects } = await project_main_actor.mishicat.get_projects();
 	const { ok: snaps_after_delete } = await snap_main_actor.mishicat.get_all_snaps();
 
-	console.log('response: ', response);
-	console.log('projects: ', projects);
-	console.log('snaps_after_delete: ', snaps_after_delete);
-
+	t.equal(projects[0].snaps.length, 0);
+	t.equal(snaps_after_delete[0].project.length, 0);
 	t.equal(response.ok, 'Deleted Snaps From Project');
 });
 
-// test('ProjectMain[mishicat].delete_projects(): ', async function (t) {
-// 	const snaps = [];
-// 	let create_response = await project_main_actor.mishicat.create_project('Deleted Project', snaps);
-// 	let delete_response = await project_main_actor.mishicat.delete_projects([create_response.ok.id]);
-// });
+test('ProjectMain[mishicat].delete_projects(): should create and delete project', async function (t) {
+	const snaps = [];
+	await project_main_actor.mishicat.create_project('Deleted Project', snaps);
+	let { ok: projects } = await project_main_actor.mishicat.get_projects();
+	let project = projects[2];
+	let delete_response = await project_main_actor.mishicat.delete_projects([project.id]);
 
-// test('ProjectMain[mishicat].get_projects(): ', async function (t) {
-// 	let get_response = await project_main_actor.mishicat.get_projects();
-// 	let get_ids_response = await project_main_actor.mishicat.get_project_ids();
+	t.equal(delete_response.ok, 'Deleted Projects');
+});
 
-// 	console.log('get_response', get_response.ok);
-// 	console.log('get_ids_response', get_ids_response.ok);
-// });
+test('ProjectMain[mishicat].get_projects(): ', async function (t) {
+	let get_response = await project_main_actor.mishicat.get_projects();
+	let get_ids_response = await project_main_actor.mishicat.get_project_ids();
+
+	t.equal(get_response.ok.length, 2);
+	t.equal(get_ids_response.ok.length, 2);
+});

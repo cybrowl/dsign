@@ -2,6 +2,7 @@ import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
+import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Source "mo:ulid/Source";
@@ -102,7 +103,7 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 
 	public shared({ caller }) func update_snap_project(
 		snaps_ref : [SnapRef],
-		project : ?Project
+		project : Project
 	) : async Result.Result<Text, Text> {
 		if (project_main_principal != caller) {
 			return #err("Unauthorized");
@@ -119,7 +120,7 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 						id = snap.id;
 						image_cover_location = snap.image_cover_location;
 						images = snap.images;
-						project = project;
+						project = Option.make(project);
 						tags = snap.tags;
 						title = snap.title;
 						username = snap.username;

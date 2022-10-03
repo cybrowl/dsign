@@ -181,7 +181,11 @@ actor ProjectMain {
 						return #err(#ErrorCall(debug_show (err)));
 					};
 					case (#ok _) {
-						// todo: the front end needs to handle removing the snaps
+						// delete snaps from project
+						for (snap in snaps.vals()) {
+							let snap_actor = actor (snap.canister_id) : SnapActor;
+							ignore snap_actor.delete_project_from_snaps(snaps);
+						};
 						return #ok("Deleted Snaps From Project");
 					};
 				};

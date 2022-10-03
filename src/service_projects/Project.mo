@@ -31,7 +31,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 	var projects : HashMap.HashMap<ProjectID, Project> = HashMap.HashMap(0, Text.equal, Text.hash);
 	stable var projects_stable_storage : [(ProjectID, Project)] = [];
 
-	public shared ({ caller }) func create_project(
+	public shared({ caller }) func create_project(
 		name : Text,
 		snap_refs : ?[SnapRef],
 		owner : UserPrincipal
@@ -77,7 +77,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 		return #ok(project);
 	};
 
-	public shared ({ caller }) func delete_projects(projectIds : [ProjectID]) : async Result.Result<(), DeleteProjectsErr> {
+	public shared({ caller }) func delete_projects(projectIds : [ProjectID]) : async Result.Result<(), DeleteProjectsErr> {
 		if (controller != caller) {
 			return #err(#NotAuthorized);
 		};
@@ -94,7 +94,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 		return #ok(());
 	};
 
-	public shared ({ caller }) func delete_snaps_from_project(
+	public shared({ caller }) func delete_snaps_from_project(
 		snaps : [SnapRef],
 		project_id : ProjectID,
 		owner : UserPrincipal

@@ -115,7 +115,8 @@ module {
 	public type SnapActor = actor {
 		create_snap : shared(CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, Text>;
 		delete_snaps : shared([SnapID]) -> async ();
-		update_snap_project : shared([SnapRef], ?Project) -> async ();
+		update_snap_project : shared([SnapRef], Project) -> async ();
+		delete_project_from_snaps : shared([SnapRef]) -> async Result.Result<Text, Text>;
 		get_all_snaps : query ([SnapID]) -> async [SnapPublic];
 	};
 };
