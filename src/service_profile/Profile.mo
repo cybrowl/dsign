@@ -68,7 +68,7 @@ actor Profile = {
 		profiles.put(principal, profile);
 	};
 
-	public shared ({ caller }) func update_profile_avatar(img_asset_ids : [Nat]) : async Result.Result<Text, ProfileErr> {
+	public shared({ caller }) func update_profile_avatar(img_asset_ids : [Nat]) : async Result.Result<Text, ProfileErr> {
 		var profile = {
 			avatar = {
 				id = "";
@@ -129,11 +129,11 @@ actor Profile = {
 	};
 
 	// ------------------------- Canister Management -------------------------
-	private func create_image_assets_canister(profile_principal : Principal) : async () {
+	private func create_image_assets_canister(profile_principal : Principal, is_prod : Bool) : async () {
 		let tags = [ACTOR_NAME, "create_image_assets_canister"];
 
 		Cycles.add(CYCLE_AMOUNT);
-		let image_assets_actor = await ImageAssets.ImageAssets(profile_principal, true);
+		let image_assets_actor = await ImageAssets.ImageAssets(profile_principal, is_prod);
 		let principal = Principal.fromActor(image_assets_actor);
 
 		image_assets_canister_id := Principal.toText(principal);
@@ -144,7 +144,7 @@ actor Profile = {
 		);
 	};
 
-	public shared ({ caller }) func install_code(
+	public shared({ caller }) func install_code(
 		canister_id : Principal,
 		arg : Blob,
 		wasm_module : Blob
@@ -152,7 +152,12 @@ actor Profile = {
 		let principal = Principal.toText(caller);
 
 		if (Text.equal(principal, "be7if-4i5lo-xnuq5-6ilpw-aedq2-epko6-gdmew-kzcse-7qpey-wztpj-qqe")) {
-			await ic.install_code({ arg = arg; wasm_module = wasm_module; mode = #upgrade; canister_id = canister_id });
+			await ic.install_code({
+				arg = arg;
+				wasm_module = wasm_module;
+				mode = #upgrade;
+				canister_id = canister_id;
+			});
 
 			return "success";
 		};
@@ -160,13 +165,17 @@ actor Profile = {
 		return "not_authorized";
 	};
 
-	public shared (msg) func initialize_canisters() : async () {
+	public shared(msg) func initialize_canisters() : async () {
 		let tags = [ACTOR_NAME, "initialize_canisters"];
 		let profile_principal = Principal.fromActor(Profile);
+		let is_prod = Text.equal(
+			Principal.toText(profile_principal),
+			"kxkd5-7qaaa-aaaag-aaawa-cai"
+		);
 
 		// create image assets canister
 		if (image_assets_canister_id.size() < 1) {
-			await create_image_assets_canister(profile_principal);
+			await create_image_assets_canister(profile_principal, is_prod);
 		} else {
 			await Logger.log_event(
 				tags,

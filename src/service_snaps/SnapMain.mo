@@ -1,4 +1,5 @@
 import Array "mo:base/Array";
+import Arr "mo:array/Array";
 import Buffer "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
@@ -63,7 +64,7 @@ actor SnapMain {
 	private let ic : ICInterface = actor "aaaaa-aa";
 
 	// ------------------------- Snaps Management -------------------------
-	public shared ({ caller }) func create_user_snap_storage() : async Bool {
+	public shared({ caller }) func create_user_snap_storage() : async Bool {
 		let tags = [ACTOR_NAME, "create_user_snap_storage"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -88,7 +89,7 @@ actor SnapMain {
 		};
 	};
 
-	public shared ({ caller }) func create_snap(args : CreateSnapArgs) : async Result.Result<Text, CreateSnapErr> {
+	public shared({ caller }) func create_snap(args : CreateSnapArgs) : async Result.Result<Text, CreateSnapErr> {
 		let tags = [ACTOR_NAME, "create_snap"];
 		let is_anonymous = Principal.isAnonymous(caller);
 		let has_image = args.img_asset_ids.size() > 0;
@@ -191,7 +192,7 @@ actor SnapMain {
 		};
 	};
 
-	public shared ({ caller }) func delete_snaps(snap_ids_delete : [SnapID]) : async Result.Result<Text, DeleteSnapsErr> {
+	public shared({ caller }) func delete_snaps(snap_ids_delete : [SnapID]) : async Result.Result<Text, DeleteSnapsErr> {
 		let tags = [ACTOR_NAME, "delete_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -223,7 +224,14 @@ actor SnapMain {
 
 					await snap_actor.delete_snaps(snap_ids_delete);
 
-					//todo: remove snap ids from snap_canister_ids
+					let snap_ids_exclude_deleted = Array.filter(
+						snap_ids,
+						func(snap_id : SnapID) : Bool {
+							return Arr.contains(snap_ids_delete, snap_id, Text.notEqual);
+						}
+					);
+
+					user_snap_ids_storage.put(canister_id, snap_ids_exclude_deleted);
 				};
 
 				return #ok("delete_snaps");
@@ -234,7 +242,7 @@ actor SnapMain {
 		};
 	};
 
-	public shared ({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], GetAllSnapsErr> {
+	public shared({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], GetAllSnapsErr> {
 		let tags = [ACTOR_NAME, "get_all_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -259,6 +267,27 @@ actor SnapMain {
 			};
 			case (_) {
 				#err(#UserNotFound(true));
+			};
+		};
+	};
+
+	public shared({ caller }) func get_snap_ids() : async Result.Result<[SnapID], Text> {
+		let tags = [ACTOR_NAME, "get_snap_ids"];
+
+		switch (user_canisters_ref.get(caller)) {
+			case (?snap_canister_ids) {
+				let all_snap_ids = Buffer.Buffer<SnapID>(0);
+
+				for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
+					for (snap_id in snap_ids.vals()) {
+						all_snap_ids.add(snap_id);
+					};
+				};
+
+				return #ok(all_snap_ids.toArray());
+			};
+			case (_) {
+				return #err("user not found");
 			};
 		};
 	};
@@ -300,7 +329,7 @@ actor SnapMain {
 		snap_canister_id := Principal.toText(principal);
 	};
 
-	public shared (msg) func initialize_canisters(args : InitArgs) : async () {
+	public shared(msg) func initialize_canisters(args : InitArgs) : async () {
 		let tags = [ACTOR_NAME, "initialize_canisters"];
 		let snap_main_principal = Principal.fromActor(SnapMain);
 
@@ -395,7 +424,7 @@ actor SnapMain {
 		await ic.canister_status({ canister_id = principal });
 	};
 
-	public shared ({ caller }) func get_child_controllers(canister_id : Text) : async Text {
+	public shared({ caller }) func get_child_controllers(canister_id : Text) : async Text {
 		let principal : Principal = Principal.fromText(canister_id);
 
 		let response = await ic.canister_status({ canister_id = principal });
@@ -403,7 +432,7 @@ actor SnapMain {
 		return debug_show (response.settings.controllers, caller);
 	};
 
-	public shared ({ caller }) func install_code(
+	public shared({ caller }) func install_code(
 		canister_id : Principal,
 		arg : Blob,
 		wasm_module : Blob
@@ -411,7 +440,12 @@ actor SnapMain {
 		let principal = Principal.toText(caller);
 
 		if (Text.equal(principal, "be7if-4i5lo-xnuq5-6ilpw-aedq2-epko6-gdmew-kzcse-7qpey-wztpj-qqe")) {
-			await ic.install_code({ arg = arg; wasm_module = wasm_module; mode = #upgrade; canister_id = canister_id });
+			await ic.install_code({
+				arg = arg;
+				wasm_module = wasm_module;
+				mode = #upgrade;
+				canister_id = canister_id;
+			});
 
 			return "success";
 		};

@@ -228,7 +228,7 @@ test('SnapMain[mishicat].create_snap(): without file asset => #ok - snap', async
 
 	const response = await snap_main_actor.mishicat.create_snap(create_args);
 
-	console.log('response: ', response);
+	t.deepEqual(response.ok, 'Created Snap');
 });
 
 test('ImageAssetStaging[mishicat].get_asset(): should return asset => #err - asset', async function (t) {
@@ -308,7 +308,7 @@ test('SnapMain[mishicat].create_snap(): with file and images => #ok - snap', asy
 
 	const response = await snap_main_actor.mishicat.create_snap(create_args);
 
-	console.log('response: ', response);
+	t.deepEqual(response.ok, 'Created Snap');
 });
 
 test('SnapMain.get_all_snaps()', async function (t) {
