@@ -21,6 +21,7 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 	type CreateSnapArgs = Types.CreateSnapArgs;
 	type ImageRef = Types.ImageRef;
 	type Project = ProjectTypes.Project;
+	type ProjectRef = ProjectTypes.ProjectRef;
 	type ProjectActor = ProjectTypes.ProjectActor;
 	type Snap = Types.Snap;
 	type SnapPublic = Types.SnapPublic;

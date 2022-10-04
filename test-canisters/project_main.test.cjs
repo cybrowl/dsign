@@ -206,6 +206,7 @@ test('ProjectMain[mishicat].get_projects(): should have both projects', async fu
 
 test('SnapMain[mishicat].get_all_snaps(): should have project as part of snap', async function (t) {
 	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
+
 	const project = snaps[0].project[0];
 
 	t.equal(project.name, 'Project One');
