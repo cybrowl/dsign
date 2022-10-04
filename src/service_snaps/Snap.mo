@@ -101,41 +101,6 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 		};
 	};
 
-	public shared({ caller }) func update_snap_project(
-		snaps_ref : [SnapRef],
-		project : Project
-	) : async Result.Result<Text, Text> {
-		if (project_main_principal != caller) {
-			return #err("Unauthorized");
-		};
-
-		for (snap_ref in snaps_ref.vals()) {
-			switch (snaps.get(snap_ref.id)) {
-				case (null) {};
-				case (?snap) {
-					let update_snap : Snap = {
-						canister_id = snap.canister_id;
-						created = snap.created;
-						file_asset = snap.file_asset;
-						id = snap.id;
-						image_cover_location = snap.image_cover_location;
-						images = snap.images;
-						project = Option.make(project);
-						tags = snap.tags;
-						title = snap.title;
-						username = snap.username;
-						owner = snap.owner;
-						metrics = snap.metrics;
-					};
-
-					snaps.put(snap.id, update_snap);
-				};
-			};
-		};
-
-		#ok("Updated Snap Project");
-	};
-
 	public shared({ caller }) func delete_project_from_snaps(
 		snaps_ref : [SnapRef]
 	) : async Result.Result<Text, Text> {
@@ -168,6 +133,49 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 		};
 
 		#ok("Deleted Project From Snaps");
+	};
+
+	public shared({ caller }) func add_project_to_snaps(
+		snaps_ref : [SnapRef],
+		project_ref : ProjectRef
+	) : async Result.Result<Text, Text> {
+		if (project_main_principal != caller) {
+			return #err("Unauthorized");
+		};
+
+		let project_actor = actor (project_ref.canister_id) : ProjectActor;
+
+		switch (await project_actor.get_projects([project_ref.id])) {
+			case (projects) {
+				let project = projects[0];
+
+				for (snap_ref in snaps_ref.vals()) {
+					switch (snaps.get(snap_ref.id)) {
+						case (null) {};
+						case (?snap) {
+							let update_snap : Snap = {
+								canister_id = snap.canister_id;
+								created = snap.created;
+								file_asset = snap.file_asset;
+								id = snap.id;
+								image_cover_location = snap.image_cover_location;
+								images = snap.images;
+								project = Option.make(project);
+								tags = snap.tags;
+								title = snap.title;
+								username = snap.username;
+								owner = snap.owner;
+								metrics = snap.metrics;
+							};
+
+							snaps.put(snap.id, update_snap);
+						};
+					};
+				};
+			};
+		};
+
+		#ok("Updated Snap Project");
 	};
 
 	public query func get_all_snaps(snapIds : [SnapID]) : async [SnapPublic] {

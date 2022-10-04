@@ -39,17 +39,6 @@ actor Profile = {
 		return "0.0.1";
 	};
 
-	public query ({ caller }) func get_profile() : async Result.Result<ProfileOk, ProfileErr> {
-		switch (profiles.get(caller)) {
-			case (null) {
-				#err(#ProfileNotFound);
-			};
-			case (?profile) {
-				return #ok({ profile });
-			};
-		};
-	};
-
 	// note: this is only invoked from username.create_username()
 	public shared func create_profile(principal : UserPrincipal, username : Username) : async () {
 
@@ -127,6 +116,21 @@ actor Profile = {
 			return #ok("updated avatar");
 		};
 	};
+
+	//TODO: update_profile_banner
+
+	public query ({ caller }) func get_profile() : async Result.Result<ProfileOk, ProfileErr> {
+		switch (profiles.get(caller)) {
+			case (null) {
+				#err(#ProfileNotFound);
+			};
+			case (?profile) {
+				return #ok({ profile });
+			};
+		};
+	};
+
+	//TODO: get_profile_public
 
 	// ------------------------- Canister Management -------------------------
 	private func create_image_assets_canister(profile_principal : Principal, is_prod : Bool) : async () {

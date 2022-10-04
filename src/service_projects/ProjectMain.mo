@@ -17,6 +17,7 @@ import SnapTypes "../service_snaps/types";
 import Utils "../utils/utils";
 
 actor ProjectMain {
+	type AddSnapsToProjectErr = Types.AddSnapsToProjectErr;
 	type CreateProjectErr = Types.CreateProjectErr;
 	type DeleteProjectsErr = Types.DeleteProjectsErr;
 	type DeleteSnapsFromProjectErr = Types.DeleteSnapsFromProjectErr;
@@ -44,7 +45,7 @@ actor ProjectMain {
 
 	stable var project_canister_id : Text = "";
 
-	// ------------------------- Project Management -------------------------
+	// ------------------------- PROJECTS MANAGEMENT -------------------------
 	public shared({ caller }) func create_user_project_storage() : async Bool {
 		let tags = [ACTOR_NAME, "create_user_project_storage"];
 
@@ -110,6 +111,11 @@ actor ProjectMain {
 				project_ids.add(project.id);
 				user_project_ids_storage.put(project_canister_id, project_ids.toArray());
 
+				let project_ref = {
+					id = project.id;
+					canister_id = project.canister_id;
+				};
+
 				// add project to snaps
 				for (snap in project.snaps.vals()) {
 					let snap_ref = {
@@ -118,7 +124,7 @@ actor ProjectMain {
 					};
 
 					let snap_actor = actor (snap.canister_id) : SnapActor;
-					ignore snap_actor.update_snap_project([snap_ref], project);
+					ignore snap_actor.add_project_to_snaps([snap_ref], project_ref);
 				};
 
 				#ok("Created Project");
@@ -196,9 +202,47 @@ actor ProjectMain {
 		};
 	};
 
-	// move snaps to project
+	public shared({ caller }) func add_snaps_to_project(
+		snaps : [SnapRef],
+		project_ref : ProjectRef
+	) : async Result.Result<Text, AddSnapsToProjectErr> {
+		let tags = [ACTOR_NAME, "add_snaps_to_project"];
 
-	// update project
+		switch (user_canisters_ref.get(caller)) {
+			case (?user_project_ids_storage) {
+				let my_ids = Utils.get_all_ids(user_project_ids_storage);
+				let matches = Utils.all_ids_match(my_ids, [project_ref.id]);
+
+				if (matches.all_match == false) {
+					return #err(#ProjectIdsDoNotMatch);
+				};
+
+				let project_actor = actor (project_ref.canister_id) : ProjectActor;
+
+				switch (await project_actor.add_snaps_to_project(snaps, project_ref.id, caller)) {
+					case (#err err) {
+						return #err(#ErrorCall(debug_show (err)));
+					};
+					case (#ok _) {
+						// add project to snaps
+						for (snap in snaps.vals()) {
+							let snap_actor = actor (snap.canister_id) : SnapActor;
+							ignore snap_actor.add_project_to_snaps(snaps, project_ref);
+						};
+
+						return #ok("Added Snaps To Project");
+					};
+				};
+			};
+			case (_) {
+				#err(#UserNotFound);
+			};
+		};
+	};
+
+	//TODO: update_project_details
+
+	//TODO: get_all_projects_public
 
 	public shared({ caller }) func get_projects() : async Result.Result<[Project], GetProjectsErr> {
 		let tags = [ACTOR_NAME, "get_projects"];
@@ -245,7 +289,7 @@ actor ProjectMain {
 		};
 	};
 
-	// ------------------------- Canister Management -------------------------
+	// ------------------------- CANISTER MANAGEMENT -------------------------
 	public query func version() : async Nat {
 		return VERSION;
 	};
@@ -294,7 +338,7 @@ actor ProjectMain {
 		return project_canister_id;
 	};
 
-	// ------------------------- System Methods -------------------------
+	// ------------------------- SYSTEM METHODS -------------------------
 	system func preupgrade() {
 		var anon_principal = Principal.fromText("2vxsx-fae");
 		user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));

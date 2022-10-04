@@ -14,6 +14,7 @@ import Username "canister:username";
 import Types "./types";
 
 actor class Project(controller : Principal, is_prod : Bool) = this {
+	type AddSnapsToProjectErr = Types.AddSnapsToProjectErr;
 	type CreateProjectErr = Types.CreateProjectErr;
 	type DeleteProjectsErr = Types.DeleteProjectsErr;
 	type DeleteSnapsFromProjectErr = Types.DeleteSnapsFromProjectErr;
@@ -141,6 +142,50 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 				projects.put(project_id, project_updated);
 
 				return #ok("Snaps Deleted");
+			};
+		};
+	};
+
+	public shared({ caller }) func add_snaps_to_project(
+		snaps : [SnapRef],
+		project_id : ProjectID,
+		owner : UserPrincipal
+	) : async Result.Result<Text, AddSnapsToProjectErr> {
+
+		let tags = [ACTOR_NAME, "add_snaps_to_project"];
+
+		if (controller != caller) {
+			return #err(#NotAuthorized);
+		};
+
+		switch (projects.get(project_id)) {
+			case null {
+				return #err(#ProjectNotFound);
+			};
+			case (?project) {
+				if (project.owner != owner) {
+					return #err(#NotOwner);
+				};
+
+				let updated_snaps : Buffer.Buffer<SnapRef> = Buffer.fromArray(project.snaps);
+
+				for (snap in snaps.vals()) {
+					updated_snaps.add(snap);
+				};
+
+				let project_updated : Project = {
+					id = project.id;
+					canister_id = project.canister_id;
+					created = project.created;
+					username = project.username;
+					owner = project.owner;
+					name = project.name;
+					snaps = updated_snaps.toArray();
+				};
+
+				projects.put(project_id, project_updated);
+
+				return #ok("Snaps Added To Project");
 			};
 		};
 	};

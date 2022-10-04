@@ -59,18 +59,20 @@
 	});
 
 	async function getAllSnaps() {
-		const response = await $actor_snap_main.actor.get_all_snaps();
+		try {
+			const { ok: all_snaps, err: error } = await $actor_snap_main.actor.get_all_snaps();
 
-		console.log('snaps: ', response.ok);
+			if (all_snaps) {
+				snap_store.set({ isFetching: false, snaps: [...all_snaps] });
 
-		if (response.ok) {
-			snap_store.set({ isFetching: false, snaps: [...response.ok] });
-
-			local_storage_projects.set({ all_snaps_count: response.ok.length || 1 });
-		} else {
-			if (response.err['UserNotFound'] === true) {
-				await $actor_snap_main.actor.create_user_snap_storage();
+				local_storage_projects.set({ all_snaps_count: all_snaps.length || 1 });
+			} else {
+				if (error['UserNotFound'] === true) {
+					await $actor_snap_main.actor.create_user_snap_storage();
+				}
 			}
+		} catch (error) {
+			console.log('error: ', error);
 		}
 	}
 

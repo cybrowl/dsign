@@ -62,7 +62,7 @@ actor SnapMain {
 
 	private let ic : ICInterface = actor "aaaaa-aa";
 
-	// ------------------------- Snaps Management -------------------------
+	// ------------------------- SNAPS MANAGEMENT -------------------------
 	public shared({ caller }) func create_user_snap_storage() : async Bool {
 		let tags = [ACTOR_NAME, "create_user_snap_storage"];
 
@@ -239,6 +239,8 @@ actor SnapMain {
 		};
 	};
 
+	//TODO: update_snap_likes
+
 	public shared({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], GetAllSnapsErr> {
 		let tags = [ACTOR_NAME, "get_all_snaps"];
 
@@ -268,6 +270,9 @@ actor SnapMain {
 		};
 	};
 
+	//TODO: get_all_snaps_without_project
+	//TODO: get_all_snaps_public
+
 	public shared({ caller }) func get_snap_ids() : async Result.Result<[SnapID], Text> {
 		let tags = [ACTOR_NAME, "get_snap_ids"];
 
@@ -289,13 +294,12 @@ actor SnapMain {
 		};
 	};
 
-	//todo: get all snaps from project
-
-	// ------------------------- Canister Management -------------------------
+	// ------------------------- CANISTER MANAGEMENT -------------------------
 	public query func version() : async Nat {
 		return VERSION;
 	};
 
+	// CREATE CANISTER
 	private func create_assets_canister(snap_main_principal : Principal, is_prod : Bool) : async () {
 		Cycles.add(CYCLE_AMOUNT);
 		let assets_actor = await Assets.Assets(snap_main_principal, is_prod);
@@ -326,6 +330,7 @@ actor SnapMain {
 		snap_canister_id := Principal.toText(principal);
 	};
 
+	// INIT CANISTERS
 	public shared(msg) func initialize_canisters(args : InitArgs) : async () {
 		let tags = [ACTOR_NAME, "initialize_canisters"];
 		let snap_main_principal = Principal.fromActor(SnapMain);
@@ -415,6 +420,7 @@ actor SnapMain {
 		};
 	};
 
+	// UPDATE CHILD CANISTERS
 	public shared func get_child_status(canister_id : Text) : async ICInterfaceStatusResponse {
 		let principal : Principal = Principal.fromText(canister_id);
 
@@ -450,7 +456,7 @@ actor SnapMain {
 		return "not_authorized";
 	};
 
-	// ------------------------- System Methods -------------------------
+	// ------------------------- SYSTEM METHODS -------------------------
 	system func preupgrade() {
 		var anon_principal = Principal.fromText("2vxsx-fae");
 		user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
