@@ -167,6 +167,70 @@ test('SnapMain[mishicat].create_snap(): should create snap without file asset =>
 	t.deepEqual(response, { ok: 'Created Snap' });
 });
 
+test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function (t) {
+	let promises = [];
+
+	images.forEach(async function (image) {
+		const args = {
+			data: image,
+			file_format: 'png'
+		};
+
+		promises.push(assets_img_staging_actors.mishicat.create_asset(args));
+	});
+
+	try {
+		img_asset_ids = await Promise.all(promises);
+	} catch (error) {
+		console.log('error: ', error);
+	}
+});
+
+test('SnapMain[mishicat].create_snap(): should create snap without file asset => #ok - snap', async function (t) {
+	let create_args = {
+		title: 'Snap Two',
+		image_cover_location: 1,
+		img_asset_ids: img_asset_ids,
+		file_asset: []
+	};
+
+	let response = await snap_main_actor.mishicat.create_snap(create_args);
+
+	t.deepEqual(response, { ok: 'Created Snap' });
+});
+
+test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function (t) {
+	let promises = [];
+
+	images.forEach(async function (image) {
+		const args = {
+			data: image,
+			file_format: 'png'
+		};
+
+		promises.push(assets_img_staging_actors.mishicat.create_asset(args));
+	});
+
+	try {
+		img_asset_ids = await Promise.all(promises);
+	} catch (error) {
+		console.log('error: ', error);
+	}
+});
+
+test('SnapMain[mishicat].create_snap(): should create snap without file asset => #ok - snap', async function (t) {
+	let create_args = {
+		title: 'Snap Three',
+		image_cover_location: 1,
+		img_asset_ids: img_asset_ids,
+		file_asset: []
+	};
+
+	let response = await snap_main_actor.mishicat.create_snap(create_args);
+
+	t.deepEqual(response, { ok: 'Created Snap' });
+});
+
 // CREATE PROJECT
 test('ProjectMain[mishicat].create_user_project_storage(): should create initial storage for projects => #ok - true', async function (t) {
 	const response = await project_main_actor.mishicat.create_user_project_storage();
@@ -243,6 +307,35 @@ test('ProjectMain[mishicat].delete_snaps_from_project(): should delete snaps fro
 	t.equal(response.ok, 'Deleted Snaps From Project');
 });
 
+test('ProjectMain[mishicat].add_snaps_to_project(): should move all snaps to project one', async function (t) {
+	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	let { ok: projects } = await project_main_actor.mishicat.get_projects();
+
+	const snap_refs = snaps.reduce(function (acc, snap) {
+		acc.push({
+			id: snap.id,
+			canister_id: snap.canister_id
+		});
+
+		return acc;
+	}, []);
+
+	const project_ref = {
+		id: projects[0].id,
+		canister_id: projects[0].canister_id
+	};
+
+	let response = await project_main_actor.mishicat.add_snaps_to_project(snap_refs, project_ref);
+
+	t.equal(response.ok, 'Added Snaps To Project');
+
+	let { ok: all_projects } = await project_main_actor.mishicat.get_projects();
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+
+	t.equal(all_projects[0].snaps.length, 3);
+	t.equal(all_snaps[0].project[0].id, all_projects[0].id);
+});
+
 test('ProjectMain[mishicat].delete_projects(): should create and delete project', async function (t) {
 	const snaps = [];
 	await project_main_actor.mishicat.create_project('Deleted Project', snaps);
@@ -254,9 +347,9 @@ test('ProjectMain[mishicat].delete_projects(): should create and delete project'
 });
 
 test('ProjectMain[mishicat].get_projects(): ', async function (t) {
-	let get_response = await project_main_actor.mishicat.get_projects();
+	let { ok: projects } = await project_main_actor.mishicat.get_projects();
 	let get_ids_response = await project_main_actor.mishicat.get_project_ids();
 
-	t.equal(get_response.ok.length, 2);
+	t.equal(projects.length, 2);
 	t.equal(get_ids_response.ok.length, 2);
 });

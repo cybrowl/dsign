@@ -46,7 +46,7 @@ actor ProjectMain {
 	stable var project_canister_id : Text = "";
 
 	// ------------------------- PROJECTS MANAGEMENT -------------------------
-	public shared({ caller }) func create_user_project_storage() : async Bool {
+	public shared ({ caller }) func create_user_project_storage() : async Bool {
 		let tags = [ACTOR_NAME, "create_user_project_storage"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -71,7 +71,7 @@ actor ProjectMain {
 		};
 	};
 
-	public shared({ caller }) func create_project(name : Text, snaps : ?[SnapRef]) : async Result.Result<Text, CreateProjectErr> {
+	public shared ({ caller }) func create_project(name : Text, snaps : ?[SnapRef]) : async Result.Result<Text, CreateProjectErr> {
 		let tags = [ACTOR_NAME, "create_project"];
 
 		//todo: args security checks
@@ -132,7 +132,7 @@ actor ProjectMain {
 		};
 	};
 
-	public shared({ caller }) func delete_projects(project_ids_delete : [ProjectID]) : async Result.Result<Text, DeleteProjectsErr> {
+	public shared ({ caller }) func delete_projects(project_ids_delete : [ProjectID]) : async Result.Result<Text, DeleteProjectsErr> {
 		let tags = [ACTOR_NAME, "delete_projects"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -165,7 +165,7 @@ actor ProjectMain {
 		};
 	};
 
-	public shared({ caller }) func delete_snaps_from_project(
+	public shared ({ caller }) func delete_snaps_from_project(
 		snaps : [SnapRef],
 		project_ref : ProjectRef
 	) : async Result.Result<Text, DeleteSnapsFromProjectErr> {
@@ -202,7 +202,7 @@ actor ProjectMain {
 		};
 	};
 
-	public shared({ caller }) func add_snaps_to_project(
+	public shared ({ caller }) func add_snaps_to_project(
 		snaps : [SnapRef],
 		project_ref : ProjectRef
 	) : async Result.Result<Text, AddSnapsToProjectErr> {
@@ -244,7 +244,7 @@ actor ProjectMain {
 
 	//TODO: get_all_projects_public
 
-	public shared({ caller }) func get_projects() : async Result.Result<[Project], GetProjectsErr> {
+	public shared ({ caller }) func get_projects() : async Result.Result<[Project], GetProjectsErr> {
 		let tags = [ACTOR_NAME, "get_projects"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -268,7 +268,7 @@ actor ProjectMain {
 		};
 	};
 
-	public shared({ caller }) func get_project_ids() : async Result.Result<[ProjectID], Text> {
+	public shared ({ caller }) func get_project_ids() : async Result.Result<[ProjectID], Text> {
 		let tags = [ACTOR_NAME, "get_project_ids"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -302,7 +302,7 @@ actor ProjectMain {
 		project_canister_id := Principal.toText(principal);
 	};
 
-	public shared(msg) func initialize_canisters(projectCanisterId : ?Text) : async Text {
+	public shared (msg) func initialize_canisters(projectCanisterId : ?Text) : async Text {
 		let tags = [ACTOR_NAME, "initialize_canisters"];
 		let project_main_principal = Principal.fromActor(ProjectMain);
 		let is_prod = Text.equal(
