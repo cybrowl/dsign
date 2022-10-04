@@ -11,6 +11,10 @@ module {
 		all_match : Bool;
 		ids_not_found : [Text];
 	};
+	public type SnapRef = {
+		id : Text;
+		canister_id : Text;
+	};
 
 	public func get_all_ids(user_ids_storage : IDStorage) : [Text] {
 		var all_ids = Buffer.Buffer<Text>(0);
@@ -60,6 +64,29 @@ module {
 		);
 
 		return non_exluded_ids;
+	};
+
+	public func remove_snaps(snaps : [SnapRef], delete_list : [SnapRef]) : [SnapRef] {
+		let result = Array.filter(
+			snaps,
+			func(snap : SnapRef) : Bool {
+				let found = Arr.contains(
+					delete_list,
+					snap,
+					func(a : SnapRef, b : SnapRef) : Bool {
+						return Text.equal(a.id, b.id);
+					}
+				);
+
+				if (found) {
+					return false;
+				} else {
+					return true;
+				};
+			}
+		);
+
+		return result;
 	};
 
 };

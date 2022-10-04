@@ -12,6 +12,7 @@ import XorShift "mo:rand/XorShift";
 import Username "canister:username";
 
 import Types "./types";
+import Utils "../utils/utils";
 
 actor class Project(controller : Principal, is_prod : Bool) = this {
 	type AddSnapsToProjectErr = Types.AddSnapsToProjectErr;
@@ -32,7 +33,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 	var projects : HashMap.HashMap<ProjectID, Project> = HashMap.HashMap(0, Text.equal, Text.hash);
 	stable var projects_stable_storage : [(ProjectID, Project)] = [];
 
-	public shared({ caller }) func create_project(
+	public shared ({ caller }) func create_project(
 		name : Text,
 		snap_refs : ?[SnapRef],
 		owner : UserPrincipal
@@ -78,7 +79,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 		return #ok(project);
 	};
 
-	public shared({ caller }) func delete_projects(projectIds : [ProjectID]) : async Result.Result<(), DeleteProjectsErr> {
+	public shared ({ caller }) func delete_projects(projectIds : [ProjectID]) : async Result.Result<(), DeleteProjectsErr> {
 		if (controller != caller) {
 			return #err(#NotAuthorized);
 		};
@@ -95,7 +96,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 		return #ok(());
 	};
 
-	public shared({ caller }) func delete_snaps_from_project(
+	public shared ({ caller }) func delete_snaps_from_project(
 		snaps : [SnapRef],
 		project_id : ProjectID,
 		owner : UserPrincipal
@@ -117,17 +118,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 					return #err(#NotOwner);
 				};
 
-				let snaps_kept = Buffer.Buffer<SnapRef>(0);
-
-				for (snap in snaps.vals()) {
-					for (project_snap in project.snaps.vals()) {
-						if (snap.id != project_snap.id) {
-							snaps_kept.add(project_snap);
-						};
-					};
-				};
-
-				// todo: remove project from snaps that are removed from project
+				let updated_snaps = Utils.remove_snaps(project.snaps, snaps);
 
 				let project_updated : Project = {
 					id = project.id;
@@ -136,7 +127,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 					username = project.username;
 					owner = project.owner;
 					name = project.name;
-					snaps = snaps_kept.toArray();
+					snaps = updated_snaps;
 				};
 
 				projects.put(project_id, project_updated);
@@ -146,7 +137,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 		};
 	};
 
-	public shared({ caller }) func add_snaps_to_project(
+	public shared ({ caller }) func add_snaps_to_project(
 		snaps : [SnapRef],
 		project_id : ProjectID,
 		owner : UserPrincipal

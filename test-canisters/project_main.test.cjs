@@ -309,7 +309,7 @@ test('ProjectMain[mishicat].delete_snaps_from_project(): should delete snaps fro
 
 test('ProjectMain[mishicat].add_snaps_to_project(): should move all snaps to project one', async function (t) {
 	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
-	let { ok: projects } = await project_main_actor.mishicat.get_projects();
+	const { ok: projects } = await project_main_actor.mishicat.get_projects();
 
 	const snap_refs = snaps.reduce(function (acc, snap) {
 		acc.push({
@@ -334,6 +334,37 @@ test('ProjectMain[mishicat].add_snaps_to_project(): should move all snaps to pro
 
 	t.equal(all_projects[0].snaps.length, 3);
 	t.equal(all_snaps[0].project[0].id, all_projects[0].id);
+});
+
+test('ProjectMain[mishicat].delete_snaps_from_project(): should all delete snaps from project one', async function (t) {
+	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const { ok: projects_before } = await project_main_actor.mishicat.get_projects();
+
+	const snap_refs = snaps.reduce(function (acc, snap) {
+		acc.push({
+			id: snap.id,
+			canister_id: snap.canister_id
+		});
+
+		return acc;
+	}, []);
+
+	const project_ref = {
+		id: projects_before[0].id,
+		canister_id: projects_before[0].canister_id
+	};
+
+	let response = await project_main_actor.mishicat.delete_snaps_from_project(
+		snap_refs,
+		project_ref
+	);
+
+	console.log('response', response);
+	let { ok: projects_after } = await project_main_actor.mishicat.get_projects();
+	const { ok: snaps_after } = await snap_main_actor.mishicat.get_all_snaps();
+
+	console.log('projects_after: ', projects_after);
+	console.log('snaps_after: ', snaps_after);
 });
 
 test('ProjectMain[mishicat].delete_projects(): should create and delete project', async function (t) {

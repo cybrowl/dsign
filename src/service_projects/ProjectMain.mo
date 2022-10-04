@@ -187,7 +187,7 @@ actor ProjectMain {
 						return #err(#ErrorCall(debug_show (err)));
 					};
 					case (#ok _) {
-						// delete snaps from project
+						// delete project from snaps
 						for (snap in snaps.vals()) {
 							let snap_actor = actor (snap.canister_id) : SnapActor;
 							ignore snap_actor.delete_project_from_snaps(snaps);

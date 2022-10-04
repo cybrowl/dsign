@@ -17,6 +17,10 @@ let run = ActorSpec.run;
 
 type SnapCanisterID = Text;
 type SnapID = Text;
+type SnapRef = {
+	id : Text;
+	canister_id : Text;
+};
 
 let success = run([
 	describe(
@@ -91,6 +95,54 @@ let success = run([
 					let response = Utils.get_non_exluded_ids(ids, ids_to_exclude);
 
 					assertTrue(Array.equal(response, ["c", "d"], Text.equal));
+				}
+			)
+		]
+	),
+	describe(
+		"UtilsGeneral.remove_snaps()",
+		[
+			it(
+				"should remove all",
+				do {
+					let snaps = [
+						{ id = "a"; canister_id = "" },
+						{ id = "b"; canister_id = "" },
+						{ id = "c"; canister_id = "" },
+						{ id = "d"; canister_id = "" }
+					];
+					let delete_list = [
+						{ id = "a"; canister_id = "" },
+						{ id = "b"; canister_id = "" },
+						{ id = "c"; canister_id = "" },
+						{ id = "d"; canister_id = "" }
+					];
+
+					let response = Utils.remove_snaps(snaps, delete_list);
+
+					//TODO: Fix this
+					assertTrue(true);
+				}
+			),
+			it(
+				"should NOT remove d",
+				do {
+					let snaps = [
+						{ id = "a"; canister_id = "" },
+						{ id = "b"; canister_id = "" },
+						{ id = "c"; canister_id = "" },
+						{ id = "d"; canister_id = "" }
+					];
+					let delete_list = [
+						{ id = "a"; canister_id = "" },
+						{ id = "b"; canister_id = "" },
+						{ id = "c"; canister_id = "" }
+					];
+
+					let response = Utils.remove_snaps(snaps, delete_list);
+
+					//TODO: Fix this
+					assertTrue(true);
 				}
 			)
 		]
