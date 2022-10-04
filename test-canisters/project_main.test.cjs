@@ -37,8 +37,6 @@ let project_main_actor = {};
 let project_actor = {};
 let username_actors = {};
 
-let project_with_snaps = null;
-let project_no_snaps = null;
 let img_asset_ids = [];
 
 test('Setup Actors', async function (t) {

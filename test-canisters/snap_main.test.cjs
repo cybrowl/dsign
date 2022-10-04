@@ -38,7 +38,6 @@ let assets_img_staging_actors = {};
 let snap_main_actor = {};
 let username_actors = {};
 
-let created_snap = {};
 let chunk_ids = [];
 let img_asset_ids = [];
 
