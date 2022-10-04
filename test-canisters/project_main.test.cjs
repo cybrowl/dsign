@@ -334,6 +334,7 @@ test('ProjectMain[mishicat].add_snaps_to_project(): should move all snaps to pro
 
 	t.equal(all_projects[0].snaps.length, 3);
 	t.equal(all_snaps[0].project[0].id, all_projects[0].id);
+	t.equal(all_snaps[0].project[0].name, all_projects[0].name);
 });
 
 test('ProjectMain[mishicat].delete_snaps_from_project(): should all delete snaps from project one', async function (t) {
@@ -359,12 +360,43 @@ test('ProjectMain[mishicat].delete_snaps_from_project(): should all delete snaps
 		project_ref
 	);
 
-	console.log('response', response);
+	t.equal(response.ok, 'Deleted Snaps From Project');
+
 	let { ok: projects_after } = await project_main_actor.mishicat.get_projects();
 	const { ok: snaps_after } = await snap_main_actor.mishicat.get_all_snaps();
 
-	console.log('projects_after: ', projects_after);
-	console.log('snaps_after: ', snaps_after);
+	t.equal(projects_after[0].snaps.length, 0);
+	t.equal(snaps_after[0].project.length, 0);
+});
+
+test('ProjectMain[mishicat].add_snaps_to_project(): should move all snaps to project two', async function (t) {
+	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const { ok: projects } = await project_main_actor.mishicat.get_projects();
+
+	const snap_refs = snaps.reduce(function (acc, snap) {
+		acc.push({
+			id: snap.id,
+			canister_id: snap.canister_id
+		});
+
+		return acc;
+	}, []);
+
+	const project_ref = {
+		id: projects[1].id,
+		canister_id: projects[1].canister_id
+	};
+
+	let response = await project_main_actor.mishicat.add_snaps_to_project(snap_refs, project_ref);
+
+	t.equal(response.ok, 'Added Snaps To Project');
+
+	let { ok: all_projects } = await project_main_actor.mishicat.get_projects();
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+
+	t.equal(all_projects[1].snaps.length, 3);
+	t.equal(all_snaps[0].project[0].id, all_projects[1].id);
+	t.equal(all_snaps[0].project[0].name, all_projects[1].name);
 });
 
 test('ProjectMain[mishicat].delete_projects(): should create and delete project', async function (t) {
