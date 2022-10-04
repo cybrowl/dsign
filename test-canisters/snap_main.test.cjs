@@ -347,13 +347,14 @@ test('SnapMain[mishicat].delete_snaps(): with valid id => #ok - "delete_snaps"',
 	const snap_ids = await snap_main_actor.mishicat.get_snap_ids();
 	const response = await snap_main_actor.mishicat.delete_snaps([snap_ids.ok[2]]);
 
-	console.log('response: ', response);
+	t.equal(response.ok, 'Deleted Snaps');
 });
 
 test('SnapMain.get_all_snaps()', async function (t) {
 	const all_snaps = await snap_main_actor.mishicat.get_all_snaps();
 	const snap_ids = await snap_main_actor.mishicat.get_snap_ids();
 
-	console.log('all_snaps: ', all_snaps.ok);
-	console.log('snap_ids: ', snap_ids.ok);
+	t.equal(all_snaps.ok.length, snap_ids.ok.length);
+	t.equal(all_snaps.ok.length, 2);
+	t.equal(snap_ids.ok.length, 2);
 });

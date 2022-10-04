@@ -231,7 +231,7 @@ actor SnapMain {
 					user_snap_ids_storage.put(canister_id, snap_ids_not_deleted);
 				};
 
-				return #ok("delete_snaps");
+				return #ok("Deleted Snaps");
 			};
 			case (_) {
 				#err(#UserNotFound);
