@@ -38,9 +38,7 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 	var snaps : HashMap.HashMap<SnapID, Snap> = HashMap.HashMap(0, Text.equal, Text.hash);
 	stable var snaps_stable_storage : [(SnapID, Snap)] = [];
 
-	//TODO: only allow snap_main to accesss write methods
-
-	public shared({ caller }) func create_snap(
+	public shared ({ caller }) func create_snap(
 		args : CreateSnapArgs,
 		images_ref : [ImageRef],
 		file_asset : AssetRef,
@@ -87,7 +85,7 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 		return #ok(snap);
 	};
 
-	public shared({ caller }) func delete_snaps(snapIds : [SnapID]) : async () {
+	public shared ({ caller }) func delete_snaps(snapIds : [SnapID]) : async () {
 		if (controller != caller) {
 			return ();
 		};
@@ -102,7 +100,7 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 		};
 	};
 
-	public shared({ caller }) func delete_project_from_snaps(
+	public shared ({ caller }) func delete_project_from_snaps(
 		snaps_ref : [SnapRef]
 	) : async Result.Result<Text, Text> {
 		if (project_main_principal != caller) {
@@ -136,7 +134,7 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 		#ok("Deleted Project From Snaps");
 	};
 
-	public shared({ caller }) func add_project_to_snaps(
+	public shared ({ caller }) func add_project_to_snaps(
 		snaps_ref : [SnapRef],
 		project_ref : ProjectRef
 	) : async Result.Result<Text, Text> {
@@ -179,10 +177,10 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 		#ok("Updated Snap Project");
 	};
 
-	public query func get_all_snaps(snapIds : [SnapID]) : async [SnapPublic] {
+	public query func get_all_snaps(snap_ids : [SnapID]) : async [SnapPublic] {
 		var snaps_list = Buffer.Buffer<SnapPublic>(0);
 
-		for (snap_id in snapIds.vals()) {
+		for (snap_id in snap_ids.vals()) {
 			switch (snaps.get(snap_id)) {
 				case null {};
 				case (?snap) {

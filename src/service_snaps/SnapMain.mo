@@ -20,7 +20,6 @@ import Types "./types";
 import Utils "../utils/utils";
 
 actor SnapMain {
-	type AssetsActor = Types.AssetsActor;
 	type CreateAssetArgs = Types.CreateAssetArgs;
 	type CreateSnapArgs = Types.CreateSnapArgs;
 	type CreateSnapErr = Types.CreateSnapErr;
@@ -28,19 +27,18 @@ actor SnapMain {
 	type GetAllSnapsErr = Types.GetAllSnapsErr;
 	type ICInterface = Types.ICInterface;
 	type ICInterfaceStatusResponse = Types.ICInterfaceStatusResponse;
-	type ImageAssetsActor = Types.ImageAssetsActor;
 	type ImageRef = Types.ImageRef;
 	type InitArgs = Types.InitArgs;
 	type ProjectRef = Types.ProjectRef;
-	type Snap = Types.Snap;
-	type SnapActor = Types.SnapActor;
 	type SnapCanisterID = Types.SnapCanisterID;
 	type SnapID = Types.SnapID;
 	type SnapIDStorage = Types.SnapIDStorage;
 	type SnapPublic = Types.SnapPublic;
-	type SnapRef = Types.SnapRef;
-	type Username = Types.Username;
 	type UserPrincipal = Types.UserPrincipal;
+
+	type AssetsActor = Types.AssetsActor;
+	type ImageAssetsActor = Types.ImageAssetsActor;
+	type SnapActor = Types.SnapActor;
 
 	let ACTOR_NAME : Text = "SnapMain";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
@@ -58,6 +56,8 @@ actor SnapMain {
 	stable var assets_canister_id : Text = "";
 	stable var image_assets_canister_id : Text = "";
 	stable var snap_canister_id : Text = "";
+
+	// this doesn't change after init
 	stable var project_main_canister_id : Text = "";
 
 	private let ic : ICInterface = actor "aaaaa-aa";
@@ -340,7 +340,9 @@ actor SnapMain {
 			"lyswl-7iaaa-aaaag-aatya-cai"
 		);
 
-		if (project_main_canister_id.size() < 1) {
+		let has_project_main_canister_id : Bool = project_main_canister_id.size() > 0;
+
+		if (has_project_main_canister_id == false) {
 			switch (args.project_main_canister_id) {
 				case (null) {
 					project_main_canister_id := "";
