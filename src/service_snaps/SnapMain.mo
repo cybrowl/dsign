@@ -63,7 +63,7 @@ actor SnapMain {
 	private let ic : ICInterface = actor "aaaaa-aa";
 
 	// ------------------------- SNAPS MANAGEMENT -------------------------
-	public shared({ caller }) func create_user_snap_storage() : async Bool {
+	public shared ({ caller }) func create_user_snap_storage() : async Bool {
 		let tags = [ACTOR_NAME, "create_user_snap_storage"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -88,7 +88,7 @@ actor SnapMain {
 		};
 	};
 
-	public shared({ caller }) func create_snap(args : CreateSnapArgs) : async Result.Result<Text, CreateSnapErr> {
+	public shared ({ caller }) func create_snap(args : CreateSnapArgs) : async Result.Result<Text, CreateSnapErr> {
 		let tags = [ACTOR_NAME, "create_snap"];
 		let is_anonymous = Principal.isAnonymous(caller);
 		let has_image = args.img_asset_ids.size() > 0;
@@ -191,7 +191,7 @@ actor SnapMain {
 		};
 	};
 
-	public shared({ caller }) func delete_snaps(snap_ids_delete : [SnapID]) : async Result.Result<Text, DeleteSnapsErr> {
+	public shared ({ caller }) func delete_snaps(snap_ids_delete : [SnapID]) : async Result.Result<Text, DeleteSnapsErr> {
 		let tags = [ACTOR_NAME, "delete_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -241,7 +241,7 @@ actor SnapMain {
 
 	//TODO: update_snap_likes
 
-	public shared({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], GetAllSnapsErr> {
+	public shared ({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], GetAllSnapsErr> {
 		let tags = [ACTOR_NAME, "get_all_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -273,7 +273,7 @@ actor SnapMain {
 	//TODO: get_all_snaps_without_project
 	//TODO: get_all_snaps_public
 
-	public shared({ caller }) func get_snap_ids() : async Result.Result<[SnapID], Text> {
+	public shared ({ caller }) func get_snap_ids() : async Result.Result<[SnapID], Text> {
 		let tags = [ACTOR_NAME, "get_snap_ids"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -331,7 +331,7 @@ actor SnapMain {
 	};
 
 	// INIT CANISTERS
-	public shared(msg) func initialize_canisters(args : InitArgs) : async () {
+	public shared (msg) func initialize_canisters(args : InitArgs) : async () {
 		let tags = [ACTOR_NAME, "initialize_canisters"];
 		let snap_main_principal = Principal.fromActor(SnapMain);
 
@@ -427,7 +427,7 @@ actor SnapMain {
 		await ic.canister_status({ canister_id = principal });
 	};
 
-	public shared({ caller }) func get_child_controllers(canister_id : Text) : async Text {
+	public shared ({ caller }) func get_child_controllers(canister_id : Text) : async Text {
 		let principal : Principal = Principal.fromText(canister_id);
 
 		let response = await ic.canister_status({ canister_id = principal });
@@ -435,7 +435,7 @@ actor SnapMain {
 		return debug_show (response.settings.controllers, caller);
 	};
 
-	public shared({ caller }) func install_code(
+	public shared ({ caller }) func install_code(
 		canister_id : Principal,
 		arg : Blob,
 		wasm_module : Blob

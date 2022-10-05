@@ -39,7 +39,7 @@ let username_actors = {};
 
 let img_asset_ids = [];
 
-test('Setup Actors', async function (t) {
+test('Setup Actors', async function () {
 	console.log('=========== Project Main ===========');
 
 	console.log('project_main_canister_id: ', project_main_canister_id);
@@ -88,9 +88,11 @@ test('Setup Actors', async function (t) {
 });
 
 test('ProjectMain[mishicat].initialize_canisters()', async function (t) {
-	let response = await project_main_actor.mishicat.initialize_canisters([test_project_canister_id]);
+	let project_canister_id = await project_main_actor.mishicat.initialize_canisters([
+		test_project_canister_id
+	]);
 
-	console.log('project_canister_ids: ', response, test_project_canister_id);
+	t.equal(project_canister_id, test_project_canister_id);
 });
 
 // NOT AUTHORIZED
@@ -149,6 +151,7 @@ test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - 
 
 	try {
 		img_asset_ids = await Promise.all(promises);
+		t.equal(img_asset_ids.length, images.length);
 	} catch (error) {
 		console.log('error: ', error);
 	}
@@ -181,6 +184,7 @@ test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - 
 
 	try {
 		img_asset_ids = await Promise.all(promises);
+		t.equal(img_asset_ids.length, images.length);
 	} catch (error) {
 		console.log('error: ', error);
 	}
@@ -213,6 +217,7 @@ test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - 
 
 	try {
 		img_asset_ids = await Promise.all(promises);
+		t.equal(img_asset_ids.length, images.length);
 	} catch (error) {
 		console.log('error: ', error);
 	}
