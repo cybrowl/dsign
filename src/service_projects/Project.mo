@@ -15,10 +15,10 @@ import Types "./types";
 import Utils "../utils/utils";
 
 actor class Project(controller : Principal, is_prod : Bool) = this {
-	type AddSnapsToProjectErr = Types.AddSnapsToProjectErr;
-	type CreateProjectErr = Types.CreateProjectErr;
-	type DeleteProjectsErr = Types.DeleteProjectsErr;
-	type DeleteSnapsFromProjectErr = Types.DeleteSnapsFromProjectErr;
+	type ErrAddSnapsToProject = Types.ErrAddSnapsToProject;
+	type ErrCreateProject = Types.ErrCreateProject;
+	type ErrDeleteProjects = Types.ErrDeleteProjects;
+	type ErrDeleteSnapsFromProject = Types.ErrDeleteSnapsFromProject;
 	type Project = Types.Project;
 	type ProjectID = Types.ProjectID;
 	type SnapRef = Types.SnapRef;
@@ -37,7 +37,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 		name : Text,
 		snap_refs : ?[SnapRef],
 		owner : UserPrincipal
-	) : async Result.Result<Project, CreateProjectErr> {
+	) : async Result.Result<Project, ErrCreateProject> {
 
 		if (controller != caller) {
 			return #err(#NotAuthorized);
@@ -79,12 +79,12 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 		return #ok(project);
 	};
 
-	public shared ({ caller }) func delete_projects(projectIds : [ProjectID]) : async Result.Result<(), DeleteProjectsErr> {
+	public shared ({ caller }) func delete_projects(project_ids : [ProjectID]) : async Result.Result<(), ErrDeleteProjects> {
 		if (controller != caller) {
 			return #err(#NotAuthorized);
 		};
 
-		for (project_id in projectIds.vals()) {
+		for (project_id in project_ids.vals()) {
 			switch (projects.get(project_id)) {
 				case null {};
 				case (?project) {
@@ -100,7 +100,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 		snaps : [SnapRef],
 		project_id : ProjectID,
 		owner : UserPrincipal
-	) : async Result.Result<Text, DeleteSnapsFromProjectErr> {
+	) : async Result.Result<Text, ErrDeleteSnapsFromProject> {
 
 		let tags = [ACTOR_NAME, "delete_snaps_from_project"];
 
@@ -141,7 +141,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 		snaps : [SnapRef],
 		project_id : ProjectID,
 		owner : UserPrincipal
-	) : async Result.Result<Text, AddSnapsToProjectErr> {
+	) : async Result.Result<Text, ErrAddSnapsToProject> {
 
 		let tags = [ACTOR_NAME, "add_snaps_to_project"];
 
@@ -181,10 +181,10 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 		};
 	};
 
-	public query func get_projects(projectIds : [ProjectID]) : async [Project] {
+	public query func get_projects(project_ids : [ProjectID]) : async [Project] {
 		var projects_list = Buffer.Buffer<Project>(0);
 
-		for (project_id in projectIds.vals()) {
+		for (project_id in project_ids.vals()) {
 			switch (projects.get(project_id)) {
 				case null {};
 				case (?project) {

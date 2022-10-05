@@ -17,11 +17,11 @@ import SnapTypes "../service_snaps/types";
 import Utils "../utils/utils";
 
 actor ProjectMain {
-	type AddSnapsToProjectErr = Types.AddSnapsToProjectErr;
-	type CreateProjectErr = Types.CreateProjectErr;
-	type DeleteProjectsErr = Types.DeleteProjectsErr;
-	type DeleteSnapsFromProjectErr = Types.DeleteSnapsFromProjectErr;
-	type GetProjectsErr = Types.GetProjectsErr;
+	type ErrAddSnapsToProject = Types.ErrAddSnapsToProject;
+	type ErrCreateProject = Types.ErrCreateProject;
+	type ErrDeleteProjects = Types.ErrDeleteProjects;
+	type ErrDeleteSnapsFromProject = Types.ErrDeleteSnapsFromProject;
+	type ErrGetProjects = Types.ErrGetProjects;
 	type Project = Types.Project;
 	type ProjectActor = Types.ProjectActor;
 	type ProjectCanisterID = Types.ProjectCanisterID;
@@ -71,7 +71,7 @@ actor ProjectMain {
 		};
 	};
 
-	public shared ({ caller }) func create_project(name : Text, snaps : ?[SnapRef]) : async Result.Result<Text, CreateProjectErr> {
+	public shared ({ caller }) func create_project(name : Text, snaps : ?[SnapRef]) : async Result.Result<Text, ErrCreateProject> {
 		let tags = [ACTOR_NAME, "create_project"];
 
 		//todo: args security checks
@@ -132,7 +132,7 @@ actor ProjectMain {
 		};
 	};
 
-	public shared ({ caller }) func delete_projects(project_ids_delete : [ProjectID]) : async Result.Result<Text, DeleteProjectsErr> {
+	public shared ({ caller }) func delete_projects(project_ids_delete : [ProjectID]) : async Result.Result<Text, ErrDeleteProjects> {
 		let tags = [ACTOR_NAME, "delete_projects"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -168,7 +168,7 @@ actor ProjectMain {
 	public shared ({ caller }) func delete_snaps_from_project(
 		snaps : [SnapRef],
 		project_ref : ProjectRef
-	) : async Result.Result<Text, DeleteSnapsFromProjectErr> {
+	) : async Result.Result<Text, ErrDeleteSnapsFromProject> {
 		let tags = [ACTOR_NAME, "delete_snaps_from_project"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -205,7 +205,7 @@ actor ProjectMain {
 	public shared ({ caller }) func add_snaps_to_project(
 		snaps : [SnapRef],
 		project_ref : ProjectRef
-	) : async Result.Result<Text, AddSnapsToProjectErr> {
+	) : async Result.Result<Text, ErrAddSnapsToProject> {
 		let tags = [ACTOR_NAME, "add_snaps_to_project"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -244,7 +244,7 @@ actor ProjectMain {
 
 	//TODO: get_all_projects_public
 
-	public shared ({ caller }) func get_projects() : async Result.Result<[Project], GetProjectsErr> {
+	public shared ({ caller }) func get_projects() : async Result.Result<[Project], ErrGetProjects> {
 		let tags = [ACTOR_NAME, "get_projects"];
 
 		switch (user_canisters_ref.get(caller)) {

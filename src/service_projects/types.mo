@@ -40,7 +40,7 @@ module {
 		snaps : [SnapRef];
 	};
 
-	public type CreateProjectErr = {
+	public type ErrCreateProject = {
 		#NotAuthorized;
 		#UserAnonymous;
 		#UserNotFound;
@@ -49,22 +49,13 @@ module {
 		#ErrorCall : Text;
 	};
 
-	public type DeleteProjectsErr = {
+	public type ErrDeleteProjects = {
 		#NotAuthorized;
 		#UserNotFound;
 		#ProjectIdsDoNotMatch;
 	};
 
-	public type DeleteSnapsFromProjectErr = {
-		#NotAuthorized;
-		#NotOwner;
-		#ProjectNotFound;
-		#ProjectIdsDoNotMatch;
-		#UserNotFound;
-		#ErrorCall : Text;
-	};
-
-	public type AddSnapsToProjectErr = {
+	public type ErrDeleteSnapsFromProject = {
 		#NotAuthorized;
 		#NotOwner;
 		#ProjectNotFound;
@@ -73,16 +64,25 @@ module {
 		#ErrorCall : Text;
 	};
 
-	public type GetProjectsErr = {
+	public type ErrAddSnapsToProject = {
+		#NotAuthorized;
+		#NotOwner;
+		#ProjectNotFound;
+		#ProjectIdsDoNotMatch;
+		#UserNotFound;
+		#ErrorCall : Text;
+	};
+
+	public type ErrGetProjects = {
 		#UserNotFound;
 	};
 
 	// Actor Interface
 	public type ProjectActor = actor {
-		create_project : shared(Text, ?[SnapRef], UserPrincipal) -> async Result.Result<Project, CreateProjectErr>;
-		delete_projects : shared([ProjectID]) -> async ();
-		delete_snaps_from_project : shared([SnapRef], ProjectID, Principal) -> async Result.Result<Text, DeleteSnapsFromProjectErr>;
-		add_snaps_to_project : shared([SnapRef], ProjectID, Principal) -> async Result.Result<Text, AddSnapsToProjectErr>;
+		create_project : shared (Text, ?[SnapRef], UserPrincipal) -> async Result.Result<Project, ErrCreateProject>;
+		delete_projects : shared ([ProjectID]) -> async ();
+		delete_snaps_from_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Text, ErrDeleteSnapsFromProject>;
+		add_snaps_to_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Text, ErrAddSnapsToProject>;
 		get_projects : query ([ProjectID]) -> async [Project];
 	};
 };
