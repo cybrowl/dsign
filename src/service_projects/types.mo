@@ -74,7 +74,8 @@ module {
 	};
 
 	public type ErrGetProjects = {
-		#UserNotFound;
+		#UserNotFound : Bool;
+		#NoProjects : Bool;
 	};
 
 	// Actor Interface

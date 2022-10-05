@@ -249,7 +249,7 @@ actor ProjectMain {
 
 	//TODO: get_all_projects_public
 
-	public shared ({ caller }) func get_projects() : async Result.Result<[ProjectPublic], ErrGetProjects> {
+	public shared ({ caller }) func get_all_projects() : async Result.Result<[ProjectPublic], ErrGetProjects> {
 		let tags = [ACTOR_NAME, "get_projects"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -265,10 +265,14 @@ actor ProjectMain {
 					};
 				};
 
+				if (all_projects.size() == 0) {
+					return #err(#NoProjects(true));
+				};
+
 				return #ok(all_projects.toArray());
 			};
 			case (_) {
-				return #err(#UserNotFound);
+				return #err(#UserNotFound(true));
 			};
 		};
 	};

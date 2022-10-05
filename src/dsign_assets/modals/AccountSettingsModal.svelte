@@ -13,6 +13,11 @@
 	} from '../store/actor_assets_img_staging';
 	import { createActor as create_actor_username, actor_username } from '../store/actor_username';
 	import { createActor as create_actor_profile, actor_profile } from '../store/actor_profile';
+	import {
+		createActor as create_actor_project_main,
+		actor_project_main
+	} from '../store/actor_project_main';
+	import { createActor as create_actor_snap_main, actor_snap_main } from '../store/actor_snap_main';
 
 	import { auth_client } from '../store/auth_client';
 	import { isAccountSettingsModalVisible } from '../store/modal';
@@ -86,6 +91,24 @@
 		actor_profile.update(() => ({
 			loggedIn: false,
 			actor: create_actor_profile({
+				agentOptions: {
+					identity: $auth_client.getIdentity()
+				}
+			})
+		}));
+
+		actor_project_main.update(() => ({
+			loggedIn: false,
+			actor: create_actor_project_main({
+				agentOptions: {
+					identity: $auth_client.getIdentity()
+				}
+			})
+		}));
+
+		actor_snap_main.update(() => ({
+			loggedIn: false,
+			actor: create_actor_snap_main({
 				agentOptions: {
 					identity: $auth_client.getIdentity()
 				}

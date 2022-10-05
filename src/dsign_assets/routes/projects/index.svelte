@@ -19,8 +19,10 @@
 		isSnapCreationModalVisible
 	} from '../../store/modal';
 
+	import { actor_project_main, project_store } from '../../store/actor_project_main';
 	import { actor_snap_main, snap_store } from '../../store/actor_snap_main';
-	import { local_storage_projects } from '../../store/local_storage';
+
+	import { local_storage_snaps, local_storage_projects } from '../../store/local_storage';
 	import { page_navigation } from '../../store/page_navigation';
 
 	let isAuthenticated = false;
@@ -51,8 +53,18 @@
 			});
 		}
 
+		if ($project_store.projects.length === 0) {
+			project_store.update(({ projects }) => {
+				return {
+					isFetching: true,
+					projects: projects
+				};
+			});
+		}
+
 		if (isAuthenticated) {
 			await getAllSnaps();
+			await getAllProjects();
 		} else {
 			window.location.href = '/';
 		}
@@ -62,13 +74,35 @@
 		try {
 			const { ok: all_snaps, err: error } = await $actor_snap_main.actor.get_all_snaps();
 
+			console.log('all_snaps', all_snaps);
+
 			if (all_snaps) {
 				snap_store.set({ isFetching: false, snaps: [...all_snaps] });
 
-				local_storage_projects.set({ all_snaps_count: all_snaps.length || 1 });
+				local_storage_snaps.set({ all_snaps_count: all_snaps.length || 1 });
 			} else {
 				if (error['UserNotFound'] === true) {
 					await $actor_snap_main.actor.create_user_snap_storage();
+				}
+			}
+		} catch (error) {
+			console.log('error: ', error);
+		}
+	}
+
+	async function getAllProjects() {
+		try {
+			const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects();
+
+			console.log('error: ', error);
+
+			if (all_projects) {
+				project_store.set({ isFetching: false, projects: [...all_projects] });
+
+				local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
+			} else {
+				if (error['UserNotFound'] === true) {
+					await $actor_project_main.actor.create_user_project_storage();
 				}
 			}
 		} catch (error) {
@@ -150,7 +184,7 @@
 			class="col-start-2 col-end-12 grid grid-cols-4 
 					row-start-3 row-end-auto mx-4 gap-10 mt-2 mb-16"
 		>
-			{#each { length: $local_storage_projects.all_snaps_count } as _, i}
+			{#each { length: $local_storage_snaps.all_snaps_count } as _, i}
 				<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />
 			{/each}
 		</div>
