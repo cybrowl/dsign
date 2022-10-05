@@ -12,6 +12,7 @@ import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
 import Username "canister:username";
+import Logger "canister:logger";
 
 import Types "./types";
 import ProjectTypes "../service_projects/types";
@@ -140,7 +141,14 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 		snaps_ref : [SnapRef],
 		project_ref : ProjectRef
 	) : async () {
+		let tags = [ACTOR_NAME, "add_project_to_snaps"];
+
 		if (project_main != caller) {
+			ignore Logger.log_event(
+				tags,
+				"Unauthorized"
+			);
+
 			return ();
 		};
 
@@ -148,7 +156,7 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 
 		switch (await project_actor.get_projects_actor([project_ref.id])) {
 			case (projects) {
-				let project = Option.make(projects[0]);
+				let project = projects[0];
 
 				for (snap_ref in snaps_ref.vals()) {
 					switch (snaps.get(snap_ref.id)) {
@@ -161,7 +169,7 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 								id = snap.id;
 								image_cover_location = snap.image_cover_location;
 								images = snap.images;
-								project = project;
+								project = Option.make(project);
 								tags = snap.tags;
 								title = snap.title;
 								username = snap.username;
