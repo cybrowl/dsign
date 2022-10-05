@@ -45,6 +45,24 @@ actor ProjectMain {
 
 	stable var project_canister_id : Text = "";
 
+	// ------------------------- PRIVATE METHODS -------------------------
+	private func add_project_to_snaps(project : Project) : async () {
+		let project_ref = {
+			id = project.id;
+			canister_id = project.canister_id;
+		};
+
+		for (snap in project.snaps.vals()) {
+			let snap_ref = {
+				id = snap.id;
+				canister_id = snap.canister_id;
+			};
+
+			let snap_actor = actor (snap.canister_id) : SnapActor;
+			ignore snap_actor.add_project_to_snaps([snap_ref], project_ref);
+		};
+	};
+
 	// ------------------------- PROJECTS MANAGEMENT -------------------------
 	public shared ({ caller }) func create_user_project_storage() : async Bool {
 		let tags = [ACTOR_NAME, "create_user_project_storage"];
@@ -111,21 +129,7 @@ actor ProjectMain {
 				project_ids.add(project.id);
 				user_project_ids_storage.put(project_canister_id, project_ids.toArray());
 
-				let project_ref = {
-					id = project.id;
-					canister_id = project.canister_id;
-				};
-
-				// add project to snaps
-				for (snap in project.snaps.vals()) {
-					let snap_ref = {
-						id = snap.id;
-						canister_id = snap.canister_id;
-					};
-
-					let snap_actor = actor (snap.canister_id) : SnapActor;
-					ignore snap_actor.add_project_to_snaps([snap_ref], project_ref);
-				};
+				ignore add_project_to_snaps(project);
 
 				#ok("Created Project");
 			};

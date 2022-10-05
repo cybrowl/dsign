@@ -283,7 +283,7 @@ test('SnapMain[mishicat].get_all_snaps(): should have project as part of snap', 
 	t.equal(project.id.length > 0, true);
 });
 
-test('ProjectMain[mishicat].delete_snaps_from_project(): should delete snaps from project', async function (t) {
+test('ProjectMain[mishicat].delete_snaps_from_project(): with snaps => #ok - Deleted Snaps From Project', async function (t) {
 	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
 	const project = snaps[0].project[0];
 	const snap = snaps[0];
