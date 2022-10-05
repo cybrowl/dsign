@@ -16,7 +16,7 @@ import Username "canister:username";
 import Types "./types";
 import ProjectTypes "../service_projects/types";
 
-actor class Snap(controller : Principal, project_main_principal : Principal) = this {
+actor class Snap(snap_main : Principal, project_main : Principal) = this {
 	type AssetRef = Types.AssetRef;
 	type CreateSnapArgs = Types.CreateSnapArgs;
 	type ErrCreateSnap = Types.ErrCreateSnap;
@@ -47,7 +47,7 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 		owner : UserPrincipal
 	) : async Result.Result<Snap, ErrCreateSnap> {
 
-		if (controller != caller) {
+		if (snap_main != caller) {
 			return #err(#Unauthorized);
 		};
 
@@ -88,7 +88,7 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 	};
 
 	public shared ({ caller }) func delete_snaps(snap_ids : [SnapID]) : async () {
-		if (controller != caller) {
+		if (snap_main != caller) {
 			return ();
 		};
 
@@ -106,7 +106,7 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 	public shared ({ caller }) func delete_project_from_snaps(
 		snaps_ref : [SnapRef]
 	) : async () {
-		if (project_main_principal != caller) {
+		if (project_main != caller) {
 			return ();
 		};
 
@@ -140,7 +140,7 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 		snaps_ref : [SnapRef],
 		project_ref : ProjectRef
 	) : async () {
-		if (project_main_principal != caller) {
+		if (project_main != caller) {
 			return ();
 		};
 

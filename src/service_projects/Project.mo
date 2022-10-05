@@ -14,7 +14,7 @@ import Username "canister:username";
 import Types "./types";
 import Utils "../utils/utils";
 
-actor class Project(controller : Principal, is_prod : Bool) = this {
+actor class Project(project_main : Principal, is_prod : Bool) = this {
 	type ErrAddSnapsToProject = Types.ErrAddSnapsToProject;
 	type ErrCreateProject = Types.ErrCreateProject;
 	type ErrDeleteProjects = Types.ErrDeleteProjects;
@@ -40,7 +40,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 		owner : UserPrincipal
 	) : async Result.Result<Project, ErrCreateProject> {
 
-		if (controller != caller) {
+		if (project_main != caller) {
 			return #err(#NotAuthorized);
 		};
 
@@ -81,7 +81,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 	};
 
 	public shared ({ caller }) func delete_projects(project_ids : [ProjectID]) : async Result.Result<(), ErrDeleteProjects> {
-		if (controller != caller) {
+		if (project_main != caller) {
 			return #err(#NotAuthorized);
 		};
 
@@ -105,7 +105,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 
 		let tags = [ACTOR_NAME, "delete_snaps_from_project"];
 
-		if (controller != caller) {
+		if (project_main != caller) {
 			return #err(#NotAuthorized);
 		};
 
@@ -146,7 +146,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 
 		let tags = [ACTOR_NAME, "add_snaps_to_project"];
 
-		if (controller != caller) {
+		if (project_main != caller) {
 			return #err(#NotAuthorized);
 		};
 
