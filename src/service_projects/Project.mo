@@ -33,6 +33,7 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 	var projects : HashMap.HashMap<ProjectID, Project> = HashMap.HashMap(0, Text.equal, Text.hash);
 	stable var projects_stable_storage : [(ProjectID, Project)] = [];
 
+	// ------------------------- PROJECTS MANAGEMENT -------------------------
 	public shared ({ caller }) func create_project(
 		name : Text,
 		snap_refs : ?[SnapRef],
@@ -196,12 +197,12 @@ actor class Project(controller : Principal, is_prod : Bool) = this {
 		return projects_list.toArray();
 	};
 
-	// ------------------------- Canister Management -------------------------
+	// ------------------------- CANISTER MANAGEMENT -------------------------
 	public query func version() : async Nat {
 		return VERSION;
 	};
 
-	// ------------------------- System Methods -------------------------
+	// ------------------------- SYSTEM METHODS -------------------------
 	system func preupgrade() {
 		projects_stable_storage := Iter.toArray(projects.entries());
 	};

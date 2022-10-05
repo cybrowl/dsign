@@ -19,15 +19,17 @@ import ProjectTypes "../service_projects/types";
 actor class Snap(controller : Principal, project_main_principal : Principal) = this {
 	type AssetRef = Types.AssetRef;
 	type CreateSnapArgs = Types.CreateSnapArgs;
+	type ErrCreateSnap = Types.ErrCreateSnap;
 	type ImageRef = Types.ImageRef;
 	type Project = ProjectTypes.Project;
 	type ProjectRef = ProjectTypes.ProjectRef;
-	type ProjectActor = ProjectTypes.ProjectActor;
 	type Snap = Types.Snap;
-	type SnapPublic = Types.SnapPublic;
 	type SnapID = Types.SnapID;
+	type SnapPublic = Types.SnapPublic;
 	type SnapRef = Types.SnapRef;
 	type UserPrincipal = Types.UserPrincipal;
+
+	type ProjectActor = ProjectTypes.ProjectActor;
 
 	let ACTOR_NAME : Text = "Snap";
 	let VERSION : Nat = 1;
@@ -43,10 +45,10 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 		images_ref : [ImageRef],
 		file_asset : AssetRef,
 		owner : UserPrincipal
-	) : async Result.Result<Snap, Text> {
+	) : async Result.Result<Snap, ErrCreateSnap> {
 
 		if (controller != caller) {
-			return #err("Unauthorized");
+			return #err(#Unauthorized);
 		};
 
 		let snap_id = ULID.toText(se.new());
@@ -58,7 +60,7 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 				username := username_;
 			};
 			case (#err error) {
-				return #err("Username Not Found");
+				return #err(#UsernameNotFound);
 			};
 		};
 
@@ -85,12 +87,12 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 		return #ok(snap);
 	};
 
-	public shared ({ caller }) func delete_snaps(snapIds : [SnapID]) : async () {
+	public shared ({ caller }) func delete_snaps(snap_ids : [SnapID]) : async () {
 		if (controller != caller) {
 			return ();
 		};
 
-		for (snap_id in snapIds.vals()) {
+		for (snap_id in snap_ids.vals()) {
 			switch (snaps.get(snap_id)) {
 				case null {};
 				case (?snap) {
@@ -100,11 +102,12 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 		};
 	};
 
+	// NOTE: only called from Project Main
 	public shared ({ caller }) func delete_project_from_snaps(
 		snaps_ref : [SnapRef]
-	) : async Result.Result<Text, Text> {
+	) : async () {
 		if (project_main_principal != caller) {
-			return #err("Unauthorized");
+			return ();
 		};
 
 		for (snap_ref in snaps_ref.vals()) {
@@ -130,16 +133,15 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 				};
 			};
 		};
-
-		#ok("Deleted Project From Snaps");
 	};
 
+	// NOTE: only called from Project Main
 	public shared ({ caller }) func add_project_to_snaps(
 		snaps_ref : [SnapRef],
 		project_ref : ProjectRef
-	) : async Result.Result<Text, Text> {
+	) : async () {
 		if (project_main_principal != caller) {
-			return #err("Unauthorized");
+			return ();
 		};
 
 		let project_actor = actor (project_ref.canister_id) : ProjectActor;
@@ -173,8 +175,6 @@ actor class Snap(controller : Principal, project_main_principal : Principal) = t
 				};
 			};
 		};
-
-		#ok("Updated Snap Project");
 	};
 
 	public query func get_all_snaps(snap_ids : [SnapID]) : async [SnapPublic] {

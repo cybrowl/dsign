@@ -93,30 +93,31 @@ module {
 		project_main_canister_id : ?Text;
 	};
 
-	public type CreateSnapErr = {
+	public type ErrCreateSnap = {
 		#UserAnonymous;
 		#NoImageToSave;
 		#FourImagesMax;
 		#UsernameNotFound;
+		#Unauthorized;
 		#UserNotFound;
 		#ErrorCall : Text;
 	};
 
-	public type GetAllSnapsErr = {
+	public type ErrGetAllSnaps = {
 		#UserNotFound : Bool;
 	};
 
-	public type DeleteSnapsErr = {
+	public type ErrDeleteSnaps = {
 		#UserNotFound;
 		#SnapIdsDoNotMatch;
 	};
 
 	// Actor Interface
 	public type SnapActor = actor {
-		create_snap : shared(CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, Text>;
-		delete_snaps : shared([SnapID]) -> async ();
-		delete_project_from_snaps : shared([SnapRef]) -> async Result.Result<Text, Text>;
-		add_project_to_snaps : shared([SnapRef], ProjectRef) -> async ();
+		create_snap : shared (CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, ErrCreateSnap>;
+		delete_snaps : shared ([SnapID]) -> async ();
+		delete_project_from_snaps : shared ([SnapRef]) -> async ();
+		add_project_to_snaps : shared ([SnapRef], ProjectRef) -> async ();
 		get_all_snaps : query ([SnapID]) -> async [SnapPublic];
 	};
 };

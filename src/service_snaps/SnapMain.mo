@@ -22,14 +22,13 @@ import Utils "../utils/utils";
 actor SnapMain {
 	type CreateAssetArgs = Types.CreateAssetArgs;
 	type CreateSnapArgs = Types.CreateSnapArgs;
-	type CreateSnapErr = Types.CreateSnapErr;
-	type DeleteSnapsErr = Types.DeleteSnapsErr;
-	type GetAllSnapsErr = Types.GetAllSnapsErr;
+	type ErrCreateSnap = Types.ErrCreateSnap;
+	type ErrDeleteSnaps = Types.ErrDeleteSnaps;
+	type ErrGetAllSnaps = Types.ErrGetAllSnaps;
 	type ICInterface = Types.ICInterface;
 	type ICInterfaceStatusResponse = Types.ICInterfaceStatusResponse;
 	type ImageRef = Types.ImageRef;
 	type InitArgs = Types.InitArgs;
-	type ProjectRef = Types.ProjectRef;
 	type SnapCanisterID = Types.SnapCanisterID;
 	type SnapID = Types.SnapID;
 	type SnapIDStorage = Types.SnapIDStorage;
@@ -88,7 +87,7 @@ actor SnapMain {
 		};
 	};
 
-	public shared ({ caller }) func create_snap(args : CreateSnapArgs) : async Result.Result<Text, CreateSnapErr> {
+	public shared ({ caller }) func create_snap(args : CreateSnapArgs) : async Result.Result<Text, ErrCreateSnap> {
 		let tags = [ACTOR_NAME, "create_snap"];
 		let is_anonymous = Principal.isAnonymous(caller);
 		let has_image = args.img_asset_ids.size() > 0;
@@ -191,7 +190,7 @@ actor SnapMain {
 		};
 	};
 
-	public shared ({ caller }) func delete_snaps(snap_ids_delete : [SnapID]) : async Result.Result<Text, DeleteSnapsErr> {
+	public shared ({ caller }) func delete_snaps(snap_ids_delete : [SnapID]) : async Result.Result<Text, ErrDeleteSnaps> {
 		let tags = [ACTOR_NAME, "delete_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
@@ -241,7 +240,7 @@ actor SnapMain {
 
 	//TODO: update_snap_likes
 
-	public shared ({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], GetAllSnapsErr> {
+	public shared ({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], ErrGetAllSnaps> {
 		let tags = [ACTOR_NAME, "get_all_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
