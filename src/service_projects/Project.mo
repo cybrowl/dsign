@@ -21,6 +21,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	type ErrDeleteSnapsFromProject = Types.ErrDeleteSnapsFromProject;
 	type Project = Types.Project;
 	type ProjectID = Types.ProjectID;
+	type ProjectPublic = Types.ProjectPublic;
 	type SnapRef = Types.SnapRef;
 	type UserPrincipal = Types.UserPrincipal;
 
@@ -182,13 +183,47 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 		};
 	};
 
-	public query func get_projects(project_ids : [ProjectID]) : async [Project] {
+	public query func get_projects(project_ids : [ProjectID]) : async [ProjectPublic] {
+		var projects_list = Buffer.Buffer<ProjectPublic>(0);
+
+		for (project_id in project_ids.vals()) {
+			switch (projects.get(project_id)) {
+				case null {};
+				case (?project) {
+					let project_public : ProjectPublic = {
+						id = project.id;
+						canister_id = project.canister_id;
+						created = project.created;
+						username = project.username;
+						name = project.name;
+						snaps = project.snaps;
+					};
+
+					projects_list.add(project);
+				};
+			};
+		};
+
+		return projects_list.toArray();
+	};
+
+	public query func get_projects_actor(project_ids : [ProjectID]) : async [Project] {
 		var projects_list = Buffer.Buffer<Project>(0);
 
 		for (project_id in project_ids.vals()) {
 			switch (projects.get(project_id)) {
 				case null {};
 				case (?project) {
+					let project_public : Project = {
+						id = project.id;
+						canister_id = project.canister_id;
+						created = project.created;
+						username = project.username;
+						owner = project.owner;
+						name = project.name;
+						snaps = project.snaps;
+					};
+
 					projects_list.add(project);
 				};
 			};

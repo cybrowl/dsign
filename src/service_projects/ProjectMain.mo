@@ -23,6 +23,7 @@ actor ProjectMain {
 	type ErrDeleteSnapsFromProject = Types.ErrDeleteSnapsFromProject;
 	type ErrGetProjects = Types.ErrGetProjects;
 	type Project = Types.Project;
+	type ProjectPublic = Types.ProjectPublic;
 	type ProjectActor = Types.ProjectActor;
 	type ProjectCanisterID = Types.ProjectCanisterID;
 	type ProjectID = Types.ProjectID;
@@ -248,12 +249,12 @@ actor ProjectMain {
 
 	//TODO: get_all_projects_public
 
-	public shared ({ caller }) func get_projects() : async Result.Result<[Project], ErrGetProjects> {
+	public shared ({ caller }) func get_projects() : async Result.Result<[ProjectPublic], ErrGetProjects> {
 		let tags = [ACTOR_NAME, "get_projects"];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?project_canister_ids) {
-				let all_projects = Buffer.Buffer<Project>(0);
+				let all_projects = Buffer.Buffer<ProjectPublic>(0);
 
 				for ((canister_id, project_ids) in project_canister_ids.entries()) {
 					let project_actor = actor (canister_id) : ProjectActor;

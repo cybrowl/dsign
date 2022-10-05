@@ -146,9 +146,9 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 
 		let project_actor = actor (project_ref.canister_id) : ProjectActor;
 
-		switch (await project_actor.get_projects([project_ref.id])) {
+		switch (await project_actor.get_projects_actor([project_ref.id])) {
 			case (projects) {
-				let project = projects[0];
+				let project = Option.make(projects[0]);
 
 				for (snap_ref in snaps_ref.vals()) {
 					switch (snaps.get(snap_ref.id)) {
@@ -161,7 +161,7 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 								id = snap.id;
 								image_cover_location = snap.image_cover_location;
 								images = snap.images;
-								project = Option.make(project);
+								project = project;
 								tags = snap.tags;
 								title = snap.title;
 								username = snap.username;
