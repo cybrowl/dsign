@@ -9,6 +9,7 @@ import Time "mo:base/Time";
 import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
+import Logger "canister:logger";
 import Username "canister:username";
 
 import Types "./types";
@@ -160,7 +161,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 					return #err(#NotOwner);
 				};
 
-				let updated_snaps : Buffer.Buffer<SnapRef> = Buffer.fromArray(project.snaps);
+				var updated_snaps : Buffer.Buffer<SnapRef> = Buffer.fromArray(project.snaps);
 
 				for (snap in snaps.vals()) {
 					updated_snaps.add(snap);
@@ -177,6 +178,8 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 				};
 
 				projects.put(project_id, project_updated);
+
+				ignore Logger.log_event(tags, "Snaps Added To Project");
 
 				return #ok("Snaps Added To Project");
 			};

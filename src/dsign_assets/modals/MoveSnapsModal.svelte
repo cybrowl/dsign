@@ -5,6 +5,7 @@
 
 	// actors
 	import { actor_project_main, project_store } from '../store/actor_project_main';
+	import { snap_store } from '../store/actor_snap_main';
 
 	// local storage
 	import { local_storage_projects } from '../store/local_storage';
@@ -19,7 +20,36 @@
 	}
 
 	async function handleMoveSubmit(e) {
-		console.log('handleMoveSubmit', e.detail);
+		const { selected_project } = e.detail;
+
+		const selected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === true);
+		const selected_snaps_list = selected_snaps.map((snap) => {
+			return {
+				id: snap.id,
+				canister_id: snap.canister_id
+			};
+		});
+
+		let project_ref = {
+			id: selected_project.id,
+			canister_id: selected_project.canister_id
+		};
+
+		try {
+			await $actor_project_main.actor.add_snaps_to_project(selected_snaps_list, project_ref);
+
+			const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects();
+
+			if (all_projects) {
+				project_store.set({ isFetching: false, projects: [...all_projects] });
+
+				local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
+
+				handleCloseMoveSnapsModal();
+			}
+		} catch (error) {
+			console.log('call => handleMoveSubmit error: ', error);
+		}
 	}
 
 	function handleOpenCreateProjectModal() {
