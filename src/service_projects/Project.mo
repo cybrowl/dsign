@@ -205,7 +205,9 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 
 						switch (await snap_actor.get_all_snaps([snap.id])) {
 							case (snap_) {
-								snap_list.add(snap_[0]);
+								if (snap_.size() > 0) {
+									snap_list.add(snap_[0]);
+								};
 							};
 						};
 					};
