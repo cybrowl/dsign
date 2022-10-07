@@ -36,6 +36,11 @@
 	let isEditActive = false;
 	let number_snaps_selected = 0;
 
+	let projectsTabs = {
+		isSnapsSelected: true,
+		isProjectsSelected: false
+	};
+
 	onMount(async () => {
 		let authClient = await AuthClient.create();
 
@@ -190,7 +195,11 @@
 			class="flex col-start-2 col-end-12 row-start-2 row-end-auto mx-4 
 					self-end justify-between items-center"
 		>
-			<ProjectsTabs isSnapsSelected={true} />
+			<ProjectsTabs
+				{projectsTabs}
+				on:toggleSnaps={(e) => (projectsTabs = e.detail)}
+				on:toggleProjects={(e) => (projectsTabs = e.detail)}
+			/>
 			<ProjectEditActionsBar
 				{isEditActive}
 				on:clickMove={handleOpenMoveSnapsModal}
@@ -200,38 +209,40 @@
 		</div>
 	{/if}
 
-	<!-- Fetching Snaps -->
-	{#if $snap_store.isFetching === true}
-		<div
-			class="col-start-2 col-end-12 grid grid-cols-4 
+	{#if projectsTabs.isSnapsSelected}
+		<!-- Fetching Snaps -->
+		{#if $snap_store.isFetching === true}
+			<div
+				class="col-start-2 col-end-12 grid grid-cols-4 
 					row-start-3 row-end-auto mx-4 gap-10 mt-2 mb-16"
-		>
-			{#each { length: $local_storage_snaps.all_snaps_count } as _, i}
-				<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />
-			{/each}
-		</div>
-	{/if}
+			>
+				{#each { length: $local_storage_snaps.all_snaps_count } as _, i}
+					<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />
+				{/each}
+			</div>
+		{/if}
 
-	<!-- No Snaps Found -->
-	{#if $snap_store.snaps.length === 0 && $snap_store.isFetching === false}
-		<div
-			class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4 mt-2
+		<!-- No Snaps Found -->
+		{#if $snap_store.snaps.length === 0 && $snap_store.isFetching === false}
+			<div
+				class="flex col-start-2 col-end-12 row-start-3 row-end-auto mx-4 mt-2
 		"
-		>
-			<SnapCardEmpty />
-		</div>
-	{/if}
+			>
+				<SnapCardEmpty />
+			</div>
+		{/if}
 
-	<!-- Snaps -->
-	{#if $snap_store.snaps.length > 0}
-		<div
-			class="col-start-2 col-end-12 grid grid-cols-4 
+		<!-- Snaps -->
+		{#if $snap_store.snaps.length > 0}
+			<div
+				class="col-start-2 col-end-12 grid grid-cols-4 
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
-		>
-			{#each $snap_store.snaps as snap}
-				<SnapCard {snap} isEditMode={isEditActive} />
-			{/each}
-		</div>
+			>
+				{#each $snap_store.snaps as snap}
+					<SnapCard {snap} isEditMode={isEditActive} />
+				{/each}
+			</div>
+		{/if}
 	{/if}
 </main>
 
