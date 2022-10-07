@@ -1,8 +1,10 @@
 <script>
-	import AccountSettings from 'dsign-components/components/AccountSettings.svelte';
 	import get from 'lodash/get.js';
+
+	import AccountSettings from 'dsign-components/components/AccountSettings.svelte';
 	import Modal from 'dsign-components/components/Modal.svelte';
 
+	// actors
 	import {
 		createActor as create_actor_assets_file_chunks,
 		actor_assets_file_chunks

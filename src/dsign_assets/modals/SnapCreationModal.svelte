@@ -1,11 +1,12 @@
 <script>
 	import { onDestroy } from 'svelte';
+	import get from 'lodash/get.js';
 
 	import SnapCreation from 'dsign-components/components/SnapCreation.svelte';
 	import SnapCreationPublishing from 'dsign-components/components/SnapCreationPublishing.svelte';
-	import get from 'lodash/get.js';
 	import Modal from 'dsign-components/components/Modal.svelte';
 
+	// actors
 	import { actor_snap_main, snap_store } from '../store/actor_snap_main';
 	import { actor_assets_file_chunks } from '../store/actor_assets_file_chunks';
 	import { actor_assets_img_staging } from '../store/actor_assets_img_staging';

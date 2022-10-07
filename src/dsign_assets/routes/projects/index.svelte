@@ -3,33 +3,37 @@
 	import { AuthClient } from '@dfinity/auth-client';
 	import get from 'lodash/get.js';
 
-	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
-	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
 	import Login from '../../components/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import ProjectEditActionsBar from 'dsign-components/components/ProjectEditActionsBar.svelte';
 	import ProjectsTabs from 'dsign-components/components/ProjectsTabs.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
-	import MoveSnapsModal from '../../modals/MoveSnapsModal.svelte';
 	import SnapCardEmpty from 'dsign-components/components/SnapCardEmpty.svelte';
+
+	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
+	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
+	import MoveSnapsModal from '../../modals/MoveSnapsModal.svelte';
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
 	import {
-		isAccountSettingsModalVisible,
 		isAccountCreationModalVisible,
-		isSnapCreationModalVisible,
-		isMoveSnapsModalVisible
+		isAccountSettingsModalVisible,
+		isMoveSnapsModalVisible,
+		isSnapCreationModalVisible
 	} from '../../store/modal';
 
+	// actors
 	import { actor_project_main, project_store } from '../../store/actor_project_main';
 	import { actor_snap_main, snap_store } from '../../store/actor_snap_main';
 
+	// local storage
 	import { local_storage_snaps, local_storage_projects } from '../../store/local_storage';
+
+	// page navigation
 	import { page_navigation } from '../../store/page_navigation';
 
 	let isAuthenticated = false;
 	let isEditActive = false;
-
 	let number_snaps_selected = 0;
 
 	onMount(async () => {
@@ -78,18 +82,16 @@
 		try {
 			const { ok: all_snaps, err: error } = await $actor_snap_main.actor.get_all_snaps();
 
-			console.log('all_snaps', all_snaps);
+			console.log('call: all_snaps', all_snaps);
 
 			if (all_snaps) {
 				snap_store.set({ isFetching: false, snaps: [...all_snaps] });
 
 				local_storage_snaps.set({ all_snaps_count: all_snaps.length || 1 });
 			} else {
-				if (error['UserNotFound'] === true) {
-					await $actor_snap_main.actor.create_user_snap_storage();
-				}
 			}
 		} catch (error) {
+			await $actor_snap_main.actor.create_user_snap_storage();
 			console.log('error: ', error);
 		}
 	}
@@ -98,7 +100,8 @@
 		try {
 			const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects();
 
-			console.log('error: ', error);
+			console.log('call error: ', error);
+			console.log('call all_projects: ', all_projects);
 
 			if (all_projects) {
 				project_store.set({ isFetching: false, projects: [...all_projects] });
@@ -106,11 +109,12 @@
 				local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
 			} else {
 				if (error['UserNotFound'] === true) {
-					await $actor_project_main.actor.create_user_project_storage();
+					console.log("create user's project storage");
 				}
 			}
 		} catch (error) {
 			console.log('error: ', error);
+			await $actor_project_main.actor.create_user_project_storage();
 		}
 	}
 
@@ -168,18 +172,17 @@
 		</PageNavigation>
 	</div>
 
-	{#if $isAccountSettingsModalVisible}
-		<AccountSettingsModal />
-	{/if}
 	{#if $isAccountCreationModalVisible}
 		<AccountCreationModal />
 	{/if}
-	{#if $isSnapCreationModalVisible}
-		<SnapCreationModal />
+	{#if $isAccountSettingsModalVisible}
+		<AccountSettingsModal />
 	{/if}
-
 	{#if $isMoveSnapsModalVisible}
 		<MoveSnapsModal {number_snaps_selected} />
+	{/if}
+	{#if $isSnapCreationModalVisible}
+		<SnapCreationModal />
 	{/if}
 
 	{#if isAuthenticated}
