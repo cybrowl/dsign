@@ -32,11 +32,12 @@ actor ImageAssetStaging = {
 	public shared ({ caller }) func create_asset(img : Types.Img) : async Nat {
 		//TODO: check username to stop spam
 
-		let is_valid_image = Utils.is_valid_image(img.data);
+		// TODO: check if img is valid
+		// let is_valid_image = Utils.is_valid_image(img.data);
 
-		if (is_valid_image == false) {
-			return 0;
-		};
+		// if (is_valid_image == false) {
+		// 	return 0;
+		// };
 
 		asset_id_count := asset_id_count + 1;
 

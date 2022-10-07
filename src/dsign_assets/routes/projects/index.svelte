@@ -10,13 +10,15 @@
 	import ProjectEditActionsBar from 'dsign-components/components/ProjectEditActionsBar.svelte';
 	import ProjectsTabs from 'dsign-components/components/ProjectsTabs.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
+	import MoveSnapsModal from '../../modals/MoveSnapsModal.svelte';
 	import SnapCardEmpty from 'dsign-components/components/SnapCardEmpty.svelte';
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
 	import {
 		isAccountSettingsModalVisible,
 		isAccountCreationModalVisible,
-		isSnapCreationModalVisible
+		isSnapCreationModalVisible,
+		isMoveSnapsModalVisible
 	} from '../../store/modal';
 
 	import { actor_project_main, project_store } from '../../store/actor_project_main';
@@ -27,6 +29,8 @@
 
 	let isAuthenticated = false;
 	let isEditActive = false;
+
+	let number_snaps_selected = 0;
 
 	onMount(async () => {
 		let authClient = await AuthClient.create();
@@ -140,6 +144,16 @@
 		await $actor_snap_main.actor.delete_snaps(selected_snaps_ids);
 		await getAllSnaps();
 	}
+
+	function handleOpenMoveSnapsModal() {
+		const selected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === true);
+
+		number_snaps_selected = selected_snaps.length;
+
+		if (selected_snaps.length > 0) {
+			isMoveSnapsModalVisible.update((isMoveSnapsModalVisible) => !isMoveSnapsModalVisible);
+		}
+	}
 </script>
 
 <!-- src/routes/projects.svelte -->
@@ -164,6 +178,10 @@
 		<SnapCreationModal />
 	{/if}
 
+	{#if $isMoveSnapsModalVisible}
+		<MoveSnapsModal {number_snaps_selected} />
+	{/if}
+
 	{#if isAuthenticated}
 		<div
 			class="flex col-start-2 col-end-12 row-start-2 row-end-auto mx-4 
@@ -172,6 +190,7 @@
 			<ProjectsTabs isSnapsSelected={true} />
 			<ProjectEditActionsBar
 				{isEditActive}
+				on:clickMove={handleOpenMoveSnapsModal}
 				on:toggleEditMode={handleToggleEditMode}
 				on:clickRemove={handleDeleteSnaps}
 			/>
