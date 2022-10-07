@@ -4,16 +4,40 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
 
+import AssetTypes "../service_assets/types";
+import ImgAssetTypes "../service_assets_img/types";
+
 module {
 	public type Time = Int;
 	public type UserPrincipal = Principal;
 	public type ProjectCanisterID = Text;
 	public type ProjectID = Text;
 	public type ProjectIDStorage = HashMap.HashMap<ProjectCanisterID, [ProjectID]>;
+	public type SnapID = Text;
+
+	public type AssetRef = AssetTypes.AssetRef;
+	public type ImageRef = ImgAssetTypes.ImageRef;
 
 	public type SnapRef = {
 		id : Text;
 		canister_id : Text;
+	};
+
+	public type SnapPublic = {
+		canister_id : Text;
+		created : Time;
+		file_asset : AssetRef;
+		id : SnapID;
+		image_cover_location : Nat8;
+		images : [ImageRef];
+		project : ?ProjectPublic;
+		tags : ?[Text];
+		title : Text;
+		username : Text;
+		metrics : {
+			likes : Nat;
+			views : Nat;
+		};
 	};
 
 	public type ProjectRef = {
@@ -27,7 +51,7 @@ module {
 		created : Time;
 		username : Text;
 		name : Text;
-		snaps : [SnapRef];
+		snaps : [SnapPublic];
 	};
 
 	public type Project = {

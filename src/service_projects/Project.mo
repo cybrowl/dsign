@@ -13,6 +13,8 @@ import Logger "canister:logger";
 import Username "canister:username";
 
 import Types "./types";
+import SnapTypes "../service_snaps/types";
+
 import Utils "../utils/utils";
 
 actor class Project(project_main : Principal, is_prod : Bool) = this {
@@ -23,6 +25,8 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	type Project = Types.Project;
 	type ProjectID = Types.ProjectID;
 	type ProjectPublic = Types.ProjectPublic;
+	type SnapActor = SnapTypes.SnapActor;
+	type SnapPublic = Types.SnapPublic;
 	type SnapRef = Types.SnapRef;
 	type UserPrincipal = Types.UserPrincipal;
 
@@ -186,23 +190,36 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 		};
 	};
 
-	public query func get_projects(project_ids : [ProjectID]) : async [ProjectPublic] {
+	public shared func get_projects(project_ids : [ProjectID]) : async [ProjectPublic] {
 		var projects_list = Buffer.Buffer<ProjectPublic>(0);
 
 		for (project_id in project_ids.vals()) {
 			switch (projects.get(project_id)) {
 				case null {};
 				case (?project) {
+
+					var snap_list = Buffer.Buffer<SnapPublic>(0);
+
+					for (snap in project.snaps.vals()) {
+						let snap_actor = actor (snap.canister_id) : SnapActor;
+
+						switch (await snap_actor.get_all_snaps([snap.id])) {
+							case (snap_) {
+								snap_list.add(snap_[0]);
+							};
+						};
+					};
+
 					let project_public : ProjectPublic = {
 						id = project.id;
 						canister_id = project.canister_id;
 						created = project.created;
 						username = project.username;
 						name = project.name;
-						snaps = project.snaps;
+						snaps = snap_list.toArray();
 					};
 
-					projects_list.add(project);
+					projects_list.add(project_public);
 				};
 			};
 		};
@@ -217,16 +234,6 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 			switch (projects.get(project_id)) {
 				case null {};
 				case (?project) {
-					let project_public : Project = {
-						id = project.id;
-						canister_id = project.canister_id;
-						created = project.created;
-						username = project.username;
-						owner = project.owner;
-						name = project.name;
-						snaps = project.snaps;
-					};
-
 					projects_list.add(project);
 				};
 			};
