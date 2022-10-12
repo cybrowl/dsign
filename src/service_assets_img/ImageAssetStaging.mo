@@ -31,6 +31,7 @@ actor ImageAssetStaging = {
 
 	public shared ({ caller }) func create_asset(img : Types.Img) : async Nat {
 		//TODO: check username to stop spam
+		//TODO: add limit to number of file space per user
 
 		// TODO: check if img is valid
 		// let is_valid_image = Utils.is_valid_image(img.data);

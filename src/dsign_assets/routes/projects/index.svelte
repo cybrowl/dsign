@@ -7,6 +7,7 @@
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import ProjectEditActionsBar from 'dsign-components/components/ProjectEditActionsBar.svelte';
 	import ProjectsTabs from 'dsign-components/components/ProjectsTabs.svelte';
+	import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 	import SnapCardEmpty from 'dsign-components/components/SnapCardEmpty.svelte';
 
@@ -190,6 +191,7 @@
 		<SnapCreationModal />
 	{/if}
 
+	<!-- ProjectsTabs & ProjectEditActionsBar -->
 	{#if isAuthenticated}
 		<div
 			class="flex col-start-2 col-end-12 row-start-2 row-end-auto mx-4 
@@ -200,15 +202,18 @@
 				on:toggleSnaps={(e) => (projectsTabs = e.detail)}
 				on:toggleProjects={(e) => (projectsTabs = e.detail)}
 			/>
-			<ProjectEditActionsBar
-				{isEditActive}
-				on:clickMove={handleOpenMoveSnapsModal}
-				on:toggleEditMode={handleToggleEditMode}
-				on:clickRemove={handleDeleteSnaps}
-			/>
+			{#if projectsTabs.isSnapsSelected}
+				<ProjectEditActionsBar
+					{isEditActive}
+					on:clickMove={handleOpenMoveSnapsModal}
+					on:toggleEditMode={handleToggleEditMode}
+					on:clickRemove={handleDeleteSnaps}
+				/>
+			{/if}
 		</div>
 	{/if}
 
+	<!-- Snaps -->
 	{#if projectsTabs.isSnapsSelected}
 		<!-- Fetching Snaps -->
 		{#if $snap_store.isFetching === true}
@@ -240,6 +245,18 @@
 				{/each}
 			</div>
 		{/if}
+	{/if}
+
+	<!-- Projects -->
+	{#if projectsTabs.isProjectsSelected}
+		<div
+			class="col-start-2 col-end-12 grid grid-cols-4 
+		row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
+		>
+			{#each $project_store.projects as project}
+				<ProjectCard {project} />
+			{/each}
+		</div>
 	{/if}
 </main>
 

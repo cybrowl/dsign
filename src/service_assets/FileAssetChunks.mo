@@ -23,6 +23,7 @@ actor FileAssetChunks = {
 
 	public shared ({ caller }) func create_chunk(chunk : Types.Chunk) : async Nat {
 		//TODO: check username to stop spam
+		//TODO: add limit to number of file space per user
 
 		chunk_id_count := chunk_id_count + 1;
 
