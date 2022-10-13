@@ -23,7 +23,6 @@ module {
 	public type CreateAssetArgs = AssetTypes.CreateAssetArgs;
 
 	public type Project = ProjectTypes.Project;
-	public type ProjectPublic = ProjectTypes.ProjectPublic;
 	public type ProjectActor = ProjectTypes.ProjectActor;
 	public type ProjectRef = ProjectTypes.ProjectRef;
 
@@ -34,6 +33,14 @@ module {
 	public type SnapCanisterID = Text;
 	public type SnapID = Text;
 	public type SnapIDStorage = HashMap.HashMap<SnapCanisterID, [SnapID]>;
+
+	public type ProjectPublic = {
+		id : Text;
+		canister_id : Text;
+		created : Time;
+		username : Text;
+		name : Text;
+	};
 
 	public type SnapRef = {
 		id : Text;

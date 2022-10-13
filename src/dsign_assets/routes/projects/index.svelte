@@ -86,7 +86,8 @@
 
 	async function getAllSnaps() {
 		try {
-			const { ok: all_snaps, err: error } = await $actor_snap_main.actor.get_all_snaps();
+			const { ok: all_snaps, err: error } =
+				await $actor_snap_main.actor.get_all_snaps_without_project();
 
 			console.log('call: all_snaps', all_snaps);
 

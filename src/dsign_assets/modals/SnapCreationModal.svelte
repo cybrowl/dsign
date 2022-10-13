@@ -16,12 +16,8 @@
 
 	onDestroy(() => (is_publishing = false));
 
-	function handleCloseModal(all_snaps) {
+	function handleCloseModal() {
 		isSnapCreationModalVisible.update((isSnapCreationModalVisible) => !isSnapCreationModalVisible);
-
-		if (all_snaps && all_snaps.ok) {
-			snap_store.set({ isFetching: false, snaps: [...all_snaps.ok] });
-		}
 	}
 
 	async function commitImgAssetsToStaging(images) {
@@ -110,9 +106,11 @@
 
 		const created_snap_res = await $actor_snap_main.actor.create_snap(create_snap_args);
 
-		console.log('created_snap_res', created_snap_res);
+		const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
 
-		const all_snaps = await $actor_snap_main.actor.get_all_snaps();
+		if (all_snaps) {
+			snap_store.set({ isFetching: false, snaps: [...all_snaps] });
+		}
 
 		handleCloseModal(all_snaps);
 	}

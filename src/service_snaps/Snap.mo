@@ -23,6 +23,7 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 	type ErrCreateSnap = Types.ErrCreateSnap;
 	type ImageRef = Types.ImageRef;
 	type Project = ProjectTypes.Project;
+	type ProjectPublic = Types.ProjectPublic;
 	type ProjectRef = ProjectTypes.ProjectRef;
 	type Snap = Types.Snap;
 	type SnapID = Types.SnapID;
@@ -193,6 +194,26 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 				case null {};
 				case (?snap) {
 
+					let project_public = label project : ?ProjectPublic {
+						switch (snap.project) {
+							case (null) {
+								null;
+							};
+							case (?project) {
+								var project_public : ProjectPublic = {
+									id = project.id;
+									canister_id = project.canister_id;
+									created = project.created;
+									username = project.username;
+									name = project.name;
+								};
+
+								?project_public;
+
+							};
+						};
+					};
+
 					let snap_public : SnapPublic = {
 						canister_id = snap.canister_id;
 						created = snap.created;
@@ -200,7 +221,7 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 						id = snap.id;
 						image_cover_location = snap.image_cover_location;
 						images = snap.images;
-						project = snap.project;
+						project = project_public;
 						tags = snap.tags;
 						title = snap.title;
 						username = snap.username;

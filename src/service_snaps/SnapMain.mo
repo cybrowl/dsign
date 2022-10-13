@@ -269,7 +269,43 @@ actor SnapMain {
 		};
 	};
 
-	//TODO: get_all_snaps_without_project
+	public shared ({ caller }) func get_all_snaps_without_project() : async Result.Result<[SnapPublic], ErrGetAllSnaps> {
+		let tags = [ACTOR_NAME, "get_all_snaps_without_project"];
+
+		switch (user_canisters_ref.get(caller)) {
+			case (?user_snap_ids_storage) {
+				let all_snaps = Buffer.Buffer<SnapPublic>(0);
+
+				for ((canister_id, snap_ids) in user_snap_ids_storage.entries()) {
+					let snap_actor = actor (canister_id) : SnapActor;
+					let snaps = await snap_actor.get_all_snaps(snap_ids);
+
+					ignore Logger.log_event(
+						tags,
+						debug_show ("snap_ids: ", snap_ids)
+					);
+
+					for (snap in snaps.vals()) {
+						switch (snap.project) {
+							case (null) {
+								all_snaps.add(snap);
+							};
+							case (_) {
+								// do nothing
+							};
+						};
+					};
+				};
+				return #ok(all_snaps.toArray());
+
+			};
+			case (_) {
+				#err(#UserNotFound(true));
+			};
+		};
+
+	};
+
 	//TODO: get_all_snaps_public
 
 	public shared ({ caller }) func get_snap_ids() : async Result.Result<[SnapID], Text> {
