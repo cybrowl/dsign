@@ -23,6 +23,11 @@ module {
 		canister_id : Text;
 	};
 
+	public type ProjectRef = {
+		id : Text;
+		canister_id : Text;
+	};
+
 	public type SnapPublic = {
 		canister_id : Text;
 		created : Time;
@@ -38,11 +43,6 @@ module {
 			likes : Nat;
 			views : Nat;
 		};
-	};
-
-	public type ProjectRef = {
-		id : Text;
-		canister_id : Text;
 	};
 
 	public type ProjectPublic = {

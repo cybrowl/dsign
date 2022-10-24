@@ -206,6 +206,7 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 									created = project.created;
 									username = project.username;
 									name = project.name;
+									snaps = [];
 								};
 
 								?project_public;

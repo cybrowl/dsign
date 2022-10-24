@@ -86,6 +86,7 @@
 
 			console.log('is_create_project_modal_open: ', is_create_project_modal_open);
 		} catch (error) {
+			await $actor_project_main.actor.create_user_project_storage();
 			console.log('call => handleCreateProjectSubmit error: ', error);
 		}
 	}

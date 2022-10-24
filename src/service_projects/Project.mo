@@ -26,7 +26,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	type ProjectID = Types.ProjectID;
 	type ProjectPublic = Types.ProjectPublic;
 	type SnapActor = SnapTypes.SnapActor;
-	type SnapPublic = Types.SnapPublic;
+	type SnapPublic = SnapTypes.SnapPublic;
 	type SnapRef = Types.SnapRef;
 	type UserPrincipal = Types.UserPrincipal;
 

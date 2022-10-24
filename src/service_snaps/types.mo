@@ -40,6 +40,7 @@ module {
 		created : Time;
 		username : Text;
 		name : Text;
+		snaps : [SnapPublic];
 	};
 
 	public type SnapRef = {

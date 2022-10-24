@@ -165,6 +165,20 @@
 			isMoveSnapsModalVisible.update((isMoveSnapsModalVisible) => !isMoveSnapsModalVisible);
 		}
 	}
+
+	function handleClickProject() {}
+
+	function handleRenameProject() {}
+
+	async function handleDeleteProject(e) {
+		const project = get(e, 'detail');
+
+		const { ok: success, err: error } = await $actor_project_main.actor.delete_projects([
+			project.id
+		]);
+
+		console.log('success: ', success);
+	}
 </script>
 
 <!-- src/routes/projects.svelte -->
@@ -255,7 +269,12 @@
 		row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
 		>
 			{#each $project_store.projects as project}
-				<ProjectCard {project} />
+				<ProjectCard
+					{project}
+					on:clickProject={handleClickProject}
+					on:clickRenameProject={handleRenameProject}
+					on:clickDeleteProject={handleDeleteProject}
+				/>
 			{/each}
 		</div>
 	{/if}
