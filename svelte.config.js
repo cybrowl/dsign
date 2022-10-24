@@ -1,8 +1,15 @@
 import preprocess from 'svelte-preprocess';
+import tailwind from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
+
 import adapter from '@sveltejs/adapter-static';
 
 const config = {
-	preprocess: preprocess(),
+	preprocess: preprocess({
+		postcss: {
+			plugins: [tailwind, autoprefixer]
+		}
+	}),
 
 	kit: {
 		files: {
@@ -16,7 +23,7 @@ const config = {
 			assets: '',
 			base: ''
 		},
-		adapter: adapter({ pages: 'build', assets: 'build', fallback: "index.html" })
+		adapter: adapter({ pages: 'build', assets: 'build', fallback: 'index.html' })
 	}
 };
 
