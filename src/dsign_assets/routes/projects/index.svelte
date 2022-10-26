@@ -26,7 +26,12 @@
 	} from '../../store/modal';
 
 	// actors
-	import { actor_project_main, project_store } from '../../store/actor_project_main';
+	import {
+		actor_project_main,
+		project_store,
+		projects_tabs,
+		is_edit_active
+	} from '../../store/actor_project_main';
 	import { actor_snap_main, snap_store } from '../../store/actor_snap_main';
 
 	// local storage
@@ -36,14 +41,7 @@
 	import { page_navigation } from '../../store/page_navigation';
 
 	let isAuthenticated = false;
-	let isEditActive = false;
 	let number_snaps_selected = 0;
-
-	let projectsTabs = {
-		isSnapsSelected: true,
-		isProjectsSelected: false,
-		isProjectSelected: false
-	};
 
 	let project = {};
 
@@ -131,7 +129,7 @@
 	}
 
 	function handleToggleEditMode(e) {
-		isEditActive = get(e, 'detail');
+		is_edit_active.set(get(e, 'detail', false));
 
 		snap_store.update(({ snaps }) => {
 			const new_all_snaps = snaps.map((snap) => {
@@ -204,11 +202,11 @@
 
 		project.name = project.name.charAt(0).toUpperCase() + project.name.slice(1);
 
-		projectsTabs = {
+		projects_tabs.set({
 			isSnapsSelected: false,
 			isProjectsSelected: false,
 			isProjectSelected: true
-		};
+		});
 	}
 
 	function handleRenameProject() {}
@@ -260,13 +258,13 @@
 		>
 			<ProjectsTabs
 				project_name={project.name}
-				{projectsTabs}
-				on:toggleSnaps={(e) => (projectsTabs = e.detail)}
-				on:toggleProjects={(e) => (projectsTabs = e.detail)}
+				projectsTabs={$projects_tabs}
+				on:toggleSnaps={(e) => projects_tabs.set(e.detail)}
+				on:toggleProjects={(e) => projects_tabs.set(e.detail)}
 			/>
-			{#if projectsTabs.isSnapsSelected || projectsTabs.isProjectSelected}
+			{#if $projects_tabs.isSnapsSelected || $projects_tabs.isProjectSelected}
 				<ProjectEditActionsBar
-					{isEditActive}
+					isEditActive={$is_edit_active}
 					on:clickMove={handleOpenMoveSnapsModal}
 					on:toggleEditMode={handleToggleEditMode}
 					on:clickRemove={handleDeleteSnaps}
@@ -276,7 +274,7 @@
 	{/if}
 
 	<!-- Snaps -->
-	{#if projectsTabs.isSnapsSelected}
+	{#if $projects_tabs.isSnapsSelected}
 		<!-- Fetching Snaps -->
 		{#if $snap_store.isFetching === true}
 			<div
@@ -303,14 +301,14 @@
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
 			>
 				{#each $snap_store.snaps as snap}
-					<SnapCard {snap} isEditMode={isEditActive} />
+					<SnapCard {snap} isEditMode={$is_edit_active} />
 				{/each}
 			</div>
 		{/if}
 	{/if}
 
 	<!-- Projects -->
-	{#if projectsTabs.isProjectsSelected}
+	{#if $projects_tabs.isProjectsSelected}
 		<div
 			class="col-start-2 col-end-12 grid grid-cols-4 
 		row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
@@ -327,15 +325,15 @@
 	{/if}
 
 	<!-- Project -->
-	{#if projectsTabs.isProjectSelected}
+	{#if $projects_tabs.isProjectSelected}
 		<!-- Snaps -->
-		{#if project.snaps.length > 0}
+		{#if project.snaps && project.snaps.length > 0}
 			<div
 				class="col-start-2 col-end-12 grid grid-cols-4 
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
 			>
 				{#each project.snaps as snap}
-					<SnapCard {snap} isEditMode={isEditActive} />
+					<SnapCard {snap} isEditMode={$is_edit_active} />
 				{/each}
 			</div>
 		{/if}

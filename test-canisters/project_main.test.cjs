@@ -285,7 +285,6 @@ test('SnapMain[mishicat].get_all_snaps(): should have project as part of snap', 
 	const project = snaps[0].project[0];
 
 	t.equal(project.name, 'Project One');
-	t.equal(project.snaps.length, 1);
 	t.equal(project.id.length > 0, true);
 });
 

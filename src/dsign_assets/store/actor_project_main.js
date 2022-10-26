@@ -40,3 +40,11 @@ export const actor_project_main = writable({
 });
 
 export const project_store = writable({ isFetching: false, projects: [] });
+
+export const projects_tabs = writable({
+	isSnapsSelected: true,
+	isProjectsSelected: false,
+	isProjectSelected: false
+});
+
+export const is_edit_active = writable(false);

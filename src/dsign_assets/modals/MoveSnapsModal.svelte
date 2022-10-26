@@ -4,7 +4,7 @@
 	import Modal from 'dsign-components/components/Modal.svelte';
 
 	// actors
-	import { actor_project_main, project_store } from '../store/actor_project_main';
+	import { actor_project_main, project_store, is_edit_active } from '../store/actor_project_main';
 	import { actor_snap_main, snap_store } from '../store/actor_snap_main';
 
 	// local storage
@@ -20,6 +20,15 @@
 
 	function handleCloseMoveSnapsModal() {
 		isMoveSnapsModalVisible.update((isMoveSnapsModalVisible) => !isMoveSnapsModalVisible);
+		is_edit_active.update((is_edit_active) => !is_edit_active);
+	}
+
+	function handleOpenCreateProjectModal() {
+		is_create_project_modal_open = true;
+	}
+
+	function handleCloseProjectModal() {
+		is_create_project_modal_open = false;
 	}
 
 	async function handleMoveSubmit(e) {
@@ -33,12 +42,12 @@
 			};
 		});
 
-		let project_ref = {
-			id: selected_project.id,
-			canister_id: selected_project.canister_id
-		};
-
 		try {
+			let project_ref = {
+				id: selected_project.id,
+				canister_id: selected_project.canister_id
+			};
+
 			await $actor_project_main.actor.add_snaps_to_project(selected_snaps_list, project_ref);
 
 			const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects();
@@ -59,14 +68,6 @@
 		} catch (error) {
 			console.log('call => handleMoveSubmit error: ', error);
 		}
-	}
-
-	function handleOpenCreateProjectModal() {
-		is_create_project_modal_open = true;
-	}
-
-	function handleCloseProjectModal() {
-		is_create_project_modal_open = false;
 	}
 
 	async function handleCreateProjectSubmit(e) {
