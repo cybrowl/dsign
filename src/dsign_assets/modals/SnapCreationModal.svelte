@@ -10,6 +10,7 @@
 	import { actor_snap_main, snap_store } from '../store/actor_snap_main';
 	import { actor_assets_file_chunks } from '../store/actor_assets_file_chunks';
 	import { actor_assets_img_staging } from '../store/actor_assets_img_staging';
+
 	import { isSnapCreationModalVisible } from '../store/modal';
 
 	let is_publishing = false;

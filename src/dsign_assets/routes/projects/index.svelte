@@ -14,12 +14,14 @@
 	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
 	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
 	import MoveSnapsModal from '../../modals/MoveSnapsModal.svelte';
+	import ProjectOptionsModal from '../../modals/ProjectOptionsModal.svelte';
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
 	import {
 		isAccountCreationModalVisible,
 		isAccountSettingsModalVisible,
 		isMoveSnapsModalVisible,
+		isProjectOptionsModalVisible,
 		isSnapCreationModalVisible
 	} from '../../store/modal';
 
@@ -39,8 +41,11 @@
 
 	let projectsTabs = {
 		isSnapsSelected: true,
-		isProjectsSelected: false
+		isProjectsSelected: false,
+		isProjectSelected: false
 	};
+
+	let project = {};
 
 	onMount(async () => {
 		let authClient = await AuthClient.create();
@@ -141,19 +146,47 @@
 				snaps: [...new_all_snaps]
 			};
 		});
+
+		if (project.snaps) {
+			project.snaps = project.snaps.map((snap) => {
+				return {
+					...snap,
+					isSelected: false
+				};
+			});
+		}
 	}
 
-	async function handleDeleteSnaps(e) {
-		const selected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === true);
-		const unselected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === false);
-		const selected_snaps_ids = selected_snaps.map((snap) => snap.id);
+	async function handleDeleteSnaps() {
+		if ($snap_store.snaps) {
+			const selected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === true);
+			const unselected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === false);
+			const selected_snaps_ids = selected_snaps.map((snap) => snap.id);
 
-		snap_store.set({ isFetching: false, snaps: unselected_snaps });
+			if (selected_snaps_ids.length > 0) {
+				snap_store.set({ isFetching: false, snaps: unselected_snaps });
 
-		handleToggleEditMode({ detail: false });
+				handleToggleEditMode({ detail: false });
 
-		await $actor_snap_main.actor.delete_snaps(selected_snaps_ids);
-		await getAllSnaps();
+				await $actor_snap_main.actor.delete_snaps(selected_snaps_ids);
+				await getAllSnaps();
+			}
+		}
+
+		if (project.snaps) {
+			const project_selected_snaps = project.snaps.filter((snap) => snap.isSelected === true);
+			const project_unselected_snaps = project.snaps.filter((snap) => snap.isSelected === false);
+			const project_selected_snaps_ids = project_selected_snaps.map((snap) => snap.id);
+
+			if (project_selected_snaps_ids.length > 0) {
+				project.snaps = project_unselected_snaps;
+
+				handleToggleEditMode({ detail: false });
+
+				await $actor_snap_main.actor.delete_snaps(project_selected_snaps_ids);
+				await getAllSnaps();
+			}
+		}
 	}
 
 	function handleOpenMoveSnapsModal() {
@@ -166,18 +199,26 @@
 		}
 	}
 
-	function handleClickProject() {}
+	function handleClickProject(e) {
+		project = get(e, 'detail');
+
+		project.name = project.name.charAt(0).toUpperCase() + project.name.slice(1);
+
+		projectsTabs = {
+			isSnapsSelected: false,
+			isProjectsSelected: false,
+			isProjectSelected: true
+		};
+	}
 
 	function handleRenameProject() {}
 
 	async function handleDeleteProject(e) {
-		const project = get(e, 'detail');
+		isProjectOptionsModalVisible.update(
+			(isProjectOptionsModalVisible) => !isProjectOptionsModalVisible
+		);
 
-		const { ok: success, err: error } = await $actor_project_main.actor.delete_projects([
-			project.id
-		]);
-
-		console.log('success: ', success);
+		project = get(e, 'detail');
 	}
 </script>
 
@@ -187,12 +228,14 @@
 </svelte:head>
 
 <main class="grid grid-cols-12 gap-y-2">
-	<div class="col-start-2 col-end-12 mb-16">
+	<!-- Header Nav -->
+	<div class="col-start-2 col-end-12 mb-8">
 		<PageNavigation navItems={$page_navigation.navItems}>
 			<Login />
 		</PageNavigation>
 	</div>
 
+	<!-- Modals -->
 	{#if $isAccountCreationModalVisible}
 		<AccountCreationModal />
 	{/if}
@@ -205,19 +248,23 @@
 	{#if $isSnapCreationModalVisible}
 		<SnapCreationModal />
 	{/if}
+	{#if $isProjectOptionsModalVisible}
+		<ProjectOptionsModal {project} />
+	{/if}
 
 	<!-- ProjectsTabs & ProjectEditActionsBar -->
 	{#if isAuthenticated}
 		<div
 			class="flex col-start-2 col-end-12 row-start-2 row-end-auto mx-4 
-					self-end justify-between items-center"
+					self-end justify-between items-center h-10"
 		>
 			<ProjectsTabs
+				project_name={project.name}
 				{projectsTabs}
 				on:toggleSnaps={(e) => (projectsTabs = e.detail)}
 				on:toggleProjects={(e) => (projectsTabs = e.detail)}
 			/>
-			{#if projectsTabs.isSnapsSelected}
+			{#if projectsTabs.isSnapsSelected || projectsTabs.isProjectSelected}
 				<ProjectEditActionsBar
 					{isEditActive}
 					on:clickMove={handleOpenMoveSnapsModal}
@@ -277,6 +324,21 @@
 				/>
 			{/each}
 		</div>
+	{/if}
+
+	<!-- Project -->
+	{#if projectsTabs.isProjectSelected}
+		<!-- Snaps -->
+		{#if project.snaps.length > 0}
+			<div
+				class="col-start-2 col-end-12 grid grid-cols-4 
+						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
+			>
+				{#each project.snaps as snap}
+					<SnapCard {snap} isEditMode={isEditActive} />
+				{/each}
+			</div>
+		{/if}
 	{/if}
 </main>
 
