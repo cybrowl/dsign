@@ -4,7 +4,7 @@
 	import Button from 'dsign-components/components/Button.svelte';
 	import environment from 'environment';
 	import ProfileAvatar from './ProfileAvatar.svelte';
-	import { isSnapCreationModalVisible } from '../store/modal';
+	import { is_snap_creation_modal_visible } from '../store/modal';
 
 	import {
 		createActor as create_actor_assets_file_chunks,
@@ -141,7 +141,9 @@
 	}
 
 	async function openSnapCreationModal() {
-		isSnapCreationModalVisible.update((isSnapCreationModalVisible) => !isSnapCreationModalVisible);
+		is_snap_creation_modal_visible.update(
+			(is_snap_creation_modal_visible) => !is_snap_creation_modal_visible
+		);
 	}
 </script>
 

@@ -4,18 +4,23 @@
 
 	// actors
 	import { actor_project_main, project_store } from '../store/actor_project_main';
+	import { actor_snap_main } from '../store/actor_snap_main';
 
-	import { isProjectOptionsModalVisible } from '../store/modal';
+	import { is_project_options_modal_visible } from '../store/modal';
 
-	export let project = {};
+	export let project = {
+		snaps: []
+	};
 
 	function handleCloseModal() {
-		isProjectOptionsModalVisible.update(
-			(isProjectOptionsModalVisible) => !isProjectOptionsModalVisible
+		is_project_options_modal_visible.update(
+			(is_project_options_modal_visible) => !is_project_options_modal_visible
 		);
 	}
 
 	async function handleDeleteProject() {
+		const project_snaps_ids = project.snaps.map((snap) => snap.id);
+
 		project_store.update(({ projects }) => {
 			const updated_projects = projects.filter((project_) => {
 				return project_.id !== project.id;
@@ -27,13 +32,20 @@
 			};
 		});
 
-		isProjectOptionsModalVisible.update(
-			(isProjectOptionsModalVisible) => !isProjectOptionsModalVisible
+		is_project_options_modal_visible.update(
+			(is_project_options_modal_visible) => !is_project_options_modal_visible
 		);
 
-		const { ok: success, err: error } = await $actor_project_main.actor.delete_projects([
-			project.id
-		]);
+		try {
+			const { ok: success, err: error } = await $actor_project_main.actor.delete_projects([
+				project.id
+			]);
+
+			const { ok: deleted_snaps, err: deleted_snaps_err } =
+				await $actor_snap_main.actor.delete_snaps(project_snaps_ids);
+		} catch (error) {
+			console.log(error);
+		}
 	}
 </script>
 

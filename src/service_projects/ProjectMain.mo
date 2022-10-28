@@ -246,6 +246,55 @@ actor ProjectMain {
 		};
 	};
 
+	public shared ({ caller }) func move_snaps_from_project(
+		snaps : [SnapRef],
+		project_from_ref : ProjectRef,
+		project_to_ref : ProjectRef
+	) : async Result.Result<Text, ErrAddSnapsToProject> {
+		let tags = [ACTOR_NAME, "move_snaps_from_project"];
+
+		switch (user_canisters_ref.get(caller)) {
+			case (?user_project_ids_storage) {
+				let my_ids = Utils.get_all_ids(user_project_ids_storage);
+				let from_matches = Utils.all_ids_match(my_ids, [project_from_ref.id]);
+				let to_matches = Utils.all_ids_match(my_ids, [project_to_ref.id]);
+
+				if (from_matches.all_match == false and to_matches.all_match == false) {
+					return #err(#ProjectIdsDoNotMatch);
+				};
+
+				let project_actor_to = actor (project_to_ref.canister_id) : ProjectActor;
+				let project_actor_from = actor (project_from_ref.canister_id) : ProjectActor;
+
+				switch (await project_actor_to.add_snaps_to_project(snaps, project_to_ref.id, caller)) {
+					case (#err err) {
+						return #err(#ErrorCall(debug_show (err)));
+					};
+					case (#ok _) {
+						// add project to snaps
+						for (snap in snaps.vals()) {
+							let snap_actor = actor (snap.canister_id) : SnapActor;
+							ignore snap_actor.add_project_to_snaps(snaps, project_to_ref);
+						};
+					};
+				};
+
+				switch (await project_actor_from.delete_snaps_from_project(snaps, project_from_ref.id, caller)) {
+					case (#err err) {
+						return #err(#ErrorCall(debug_show (err)));
+					};
+					case (#ok _) {
+						return #ok("Deleted Snaps From Project");
+					};
+				};
+
+			};
+			case (_) {
+				#err(#UserNotFound);
+			};
+		};
+	};
+
 	//TODO: update_project_details
 
 	//TODO: get_all_projects_public

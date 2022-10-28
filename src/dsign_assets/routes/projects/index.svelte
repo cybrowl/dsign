@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { AuthClient } from '@dfinity/auth-client';
 	import get from 'lodash/get.js';
 
@@ -18,11 +18,11 @@
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
 	import {
-		isAccountCreationModalVisible,
-		isAccountSettingsModalVisible,
-		isMoveSnapsModalVisible,
-		isProjectOptionsModalVisible,
-		isSnapCreationModalVisible
+		is_account_creation_modal_visible,
+		is_account_settings_modal_visible,
+		is_move_snaps_modal_visible,
+		is_project_options_modal_visible,
+		is_snap_creation_modal_visible
 	} from '../../store/modal';
 
 	// actors
@@ -41,9 +41,9 @@
 	import { page_navigation } from '../../store/page_navigation';
 
 	let isAuthenticated = false;
-	let number_snaps_selected = 0;
 
-	let project = {};
+	let number_snaps_selected = 0;
+	let project = { snaps: [] };
 
 	onMount(async () => {
 		let authClient = await AuthClient.create();
@@ -70,12 +70,11 @@
 			});
 		}
 
-		if ($project_store.projects.length === 0) {
-			project_store.update(({ projects }) => {
-				return {
-					isFetching: true,
-					projects: projects
-				};
+		if ($project_store.projects.length > 1) {
+			projects_tabs.set({
+				isSnapsSelected: false,
+				isProjectsSelected: true,
+				isProjectSelected: false
 			});
 		}
 
@@ -87,12 +86,22 @@
 		}
 	});
 
+	onDestroy(() => {
+		projects_tabs.set({
+			isSnapsSelected: true,
+			isProjectsSelected: false,
+			isProjectSelected: false
+		});
+	});
+
 	async function getAllSnaps() {
 		try {
 			const { ok: all_snaps, err: error } =
 				await $actor_snap_main.actor.get_all_snaps_without_project();
 
-			console.log('call: all_snaps', all_snaps);
+			const { ok: all_snap_ids } = await $actor_snap_main.actor.get_snap_ids();
+
+			console.log('call: all_snap_ids', all_snap_ids);
 
 			if (all_snaps) {
 				snap_store.set({ isFetching: false, snaps: [...all_snaps] });
@@ -192,8 +201,10 @@
 
 		number_snaps_selected = selected_snaps.length;
 
-		if (selected_snaps.length > 0) {
-			isMoveSnapsModalVisible.update((isMoveSnapsModalVisible) => !isMoveSnapsModalVisible);
+		if (selected_snaps.length > 0 || project.snaps.length > 0) {
+			is_move_snaps_modal_visible.update(
+				(is_move_snaps_modal_visible) => !is_move_snaps_modal_visible
+			);
 		}
 	}
 
@@ -212,8 +223,8 @@
 	function handleRenameProject() {}
 
 	async function handleDeleteProject(e) {
-		isProjectOptionsModalVisible.update(
-			(isProjectOptionsModalVisible) => !isProjectOptionsModalVisible
+		is_project_options_modal_visible.update(
+			(is_project_options_modal_visible) => !is_project_options_modal_visible
 		);
 
 		project = get(e, 'detail');
@@ -227,33 +238,33 @@
 
 <main class="grid grid-cols-12 gap-y-2">
 	<!-- Header Nav -->
-	<div class="col-start-2 col-end-12 mb-8">
+	<div class="col-start-2 col-end-12 row-start-1 row-end-2 mb-8">
 		<PageNavigation navItems={$page_navigation.navItems}>
 			<Login />
 		</PageNavigation>
 	</div>
 
 	<!-- Modals -->
-	{#if $isAccountCreationModalVisible}
+	{#if $is_account_creation_modal_visible}
 		<AccountCreationModal />
 	{/if}
-	{#if $isAccountSettingsModalVisible}
+	{#if $is_account_settings_modal_visible}
 		<AccountSettingsModal />
 	{/if}
-	{#if $isMoveSnapsModalVisible}
-		<MoveSnapsModal {number_snaps_selected} />
+	{#if $is_move_snaps_modal_visible}
+		<MoveSnapsModal {number_snaps_selected} {project} />
 	{/if}
-	{#if $isSnapCreationModalVisible}
+	{#if $is_snap_creation_modal_visible}
 		<SnapCreationModal />
 	{/if}
-	{#if $isProjectOptionsModalVisible}
+	{#if $is_project_options_modal_visible}
 		<ProjectOptionsModal {project} />
 	{/if}
 
 	<!-- ProjectsTabs & ProjectEditActionsBar -->
 	{#if isAuthenticated}
 		<div
-			class="flex col-start-2 col-end-12 row-start-2 row-end-auto mx-4 
+			class="flex col-start-2 col-end-12 row-start-2 row-end-3 mx-4 
 					self-end justify-between items-center h-10"
 		>
 			<ProjectsTabs

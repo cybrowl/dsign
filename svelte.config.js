@@ -23,7 +23,12 @@ const config = {
 			assets: '',
 			base: ''
 		},
-		adapter: adapter({ pages: 'build', assets: 'build', fallback: 'index.html' })
+		adapter: adapter({
+			pages: 'build',
+			assets: 'build',
+			fallback: 'index.html',
+			precompress: false
+		})
 	}
 };
 

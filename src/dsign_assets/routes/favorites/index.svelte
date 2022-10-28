@@ -7,9 +7,9 @@
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
 	import {
-		isAccountSettingsModalVisible,
-		isAccountCreationModalVisible,
-		isSnapCreationModalVisible
+		is_account_settings_modal_visible,
+		is_account_creation_modal_visible,
+		is_snap_creation_modal_visible
 	} from '../../store/modal';
 	import { page_navigation } from '../../store/page_navigation';
 
@@ -37,17 +37,17 @@
 	</div>
 
 	<!-- AccountSettingsModal -->
-	{#if $isAccountSettingsModalVisible}
+	{#if $is_account_settings_modal_visible}
 		<AccountSettingsModal />
 	{/if}
 
 	<!-- AccountCreationModal -->
-	{#if $isAccountCreationModalVisible}
+	{#if $is_account_creation_modal_visible}
 		<AccountCreationModal />
 	{/if}
 
 	<!-- SnapCreationModal -->
-	{#if $isSnapCreationModalVisible}
+	{#if $is_snap_creation_modal_visible}
 		<SnapCreationModal />
 	{/if}
 

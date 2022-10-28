@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 
-export const isAccountSettingsModalVisible = writable(false);
-export const isAccountCreationModalVisible = writable(false);
-export const isSnapCreationModalVisible = writable(false);
-export const isMoveSnapsModalVisible = writable(false);
-export const isProjectOptionsModalVisible = writable(false);
+export const is_account_settings_modal_visible = writable(false);
+export const is_account_creation_modal_visible = writable(false);
+export const is_snap_creation_modal_visible = writable(false);
+export const is_move_snaps_modal_visible = writable(false);
+export const is_project_options_modal_visible = writable(false);
