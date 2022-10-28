@@ -5,11 +5,7 @@
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import SnapCreationModal from '../modals/SnapCreationModal.svelte';
 
-	import {
-		is_account_settings_modal_visible,
-		is_account_creation_modal_visible,
-		is_snap_creation_modal_visible
-	} from '../store/modal';
+	import { modal_visible } from '../store/modal';
 	import { page_navigation } from '../store/page_navigation';
 
 	page_navigation.update(({ navItems }) => {
@@ -36,17 +32,17 @@
 	</div>
 
 	<!-- AccountSettingsModal -->
-	{#if $is_account_settings_modal_visible}
+	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}
 
 	<!-- AccountCreationModal -->
-	{#if $is_account_creation_modal_visible}
+	{#if $modal_visible.account_creation}
 		<AccountCreationModal />
 	{/if}
 
 	<!-- SnapCreationModal -->
-	{#if $is_snap_creation_modal_visible}
+	{#if $modal_visible.snap_creation}
 		<SnapCreationModal />
 	{/if}
 </main>

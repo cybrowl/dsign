@@ -17,13 +17,7 @@
 	import ProjectOptionsModal from '../../modals/ProjectOptionsModal.svelte';
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
-	import {
-		is_account_creation_modal_visible,
-		is_account_settings_modal_visible,
-		is_move_snaps_modal_visible,
-		is_project_options_modal_visible,
-		is_snap_creation_modal_visible
-	} from '../../store/modal';
+	import { modal_visible } from '../../store/modal';
 
 	// actors
 	import {
@@ -202,9 +196,12 @@
 		number_snaps_selected = selected_snaps.length;
 
 		if (selected_snaps.length > 0 || project.snaps.length > 0) {
-			is_move_snaps_modal_visible.update(
-				(is_move_snaps_modal_visible) => !is_move_snaps_modal_visible
-			);
+			modal_visible.update((options) => {
+				return {
+					...options,
+					move_snaps: !options.move_snaps
+				};
+			});
 		}
 	}
 
@@ -223,9 +220,12 @@
 	function handleRenameProject() {}
 
 	async function handleDeleteProject(e) {
-		is_project_options_modal_visible.update(
-			(is_project_options_modal_visible) => !is_project_options_modal_visible
-		);
+		modal_visible.update((options) => {
+			return {
+				...options,
+				project_options: !options.project_options
+			};
+		});
 
 		project = get(e, 'detail');
 	}
@@ -245,19 +245,19 @@
 	</div>
 
 	<!-- Modals -->
-	{#if $is_account_creation_modal_visible}
+	{#if $modal_visible.account_creation}
 		<AccountCreationModal />
 	{/if}
-	{#if $is_account_settings_modal_visible}
+	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}
-	{#if $is_move_snaps_modal_visible}
+	{#if $modal_visible.move_snaps}
 		<MoveSnapsModal {number_snaps_selected} {project} />
 	{/if}
-	{#if $is_snap_creation_modal_visible}
+	{#if $modal_visible.snap_creation}
 		<SnapCreationModal />
 	{/if}
-	{#if $is_project_options_modal_visible}
+	{#if $modal_visible.project_options}
 		<ProjectOptionsModal {project} />
 	{/if}
 

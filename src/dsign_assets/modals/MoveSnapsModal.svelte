@@ -15,7 +15,7 @@
 	// local storage
 	import { local_storage_projects, local_storage_snaps } from '../store/local_storage';
 
-	import { is_move_snaps_modal_visible } from '../store/modal';
+	import { modal_visible } from '../store/modal';
 
 	export let number_snaps_selected = 0;
 	export let project = { snaps: [] };
@@ -25,9 +25,13 @@
 	let isMoveModal = true;
 
 	function handleCloseMoveSnapsModal() {
-		is_move_snaps_modal_visible.update(
-			(is_move_snaps_modal_visible) => !is_move_snaps_modal_visible
-		);
+		modal_visible.update((options) => {
+			return {
+				...options,
+				move_snaps: !options.move_snaps
+			};
+		});
+
 		is_edit_active.update((is_edit_active) => !is_edit_active);
 	}
 

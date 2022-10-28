@@ -22,7 +22,7 @@
 	import { createActor as create_actor_snap_main, actor_snap_main } from '../store/actor_snap_main';
 
 	import { auth_client } from '../store/auth_client';
-	import { is_account_settings_modal_visible } from '../store/modal';
+	import { modal_visible } from '../store/modal';
 	import { local_storage_profile, local_storage_remove } from '../store/local_storage';
 
 	async function handleAvatarChange(event) {
@@ -55,9 +55,12 @@
 	}
 
 	function handleCloseModal() {
-		is_account_settings_modal_visible.update(
-			(is_account_settings_modal_visible) => !is_account_settings_modal_visible
-		);
+		modal_visible.update((options) => {
+			return {
+				...options,
+				account_settings: !options.account_settings
+			};
+		});
 	}
 
 	async function handleLogOut() {

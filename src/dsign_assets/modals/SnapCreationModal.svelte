@@ -11,16 +11,19 @@
 	import { actor_assets_file_chunks } from '../store/actor_assets_file_chunks';
 	import { actor_assets_img_staging } from '../store/actor_assets_img_staging';
 
-	import { is_snap_creation_modal_visible } from '../store/modal';
+	import { modal_visible } from '../store/modal';
 
 	let is_publishing = false;
 
 	onDestroy(() => (is_publishing = false));
 
 	function handleCloseModal() {
-		is_snap_creation_modal_visible.update(
-			(is_snap_creation_modal_visible) => !is_snap_creation_modal_visible
-		);
+		modal_visible.update((options) => {
+			return {
+				...options,
+				snap_creation: !options.snap_creation
+			};
+		});
 	}
 
 	async function commitImgAssetsToStaging(images) {

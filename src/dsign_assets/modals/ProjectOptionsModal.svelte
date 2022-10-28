@@ -6,16 +6,19 @@
 	import { actor_project_main, project_store } from '../store/actor_project_main';
 	import { actor_snap_main } from '../store/actor_snap_main';
 
-	import { is_project_options_modal_visible } from '../store/modal';
+	import { modal_visible } from '../store/modal';
 
 	export let project = {
 		snaps: []
 	};
 
 	function handleCloseModal() {
-		is_project_options_modal_visible.update(
-			(is_project_options_modal_visible) => !is_project_options_modal_visible
-		);
+		modal_visible.update((options) => {
+			return {
+				...options,
+				project_options: !options.project_options
+			};
+		});
 	}
 
 	async function handleDeleteProject() {
@@ -32,9 +35,12 @@
 			};
 		});
 
-		is_project_options_modal_visible.update(
-			(is_project_options_modal_visible) => !is_project_options_modal_visible
-		);
+		modal_visible.update((options) => {
+			return {
+				...options,
+				project_options: !options.project_options
+			};
+		});
 
 		try {
 			const { ok: success, err: error } = await $actor_project_main.actor.delete_projects([

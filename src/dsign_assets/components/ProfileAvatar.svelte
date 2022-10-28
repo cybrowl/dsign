@@ -5,10 +5,7 @@
 
 	import { actor_profile } from '../store/actor_profile';
 
-	import {
-		is_account_settings_modal_visible,
-		is_account_creation_modal_visible
-	} from '../store/modal';
+	import { modal_visible } from '../store/modal';
 	import { local_storage_profile } from '../store/local_storage';
 
 	let hasAccount = false;
@@ -36,21 +33,30 @@
 
 		// account creation modal should be visible when user hasn't created an account
 		if (!hasAccount) {
-			is_account_creation_modal_visible.update(
-				(is_account_creation_modal_visible) => !is_account_creation_modal_visible
-			);
+			modal_visible.update((options) => {
+				return {
+					...options,
+					account_creation: !options.account_creation
+				};
+			});
 		}
 	});
 
 	async function openSettingsModal() {
 		if (hasAccount) {
-			is_account_settings_modal_visible.update(
-				(is_account_settings_modal_visible) => !is_account_settings_modal_visible
-			);
+			modal_visible.update((options) => {
+				return {
+					...options,
+					account_settings: !options.account_settings
+				};
+			});
 		} else {
-			is_account_creation_modal_visible.update(
-				(is_account_creation_modal_visible) => !is_account_creation_modal_visible
-			);
+			modal_visible.update((options) => {
+				return {
+					...options,
+					account_creation: !options.account_creation
+				};
+			});
 		}
 	}
 </script>
