@@ -64,7 +64,7 @@
 			});
 		}
 
-		if ($project_store.projects.length > 1) {
+		if ($project_store.projects.length > 0) {
 			projects_tabs.set({
 				isSnapsSelected: false,
 				isProjectsSelected: true,
