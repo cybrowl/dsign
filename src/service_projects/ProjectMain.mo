@@ -284,7 +284,7 @@ actor ProjectMain {
 						return #err(#ErrorCall(debug_show (err)));
 					};
 					case (#ok _) {
-						return #ok("Deleted Snaps From Project");
+						return #ok("Moved Snaps From Project");
 					};
 				};
 

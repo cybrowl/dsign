@@ -4,6 +4,7 @@
 	import get from 'lodash/get.js';
 
 	import Login from '../../components/Login.svelte';
+	import Notification from 'dsign-components/components/Notification.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import ProjectEditActionsBar from 'dsign-components/components/ProjectEditActionsBar.svelte';
 	import ProjectsTabs from 'dsign-components/components/ProjectsTabs.svelte';
@@ -18,6 +19,7 @@
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
 	import { modal_visible } from '../../store/modal';
+	import { notification_visible, notification } from '../../store/notification';
 
 	// actors
 	import {
@@ -236,7 +238,7 @@
 	<title>Projects</title>
 </svelte:head>
 
-<main class="grid grid-cols-12 gap-y-2">
+<main class="hidden lg:grid grid-cols-12 gap-y-2 relative">
 	<!-- Header Nav -->
 	<div class="col-start-2 col-end-12 row-start-1 row-end-2 mb-8">
 		<PageNavigation navItems={$page_navigation.navItems}>
@@ -261,10 +263,20 @@
 		<ProjectOptionsModal {project} />
 	{/if}
 
+	<!-- Notification -->
+	{#if $notification_visible.moving_snaps}
+		<div class="absolute col-start-9 col-end-12 row-start-1 row-end-2 bottom-0 right-0">
+			<Notification is_visible={$notification_visible.moving_snaps} count_down_num={5}>
+				<p>Moving snaps to</p>
+				<p><strong><u>{$notification.project_name}</u></strong></p>
+			</Notification>
+		</div>
+	{/if}
+
 	<!-- ProjectsTabs & ProjectEditActionsBar -->
 	{#if isAuthenticated}
 		<div
-			class="flex col-start-2 col-end-12 row-start-2 row-end-3 mx-4 
+			class="hidden lg:flex col-start-2 col-end-12 row-start-2 row-end-3 mx-4 
 					self-end justify-between items-center h-10"
 		>
 			<ProjectsTabs
@@ -289,7 +301,7 @@
 		<!-- Fetching Snaps -->
 		{#if $snap_store.isFetching === true}
 			<div
-				class="col-start-2 col-end-12 grid grid-cols-4 
+				class="grid col-start-2 col-end-12 grid-cols-4 
 					row-start-3 row-end-auto mx-4 gap-10 mt-2 mb-16"
 			>
 				{#each { length: $local_storage_snaps.all_snaps_count } as _, i}
@@ -321,8 +333,8 @@
 	<!-- Projects -->
 	{#if $projects_tabs.isProjectsSelected}
 		<div
-			class="col-start-2 col-end-12 grid grid-cols-4 
-		row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
+			class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
+			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
 		>
 			{#each $project_store.projects as project}
 				<ProjectCard
@@ -350,6 +362,11 @@
 		{/if}
 	{/if}
 </main>
+
+<!-- Mobile Not Supported -->
+<div class="grid lg:hidden h-screen place-items-center text-white text-4xl">
+	<h1>Sorry, Mobile Not Supported</h1>
+</div>
 
 <style>
 </style>

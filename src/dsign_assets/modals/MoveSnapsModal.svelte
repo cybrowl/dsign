@@ -11,6 +11,7 @@
 		is_edit_active
 	} from '../store/actor_project_main';
 	import { actor_snap_main, snap_store } from '../store/actor_snap_main';
+	import { notification, notification_visible } from '../store/notification';
 
 	// local storage
 	import { local_storage_projects, local_storage_snaps } from '../store/local_storage';
@@ -54,6 +55,20 @@
 
 		handleCloseMoveSnapsModal();
 
+		notification_visible.set({
+			moving_snaps: true
+		});
+
+		setTimeout(() => {
+			notification_visible.set({
+				moving_snaps: false
+			});
+		}, 5000);
+
+		notification.set({
+			project_name: selected_project.name
+		});
+
 		const selected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === true);
 		const selected_snaps_list = selected_snaps.map((snap) => {
 			return {
@@ -70,6 +85,7 @@
 			};
 		});
 
+		// From Snaps
 		if (selected_snaps_list.length > 0) {
 			try {
 				let project_ref = {
@@ -97,6 +113,7 @@
 			}
 		}
 
+		// From Another Project
 		if (project_selected_snaps_list.length > 0) {
 			try {
 				let project_to_ref = {
@@ -109,23 +126,29 @@
 					canister_id: project.canister_id
 				};
 
-				await $actor_project_main.actor.move_snaps_from_project(
+				const { ok: moved_snaps } = await $actor_project_main.actor.move_snaps_from_project(
 					project_selected_snaps_list,
 					project_from_ref,
 					project_to_ref
 				);
 
 				const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects();
-				const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
-				const { ok: all_snap_ids } = await $actor_snap_main.actor.get_snap_ids();
-
-				console.log('all_snap_ids: ', all_snap_ids);
+				if (all_projects) {
+					notification_visible.set({
+						moving_snaps: false
+					});
+				}
 
 				if (all_projects) {
 					project_store.set({ isFetching: false, projects: [...all_projects] });
 
 					local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
 				}
+
+				const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
+				const { ok: all_snap_ids } = await $actor_snap_main.actor.get_snap_ids();
+
+				console.log('all_snap_ids: ', all_snap_ids);
 
 				if (all_snaps) {
 					snap_store.set({ isFetching: false, snaps: [...all_snaps] });
