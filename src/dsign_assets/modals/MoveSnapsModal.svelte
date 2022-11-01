@@ -144,16 +144,6 @@
 
 					local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
 				}
-
-				const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
-				const { ok: all_snap_ids } = await $actor_snap_main.actor.get_snap_ids();
-
-				console.log('all_snap_ids: ', all_snap_ids);
-
-				if (all_snaps) {
-					snap_store.set({ isFetching: false, snaps: [...all_snaps] });
-					local_storage_snaps.set({ all_snaps_count: all_snaps.length || 1 });
-				}
 			} catch (error) {
 				console.log('call => handleMoveSubmit error: ', error);
 			}
