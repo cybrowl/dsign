@@ -1,7 +1,8 @@
 <script>
-	import MoveSnaps from 'dsign-components/components/MoveSnaps.svelte';
-	import CreateProject from 'dsign-components/components/CreateProject.svelte';
 	import Modal from 'dsign-components/components/Modal.svelte';
+	import MoveSnaps from 'dsign-components/components/MoveSnaps.svelte';
+	import ProjectCreation from 'dsign-components/components/ProjectCreation.svelte';
+	import ProjectCreationFetching from 'dsign-components/components/ProjectCreationFetching.svelte';
 
 	// actors
 	import {
@@ -24,6 +25,8 @@
 
 	let hideDetails = true;
 	let isMoveModal = true;
+
+	let is_creating_project = false;
 
 	function handleCloseMoveSnapsModal() {
 		modal_visible.update((options) => {
@@ -156,6 +159,12 @@
 	async function handleCreateProjectSubmit(e) {
 		const { project_name } = e.detail;
 
+		is_creating_project = true;
+
+		setTimeout(() => {
+			is_create_project_modal_open = false;
+		}, 4000);
+
 		try {
 			const created_project_res = await $actor_project_main.actor.create_project(project_name, []);
 
@@ -188,8 +197,16 @@
 		/>
 	</Modal>
 	{#if is_create_project_modal_open}
-		<Modal on:closeModal={handleCloseProjectModal}>
-			<CreateProject on:createProject={handleCreateProjectSubmit} />
+		<Modal
+			on:closeModal={handleCloseProjectModal}
+			modalHeaderVisible={!is_creating_project}
+			isModalLocked={is_creating_project}
+		>
+			{#if is_creating_project === true}
+				<ProjectCreationFetching />
+			{:else}
+				<ProjectCreation on:createProject={handleCreateProjectSubmit} />
+			{/if}
 		</Modal>
 	{/if}
 </div>
