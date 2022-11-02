@@ -266,7 +266,10 @@
 	<!-- Notification -->
 	{#if $notification_visible.moving_snaps}
 		<div class="absolute col-start-9 col-end-12 row-start-1 row-end-2 bottom-0 right-0">
-			<Notification is_visible={$notification_visible.moving_snaps} count_down_num={5}>
+			<Notification
+				is_visible={$notification_visible.moving_snaps}
+				hide_delay_sec={$notification.hide_delay_sec}
+			>
 				<p>Moving snap(s) to</p>
 				<p><strong><u>{$notification.project_name}</u></strong></p>
 			</Notification>

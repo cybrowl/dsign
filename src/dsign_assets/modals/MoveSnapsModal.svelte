@@ -47,26 +47,29 @@
 	async function handleMoveSubmit(e) {
 		const { selected_project } = e.detail;
 
-		projects_tabs.set({
-			isSnapsSelected: false,
-			isProjectsSelected: true,
-			isProjectSelected: false
-		});
-
 		handleCloseMoveSnapsModal();
+
+		const hide_notification_delay_sec = $projects_tabs.isSnapsSelected ? 6000 : 5000;
 
 		notification_visible.set({
 			moving_snaps: true
+		});
+
+		notification.set({
+			hide_delay_sec: hide_notification_delay_sec,
+			project_name: selected_project.name
 		});
 
 		setTimeout(() => {
 			notification_visible.set({
 				moving_snaps: false
 			});
-		}, 5000);
+		}, hide_notification_delay_sec);
 
-		notification.set({
-			project_name: selected_project.name
+		projects_tabs.set({
+			isSnapsSelected: false,
+			isProjectsSelected: true,
+			isProjectSelected: false
 		});
 
 		const selected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === true);

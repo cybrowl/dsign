@@ -10,7 +10,7 @@
 	import { actor_snap_main, snap_store } from '../store/actor_snap_main';
 	import { actor_assets_file_chunks } from '../store/actor_assets_file_chunks';
 	import { actor_assets_img_staging } from '../store/actor_assets_img_staging';
-
+	import { projects_tabs } from '../store/actor_project_main';
 	import { modal_visible } from '../store/modal';
 
 	let is_publishing = false;
@@ -116,6 +116,12 @@
 
 		if (all_snaps) {
 			snap_store.set({ isFetching: false, snaps: [...all_snaps] });
+
+			projects_tabs.set({
+				isSnapsSelected: true,
+				isProjectsSelected: false,
+				isProjectSelected: false
+			});
 		}
 
 		handleCloseModal(all_snaps);
