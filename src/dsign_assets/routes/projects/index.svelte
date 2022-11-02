@@ -194,8 +194,11 @@
 
 	function handleOpenMoveSnapsModal() {
 		const selected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === true);
+		const project_selected_snaps = project.snaps.filter((snap) => snap.isSelected === true);
 
-		number_snaps_selected = selected_snaps.length;
+		number_snaps_selected = $projects_tabs.isSnapsSelected
+			? selected_snaps.length
+			: project_selected_snaps.length;
 
 		if (selected_snaps.length > 0 || project.snaps.length > 0) {
 			modal_visible.update((options) => {
