@@ -125,12 +125,11 @@
 				local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
 			} else {
 				if (error['UserNotFound'] === true) {
-					console.log("create user's project storage");
+					await $actor_project_main.actor.create_user_project_storage();
 				}
 			}
 		} catch (error) {
 			console.log('error: ', error);
-			await $actor_project_main.actor.create_user_project_storage();
 		}
 	}
 
