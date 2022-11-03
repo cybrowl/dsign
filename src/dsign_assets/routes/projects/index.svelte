@@ -16,6 +16,7 @@
 	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
 	import MoveSnapsModal from '../../modals/MoveSnapsModal.svelte';
 	import ProjectOptionsModal from '../../modals/ProjectOptionsModal.svelte';
+	import ProjectRenameModal from '../../modals/ProjectRenameModal.svelte';
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
 	import { modal_visible } from '../../store/modal';
@@ -222,7 +223,16 @@
 		});
 	}
 
-	function handleRenameProject() {}
+	function handleRenameProject(e) {
+		modal_visible.update((options) => {
+			return {
+				...options,
+				project_rename: !options.project_rename
+			};
+		});
+
+		project = get(e, 'detail');
+	}
 
 	async function handleDeleteProject(e) {
 		modal_visible.update((options) => {
@@ -264,6 +274,9 @@
 	{/if}
 	{#if $modal_visible.project_options}
 		<ProjectOptionsModal {project} />
+	{/if}
+	{#if $modal_visible.project_rename}
+		<ProjectRenameModal {project} />
 	{/if}
 
 	<!-- Notification -->

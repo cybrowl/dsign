@@ -5,5 +5,6 @@ export const modal_visible = writable({
 	account_creation: false,
 	snap_creation: false,
 	move_snaps: false,
-	project_options: false
+	project_options: false,
+	project_rename: false
 });

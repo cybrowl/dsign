@@ -35,7 +35,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	type UserPrincipal = Types.UserPrincipal;
 
 	let ACTOR_NAME : Text = "Project";
-	let VERSION : Nat = 1;
+	let VERSION : Nat = 2;
 
 	private let rr = XorShift.toReader(XorShift.XorShift64(null));
 	private let se = Source.Source(rr, 0);

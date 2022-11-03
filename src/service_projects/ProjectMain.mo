@@ -39,7 +39,7 @@ actor ProjectMain {
 
 	let ACTOR_NAME : Text = "ProjectMain";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
-	let VERSION : Nat = 1;
+	let VERSION : Nat = 2;
 
 	private let ic : ICInterface = actor "aaaaa-aa";
 
