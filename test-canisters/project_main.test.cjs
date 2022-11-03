@@ -279,6 +279,21 @@ test('ProjectMain[mishicat].get_all_projects(): should have both projects => #ok
 	t.equal(second_project.snaps.length, 0);
 });
 
+test('ProjectMain[mishicat].update_project_details(): ', async function (t) {
+	let { ok: projects } = await project_main_actor.mishicat.get_all_projects();
+
+	let first_project = projects[0];
+	let project_ref = { id: first_project.id, canister_id: first_project.canister_id };
+	let { ok: updated_project } = await project_main_actor.mishicat.update_project_details(
+		{ name: ['Updated Project One'] },
+		project_ref
+	);
+	let { ok: updated_projects } = await project_main_actor.mishicat.get_all_projects();
+
+	t.deepEqual(updated_project, 'Updated Project Details');
+	t.equal(updated_projects[0].name, 'Updated Project One');
+});
+
 test('SnapMain[mishicat].get_all_snaps(): should have project as part of snap', async function (t) {
 	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
 

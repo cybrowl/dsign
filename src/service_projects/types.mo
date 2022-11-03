@@ -6,6 +6,7 @@ import Text "mo:base/Text";
 
 import AssetTypes "../service_assets/types";
 import ImgAssetTypes "../service_assets_img/types";
+import ICInterfaceTypes "../types/ic.types";
 
 module {
 	public type Time = Int;
@@ -17,6 +18,8 @@ module {
 
 	public type AssetRef = AssetTypes.AssetRef;
 	public type ImageRef = ImgAssetTypes.ImageRef;
+
+	public type ICInterface = ICInterfaceTypes.Self;
 
 	public type SnapRef = {
 		id : Text;
@@ -64,6 +67,10 @@ module {
 		snaps : [SnapRef];
 	};
 
+	public type UpdateProject = {
+		name : ?Text;
+	};
+
 	public type ErrCreateProject = {
 		#NotAuthorized;
 		#UserAnonymous;
@@ -102,12 +109,21 @@ module {
 		#NoProjects : Bool;
 	};
 
+	public type ErrUpdateProject = {
+		#NotAuthorized;
+		#ProjectIdsDoNotMatch;
+		#ProjectNotFound;
+		#UserNotFound;
+		#ErrorCall : Text;
+	};
+
 	// Actor Interface
 	public type ProjectActor = actor {
 		create_project : shared (Text, ?[SnapRef], UserPrincipal) -> async Result.Result<Project, ErrCreateProject>;
 		delete_projects : shared ([ProjectID]) -> async ();
 		delete_snaps_from_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Text, ErrDeleteSnapsFromProject>;
 		add_snaps_to_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Text, ErrAddSnapsToProject>;
+		update_project_details : shared (UpdateProject, ProjectRef) -> async Result.Result<Text, ErrUpdateProject>;
 		get_projects : query ([ProjectID]) -> async [ProjectPublic];
 		get_projects_actor : query ([ProjectID]) -> async [Project];
 	};

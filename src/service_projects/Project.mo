@@ -1,6 +1,7 @@
 import Buffer "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
+import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Source "mo:ulid/Source";
@@ -22,12 +23,15 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	type ErrCreateProject = Types.ErrCreateProject;
 	type ErrDeleteProjects = Types.ErrDeleteProjects;
 	type ErrDeleteSnapsFromProject = Types.ErrDeleteSnapsFromProject;
+	type ErrUpdateProject = Types.ErrUpdateProject;
 	type Project = Types.Project;
+	type ProjectRef = Types.ProjectRef;
 	type ProjectID = Types.ProjectID;
 	type ProjectPublic = Types.ProjectPublic;
 	type SnapActor = SnapTypes.SnapActor;
 	type SnapPublic = SnapTypes.SnapPublic;
 	type SnapRef = Types.SnapRef;
+	type UpdateProject = Types.UpdateProject;
 	type UserPrincipal = Types.UserPrincipal;
 
 	let ACTOR_NAME : Text = "Project";
@@ -186,6 +190,41 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 				ignore Logger.log_event(tags, "Snaps Added To Project");
 
 				return #ok("Snaps Added To Project");
+			};
+		};
+	};
+
+	public shared ({ caller }) func update_project_details(
+		update_project_args : UpdateProject,
+		project_ref : ProjectRef
+	) : async Result.Result<Text, ErrUpdateProject> {
+
+		let tags = [ACTOR_NAME, "update_project_details"];
+
+		if (project_main != caller) {
+			return #err(#NotAuthorized);
+		};
+
+		switch (projects.get(project_ref.id)) {
+			case null {
+				return #err(#ProjectNotFound);
+			};
+			case (?project) {
+				let project_updated : Project = {
+					id = project.id;
+					canister_id = project.canister_id;
+					created = project.created;
+					username = project.username;
+					owner = project.owner;
+					name = Option.get(update_project_args.name, project.name);
+					snaps = project.snaps;
+				};
+
+				projects.put(project_ref.id, project_updated);
+
+				ignore Logger.log_event(tags, "Project Details Updated");
+
+				return #ok("Project Details Updated");
 			};
 		};
 	};

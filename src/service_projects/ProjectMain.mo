@@ -23,6 +23,8 @@ actor ProjectMain {
 	type ErrDeleteProjects = Types.ErrDeleteProjects;
 	type ErrDeleteSnapsFromProject = Types.ErrDeleteSnapsFromProject;
 	type ErrGetProjects = Types.ErrGetProjects;
+	type ErrUpdateProject = Types.ErrUpdateProject;
+	type ICInterface = Types.ICInterface;
 	type Project = Types.Project;
 	type ProjectPublic = Types.ProjectPublic;
 	type ProjectActor = Types.ProjectActor;
@@ -32,11 +34,14 @@ actor ProjectMain {
 	type ProjectRef = Types.ProjectRef;
 	type SnapActor = SnapTypes.SnapActor;
 	type SnapRef = Types.SnapRef;
+	type UpdateProject = Types.UpdateProject;
 	type UserPrincipal = Types.UserPrincipal;
 
 	let ACTOR_NAME : Text = "ProjectMain";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
 	let VERSION : Nat = 1;
+
+	private let ic : ICInterface = actor "aaaaa-aa";
 
 	var user_canisters_ref : HashMap.HashMap<UserPrincipal, ProjectIDStorage> = HashMap.HashMap(
 		0,
@@ -295,7 +300,37 @@ actor ProjectMain {
 		};
 	};
 
-	//TODO: update_project_details
+	public shared ({ caller }) func update_project_details(
+		update_project_args : UpdateProject,
+		project_ref : ProjectRef
+	) : async Result.Result<Text, ErrUpdateProject> {
+		let tags = [ACTOR_NAME, "update_project_details"];
+
+		switch (user_canisters_ref.get(caller)) {
+			case (?user_project_ids_storage) {
+				let my_ids = Utils.get_all_ids(user_project_ids_storage);
+				let matches = Utils.all_ids_match(my_ids, [project_ref.id]);
+
+				if (matches.all_match == false) {
+					return #err(#ProjectIdsDoNotMatch);
+				};
+
+				let project_actor = actor (project_ref.canister_id) : ProjectActor;
+
+				switch (await project_actor.update_project_details(update_project_args, project_ref)) {
+					case (#err err) {
+						return #err(#ErrorCall(debug_show (err)));
+					};
+					case (#ok _) {
+						return #ok("Updated Project Details");
+					};
+				};
+			};
+			case (_) {
+				#err(#UserNotFound);
+			};
+		};
+	};
 
 	//TODO: get_all_projects_public
 
@@ -395,6 +430,28 @@ actor ProjectMain {
 		};
 
 		return project_canister_id;
+	};
+
+	// UPDATE CHILD CANISTER
+	public shared ({ caller }) func install_code(
+		canister_id : Principal,
+		arg : Blob,
+		wasm_module : Blob
+	) : async Text {
+		let principal = Principal.toText(caller);
+
+		if (Text.equal(principal, "be7if-4i5lo-xnuq5-6ilpw-aedq2-epko6-gdmew-kzcse-7qpey-wztpj-qqe")) {
+			await ic.install_code({
+				arg = arg;
+				wasm_module = wasm_module;
+				mode = #upgrade;
+				canister_id = canister_id;
+			});
+
+			return "success";
+		};
+
+		return "not_authorized";
 	};
 
 	// ------------------------- SYSTEM METHODS -------------------------
