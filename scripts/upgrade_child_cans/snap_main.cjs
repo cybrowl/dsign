@@ -74,115 +74,94 @@ const get_actor = async (canisterId, can_interface, is_prod) => {
 const installCode = async () => {
 	console.log('Installing canisters...');
 
-	let canisters = [
+	// let prod_canisters = [
+	// 	{
+	// 		name: 'image_assets',
+	// 		description: 'upgrades child canister test_image_assets',
+	// 		is_prod: true,
+	// 		canister_id: canister_ids['snap_main'].ic,
+	// 		can_interface: snap_main_interface,
+	// 		child_canister_principal: Principal.fromText('l7tq7-sqaaa-aaaag-aatyq-cai'),
+	// 		wasm: get_wasm_prod('test_image_assets'),
+	// 		arg: IDL.encode(
+	// 			[IDL.Principal, IDL.Bool],
+	// 			[Principal.fromText(canister_ids['snap_main'].ic), true]
+	// 		)
+	// 	},
+	// 	{
+	// 		name: 'assets',
+	// 		description: 'upgrades child canister test_assets',
+	// 		is_prod: true,
+	// 		canister_id: canister_ids['snap_main'].ic,
+	// 		can_interface: snap_main_interface,
+	// 		child_canister_principal: Principal.fromText('lwq3d-eyaaa-aaaag-aatza-cai'),
+	// 		wasm: get_wasm_prod('test_assets'),
+	// 		arg: IDL.encode(
+	// 			[IDL.Principal, IDL.Bool],
+	// 			[Principal.fromText(canister_ids['snap_main'].ic), true]
+	// 		)
+	// 	},
+	// 	{
+	// 		name: 'snap',
+	// 		description: 'upgrades child canister test_snap',
+	// 		is_prod: true,
+	// 		canister_id: canister_ids['snap_main'].ic,
+	// 		can_interface: snap_main_interface,
+	// 		child_canister_principal: Principal.fromText('lrr5x-jaaaa-aaaag-aatzq-cai'),
+	// 		wasm: get_wasm_prod('test_snap'),
+	// 		arg: IDL.encode(
+	// 			[IDL.Principal, IDL.Bool],
+	// 			[
+	// 				Principal.fromText(canister_ids['snap_main'].ic),
+	// 				Principal.fromText(canister_ids['project_main'].ic)
+	// 			]
+	// 		)
+	// 	}
+	// ];
+
+	let local_canisters = [
 		{
-			local: {
-				name: 'snap_main',
-				description: 'upgrades child canister test_image_assets',
-				is_prod: false,
-				canister_id: snap_main_canister_id,
-				can_interface: snap_main_interface,
-				child_canister_text: 's24we-diaaa-aaaaa-aaaka-cai',
-				child_canister_principal: Principal.fromText('s24we-diaaa-aaaaa-aaaka-cai'),
-				wasm: get_wasm('test_image_assets'),
-				arg: IDL.encode(
-					[IDL.Principal, IDL.Bool],
-					[Principal.fromText(snap_main_canister_id), false]
-				)
-			},
-			prod: {
-				name: 'snap_main',
-				description: 'upgrades child canister test_image_assets',
-				is_prod: true,
-				canister_id: canister_ids['snap_main'].ic,
-				can_interface: snap_main_interface,
-				child_canister_text: 'l7tq7-sqaaa-aaaag-aatyq-cai',
-				child_canister_principal: Principal.fromText('l7tq7-sqaaa-aaaag-aatyq-cai'),
-				wasm: get_wasm_prod('test_image_assets'),
-				arg: IDL.encode(
-					[IDL.Principal, IDL.Bool],
-					[Principal.fromText(canister_ids['snap_main'].ic), true]
-				)
-			}
+			name: 'image_assets',
+			description: 'upgrades child canister using test_image_assets wasm',
+			is_prod: false,
+			canister_id: snap_main_canister_id,
+			can_interface: snap_main_interface,
+			child_canister_principal: Principal.fromText('s24we-diaaa-aaaaa-aaaka-cai'),
+			wasm: get_wasm('test_image_assets'),
+			arg: IDL.encode([IDL.Principal, IDL.Bool], [Principal.fromText(snap_main_canister_id), false])
 		},
 		{
-			local: {
-				name: 'snap_main',
-				description: 'upgrades child canister test_assets',
-				is_prod: false,
-				canister_id: snap_main_canister_id,
-				can_interface: snap_main_interface,
-				child_canister_text: 'sp3hj-caaaa-aaaaa-aaajq-cai',
-				child_canister_principal: Principal.fromText('sp3hj-caaaa-aaaaa-aaajq-cai'),
-				wasm: get_wasm('test_assets'),
-				arg: IDL.encode(
-					[IDL.Principal, IDL.Bool],
-					[Principal.fromText(snap_main_canister_id), false]
-				)
-			},
-			prod: {
-				name: 'snap_main',
-				description: 'upgrades child canister test_assets',
-				is_prod: true,
-				canister_id: canister_ids['snap_main'].ic,
-				can_interface: snap_main_interface,
-				child_canister_text: 'lwq3d-eyaaa-aaaag-aatza-cai',
-				child_canister_principal: Principal.fromText('lwq3d-eyaaa-aaaag-aatza-cai'),
-				wasm: get_wasm_prod('test_assets'),
-				arg: IDL.encode(
-					[IDL.Principal, IDL.Bool],
-					[Principal.fromText(canister_ids['snap_main'].ic), true]
-				)
-			}
+			name: 'assets',
+			description: 'upgrades child canister using test_assets wasm',
+			is_prod: false,
+			canister_id: snap_main_canister_id,
+			can_interface: snap_main_interface,
+			child_canister_principal: Principal.fromText('sp3hj-caaaa-aaaaa-aaajq-cai'),
+			wasm: get_wasm('test_assets'),
+			arg: IDL.encode([IDL.Principal, IDL.Bool], [Principal.fromText(snap_main_canister_id), false])
 		},
 		{
-			local: {
-				name: 'snap_main',
-				description: 'upgrades child canister test_snap',
-				is_prod: false,
-				canister_id: snap_main_canister_id,
-				can_interface: snap_main_interface,
-				child_canister_text: 's55qq-oqaaa-aaaaa-aaakq-cai',
-				child_canister_principal: Principal.fromText('s55qq-oqaaa-aaaaa-aaakq-cai'),
-				wasm: get_wasm('test_snap'),
-				arg: IDL.encode(
-					[IDL.Principal, IDL.Bool],
-					[Principal.fromText(snap_main_canister_id), Principal.fromText(project_main_canister_id)]
-				)
-			},
-			prod: {
-				name: 'snap_main',
-				description: 'upgrades child canister test_snap',
-				is_prod: true,
-				canister_id: canister_ids['snap_main'].ic,
-				can_interface: snap_main_interface,
-				child_canister_text: 'lrr5x-jaaaa-aaaag-aatzq-cai',
-				child_canister_principal: Principal.fromText('lrr5x-jaaaa-aaaag-aatzq-cai'),
-				wasm: get_wasm_prod('test_snap'),
-				arg: IDL.encode(
-					[IDL.Principal, IDL.Bool],
-					[
-						Principal.fromText(canister_ids['snap_main'].ic),
-						Principal.fromText(canister_ids['project_main'].ic)
-					]
-				)
-			}
+			name: 'snap',
+			description: 'upgrades child canister using test_snap wasm',
+			is_prod: false,
+			canister_id: snap_main_canister_id,
+			can_interface: snap_main_interface,
+			child_canister_principal: Principal.fromText('s55qq-oqaaa-aaaaa-aaakq-cai'),
+			wasm: get_wasm('test_snap'),
+			arg: IDL.encode(
+				[IDL.Principal, IDL.Principal],
+				[Principal.fromText(snap_main_canister_id), Principal.fromText(project_main_canister_id)]
+			)
 		}
 	];
 
-	canisters.forEach(async (canister) => {
-		const canister_local = canister.local;
-
-		const actor = await get_actor(
-			canister_local.canister_id,
-			canister_local.can_interface,
-			canister_local.is_prod
-		);
+	local_canisters.forEach(async (canister) => {
+		const actor = await get_actor(canister.canister_id, canister.can_interface, canister.is_prod);
 
 		const res = await actor.install_code(
-			canister_local.child_canister_principal,
-			[...canister_local.arg],
-			canister_local.wasm
+			canister.child_canister_principal,
+			[...canister.arg],
+			canister.wasm
 		);
 
 		console.log('res: ', res);
