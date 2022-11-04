@@ -81,7 +81,7 @@ const installCode = async () => {
 			is_prod: true,
 			canister_id: canister_ids['snap_main'].ic,
 			can_interface: snap_main_interface,
-			child_canister_principal: Principal.fromText('l7tq7-sqaaa-aaaag-aatyq-cai'),
+			child_canister_principal: Principal.fromText('lwq3d-eyaaa-aaaag-aatza-cai'),
 			wasm: get_wasm_prod('test_image_assets'),
 			arg: IDL.encode(
 				[IDL.Principal, IDL.Bool],
@@ -94,7 +94,7 @@ const installCode = async () => {
 			is_prod: true,
 			canister_id: canister_ids['snap_main'].ic,
 			can_interface: snap_main_interface,
-			child_canister_principal: Principal.fromText('lwq3d-eyaaa-aaaag-aatza-cai'),
+			child_canister_principal: Principal.fromText('l7tq7-sqaaa-aaaag-aatyq-cai'),
 			wasm: get_wasm_prod('test_assets'),
 			arg: IDL.encode(
 				[IDL.Principal, IDL.Bool],

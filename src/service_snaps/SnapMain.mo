@@ -41,7 +41,7 @@ actor SnapMain {
 
 	let ACTOR_NAME : Text = "SnapMain";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
-	let VERSION : Nat = 1;
+	let VERSION : Nat = 2;
 
 	var user_canisters_ref : HashMap.HashMap<UserPrincipal, SnapIDStorage> = HashMap.HashMap(
 		0,
