@@ -1,4 +1,6 @@
 <script>
+	import { onDestroy } from 'svelte';
+
 	import Modal from 'dsign-components/components/Modal.svelte';
 	import ProjectCreation from 'dsign-components/components/ProjectCreation.svelte';
 	import ProjectCreationFetching from 'dsign-components/components/ProjectCreationFetching.svelte';
@@ -12,6 +14,8 @@
 	import { modal_visible } from '../store/modal';
 
 	let is_creating_project = false;
+
+	onDestroy(() => (is_creating_project = false));
 
 	function handleCloseProjectModal() {
 		modal_visible.update((options) => {
