@@ -1,8 +1,6 @@
 <script>
 	import Modal from 'dsign-components/components/Modal.svelte';
-	import MoveSnaps from 'dsign-components/components/MoveSnaps.svelte';
-	import ProjectCreation from 'dsign-components/components/ProjectCreation.svelte';
-	import ProjectCreationFetching from 'dsign-components/components/ProjectCreationFetching.svelte';
+	import SnapsMove from 'dsign-components/components/SnapsMove.svelte';
 
 	// actors
 	import {
@@ -21,18 +19,15 @@
 
 	export let number_snaps_selected = 0;
 	export let project = { snaps: [] };
-	export let is_create_project_modal_open = false;
 
 	let hideDetails = true;
 	let isMoveModal = true;
 
-	let is_creating_project = false;
-
-	function handleCloseMoveSnapsModal() {
+	function handleCloseSnapsMoveModal() {
 		modal_visible.update((options) => {
 			return {
 				...options,
-				move_snaps: !options.move_snaps
+				snaps_move: !options.snaps_move
 			};
 		});
 
@@ -40,19 +35,20 @@
 	}
 
 	function handleOpenCreateProjectModal() {
-		is_create_project_modal_open = true;
-	}
-
-	function handleCloseProjectModal() {
-		is_create_project_modal_open = false;
+		modal_visible.update((options) => {
+			return {
+				...options,
+				project_creation: !options.project_creation
+			};
+		});
 	}
 
 	async function handleMoveSubmit(e) {
 		const { selected_project } = e.detail;
 
-		handleCloseMoveSnapsModal();
+		handleCloseSnapsMoveModal();
 
-		const hide_notification_delay_sec = $projects_tabs.isSnapsSelected ? 6000 : 5000;
+		const hide_notification_delay_sec = $projects_tabs.isSnapsSelected ? 10000 : 8000;
 
 		notification_visible.set({
 			moving_snaps: true
@@ -155,61 +151,18 @@
 			}
 		}
 	}
-
-	async function handleCreateProjectSubmit(e) {
-		const { project_name } = e.detail;
-
-		is_creating_project = true;
-
-		setTimeout(() => {
-			is_create_project_modal_open = false;
-		}, 4000);
-
-		try {
-			const created_project_res = await $actor_project_main.actor.create_project(project_name, []);
-
-			const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects();
-
-			if (all_projects) {
-				project_store.set({ isFetching: false, projects: [...all_projects] });
-				local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
-			}
-
-			is_create_project_modal_open = false;
-
-			console.log('is_create_project_modal_open: ', is_create_project_modal_open);
-		} catch (error) {
-			await $actor_project_main.actor.create_user_project_storage();
-			console.log('call => handleCreateProjectSubmit error: ', error);
-		}
-	}
 </script>
 
-<div>
-	<Modal on:closeModal={handleCloseMoveSnapsModal}>
-		<MoveSnaps
-			projects={[...$project_store.projects].reverse()}
-			{number_snaps_selected}
-			{hideDetails}
-			{isMoveModal}
-			on:moveSubmit={handleMoveSubmit}
-			on:createProject={handleOpenCreateProjectModal}
-		/>
-	</Modal>
-	{#if is_create_project_modal_open}
-		<Modal
-			on:closeModal={handleCloseProjectModal}
-			modalHeaderVisible={!is_creating_project}
-			isModalLocked={is_creating_project}
-		>
-			{#if is_creating_project === true}
-				<ProjectCreationFetching />
-			{:else}
-				<ProjectCreation on:createProject={handleCreateProjectSubmit} />
-			{/if}
-		</Modal>
-	{/if}
-</div>
+<Modal on:closeModal={handleCloseSnapsMoveModal}>
+	<SnapsMove
+		projects={[...$project_store.projects].reverse()}
+		{number_snaps_selected}
+		{hideDetails}
+		{isMoveModal}
+		on:moveSubmit={handleMoveSubmit}
+		on:createProject={handleOpenCreateProjectModal}
+	/>
+</Modal>
 
 <style>
 </style>

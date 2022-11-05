@@ -14,8 +14,9 @@
 
 	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
 	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
-	import MoveSnapsModal from '../../modals/MoveSnapsModal.svelte';
-	import ProjectOptionsModal from '../../modals/ProjectOptionsModal.svelte';
+	import SnapsMoveModal from '../../modals/SnapsMoveModal.svelte';
+	import ProjectCreationModal from '../../modals/ProjectCreationModal.svelte';
+	import ProjectOptionsDeleteModal from '../../modals/ProjectOptionsDeleteModal.svelte';
 	import ProjectRenameModal from '../../modals/ProjectRenameModal.svelte';
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
@@ -192,7 +193,7 @@
 		}
 	}
 
-	function handleOpenMoveSnapsModal() {
+	function handleOpenSnapsMoveModal() {
 		const selected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === true);
 		const project_selected_snaps = project.snaps.filter((snap) => snap.isSelected === true);
 
@@ -204,7 +205,7 @@
 			modal_visible.update((options) => {
 				return {
 					...options,
-					move_snaps: !options.move_snaps
+					snaps_move: !options.snaps_move
 				};
 			});
 		}
@@ -265,14 +266,17 @@
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}
-	{#if $modal_visible.move_snaps}
-		<MoveSnapsModal {number_snaps_selected} {project} />
+	{#if $modal_visible.snaps_move}
+		<SnapsMoveModal {number_snaps_selected} {project} />
 	{/if}
 	{#if $modal_visible.snap_creation}
 		<SnapCreationModal />
 	{/if}
+	{#if $modal_visible.project_creation}
+		<ProjectCreationModal />
+	{/if}
 	{#if $modal_visible.project_options}
-		<ProjectOptionsModal {project} />
+		<ProjectOptionsDeleteModal {project} />
 	{/if}
 	{#if $modal_visible.project_rename}
 		<ProjectRenameModal {project} />
@@ -306,7 +310,7 @@
 			{#if $projects_tabs.isSnapsSelected || $projects_tabs.isProjectSelected}
 				<ProjectEditActionsBar
 					isEditActive={$is_edit_active}
-					on:clickMove={handleOpenMoveSnapsModal}
+					on:clickMove={handleOpenSnapsMoveModal}
 					on:toggleEditMode={handleToggleEditMode}
 					on:clickRemove={handleDeleteSnaps}
 				/>
