@@ -104,6 +104,10 @@
 					project_store.set({ isFetching: false, projects: [...all_projects] });
 
 					local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
+
+					notification_visible.set({
+						moving_snaps: false
+					});
 				}
 
 				if (all_snaps) {
@@ -136,15 +140,13 @@
 
 				const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects();
 				if (all_projects) {
-					notification_visible.set({
-						moving_snaps: false
-					});
-				}
-
-				if (all_projects) {
 					project_store.set({ isFetching: false, projects: [...all_projects] });
 
 					local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
+
+					notification_visible.set({
+						moving_snaps: false
+					});
 				}
 			} catch (error) {
 				console.log('call => handleMoveSubmit error: ', error);
