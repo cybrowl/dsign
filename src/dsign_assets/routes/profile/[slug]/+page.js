@@ -1,38 +1,28 @@
-import { error } from '@sveltejs/kit';
+// import { error } from '@sveltejs/kit';
 import { AuthClient } from '@dfinity/auth-client';
-import { createActor as create_actor_profile, actor_profile } from '../../../store/actor_profile';
+import { createActor as create_actor_profile } from '../../../store/actor_profile';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params }) {
-	console.log('params: ', params);
+	console.log('params', params);
+
 	let authClient = await AuthClient.create();
 
-	actor_profile.update(() => ({
-		loggedIn: true,
-		actor: create_actor_profile({
-			agentOptions: {
-				identity: authClient.getIdentity()
-			}
-		})
-	}));
-
-	actor_profile.subscribe(async (actor_profile) => {
-		console.log('actor_profile value', actor_profile);
-		let profile_res = await actor_profile.actor.get_profile();
-
-		console.log('profile_res: ', profile_res);
+	const profile_actor = create_actor_profile({
+		agentOptions: {
+			identity: authClient.getIdentity()
+		}
 	});
 
-	console.log('actor_profile.actor', actor_profile.actor);
+	let profile_res = await profile_actor.get_profile();
 
-	if (params.slug === 'cyberowl') {
-		return {
-			title: 'Hello world!',
-			content: 'Welcome to our blog. Lorem ipsum dolor sit amet...'
-		};
-	}
+	console.log('profile_res: ', profile_res);
 
-	throw error(404, 'Not found');
+	return {
+		username: params.slug,
+		profile: profile_res.ok.profile,
+		content: 'Welcome to our blog. Lorem ipsum dolor sit amet...'
+	};
 }
 
 export const ssr = true;

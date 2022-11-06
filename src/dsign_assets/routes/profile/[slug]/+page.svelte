@@ -9,6 +9,8 @@
 	import { modal_visible } from '../../../store/modal';
 	import { page_navigation } from '../../../store/page_navigation';
 
+	export let data;
+
 	page_navigation.update(({ navItems }) => {
 		navItems.forEach((navItem) => {
 			navItem.isSelected = false;
@@ -32,6 +34,8 @@
 		</PageNavigation>
 	</div>
 
+	<div>{data.profile.username}</div>
+	<div>{data.profile.created}</div>
 	<!-- AccountSettingsModal -->
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
