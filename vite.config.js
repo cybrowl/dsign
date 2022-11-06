@@ -17,19 +17,19 @@ const envOptions = {
 };
 
 const config = {
-    server: {
-        fs: {
-            allow: ['config', '.dfx/local']
-        }
-    },
-    resolve: {
-        alias: {
-            ...envOptions.aliases,
-            environment: envOptions.environment
-        },
-        dedupe: ['svelte']
-    },
-    plugins: [sveltekit()]
+	server: {
+		fs: {
+			allow: ['config', '.dfx/local']
+		}
+	},
+	resolve: {
+		alias: {
+			...envOptions.aliases,
+			environment: envOptions.environment
+		},
+		dedupe: ['svelte']
+	},
+	plugins: [sveltekit()]
 };
 
 export default config;

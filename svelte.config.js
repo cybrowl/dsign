@@ -14,15 +14,18 @@ const config = {
 	kit: {
 		files: {
 			assets: 'src/dsign_assets/assets',
-			hooks: 'src/dsign_assets/hooks',
+			// hooks: {
+			// 	server: 'src/dsign_assets/hooks',
+			// 	client: 'src/dsign_assets/hooks'
+			// },
 			lib: 'src/dsign_assets/lib',
 			routes: 'src/dsign_assets/routes',
-			template: 'src/dsign_assets/app.html'
+			appTemplate: 'src/dsign_assets/app.html'
 		},
-		paths: {
-			assets: '',
-			base: ''
-		},
+		// paths: {
+		// 	assets: '',
+		// 	base: ''
+		// },
 		adapter: adapter({
 			pages: 'build',
 			assets: 'build',

@@ -157,8 +157,8 @@
 			<ProfileAvatar />
 		</div>
 	{:else}
-		<Button label="Sign In" on:click={login} class="mr-4" />
-		<Button primary label="Let's get started!" />
+		<Button secondary={true} label="Sign In" on:click={login} class="mr-4" />
+		<Button primary={true} label="Let's get started!" />
 	{/if}
 </span>
 

@@ -1,5 +1,5 @@
 import { writable } from 'svelte-local-storage-store';
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 
 export const local_storage_profile = writable('profile', { avatar_url: '', username: '' });
 export const local_storage_snaps = writable('snaps', { all_snaps_count: '1' });
