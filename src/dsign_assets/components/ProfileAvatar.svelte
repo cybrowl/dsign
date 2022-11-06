@@ -63,10 +63,7 @@
 
 <Avatar
 	avatar={$local_storage_profile.avatar_url}
-	firstCharUsername={$local_storage_profile.username.charAt(0)}
-	lastCharUsername={$local_storage_profile.username.charAt(
-		$local_storage_profile.username.length - 1
-	)}
+	username={$local_storage_profile.username}
 	on:click={openSettingsModal}
 />
 

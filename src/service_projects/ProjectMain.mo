@@ -332,10 +332,11 @@ actor ProjectMain {
 		};
 	};
 
-	//TODO: get_all_projects_public
-
 	public shared ({ caller }) func get_all_projects() : async Result.Result<[ProjectPublic], ErrGetProjects> {
 		let tags = [ACTOR_NAME, "get_projects"];
+
+		//TODO: add username as optional arg
+		//TODO: if username is provided it should replace caller
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?project_canister_ids) {

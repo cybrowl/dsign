@@ -272,6 +272,9 @@ actor SnapMain {
 	public shared ({ caller }) func get_all_snaps_without_project() : async Result.Result<[SnapPublic], ErrGetAllSnaps> {
 		let tags = [ACTOR_NAME, "get_all_snaps_without_project"];
 
+		//TODO: add username as optional arg
+		//TODO: if username is provided it should replace caller
+
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_snap_ids_storage) {
 				let all_snaps = Buffer.Buffer<SnapPublic>(0);
@@ -305,8 +308,6 @@ actor SnapMain {
 		};
 
 	};
-
-	//TODO: get_all_snaps_public
 
 	public shared ({ caller }) func get_snap_ids() : async Result.Result<[SnapID], Text> {
 		let tags = [ACTOR_NAME, "get_snap_ids"];
