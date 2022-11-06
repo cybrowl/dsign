@@ -1,13 +1,13 @@
 <!-- src/routes/profile.svelte -->
 <script>
-	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
-	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
-	import Login from '../../components/Login.svelte';
+	import AccountCreationModal from '../../../modals/AccountCreationModal.svelte';
+	import AccountSettingsModal from '../../../modals/AccountSettingsModal.svelte';
+	import Login from '../../../components/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
-	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
+	import SnapCreationModal from '../../../modals/SnapCreationModal.svelte';
 
-	import { modal_visible } from '../../store/modal';
-	import { page_navigation } from '../../store/page_navigation';
+	import { modal_visible } from '../../../store/modal';
+	import { page_navigation } from '../../../store/page_navigation';
 
 	page_navigation.update(({ navItems }) => {
 		navItems.forEach((navItem) => {
