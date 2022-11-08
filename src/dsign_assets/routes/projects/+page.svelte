@@ -290,7 +290,7 @@
 				hide_delay_sec={$notification.hide_delay_sec}
 			>
 				<p>Moving snap(s) to</p>
-				<p><strong><u>{$notification.project_name}</u></strong></p>
+				<p><strong>{$notification.project_name}</strong></p>
 			</Notification>
 		</div>
 	{/if}
@@ -324,7 +324,7 @@
 		{#if $snap_store.isFetching === true}
 			<div
 				class="grid col-start-2 col-end-12 grid-cols-4 
-					row-start-3 row-end-auto mx-4 gap-10 mt-2 mb-16"
+					row-start-3 row-end-auto mx-4 gap-10 mt-2 mb-24"
 			>
 				{#each { length: $local_storage_snaps.all_snaps_count } as _, i}
 					<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />
@@ -336,7 +336,7 @@
 		{#if $snap_store.snaps.length === 0 && $snap_store.isFetching === false}
 			<div
 				class="col-start-2 col-end-12 grid grid-cols-4 
-			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
+			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 			>
 				<SnapCardEmpty />
 			</div>
@@ -346,7 +346,7 @@
 		{#if $snap_store.snaps.length > 0}
 			<div
 				class="col-start-2 col-end-12 grid grid-cols-4 
-						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
+						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 			>
 				{#each $snap_store.snaps as snap}
 					<SnapCard {snap} isEditMode={$is_edit_active} />
@@ -359,7 +359,7 @@
 	{#if $projects_tabs.isProjectsSelected}
 		<div
 			class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
-			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
+			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 		>
 			{#each $project_store.projects as project}
 				<ProjectCard
@@ -378,7 +378,7 @@
 		{#if project.snaps && project.snaps.length > 0}
 			<div
 				class="col-start-2 col-end-12 grid grid-cols-4 
-						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-16"
+						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 			>
 				{#each project.snaps as snap}
 					<SnapCard {snap} isEditMode={$is_edit_active} />
