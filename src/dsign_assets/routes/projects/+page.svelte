@@ -97,10 +97,6 @@
 			const { ok: all_snaps, err: error } =
 				await $actor_snap_main.actor.get_all_snaps_without_project();
 
-			const { ok: all_snap_ids } = await $actor_snap_main.actor.get_snap_ids();
-
-			console.log('call: all_snap_ids', all_snap_ids);
-
 			if (all_snaps) {
 				snap_store.set({ isFetching: false, snaps: [...all_snaps] });
 
