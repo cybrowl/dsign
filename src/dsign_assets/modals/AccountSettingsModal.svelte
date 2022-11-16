@@ -134,7 +134,6 @@
 		username={$local_storage_profile.username}
 		on:avatarChange={handleAvatarChange}
 		on:clickLogOut={handleLogOut}
-		triggerInputEvent={true}
 	/>
 </Modal>
 

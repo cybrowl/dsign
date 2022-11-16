@@ -20,6 +20,7 @@
 	});
 </script>
 
+<!-- Explore -->
 <svelte:head>
 	<title>DSign</title>
 </svelte:head>

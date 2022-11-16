@@ -77,8 +77,8 @@
 		}
 
 		if (isAuthenticated) {
-			await getAllSnaps();
-			await getAllProjects();
+			await fetchAllSnaps();
+			await fetchAllProjects();
 		} else {
 			window.location.href = '/';
 		}
@@ -92,9 +92,9 @@
 		});
 	});
 
-	async function getAllSnaps() {
+	async function fetchAllSnaps() {
 		try {
-			const { ok: all_snaps, err: error } =
+			const { ok: all_snaps, err: err_all_snaps } =
 				await $actor_snap_main.actor.get_all_snaps_without_project();
 
 			if (all_snaps) {
@@ -102,37 +102,36 @@
 
 				local_storage_snaps.set({ all_snaps_count: all_snaps.length || 1 });
 			} else {
+				if (err_all_snaps['UserNotFound'] === true) {
+					await $actor_snap_main.actor.create_user_snap_storage();
+				}
 			}
 		} catch (error) {
-			await $actor_snap_main.actor.create_user_snap_storage();
-			console.log('error: ', error);
+			console.log('fetchAllSnaps - Err: ', error);
 		}
 	}
 
-	async function getAllProjects() {
+	async function fetchAllProjects() {
 		try {
-			const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects();
-
-			console.log('call error: ', error);
-			console.log('call all_projects: ', all_projects);
+			const { ok: all_projects, err: err_all_projects } =
+				await $actor_project_main.actor.get_all_projects();
 
 			if (all_projects) {
 				project_store.set({ isFetching: false, projects: [...all_projects] });
 
 				local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
 			} else {
-				if (error['UserNotFound'] === true) {
+				if (err_all_projects['UserNotFound'] === true) {
 					await $actor_project_main.actor.create_user_project_storage();
 				}
 			}
 		} catch (error) {
-			console.log('error: ', error);
+			console.log('fetchAllProjects - Err: ', error);
 		}
 	}
 
-	function handleToggleEditMode(e) {
-		is_edit_active.set(get(e, 'detail', false));
-
+	// Snaps / Project
+	function deselectAllSnaps() {
 		snap_store.update(({ snaps }) => {
 			const new_all_snaps = snaps.map((snap) => {
 				return {
@@ -157,47 +156,41 @@
 		}
 	}
 
-	async function handleDeleteSnaps() {
-		if ($snap_store.snaps) {
-			const selected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === true);
-			const unselected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === false);
-			const selected_snaps_ids = selected_snaps.map((snap) => snap.id);
+	function handleToggleEditMode(e) {
+		is_edit_active.set(get(e, 'detail', false));
 
-			if (selected_snaps_ids.length > 0) {
-				snap_store.set({ isFetching: false, snaps: unselected_snaps });
-
-				handleToggleEditMode({ detail: false });
-
-				await $actor_snap_main.actor.delete_snaps(selected_snaps_ids);
-				await getAllSnaps();
-			}
-		}
-
-		if (project.snaps) {
-			const project_selected_snaps = project.snaps.filter((snap) => snap.isSelected === true);
-			const project_unselected_snaps = project.snaps.filter((snap) => snap.isSelected === false);
-			const project_selected_snaps_ids = project_selected_snaps.map((snap) => snap.id);
-
-			if (project_selected_snaps_ids.length > 0) {
-				project.snaps = project_unselected_snaps;
-
-				handleToggleEditMode({ detail: false });
-
-				await $actor_snap_main.actor.delete_snaps(project_selected_snaps_ids);
-				await getAllSnaps();
-			}
-		}
+		deselectAllSnaps();
 	}
 
-	function handleOpenSnapsMoveModal() {
-		const selected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === true);
-		const project_selected_snaps = project.snaps.filter((snap) => snap.isSelected === true);
+	async function handleDeleteSnaps() {
+		const snaps = $projects_tabs.isSnapsSelected
+			? get($snap_store, 'snaps', [])
+			: get(project, 'snaps', []);
 
-		number_snaps_selected = $projects_tabs.isSnapsSelected
-			? selected_snaps.length
-			: project_selected_snaps.length;
+		const selected_snaps = snaps.filter((snap) => snap.isSelected === true);
+		const selected_snaps_ids = selected_snaps.map((snap) => snap.id);
 
-		if (selected_snaps.length > 0 || project.snaps.length > 0) {
+		if (selected_snaps_ids.length === 0) {
+			//TODO: Notification
+			return 'Nothing to Delete';
+		}
+
+		// Update state to show item deleted
+		const unselected_snaps = snaps.filter((snap) => snap.isSelected === false);
+		snap_store.set({ isFetching: false, snaps: unselected_snaps });
+
+		handleToggleEditMode({ detail: false });
+
+		await $actor_snap_main.actor.delete_snaps(selected_snaps_ids);
+		await fetchAllSnaps();
+	}
+
+	function handleSnapsMoveModalOpen() {
+		const snaps = $projects_tabs.isSnapsSelected ? $snap_store.snaps : project.snaps;
+
+		const selected_snaps = snaps.filter((snap) => snap.isSelected === true);
+
+		if (selected_snaps.length > 0) {
 			modal_visible.update((options) => {
 				return {
 					...options,
@@ -207,7 +200,8 @@
 		}
 	}
 
-	function handleClickProject(e) {
+	// Projects
+	function handleProjectClick(e) {
 		project = get(e, 'detail');
 
 		project.name = project.name.charAt(0).toUpperCase() + project.name.slice(1);
@@ -219,7 +213,7 @@
 		});
 	}
 
-	function handleRenameProject(e) {
+	function handleProjectRenameModalOpen(e) {
 		modal_visible.update((options) => {
 			return {
 				...options,
@@ -230,7 +224,7 @@
 		project = get(e, 'detail');
 	}
 
-	async function handleDeleteProject(e) {
+	async function handleProjectDeleteModalOpen(e) {
 		modal_visible.update((options) => {
 			return {
 				...options,
@@ -242,7 +236,6 @@
 	}
 </script>
 
-<!-- src/routes/projects.svelte -->
 <svelte:head>
 	<title>Projects</title>
 </svelte:head>
@@ -306,7 +299,7 @@
 			{#if $projects_tabs.isSnapsSelected || $projects_tabs.isProjectSelected}
 				<ProjectEditActionsBar
 					isEditActive={$is_edit_active}
-					on:clickMove={handleOpenSnapsMoveModal}
+					on:clickMove={handleSnapsMoveModalOpen}
 					on:toggleEditMode={handleToggleEditMode}
 					on:clickRemove={handleDeleteSnaps}
 				/>
@@ -360,9 +353,9 @@
 			{#each $project_store.projects as project}
 				<ProjectCard
 					{project}
-					on:clickProject={handleClickProject}
-					on:clickRenameProject={handleRenameProject}
-					on:clickDeleteProject={handleDeleteProject}
+					on:clickProject={handleProjectClick}
+					on:clickRenameProject={handleProjectRenameModalOpen}
+					on:clickDeleteProject={handleProjectDeleteModalOpen}
 				/>
 			{/each}
 		</div>
