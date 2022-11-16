@@ -177,7 +177,12 @@
 
 		// Update state to show item deleted
 		const unselected_snaps = snaps.filter((snap) => snap.isSelected === false);
-		snap_store.set({ isFetching: false, snaps: unselected_snaps });
+
+		if ($projects_tabs.isSnapsSelected === true) {
+			snap_store.set({ isFetching: false, snaps: unselected_snaps });
+		} else {
+			project.snaps = unselected_snaps;
+		}
 
 		handleToggleEditMode({ detail: false });
 
