@@ -20,23 +20,17 @@
 	import ProjectRenameModal from '../../modals/ProjectRenameModal.svelte';
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
-	import { modal_visible } from '../../store/modal';
-	import { notification_visible, notification } from '../../store/notification';
-
 	// actors
-	import {
-		actor_project_main,
-		project_store,
-		projects_tabs,
-		is_edit_active
-	} from '../../store/actor_project_main';
-	import { actor_snap_main, snap_store } from '../../store/actor_snap_main';
+	import { actor_project_main, actor_snap_main } from '../../store/actors';
 
 	// local storage
 	import { local_storage_snaps, local_storage_projects } from '../../store/local_storage';
 
-	// page navigation
+	import { modal_visible } from '../../store/modal';
+	import { notification_visible, notification } from '../../store/notification';
 	import { page_navigation } from '../../store/page_navigation';
+	import { project_store, snap_store } from '../../store/fetch_store';
+	import { projects_tabs, is_edit_active } from '../../store/page_state';
 
 	let isAuthenticated = false;
 

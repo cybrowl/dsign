@@ -6,11 +6,12 @@
 	import ProjectCreationFetching from 'dsign-components/components/ProjectCreationFetching.svelte';
 
 	// actors
-	import { actor_project_main, project_store } from '../store/actor_project_main';
+	import { actor_project_main } from '../store/actors';
 
 	// local storage
 	import { local_storage_projects } from '../store/local_storage';
 
+	import { project_store } from '../store/fetch_store';
 	import { modal_visible } from '../store/modal';
 
 	let is_creating_project = false;

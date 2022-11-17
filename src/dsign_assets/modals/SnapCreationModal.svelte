@@ -7,10 +7,14 @@
 	import Modal from 'dsign-components/components/Modal.svelte';
 
 	// actors
-	import { actor_snap_main, snap_store } from '../store/actor_snap_main';
-	import { actor_assets_file_chunks } from '../store/actor_assets_file_chunks';
-	import { actor_assets_img_staging } from '../store/actor_assets_img_staging';
-	import { projects_tabs } from '../store/actor_project_main';
+	import {
+		actor_assets_file_chunks,
+		actor_assets_img_staging,
+		actor_snap_main
+	} from '../store/actors';
+
+	import { snap_store } from '../store/fetch_store';
+	import { projects_tabs } from '../store/page_state';
 	import { modal_visible } from '../store/modal';
 
 	let is_publishing = false;

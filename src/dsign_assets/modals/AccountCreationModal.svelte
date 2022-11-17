@@ -6,9 +6,7 @@
 	import Modal from 'dsign-components/components/Modal.svelte';
 
 	// actors
-	import { actor_project_main } from '../store/actor_project_main';
-	import { actor_snap_main } from '../store/actor_snap_main';
-	import { actor_username } from '../store/actor_username';
+	import { actor_project_main, actor_snap_main, actor_username } from '../store/actors';
 
 	// utils
 	import { getErrorMessage } from '../lib/utils';

@@ -3,7 +3,7 @@
 	import Avatar from 'dsign-components/components/Avatar.svelte';
 	import get from 'lodash/get.js';
 
-	import { actor_profile } from '../store/actor_profile';
+	import { actor_profile } from '../store/actors';
 
 	import { modal_visible } from '../store/modal';
 	import { local_storage_profile } from '../store/local_storage';

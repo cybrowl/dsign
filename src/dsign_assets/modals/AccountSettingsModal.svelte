@@ -6,20 +6,14 @@
 
 	// actors
 	import {
-		createActor as create_actor_assets_file_chunks,
-		actor_assets_file_chunks
-	} from '../store/actor_assets_file_chunks';
-	import {
-		createActor as create_actor_assets_img_staging,
-		actor_assets_img_staging
-	} from '../store/actor_assets_img_staging';
-	import { createActor as create_actor_username, actor_username } from '../store/actor_username';
-	import { createActor as create_actor_profile, actor_profile } from '../store/actor_profile';
-	import {
-		createActor as create_actor_project_main,
-		actor_project_main
-	} from '../store/actor_project_main';
-	import { createActor as create_actor_snap_main, actor_snap_main } from '../store/actor_snap_main';
+		actor_assets_file_chunks,
+		actor_assets_img_staging,
+		actor_profile,
+		actor_project_main,
+		actor_snap_main,
+		actor_username,
+		createActor
+	} from '../store/actors';
 
 	import { auth_client } from '../store/auth_client';
 	import { modal_visible } from '../store/modal';
@@ -68,55 +62,49 @@
 
 		actor_assets_file_chunks.update(() => ({
 			loggedIn: false,
-			actor: create_actor_assets_file_chunks({
-				agentOptions: {
-					identity: $auth_client.getIdentity()
-				}
+			actor: createActor({
+				actor_name: 'assets_file_chunks',
+				identity: $auth_client.getIdentity()
 			})
 		}));
 
 		actor_assets_img_staging.update(() => ({
 			loggedIn: false,
-			actor: create_actor_assets_img_staging({
-				agentOptions: {
-					identity: $auth_client.getIdentity()
-				}
+			actor: createActor({
+				actor_name: 'assets_img_staging',
+				identity: $auth_client.getIdentity()
 			})
 		}));
 
 		actor_username.update(() => ({
 			loggedIn: false,
-			actor: create_actor_username({
-				agentOptions: {
-					identity: $auth_client.getIdentity()
-				}
+			actor: createActor({
+				actor_name: 'username',
+				identity: $auth_client.getIdentity()
 			})
 		}));
 
 		actor_profile.update(() => ({
 			loggedIn: false,
-			actor: create_actor_profile({
-				agentOptions: {
-					identity: $auth_client.getIdentity()
-				}
+			actor: createActor({
+				actor_name: 'profile',
+				identity: $auth_client.getIdentity()
 			})
 		}));
 
 		actor_project_main.update(() => ({
 			loggedIn: false,
-			actor: create_actor_project_main({
-				agentOptions: {
-					identity: $auth_client.getIdentity()
-				}
+			actor: createActor({
+				actor_name: 'project_main',
+				identity: $auth_client.getIdentity()
 			})
 		}));
 
 		actor_snap_main.update(() => ({
 			loggedIn: false,
-			actor: create_actor_snap_main({
-				agentOptions: {
-					identity: $auth_client.getIdentity()
-				}
+			actor: createActor({
+				actor_name: 'snap_main',
+				identity: $auth_client.getIdentity()
 			})
 		}));
 

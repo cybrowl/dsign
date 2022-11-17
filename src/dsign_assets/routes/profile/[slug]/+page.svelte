@@ -2,6 +2,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { AuthClient } from '@dfinity/auth-client';
 
 	import AccountCreationModal from '../../../modals/AccountCreationModal.svelte';
 	import AccountSettingsModal from '../../../modals/AccountSettingsModal.svelte';
@@ -12,9 +13,12 @@
 	import { modal_visible } from '../../../store/modal';
 	import { page_navigation } from '../../../store/page_navigation';
 
-	import { actor_snap_main, snap_store } from '../../../store/actor_snap_main';
+	// actors
+	import { actor_profile, actor_snap_main, actor_project_main } from '../../../store/actors';
 
-	console.log($page.params);
+	import { snap_store, project_store } from '../../../store/fetch_store';
+
+	let isAuthenticated = false;
 
 	page_navigation.update(({ navItems }) => {
 		navItems.forEach((navItem) => {
@@ -28,21 +32,35 @@
 	});
 
 	onMount(async () => {
+		let authClient = await AuthClient.create();
+
+		isAuthenticated = await authClient.isAuthenticated();
+
 		try {
-			const { ok: all_snaps, err: error } =
-				await $actor_snap_main.actor.get_all_snaps_without_project();
-
-			console.log('profile: all_snaps', all_snaps);
-			console.log('profile: error', error);
-			if (all_snaps) {
-				snap_store.set({ isFetching: false, snaps: [...all_snaps] });
-
-				local_storage_snaps.set({ all_snaps_count: all_snaps.length || 1 });
-			} else {
+			if (isAuthenticated) {
+				Promise.all([
+					$actor_snap_main.actor.get_all_snaps_without_project(),
+					$actor_project_main.actor.get_all_projects(),
+					$actor_profile.actor.get_profile()
+				]).then((results) => {
+					console.log('results', results);
+				});
 			}
+
+			// const { ok: all_snaps, err: error } =
+			// 	await $actor_snap_main.actor.get_all_snaps_without_project();
+
+			// console.log('profile: all_snaps', all_snaps);
+			// console.log('profile: error', error);
+			// if (all_snaps) {
+			// 	snap_store.set({ isFetching: false, snaps: [...all_snaps] });
+
+			// 	local_storage_snaps.set({ all_snaps_count: all_snaps.length || 1 });
+			// } else {
+			// }
 		} catch (error) {
-			await $actor_snap_main.actor.create_user_snap_storage();
-			console.log('error: ', error);
+			// await $actor_snap_main.actor.create_user_snap_storage();
+			// console.log('error: ', error);
 		}
 	});
 </script>

@@ -5,6 +5,6 @@ export const page_navigation = writable({
 		{ name: 'Explore', href: '', isSelected: false },
 		{ name: 'Projects', href: 'projects', isSelected: false },
 		{ name: 'Favorites', href: 'favorites', isSelected: false },
-		{ name: 'Profile', href: 'profile/cyberowl', isSelected: false }
+		{ name: 'Profile', href: 'profile', isSelected: false }
 	]
 });

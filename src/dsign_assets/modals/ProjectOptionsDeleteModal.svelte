@@ -3,9 +3,9 @@
 	import ProjectOptionsDelete from 'dsign-components/components/ProjectOptionsDelete.svelte';
 
 	// actors
-	import { actor_project_main, project_store } from '../store/actor_project_main';
-	import { actor_snap_main } from '../store/actor_snap_main';
+	import { actor_project_main, actor_snap_main } from '../store/actors';
 
+	import { project_store } from '../store/fetch_store';
 	import { modal_visible } from '../store/modal';
 
 	export let project = {

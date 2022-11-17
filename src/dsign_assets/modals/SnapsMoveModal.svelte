@@ -3,19 +3,15 @@
 	import SnapsMove from 'dsign-components/components/SnapsMove.svelte';
 
 	// actors
-	import {
-		actor_project_main,
-		project_store,
-		projects_tabs,
-		is_edit_active
-	} from '../store/actor_project_main';
-	import { actor_snap_main, snap_store } from '../store/actor_snap_main';
-	import { notification, notification_visible } from '../store/notification';
+	import { actor_project_main, actor_snap_main } from '../store/actors';
 
 	// local storage
 	import { local_storage_projects, local_storage_snaps } from '../store/local_storage';
 
+	import { project_store, snap_store } from '../store/fetch_store';
+	import { projects_tabs, is_edit_active } from '../store/page_state';
 	import { modal_visible } from '../store/modal';
+	import { notification, notification_visible } from '../store/notification';
 
 	export let number_snaps_selected = 0;
 	export let project = { snaps: [] };
