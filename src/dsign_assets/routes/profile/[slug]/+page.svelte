@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { AuthClient } from '@dfinity/auth-client';
+	import get from 'lodash/get';
 
 	import AccountCreationModal from '../../../modals/AccountCreationModal.svelte';
 	import AccountSettingsModal from '../../../modals/AccountSettingsModal.svelte';
@@ -36,6 +37,16 @@
 		};
 	});
 
+	let profile_info = {
+		profile: {
+			avatar: {
+				url: ''
+			},
+			username: ''
+		},
+		projects: []
+	};
+
 	onMount(async () => {
 		let authClient = await AuthClient.create();
 
@@ -49,13 +60,12 @@
 
 		try {
 			if (isAuthenticated) {
-				Promise.all([
-					$actor_snap_main.actor.get_all_snaps_without_project(),
-					$actor_project_main.actor.get_all_projects(),
-					$actor_profile.actor.get_profile()
-				]).then((results) => {
-					console.log('results', results);
-				});
+				const { ok: profile } = await $actor_profile.actor.get_profile();
+				profile_info.profile = profile;
+
+				const projects = await $actor_project_main.actor.get_all_projects();
+
+				console.log(projects);
 			}
 
 			// const { ok: all_snaps, err: error } =
@@ -115,9 +125,9 @@
 
 	<div class="relative col-start-2 col-end-4 row-start-2 row-end-3">
 		<ProfileInfo
-			avatar={$local_storage_profile.avatar_url}
+			avatar={get(profile_info, 'profile.avatar.url', '')}
 			is_authenticated={isProfileOwner}
-			username="mishicat"
+			username={get(profile_info, 'profile.username', '')}
 			on:editProfile={openSettingsModal}
 		/>
 	</div>

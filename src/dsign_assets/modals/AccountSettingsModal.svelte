@@ -34,9 +34,7 @@
 			let img_asset_id = await $actor_assets_img_staging.actor.create_asset(create_asset_args);
 			await $actor_profile.actor.update_profile_avatar([img_asset_id]);
 
-			let {
-				ok: { profile }
-			} = await $actor_profile.actor.get_profile();
+			let { ok: profile } = await $actor_profile.actor.get_profile();
 
 			local_storage_profile.set({
 				avatar_url: get(profile, 'avatar.url', '') + '&' + Math.floor(Math.random() * 100),

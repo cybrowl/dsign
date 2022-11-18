@@ -9,20 +9,21 @@ import Time "mo:base/Time";
 
 import ImageAssets "../service_assets_img/ImageAssets";
 import Logger "canister:logger";
+import Username "canister:username";
 
 import Types "./types";
 
 actor Profile = {
-	type ImageAssetsActor = Types.ImageAssetsActor;
+	type ErrProfile = Types.ErrProfile;
 	type ICInterface = Types.ICInterface;
+	type ImageAssetsActor = Types.ImageAssetsActor;
 	type Profile = Types.Profile;
-	type ProfileErr = Types.ProfileErr;
-	type ProfileOk = Types.ProfileOk;
 	type Username = Types.Username;
 	type UserPrincipal = Types.UserPrincipal;
 
 	let ACTOR_NAME : Text = "Profile";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
+	let VERSION : Nat = 2;
 
 	private let ic : ICInterface = actor "aaaaa-aa";
 
@@ -35,29 +36,35 @@ actor Profile = {
 
 	stable var image_assets_canister_id : Text = "";
 
-	public query func version() : async Text {
-		return "0.0.1";
+	public query func version() : async Nat {
+		return VERSION;
 	};
 
-	// note: this is only invoked from username.create_username()
-	public shared func create_profile(principal : UserPrincipal, username : Username) : async () {
-
-		// TODO: only username should be able to call this
-		let profile : Profile = {
-			avatar = {
-				id = "";
-				canister_id = "";
-				url = "";
-				exists = false;
+	public shared ({ caller }) func create_profile() : async Result.Result<Profile, ErrProfile> {
+		switch (await Username.get_username_actor(caller)) {
+			case (#err err) {
+				return #err(#ErrorCall(debug_show (err)));
 			};
-			created = Time.now();
-			username = username;
-		};
+			case (#ok username) {
+				let profile : Profile = {
+					avatar = {
+						id = "";
+						canister_id = "";
+						url = "";
+						exists = false;
+					};
+					created = Time.now();
+					username = username;
+				};
 
-		profiles.put(principal, profile);
+				profiles.put(caller, profile);
+
+				return #ok(profile);
+			};
+		};
 	};
 
-	public shared({ caller }) func update_profile_avatar(img_asset_ids : [Nat]) : async Result.Result<Text, ProfileErr> {
+	public shared ({ caller }) func update_profile_avatar(img_asset_ids : [Nat]) : async Result.Result<Text, ErrProfile> {
 		var profile = {
 			avatar = {
 				id = "";
@@ -119,13 +126,13 @@ actor Profile = {
 
 	//TODO: update_profile_banner
 
-	public query ({ caller }) func get_profile() : async Result.Result<ProfileOk, ProfileErr> {
+	public query ({ caller }) func get_profile() : async Result.Result<Profile, ErrProfile> {
 		switch (profiles.get(caller)) {
 			case (null) {
 				#err(#ProfileNotFound);
 			};
 			case (?profile) {
-				return #ok({ profile });
+				return #ok(profile);
 			};
 		};
 	};
@@ -148,7 +155,7 @@ actor Profile = {
 		);
 	};
 
-	public shared({ caller }) func install_code(
+	public shared ({ caller }) func install_code(
 		canister_id : Principal,
 		arg : Blob,
 		wasm_module : Blob
@@ -169,7 +176,7 @@ actor Profile = {
 		return "not_authorized";
 	};
 
-	public shared(msg) func initialize_canisters() : async () {
+	public shared (msg) func initialize_canisters() : async () {
 		let tags = [ACTOR_NAME, "initialize_canisters"];
 		let profile_principal = Principal.fromActor(Profile);
 		let is_prod = Text.equal(

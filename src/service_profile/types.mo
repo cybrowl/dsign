@@ -21,11 +21,7 @@ module {
 		username : Username;
 	};
 
-	public type ProfileOk = {
-		profile : Profile;
-	};
-
-	public type ProfileErr = {
+	public type ErrProfile = {
 		#ProfileNotFound;
 		#ErrorCall : Text;
 	};

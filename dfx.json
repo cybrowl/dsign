@@ -33,7 +33,8 @@
       "type": "motoko",
       "dependencies": [
         "assets_img_staging",
-        "logger"
+        "logger",
+        "username"
       ]
     },
     "project_main": {
@@ -58,8 +59,7 @@
       "main": "src/service_username/Username.mo",
       "type": "motoko",
       "dependencies": [
-        "logger",
-        "profile"
+        "logger"
       ]
     },
     "logger": {

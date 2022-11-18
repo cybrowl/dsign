@@ -6,7 +6,12 @@
 	import Modal from 'dsign-components/components/Modal.svelte';
 
 	// actors
-	import { actor_project_main, actor_snap_main, actor_username } from '../store/actors';
+	import {
+		actor_profile,
+		actor_project_main,
+		actor_snap_main,
+		actor_username
+	} from '../store/actors';
 
 	// utils
 	import { getErrorMessage } from '../lib/utils';
@@ -33,16 +38,24 @@
 			errorMessage = '';
 			isCreatingAccount = true;
 
-			const response = await $actor_username.actor.create_username(e.detail.username);
+			let { ok: username, err: err_username } = await $actor_username.actor.create_username(
+				e.detail.username
+			);
+			let { ok: profile, err: err_profile } = await $actor_profile.actor.create_profile();
 
-			errorMessage = getErrorMessage(response, errorMessages);
 			isCreatingAccount = false;
 
-			if (errorMessage.length > 1) {
-				hasError = true;
+			if (err_profile || err_username) {
+				console.log('err_profile', err_profile);
+				console.log('err_username', err_username);
+				// errorMessage = getErrorMessage(response, errorMessages);
+				// isCreatingAccount = false;
+				// if (errorMessage.length > 1) {
+				// 	hasError = true;
+				// }
 			}
 
-			if (response.ok) {
+			if (username && profile) {
 				createdAccount = true;
 
 				setTimeout(function () {

@@ -5,11 +5,7 @@ module {
 	public type Username = Text;
 	public type UserPrincipal = Principal;
 
-	public type UsernameOk = {
-		username : Text;
-	};
-
-	public type UsernameErr = {
+	public type ErrUsername = {
 		#UserAnonymous;
 		#UserHasUsername;
 		#UsernameInvalid;

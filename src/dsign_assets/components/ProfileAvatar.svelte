@@ -14,9 +14,7 @@
 
 	onMount(async () => {
 		try {
-			let {
-				ok: { profile }
-			} = await profilePromise;
+			let { ok: profile } = await profilePromise;
 
 			if (profile) {
 				hasAccount = true;
