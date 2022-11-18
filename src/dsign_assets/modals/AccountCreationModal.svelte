@@ -72,6 +72,8 @@
 		} catch (error) {
 			hasError = true;
 			isCreatingAccount = false;
+
+			//TODO: add notification err
 			username_input_err = 'Failed calling create profile';
 		}
 	}

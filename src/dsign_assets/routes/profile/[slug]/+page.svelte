@@ -63,6 +63,10 @@
 				const { ok: profile } = await $actor_profile.actor.get_profile();
 				profile_info.profile = profile;
 
+				if (profile.username === $page.params.slug) {
+					isProfileOwner = true;
+				}
+
 				const projects = await $actor_project_main.actor.get_all_projects();
 
 				console.log(projects);
