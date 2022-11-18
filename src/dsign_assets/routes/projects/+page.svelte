@@ -311,8 +311,8 @@
 		<!-- Fetching Snaps -->
 		{#if $snap_store.isFetching === true}
 			<div
-				class="grid col-start-2 col-end-12 grid-cols-4 
-					row-start-3 row-end-auto mx-4 gap-10 mt-2 mb-24"
+				class="col-start-2 col-end-12 grid grid-cols-4 
+				row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 			>
 				{#each { length: $local_storage_snaps.all_snaps_count } as _, i}
 					<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />

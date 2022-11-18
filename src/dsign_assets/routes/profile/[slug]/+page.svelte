@@ -8,17 +8,22 @@
 	import AccountSettingsModal from '../../../modals/AccountSettingsModal.svelte';
 	import Login from '../../../components/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
+	import ProfileBanner from 'dsign-components/components/ProfileBanner.svelte';
+	import ProfileInfo from 'dsign-components/components/ProfileInfo.svelte';
 	import SnapCreationModal from '../../../modals/SnapCreationModal.svelte';
-
-	import { modal_visible } from '../../../store/modal';
-	import { page_navigation } from '../../../store/page_navigation';
 
 	// actors
 	import { actor_profile, actor_snap_main, actor_project_main } from '../../../store/actors';
 
+	// local storage
+	import { local_storage_profile } from '../../../store/local_storage';
+
 	import { snap_store, project_store } from '../../../store/fetch_store';
+	import { modal_visible } from '../../../store/modal';
+	import { page_navigation } from '../../../store/page_navigation';
 
 	let isAuthenticated = false;
+	let isProfileOwner = false;
 
 	page_navigation.update(({ navItems }) => {
 		navItems.forEach((navItem) => {
@@ -35,6 +40,12 @@
 		let authClient = await AuthClient.create();
 
 		isAuthenticated = await authClient.isAuthenticated();
+
+		if (isAuthenticated && $local_storage_profile.username === $page.params.slug) {
+			isProfileOwner = true;
+		} else {
+			isProfileOwner = false;
+		}
 
 		try {
 			if (isAuthenticated) {
@@ -63,14 +74,25 @@
 			// console.log('error: ', error);
 		}
 	});
+
+	function openSettingsModal() {
+		if (isProfileOwner) {
+			modal_visible.update((options) => {
+				return {
+					...options,
+					account_settings: !options.account_settings
+				};
+			});
+		}
+	}
 </script>
 
 <svelte:head>
 	<title>Profile</title>
 </svelte:head>
 
-<main class="grid grid-cols-12 gap-y-2">
-	<div class="col-start-2 col-end-12 mb-24">
+<main class="hidden lg:grid grid-cols-12 gap-y-2 relative">
+	<div class="col-start-2 col-end-12 row-start-1 row-end-2">
 		<PageNavigation navItems={$page_navigation.navItems}>
 			<Login />
 		</PageNavigation>
@@ -91,7 +113,21 @@
 		<SnapCreationModal />
 	{/if}
 
-	<div class="h-screen" />
+	<div class="relative col-start-2 col-end-4 row-start-2 row-end-3">
+		<ProfileInfo
+			avatar={$local_storage_profile.avatar_url}
+			is_authenticated={isProfileOwner}
+			username="mishicat"
+			on:editProfile={openSettingsModal}
+		/>
+	</div>
+
+	<div class="col-start-4 col-end-12 row-start-2 row-end-3">
+		<ProfileBanner
+			is_authenticated={isProfileOwner}
+			profile_banner_url="/default_profile_banner.png"
+		/>
+	</div>
 </main>
 
 <style>

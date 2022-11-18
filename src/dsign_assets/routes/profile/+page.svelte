@@ -55,6 +55,4 @@
 			<Login />
 		</PageNavigation>
 	</div>
-
-	<div class="h-screen" />
 </main>
