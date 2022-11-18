@@ -38,7 +38,7 @@
 
 		try {
 			if (isAuthenticated) {
-				let { ok: profile, err: error } = await $actor_profile.actor.get_profile();
+				let { ok: profile, err: err_get_profile } = await $actor_profile.actor.get_profile();
 				const username = get(profile, 'profile.username', 'x');
 
 				goto(`/profile/${username}`);

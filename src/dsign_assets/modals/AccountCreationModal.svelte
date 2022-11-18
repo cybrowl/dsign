@@ -13,16 +13,13 @@
 		actor_username
 	} from '../store/actors';
 
-	// utils
-	import { getErrorMessage } from '../lib/utils';
-
-	let errorMessages = {
+	let username_input_err_msgs = {
 		UsernameInvalid: 'Use lower case letters and numbers only, 2 - 20 characters in length',
 		UsernameTaken: 'Username already taken'
 	};
 
 	let createdAccount = false;
-	let errorMessage = '';
+	let username_input_err = '';
 	let hasError = false;
 	let isCreatingAccount = false;
 	let isVisible = true;
@@ -35,24 +32,33 @@
 	async function handleAccountCreation(e) {
 		try {
 			hasError = false;
-			errorMessage = '';
+			username_input_err = '';
 			isCreatingAccount = true;
 
-			let { ok: username, err: err_username } = await $actor_username.actor.create_username(
+			let { ok: username, err: err_create_username } = await $actor_username.actor.create_username(
 				e.detail.username
 			);
-			let { ok: profile, err: err_profile } = await $actor_profile.actor.create_profile();
 
-			isCreatingAccount = false;
+			if (err_create_username) {
+				hasError = true;
+				isCreatingAccount = false;
+				let err_create_username_key = Object.keys(err_create_username)[0];
+				username_input_err = username_input_err_msgs[err_create_username_key];
 
-			if (err_profile || err_username) {
-				console.log('err_profile', err_profile);
-				console.log('err_username', err_username);
-				// errorMessage = getErrorMessage(response, errorMessages);
-				// isCreatingAccount = false;
-				// if (errorMessage.length > 1) {
-				// 	hasError = true;
-				// }
+				return;
+			}
+
+			let { ok: profile, err: err_create_profile } = await $actor_profile.actor.create_profile();
+
+			if (err_create_profile) {
+				isCreatingAccount = false;
+
+				// profile err
+				// let err_create_profile_key = Object.keys(err_create_profile)[0];
+				// let notification_err = errorMessages[err_create_profile_key];
+
+				//TODO: add notification err
+				return;
 			}
 
 			if (username && profile) {
@@ -66,12 +72,12 @@
 		} catch (error) {
 			hasError = true;
 			isCreatingAccount = false;
-			errorMessage = 'Failed calling create profile';
+			username_input_err = 'Failed calling create profile';
 		}
 	}
 </script>
 
-<Modal modalHeaderVisible={!createdAccount}>
+<Modal isModalLocked={isCreatingAccount}>
 	{#if createdAccount}
 		{#if isVisible}
 			<AccountCreationSuccess />
@@ -79,7 +85,7 @@
 	{:else}
 		<AccountCreation
 			on:click={handleAccountCreation}
-			{errorMessage}
+			errorMessage={username_input_err}
 			{hasError}
 			{isCreatingAccount}
 		/>
