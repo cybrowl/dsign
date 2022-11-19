@@ -20,6 +20,7 @@
 
 	import { local_storage_profile } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
+	import modal_update from '$stores_ref/modal_update';
 	import { page_navigation } from '$stores_ref/page_navigation';
 	import page_navigation_update from '$stores_ref/page_navigation_update';
 
@@ -83,12 +84,7 @@
 
 	function openSettingsModal() {
 		if (isProfileOwner) {
-			modal_visible.update((options) => {
-				return {
-					...options,
-					account_settings: !options.account_settings
-				};
-			});
+			modal_update.change_visibility('account_settings');
 		}
 	}
 </script>
