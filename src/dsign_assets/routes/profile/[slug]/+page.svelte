@@ -12,6 +12,9 @@
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import ProfileBanner from 'dsign-components/components/ProfileBanner.svelte';
 	import ProfileInfo from 'dsign-components/components/ProfileInfo.svelte';
+	import ProfileTabs from 'dsign-components/components/ProfileTabs.svelte';
+	import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
+	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 
 	// stores
@@ -23,9 +26,13 @@
 	import modal_update from '$stores_ref/modal_update';
 	import { page_navigation } from '$stores_ref/page_navigation';
 	import page_navigation_update from '$stores_ref/page_navigation_update';
+	import { profile_tabs } from '$stores_ref/page_state';
 
 	// variables
 	let isAuthenticated = false;
+	let project = {
+		name: ''
+	};
 	let isProfileOwner = false;
 	let profile_info = {
 		profile: {
@@ -82,10 +89,21 @@
 		}
 	});
 
-	function openSettingsModal() {
+	function openAccountSettingsModal() {
 		if (isProfileOwner) {
 			modal_update.change_visibility('account_settings');
 		}
+	}
+
+	function handleProjectClick(e) {
+		project = get(e, 'detail');
+
+		project.name = project.name.charAt(0).toUpperCase() + project.name.slice(1);
+
+		profile_tabs.set({
+			isProjectsSelected: false,
+			isProjectSelected: true
+		});
 	}
 </script>
 
@@ -120,7 +138,7 @@
 			avatar={get(profile_info, 'profile.avatar.url', '')}
 			is_authenticated={isProfileOwner}
 			username={get(profile_info, 'profile.username', '')}
-			on:editProfile={openSettingsModal}
+			on:editProfile={openAccountSettingsModal}
 		/>
 	</div>
 
@@ -130,7 +148,50 @@
 			profile_banner_url="/default_profile_banner.png"
 		/>
 	</div>
+
+	<div
+		class="hidden lg:grid col-start-4 col-end-12 row-start-3 row-end-4 mt-16
+			self-end justify-between items-center h-10"
+	>
+		<ProfileTabs
+			project_name={project.name}
+			profileTabs={$profile_tabs}
+			on:toggleProjects={(e) => profile_tabs.set(e.detail)}
+		/>
+	</div>
+
+	<!-- Projects -->
+	{#if $profile_tabs.isProjectsSelected}
+		<div
+			class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+			row-start-5 row-end-auto gap-x-10 gap-y-12 mt-2 mb-24"
+		>
+			{#each $project_store.projects as project}
+				<ProjectCard {project} on:clickProject={handleProjectClick} />
+			{/each}
+		</div>
+	{/if}
+
+	<!-- Project -->
+	{#if $profile_tabs.isProjectSelected}
+		<!-- Snaps -->
+		{#if project.snaps && project.snaps.length > 0}
+			<div
+				class="col-start-4 col-end-12 grid grid-cols-4 
+						row-start-5 row-end-auto gap-x-10 gap-y-12 mt-2 mb-24"
+			>
+				{#each project.snaps as snap}
+					<SnapCard {snap} />
+				{/each}
+			</div>
+		{/if}
+	{/if}
 </main>
+
+<!-- Mobile Not Supported -->
+<div class="grid lg:hidden h-screen place-items-center text-white text-4xl">
+	<h1>Sorry, Mobile Not Supported</h1>
+</div>
 
 <style>
 </style>

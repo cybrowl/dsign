@@ -352,6 +352,7 @@
 			{#each $project_store.projects as project}
 				<ProjectCard
 					{project}
+					showOptionsPopover={true}
 					on:clickProject={handleProjectClick}
 					on:clickRenameProject={handleProjectRenameModalOpen}
 					on:clickDeleteProject={handleProjectDeleteModalOpen}

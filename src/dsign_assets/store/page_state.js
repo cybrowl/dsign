@@ -6,4 +6,9 @@ export const projects_tabs = writable({
 	isProjectSelected: false
 });
 
+export const profile_tabs = writable({
+	isProjectsSelected: true,
+	isProjectSelected: false
+});
+
 export const is_edit_active = writable(false);
