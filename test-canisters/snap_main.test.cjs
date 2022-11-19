@@ -179,7 +179,7 @@ test('ImageAssetStaging[mishicat].create_asset(): with image and valid identity 
 test('Profile[motoko].create_username(): with valid username => #ok - username', async function (t) {
 	const username = fake.word();
 
-	const { ok: username_ } = await profile_actors.mishicat.create_username(username.toLowerCase());
+	const { ok: username_ } = await profile_actors.motoko.create_username(username.toLowerCase());
 
 	t.equal(username_, username.toLowerCase());
 });
