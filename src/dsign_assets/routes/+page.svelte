@@ -25,7 +25,7 @@
 	<title>DSign</title>
 </svelte:head>
 
-<main class="grid grid-cols-12 gap-y-2">
+<main class="hidden lg:grid grid-cols-12 gap-y-2 relative">
 	<div class="col-start-2 col-end-12 mb-24">
 		<PageNavigation navItems={$page_navigation.navItems}>
 			<Login />
@@ -47,6 +47,11 @@
 		<SnapCreationModal />
 	{/if}
 </main>
+
+<!-- Mobile Not Supported -->
+<div class="grid lg:hidden h-screen place-items-center text-white text-4xl">
+	<h1>Sorry, Mobile Not Supported</h1>
+</div>
 
 <style>
 </style>

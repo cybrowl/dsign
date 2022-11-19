@@ -71,8 +71,33 @@
 		}
 
 		if (isAuthenticated) {
-			await fetchAllSnaps();
-			await fetchAllProjects();
+			Promise.all([
+				$actor_snap_main.actor.get_all_snaps_without_project(),
+				$actor_project_main.actor.get_all_projects([])
+			]).then(async ([snaps, projects]) => {
+				const { ok: all_projects, err: err_all_projects } = projects;
+				const { ok: all_snaps, err: err_all_snaps } = snaps;
+
+				if (all_snaps) {
+					snap_store.set({ isFetching: false, snaps: [...all_snaps] });
+
+					local_storage_snaps.set({ all_snaps_count: all_snaps.length || 1 });
+				} else {
+					if (err_all_snaps['UserNotFound'] === true) {
+						await $actor_snap_main.actor.create_user_snap_storage();
+					}
+				}
+
+				if (all_projects) {
+					project_store.set({ isFetching: false, projects: [...all_projects] });
+
+					local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
+				} else {
+					if (err_all_projects['UserNotFound'] === true) {
+						await $actor_project_main.actor.create_user_project_storage();
+					}
+				}
+			});
 		} else {
 			window.location.href = '/';
 		}
@@ -102,25 +127,6 @@
 			}
 		} catch (error) {
 			console.log('fetchAllSnaps - Err: ', error);
-		}
-	}
-
-	async function fetchAllProjects() {
-		try {
-			const { ok: all_projects, err: err_all_projects } =
-				await $actor_project_main.actor.get_all_projects([]);
-
-			if (all_projects) {
-				project_store.set({ isFetching: false, projects: [...all_projects] });
-
-				local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
-			} else {
-				if (err_all_projects['UserNotFound'] === true) {
-					await $actor_project_main.actor.create_user_project_storage();
-				}
-			}
-		} catch (error) {
-			console.log('fetchAllProjects - Err: ', error);
 		}
 	}
 

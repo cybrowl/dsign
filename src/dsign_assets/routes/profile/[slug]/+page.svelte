@@ -57,9 +57,12 @@
 				Promise.all([
 					$actor_profile.actor.get_profile(),
 					$actor_profile.actor.get_profile_public($page.params.slug)
-				]).then((result) => {
-					isProfileOwner = result[0].ok.username === $page.params.slug;
-					profile_info.profile = result[1].ok;
+				]).then(([profile_owner, profile_public]) => {
+					const { ok: profile_owner_ } = profile_owner;
+					const { ok: profile_public_ } = profile_public;
+
+					isProfileOwner = profile_owner_.username === $page.params.slug;
+					profile_info.profile = profile_public_;
 				});
 
 				const { ok: all_projects, err: err_all_projects } =
@@ -169,7 +172,7 @@
 		{#if project.snaps && project.snaps.length > 0}
 			<div
 				class="col-start-4 col-end-12 grid grid-cols-4 
-						row-start-5 row-end-auto gap-x-10 gap-y-12 mt-2 mb-24"
+						row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
 				{#each project.snaps as snap}
 					<SnapCard {snap} />
