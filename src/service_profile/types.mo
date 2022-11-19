@@ -23,6 +23,16 @@ module {
 
 	public type ErrProfile = {
 		#ProfileNotFound;
+		#PrincipalNotFoundForUsername;
 		#ErrorCall : Text;
+	};
+
+	public type ErrUsername = {
+		#UserAnonymous;
+		#UserHasUsername;
+		#UsernameInvalid;
+		#UsernameTaken;
+		#UsernameNotFound;
+		#UserNotFound;
 	};
 };

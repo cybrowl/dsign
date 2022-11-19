@@ -11,7 +11,7 @@ import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
 import Logger "canister:logger";
-import Username "canister:username";
+import Profile "canister:profile";
 
 import Types "./types";
 import SnapTypes "../service_snaps/types";
@@ -58,7 +58,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 		let project_canister_id = Principal.toText(Principal.fromActor(this));
 
 		var username = "";
-		switch (await Username.get_username_actor(owner)) {
+		switch (await Profile.get_username_public(owner)) {
 			case (#ok username_) {
 				username := username_;
 			};

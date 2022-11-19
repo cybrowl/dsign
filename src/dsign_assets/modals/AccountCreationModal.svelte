@@ -6,12 +6,7 @@
 	import Modal from 'dsign-components/components/Modal.svelte';
 
 	// actors
-	import {
-		actor_profile,
-		actor_project_main,
-		actor_snap_main,
-		actor_username
-	} from '../store/actors';
+	import { actor_profile, actor_project_main, actor_snap_main } from '../store/actors';
 
 	let username_input_err_msgs = {
 		UsernameInvalid: 'Use lower case letters and numbers only, 2 - 20 characters in length',
@@ -35,7 +30,7 @@
 			username_input_err = '';
 			isCreatingAccount = true;
 
-			let { ok: username, err: err_create_username } = await $actor_username.actor.create_username(
+			let { ok: username, err: err_create_username } = await $actor_profile.actor.create_username(
 				e.detail.username
 			);
 
@@ -48,20 +43,7 @@
 				return;
 			}
 
-			let { ok: profile, err: err_create_profile } = await $actor_profile.actor.create_profile();
-
-			if (err_create_profile) {
-				isCreatingAccount = false;
-
-				// profile err
-				// let err_create_profile_key = Object.keys(err_create_profile)[0];
-				// let notification_err = errorMessages[err_create_profile_key];
-
-				//TODO: add notification err
-				return;
-			}
-
-			if (username && profile) {
+			if (username) {
 				createdAccount = true;
 
 				setTimeout(function () {

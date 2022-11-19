@@ -18,8 +18,8 @@
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 
 	// stores
-	import { actor_profile, actor_snap_main, actor_project_main } from '$stores_ref/actors';
-	import { snap_store, project_store } from '$stores_ref/fetch_store';
+	import { actor_profile, actor_project_main } from '$stores_ref/actors';
+	import { project_store } from '$stores_ref/fetch_store';
 
 	import { local_storage_profile } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
@@ -52,15 +52,9 @@
 
 		isAuthenticated = await authClient.isAuthenticated();
 
-		if (isAuthenticated && $local_storage_profile.username === $page.params.slug) {
-			isProfileOwner = true;
-		} else {
-			isProfileOwner = false;
-		}
-
 		try {
 			if (isAuthenticated) {
-				const { ok: profile } = await $actor_profile.actor.get_profile();
+				const { ok: profile } = await $actor_profile.actor.get_profile_public($page.params.slug);
 				profile_info.profile = profile;
 
 				if (profile.username === $page.params.slug) {
@@ -71,21 +65,9 @@
 
 				console.log(projects);
 			}
-
-			// const { ok: all_snaps, err: error } =
-			// 	await $actor_snap_main.actor.get_all_snaps_without_project();
-
-			// console.log('profile: all_snaps', all_snaps);
-			// console.log('profile: error', error);
-			// if (all_snaps) {
-			// 	snap_store.set({ isFetching: false, snaps: [...all_snaps] });
-
-			// 	local_storage_snaps.set({ all_snaps_count: all_snaps.length || 1 });
-			// } else {
-			// }
 		} catch (error) {
-			// await $actor_snap_main.actor.create_user_snap_storage();
-			// console.log('error: ', error);
+			// Show error notification
+			// TODO: log error
 		}
 	});
 
@@ -133,6 +115,7 @@
 		<SnapCreationModal />
 	{/if}
 
+	<!-- ProfileInfo -->
 	<div class="relative col-start-2 col-end-4 row-start-2 row-end-3">
 		<ProfileInfo
 			avatar={get(profile_info, 'profile.avatar.url', '')}
@@ -142,6 +125,7 @@
 		/>
 	</div>
 
+	<!-- ProfileBanner -->
 	<div class="col-start-4 col-end-12 row-start-2 row-end-3">
 		<ProfileBanner
 			is_authenticated={isProfileOwner}
@@ -149,6 +133,7 @@
 		/>
 	</div>
 
+	<!-- ProfileTabs -->
 	<div
 		class="hidden lg:grid col-start-4 col-end-12 row-start-3 row-end-4 mt-16
 			self-end justify-between items-center h-10"

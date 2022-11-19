@@ -78,7 +78,11 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 		let self = Principal.fromActor(this);
 		let canister_id : Text = Principal.toText(self);
 
-		let asset_url = Utils.generate_asset_url({ asset_id = asset_id; canister_id = canister_id; is_prod = is_prod });
+		let asset_url = Utils.generate_asset_url({
+			asset_id = asset_id;
+			canister_id = canister_id;
+			is_prod = is_prod;
+		});
 
 		let asset : Types.Asset = {
 			canister_id = canister_id;
@@ -136,7 +140,11 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 						("cache-control", "private, max-age=0")
 					];
 					status_code = 200;
-					streaming_strategy = create_strategy({ asset_id = asset_id; chunk_index = 0; data_chunks_size = asset.data_chunks_size });
+					streaming_strategy = create_strategy({
+						asset_id = asset_id;
+						chunk_index = 0;
+						data_chunks_size = asset.data_chunks_size;
+					});
 				};
 			};
 			case _ {
@@ -187,7 +195,11 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 			case (null) throw Error.reject("asset_id not found: " # st.asset_id);
 			case (?asset) {
 				return {
-					token = create_token({ asset_id = st.asset_id; chunk_index = st.chunk_index; data_chunks_size = asset.data_chunks_size });
+					token = create_token({
+						asset_id = st.asset_id;
+						chunk_index = st.chunk_index;
+						data_chunks_size = asset.data_chunks_size;
+					});
 					body = asset.data_chunks[st.chunk_index];
 				};
 			};

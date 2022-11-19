@@ -9,12 +9,13 @@ import Time "mo:base/Time";
 
 import ImageAssets "../service_assets_img/ImageAssets";
 import Logger "canister:logger";
-import Username "canister:username";
 
 import Types "./types";
+import Utils "./utils";
 
 actor Profile = {
 	type ErrProfile = Types.ErrProfile;
+	type ErrUsername = Types.ErrUsername;
 	type ICInterface = Types.ICInterface;
 	type ImageAssetsActor = Types.ImageAssetsActor;
 	type Profile = Types.Profile;
@@ -27,6 +28,23 @@ actor Profile = {
 
 	private let ic : ICInterface = actor "aaaaa-aa";
 
+	// ------------------------- Variables -------------------------
+	// usernames
+	var username_owners : HashMap.HashMap<Username, UserPrincipal> = HashMap.HashMap(
+		0,
+		Text.equal,
+		Text.hash
+	);
+	stable var username_owners_stable_storage : [(Username, UserPrincipal)] = [];
+
+	var usernames : HashMap.HashMap<UserPrincipal, Username> = HashMap.HashMap(
+		0,
+		Principal.equal,
+		Principal.hash
+	);
+	stable var usernames_stable_storage : [(UserPrincipal, Username)] = [];
+
+	// profiles
 	var profiles : HashMap.HashMap<UserPrincipal, Profile> = HashMap.HashMap(
 		0,
 		Principal.equal,
@@ -36,34 +54,149 @@ actor Profile = {
 
 	stable var image_assets_canister_id : Text = "";
 
-	public query func version() : async Nat {
-		return VERSION;
-	};
-
-	public shared ({ caller }) func create_profile() : async Result.Result<Profile, ErrProfile> {
-		switch (await Username.get_username_actor(caller)) {
-			case (#err err) {
-				return #err(#ErrorCall(debug_show (err)));
+	// ------------------------- Username Methods -------------------------
+	private func check_username_is_available(username : Username) : Bool {
+		switch (username_owners.get(username)) {
+			case (?owner) {
+				return false;
 			};
-			case (#ok username) {
-				let profile : Profile = {
-					avatar = {
-						id = "";
-						canister_id = "";
-						url = "";
-						exists = false;
-					};
-					created = Time.now();
-					username = username;
-				};
-
-				profiles.put(caller, profile);
-
-				return #ok(profile);
+			case (_) {
+				return true;
 			};
 		};
 	};
 
+	private func check_user_has_a_username(caller : UserPrincipal) : Bool {
+		switch (usernames.get(caller)) {
+			case (?username) {
+				return true;
+			};
+			case (_) {
+				return false;
+			};
+		};
+	};
+
+	private func get_current_username(caller : UserPrincipal) : Username {
+		switch (usernames.get(caller)) {
+			case (?current_username) {
+				return current_username;
+			};
+			case (_) {
+				return "";
+			};
+		};
+	};
+
+	public shared ({ caller }) func create_username(username : Username) : async Result.Result<Username, ErrUsername> {
+		let tags = [ACTOR_NAME, "create_username"];
+		let is_anonymous = Principal.isAnonymous(caller);
+
+		let valid_username : Bool = Utils.is_valid_username(username);
+		let username_available : Bool = check_username_is_available(username);
+		let user_has_username : Bool = check_user_has_a_username(caller);
+
+		if (is_anonymous == true) {
+			return #err(#UserAnonymous);
+		};
+
+		if (valid_username == false) {
+			return #err(#UsernameInvalid);
+		};
+
+		if (username_available == false) {
+			return #err(#UsernameTaken);
+		};
+
+		if (user_has_username == true) {
+			return #err(#UserHasUsername);
+		} else {
+			usernames.put(caller, username);
+			username_owners.put(username, caller);
+
+			await Logger.log_event(tags, "created");
+
+			// create profile
+			let profile : Profile = {
+				avatar = {
+					id = "";
+					canister_id = "";
+					url = "";
+					exists = false;
+				};
+				created = Time.now();
+				username = username;
+			};
+
+			profiles.put(caller, profile);
+
+			return #ok(username);
+		};
+	};
+
+	// public shared ({ caller }) func update_username(username : Username) : async Result.Result<UsernameOk, UsernameErr> {
+	// 	let tags = [ACTOR_NAME, "update_username"];
+	// 	let is_anonymous = Principal.isAnonymous(caller);
+
+	// 	let valid_username : Bool = Utils.is_valid_username(username);
+	// 	let username_available : Bool = check_username_is_available(username);
+	// 	let user_has_username : Bool = check_user_has_a_username(caller);
+
+	// 	if (is_anonymous == true) {
+	// 		return #err(#UserAnonymous);
+	// 	};
+
+	// 	if (valid_username == false) {
+	// 		return #err(#UsernameInvalid);
+	// 	};
+
+	// 	if (user_has_username == false) {
+	// 		return #err(#UsernameNotFound);
+	// 	};
+
+	// 	if (username_available == false) {
+	// 		return #err(#UsernameTaken);
+	// 	} else {
+	// 		let current_username : Username = get_current_username(caller);
+	// 		username_owners.delete(current_username);
+	// 		username_owners.put(username, caller);
+	// 		usernames.put(caller, username);
+
+	// 		await Logger.log_event(tags, "updated");
+
+	// 		//TODO: update username in snaps, profile, avatar_url
+
+	// 		return #ok(username);
+	// 	};
+	// };
+
+	public query func get_number_of_users() : async Nat {
+		return usernames.size();
+	};
+
+	public query ({ caller }) func get_username() : async Result.Result<Username, ErrUsername> {
+		switch (usernames.get(caller)) {
+			case (?username) {
+				#ok(username);
+			};
+			case (_) {
+				#err(#UserNotFound);
+			};
+		};
+	};
+
+	public query func get_username_public(principal : UserPrincipal) : async Result.Result<Username, ErrUsername> {
+		switch (usernames.get(principal)) {
+			case (?username) {
+				#ok(username);
+			};
+			case (_) {
+				#err(#UserNotFound);
+			};
+		};
+	};
+
+	// ------------------------- Profile Methods -------------------------
 	public shared ({ caller }) func update_profile_avatar(img_asset_ids : [Nat]) : async Result.Result<Text, ErrProfile> {
 		var profile = {
 			avatar = {
@@ -124,7 +257,7 @@ actor Profile = {
 		};
 	};
 
-	//TODO: update_profile_banner
+	//TODO: update_profile
 
 	public query ({ caller }) func get_profile() : async Result.Result<Profile, ErrProfile> {
 		switch (profiles.get(caller)) {
@@ -137,9 +270,29 @@ actor Profile = {
 		};
 	};
 
-	//TODO: get_profile_public
+	public query ({ caller }) func get_profile_public(username : Username) : async Result.Result<Profile, ErrProfile> {
+		switch (username_owners.get(username)) {
+			case (?principal) {
+				switch (profiles.get(principal)) {
+					case (null) {
+						#err(#ProfileNotFound);
+					};
+					case (?profile) {
+						return #ok(profile);
+					};
+				};
+			};
+			case (_) {
+				#err(#PrincipalNotFoundForUsername);
+			};
+		};
+	};
 
 	// ------------------------- Canister Management -------------------------
+	public query func version() : async Nat {
+		return VERSION;
+	};
+
 	private func create_image_assets_canister(profile_principal : Principal, is_prod : Bool) : async () {
 		let tags = [ACTOR_NAME, "create_image_assets_canister"];
 
@@ -197,10 +350,31 @@ actor Profile = {
 
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
+		username_owners_stable_storage := Iter.toArray(username_owners.entries());
+		usernames_stable_storage := Iter.toArray(usernames.entries());
+
 		profiles_stable_storage := Iter.toArray(profiles.entries());
 	};
 
 	system func postupgrade() {
+		// owners
+		username_owners := HashMap.fromIter<Username, UserPrincipal>(
+			username_owners_stable_storage.vals(),
+			0,
+			Text.equal,
+			Text.hash
+		);
+		username_owners_stable_storage := [];
+
+		// usernames
+		usernames := HashMap.fromIter<UserPrincipal, Username>(
+			usernames_stable_storage.vals(),
+			0,
+			Principal.equal,
+			Principal.hash
+		);
+		usernames_stable_storage := [];
+
 		profiles := HashMap.fromIter<UserPrincipal, Profile>(
 			profiles_stable_storage.vals(),
 			0,

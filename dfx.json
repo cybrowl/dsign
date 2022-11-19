@@ -1,11 +1,7 @@
 {
   "canisters": {
     "dsign_assets": {
-      "dependencies": [
-        "logger",
-        "profile",
-        "username"
-      ],
+      "dependencies": [],
       "frontend": {
         "entrypoint": "build/index.html"
       },
@@ -18,7 +14,7 @@
       "main": "src/service_assets/FileAssetChunks.mo",
       "type": "motoko",
       "dependencies": [
-        "logger", "username"
+        "logger"
       ]
     },
     "assets_img_staging": {
@@ -33,8 +29,7 @@
       "type": "motoko",
       "dependencies": [
         "assets_img_staging",
-        "logger",
-        "username"
+        "logger"
       ]
     },
     "project_main": {
@@ -42,7 +37,7 @@
       "type": "motoko",
       "dependencies": [
         "logger",
-        "username"
+        "profile"
       ]
     },
     "snap_main": {
@@ -52,7 +47,7 @@
         "assets_file_chunks",
         "assets_img_staging",
         "logger",
-        "username"
+        "profile"
       ]
     },
     "username": {
@@ -85,7 +80,7 @@
       "type": "motoko",
       "dependencies": [
         "logger",
-        "username"
+        "profile"
       ]
     },
     "test_snap": {
@@ -93,7 +88,7 @@
       "type": "motoko",
       "dependencies": [
         "logger",
-        "username"
+        "profile"
       ]
     }
   },

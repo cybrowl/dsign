@@ -8,8 +8,6 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Time "mo:base/Time";
 
-import Username "canister:username";
-
 import Types "./types";
 
 actor FileAssetChunks = {
