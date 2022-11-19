@@ -78,7 +78,13 @@
 		}
 	});
 
-	onDestroy(() => project_store.set({ isFetching: true, projects: [] }));
+	onDestroy(() => {
+		project_store.set({ isFetching: true, projects: [] });
+		profile_tabs.set({
+			isProjectsSelected: true,
+			isProjectSelected: false
+		});
+	});
 
 	function openAccountSettingsModal() {
 		if (isProfileOwner) {
