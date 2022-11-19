@@ -1,6 +1,6 @@
 <!-- src/routes/profile.svelte -->
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { AuthClient } from '@dfinity/auth-client';
 	import get from 'lodash/get';
@@ -74,6 +74,8 @@
 			// TODO: log error
 		}
 	});
+
+	onDestroy(() => project_store.set({ isFetching: true, projects: [] }));
 
 	function openAccountSettingsModal() {
 		if (isProfileOwner) {
@@ -153,7 +155,7 @@
 	{#if $profile_tabs.isProjectsSelected}
 		<div
 			class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
-			row-start-5 row-end-auto gap-x-10 gap-y-12 mt-2 mb-24"
+			row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 		>
 			{#each $project_store.projects as project}
 				<ProjectCard {project} on:clickProject={handleProjectClick} />
