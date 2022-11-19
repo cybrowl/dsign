@@ -35,7 +35,7 @@
 		try {
 			const created_project_res = await $actor_project_main.actor.create_project(project_name, []);
 
-			const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects();
+			const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects([]);
 
 			if (all_projects) {
 				project_store.set({ isFetching: false, projects: [...all_projects] });

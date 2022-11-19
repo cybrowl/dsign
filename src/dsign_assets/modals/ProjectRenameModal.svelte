@@ -52,7 +52,7 @@
 			project_ref
 		);
 
-		const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects();
+		const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects([]);
 
 		if (all_projects) {
 			project_store.set({ isFetching: false, projects: [...all_projects] });

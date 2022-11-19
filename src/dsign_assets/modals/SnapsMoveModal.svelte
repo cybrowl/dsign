@@ -93,7 +93,9 @@
 
 				await $actor_project_main.actor.add_snaps_to_project(selected_snaps_list, project_ref);
 
-				const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects();
+				const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects(
+					[]
+				);
 				const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
 
 				if (all_projects) {
@@ -134,7 +136,9 @@
 					project_to_ref
 				);
 
-				const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects();
+				const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects(
+					[]
+				);
 				if (all_projects) {
 					project_store.set({ isFetching: false, projects: [...all_projects] });
 

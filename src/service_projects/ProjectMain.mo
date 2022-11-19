@@ -10,6 +10,7 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 
 import Logger "canister:logger";
+import Profile "canister:profile";
 import Project "Project";
 
 import Types "./types";
@@ -332,13 +333,21 @@ actor ProjectMain {
 		};
 	};
 
-	public shared ({ caller }) func get_all_projects() : async Result.Result<[ProjectPublic], ErrGetProjects> {
+	public shared ({ caller }) func get_all_projects(username : ?Text) : async Result.Result<[ProjectPublic], ErrGetProjects> {
 		let tags = [ACTOR_NAME, "get_projects"];
 
-		//TODO: add username as optional arg
-		//TODO: if username is provided it should replace caller
+		var user_principal = caller;
 
-		switch (user_canisters_ref.get(caller)) {
+		switch (await Profile.get_user_principal_public(Option.get(username, ""))) {
+			case (#err err) {
+				return #err(#ErrorCall(debug_show (err)));
+			};
+			case (#ok principal) {
+				user_principal := principal;
+			};
+		};
+
+		switch (user_canisters_ref.get(user_principal)) {
 			case (?project_canister_ids) {
 				let all_projects = Buffer.Buffer<ProjectPublic>(0);
 

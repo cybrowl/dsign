@@ -196,6 +196,19 @@ actor Profile = {
 		};
 	};
 
+	public query func get_user_principal_public(username : Username) : async Result.Result<UserPrincipal, ErrUsername> {
+		//TODO: lock for authorized canisters only
+
+		switch (username_owners.get(username)) {
+			case (?principal) {
+				#ok(principal);
+			};
+			case (_) {
+				#err(#UserNotFound);
+			};
+		};
+	};
+
 	// ------------------------- Profile Methods -------------------------
 	public shared ({ caller }) func update_profile_avatar(img_asset_ids : [Nat]) : async Result.Result<Text, ErrProfile> {
 		var profile = {

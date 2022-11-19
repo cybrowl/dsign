@@ -108,7 +108,7 @@
 	async function fetchAllProjects() {
 		try {
 			const { ok: all_projects, err: err_all_projects } =
-				await $actor_project_main.actor.get_all_projects();
+				await $actor_project_main.actor.get_all_projects([]);
 
 			if (all_projects) {
 				project_store.set({ isFetching: false, projects: [...all_projects] });

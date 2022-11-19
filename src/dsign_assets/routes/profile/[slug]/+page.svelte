@@ -61,9 +61,12 @@
 					isProfileOwner = true;
 				}
 
-				const projects = await $actor_project_main.actor.get_all_projects();
+				const { ok: all_projects, err: err_all_projects } =
+					await $actor_project_main.actor.get_all_projects([$page.params.slug]);
 
-				console.log(projects);
+				if (all_projects) {
+					project_store.set({ isFetching: false, projects: [...all_projects] });
+				}
 			}
 		} catch (error) {
 			// Show error notification

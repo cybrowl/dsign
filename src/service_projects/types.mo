@@ -107,6 +107,7 @@ module {
 	public type ErrGetProjects = {
 		#UserNotFound : Bool;
 		#NoProjects : Bool;
+		#ErrorCall : Text;
 	};
 
 	public type ErrUpdateProject = {
