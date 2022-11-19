@@ -5,38 +5,27 @@
 	import { AuthClient } from '@dfinity/auth-client';
 	import get from 'lodash/get';
 
-	import AccountCreationModal from '../../../modals/AccountCreationModal.svelte';
-	import AccountSettingsModal from '../../../modals/AccountSettingsModal.svelte';
-	import Login from '../../../components/Login.svelte';
+	// components
+	import AccountCreationModal from '$modals_ref/AccountCreationModal.svelte';
+	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
+	import Login from '$components_ref/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import ProfileBanner from 'dsign-components/components/ProfileBanner.svelte';
 	import ProfileInfo from 'dsign-components/components/ProfileInfo.svelte';
-	import SnapCreationModal from '../../../modals/SnapCreationModal.svelte';
+	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 
-	// actors
-	import { actor_profile, actor_snap_main, actor_project_main } from '../../../store/actors';
+	// stores
+	import { actor_profile, actor_snap_main, actor_project_main } from '$stores_ref/actors';
+	import { snap_store, project_store } from '$stores_ref/fetch_store';
 
-	// local storage
-	import { local_storage_profile } from '../../../store/local_storage';
+	import { local_storage_profile } from '$stores_ref/local_storage';
+	import { modal_visible } from '$stores_ref/modal';
+	import { page_navigation } from '$stores_ref/page_navigation';
+	import page_navigation_update from '$stores_ref/page_navigation_update';
 
-	import { snap_store, project_store } from '../../../store/fetch_store';
-	import { modal_visible } from '../../../store/modal';
-	import { page_navigation } from '../../../store/page_navigation';
-
+	// variables
 	let isAuthenticated = false;
 	let isProfileOwner = false;
-
-	page_navigation.update(({ navItems }) => {
-		navItems.forEach((navItem) => {
-			navItem.isSelected = false;
-		});
-		navItems[3].isSelected = true;
-
-		return {
-			navItems: navItems
-		};
-	});
-
 	let profile_info = {
 		profile: {
 			avatar: {
@@ -46,6 +35,9 @@
 		},
 		projects: []
 	};
+
+	// execution
+	page_navigation_update.select_item(3);
 
 	onMount(async () => {
 		let authClient = await AuthClient.create();

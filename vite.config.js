@@ -1,5 +1,6 @@
 // import { terser } from 'rollup-plugin-terser';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { resolve } from 'path';
 
 import { generateCanisterAliases, getEnvironmentPath } from './config/dfx.config.cjs';
 
@@ -25,6 +26,9 @@ const config = {
 	resolve: {
 		alias: {
 			...envOptions.aliases,
+			$components_ref: resolve('./src/dsign_assets/components/'),
+			$modals_ref: resolve('./src/dsign_assets/modals/'),
+			$stores_ref: resolve('./src/dsign_assets/store/'),
 			environment: envOptions.environment
 		},
 		dedupe: ['svelte']

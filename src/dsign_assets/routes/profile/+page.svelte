@@ -4,37 +4,30 @@
 	import get from 'lodash/get';
 	import { AuthClient } from '@dfinity/auth-client';
 
-	// actors
-	import { actor_profile } from '../../store/actors';
-
-	// local storage
-	import { local_storage_profile } from '../../store/local_storage';
-
-	import { page_navigation } from '../../store/page_navigation';
-
-	import Login from '../../components/Login.svelte';
+	// components
+	import Login from '$components_ref/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 
+	// stores
+	import { actor_profile } from '$stores_ref/actors.js';
+
+	import { local_storage_profile } from '$stores_ref/local_storage';
+	import { page_navigation } from '$stores_ref/page_navigation';
+	import page_navigation_update from '$stores_ref/page_navigation_update';
+
+	// variables
 	const username = get($local_storage_profile, 'username', '');
 
+	// execution
 	if (username.length > 0) {
 		goto(`/profile/${username}`);
 	}
 
+	page_navigation_update.select_item(3);
+
 	onMount(async () => {
 		let authClient = await AuthClient.create();
 		let isAuthenticated = await authClient.isAuthenticated();
-
-		page_navigation.update(({ navItems }) => {
-			navItems.forEach((navItem) => {
-				navItem.isSelected = false;
-			});
-			navItems[3].isSelected = true;
-
-			return {
-				navItems: navItems
-			};
-		});
 
 		try {
 			if (isAuthenticated) {
