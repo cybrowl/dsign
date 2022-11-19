@@ -12,7 +12,6 @@
 		actor_profile,
 		actor_project_main,
 		actor_snap_main,
-		actor_username,
 		createActor
 	} from '../store/actors';
 
@@ -39,11 +38,6 @@
 			}));
 
 			actor_assets_img_staging.update((args) => ({
-				...args,
-				loggedIn: false
-			}));
-
-			actor_username.update((args) => ({
 				...args,
 				loggedIn: false
 			}));
@@ -82,14 +76,6 @@
 			loggedIn: true,
 			actor: createActor({
 				actor_name: 'assets_img_staging',
-				identity: $auth_client.getIdentity()
-			})
-		}));
-
-		actor_username.update(() => ({
-			loggedIn: true,
-			actor: createActor({
-				actor_name: 'username',
 				identity: $auth_client.getIdentity()
 			})
 		}));
@@ -139,7 +125,7 @@
 </script>
 
 <span>
-	{#if $actor_username.loggedIn}
+	{#if $actor_profile.loggedIn}
 		<div class="flex items-center">
 			<Button label="Upload" primary={true} class="mr-4" on:click={openSnapCreationModal} />
 			<ProfileAvatar />

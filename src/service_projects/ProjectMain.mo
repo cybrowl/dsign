@@ -338,13 +338,18 @@ actor ProjectMain {
 
 		var user_principal = caller;
 
-		switch (await Profile.get_user_principal_public(Option.get(username, ""))) {
-			case (#err err) {
-				return #err(#ErrorCall(debug_show (err)));
+		switch (username) {
+			case (?username) {
+				switch (await Profile.get_user_principal_public(username)) {
+					case (#err err) {
+						//TODO: log error
+					};
+					case (#ok principal) {
+						user_principal := principal;
+					};
+				};
 			};
-			case (#ok principal) {
-				user_principal := principal;
-			};
+			case (_) {};
 		};
 
 		switch (user_canisters_ref.get(user_principal)) {

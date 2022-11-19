@@ -11,7 +11,6 @@
 		actor_profile,
 		actor_project_main,
 		actor_snap_main,
-		actor_username,
 		createActor
 	} from '../store/actors';
 
@@ -70,14 +69,6 @@
 			loggedIn: false,
 			actor: createActor({
 				actor_name: 'assets_img_staging',
-				identity: $auth_client.getIdentity()
-			})
-		}));
-
-		actor_username.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'username',
 				identity: $auth_client.getIdentity()
 			})
 		}));

@@ -54,12 +54,13 @@
 
 		try {
 			if (isAuthenticated) {
-				const { ok: profile } = await $actor_profile.actor.get_profile_public($page.params.slug);
-				profile_info.profile = profile;
-
-				if (profile.username === $page.params.slug) {
-					isProfileOwner = true;
-				}
+				Promise.all([
+					$actor_profile.actor.get_profile(),
+					$actor_profile.actor.get_profile_public($page.params.slug)
+				]).then((result) => {
+					isProfileOwner = result[0].ok.username === $page.params.slug;
+					profile_info.profile = result[1].ok;
+				});
 
 				const { ok: all_projects, err: err_all_projects } =
 					await $actor_project_main.actor.get_all_projects([$page.params.slug]);

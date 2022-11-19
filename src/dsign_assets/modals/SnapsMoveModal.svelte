@@ -96,6 +96,9 @@
 				const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects(
 					[]
 				);
+
+				console.log('all_projects', all_projects);
+
 				const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
 
 				if (all_projects) {

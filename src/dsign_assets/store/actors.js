@@ -4,7 +4,6 @@ import { idlFactory as idl_assets_img_staging } from '$IDLassets_img_staging';
 import { idlFactory as idl_profile } from '$IDLprofile';
 import { idlFactory as idl_project_main } from '$IDLproject_main';
 import { idlFactory as idl_snap_main } from '$IDLsnap_main';
-import { idlFactory as idl_username } from '$IDLusername';
 
 import { writable } from 'svelte/store';
 import environment from 'environment';
@@ -26,8 +25,7 @@ export function createActor(options) {
 		assets_img_staging: idl_assets_img_staging,
 		profile: idl_profile,
 		project_main: idl_project_main,
-		snap_main: idl_snap_main,
-		username: idl_username
+		snap_main: idl_snap_main
 	};
 
 	if (options && options.identity) {
@@ -74,9 +72,4 @@ export const actor_project_main = writable({
 export const actor_snap_main = writable({
 	loggedIn: false,
 	actor: createActor({ actor_name: 'snap_main' })
-});
-
-export const actor_username = writable({
-	loggedIn: false,
-	actor: createActor({ actor_name: 'username' })
 });

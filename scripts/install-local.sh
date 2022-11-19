@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# username
-dfx deploy username
-export USERNAME_ID=$(dfx canister id username)
-
 # asset chunks
 dfx deploy assets_file_chunks
 

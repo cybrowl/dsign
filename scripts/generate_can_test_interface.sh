@@ -33,11 +33,6 @@ cp .dfx/local/canisters/snap_main/snap_main.did.js .dfx/local/canisters/snap_mai
 sed -i '' 's/export//g' .dfx/local/canisters/snap_main/snap_main.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/snap_main/snap_main.did.test.cjs
 
-# username
-cp .dfx/local/canisters/username/username.did.js .dfx/local/canisters/username/username.did.test.cjs
-sed -i '' 's/export//g' .dfx/local/canisters/username/username.did.test.cjs
-echo "module.exports = { idlFactory };" >> .dfx/local/canisters/username/username.did.test.cjs
-
 # test_assets
 cp .dfx/local/canisters/test_assets/test_assets.did.js .dfx/local/canisters/test_assets/test_assets.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/test_assets/test_assets.did.test.cjs

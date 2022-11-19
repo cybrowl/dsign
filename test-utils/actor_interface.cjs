@@ -22,9 +22,6 @@ const {
 const {
 	idlFactory: test_project_interface
 } = require('../.dfx/local/canisters/test_project/test_project.did.test.cjs');
-const {
-	idlFactory: username_interface
-} = require('../.dfx/local/canisters/username/username.did.test.cjs');
 
 module.exports = {
 	assets_file_chunks_interface,
@@ -34,6 +31,5 @@ module.exports = {
 	snap_main_interface,
 	test_assets_interface,
 	test_image_assets_interface,
-	test_project_interface,
-	username_interface
+	test_project_interface
 };

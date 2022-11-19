@@ -9,17 +9,17 @@ global.fetch = fetch;
 const {
 	assets_file_chunks_interface,
 	assets_img_staging_interface,
-	snap_main_interface,
-	username_interface
+	profile_interface,
+	snap_main_interface
 } = require('../test-utils/actor_interface.cjs');
 
 // Canister Ids
 const {
 	assets_file_chunks_canister_id,
 	assets_img_staging_canister_id,
+	profile_canister_id,
 	project_main_canister_id,
-	snap_main_canister_id,
-	username_canister_id
+	snap_main_canister_id
 } = require('../test-utils/actor_canister_ids.cjs');
 
 // Identities
@@ -36,7 +36,7 @@ let images = generate_images();
 let assets_file_chunks_actors = {};
 let assets_img_staging_actors = {};
 let snap_main_actor = {};
-let username_actors = {};
+let profile_actors = {};
 
 let chunk_ids = [];
 let img_asset_ids = [];
@@ -80,21 +80,17 @@ test('Setup Actors', async function (t) {
 		default_identity
 	);
 
-	username_actors.mishicat = await get_actor(
-		username_canister_id,
-		username_interface,
+	profile_actors.mishicat = await get_actor(
+		profile_canister_id,
+		profile_interface,
 		mishicat_identity
 	);
 
-	username_actors.motoko = await get_actor(
-		username_canister_id,
-		username_interface,
-		motoko_identity
-	);
+	profile_actors.motoko = await get_actor(profile_canister_id, profile_interface, motoko_identity);
 
-	username_actors.default = await get_actor(
-		username_canister_id,
-		username_interface,
+	profile_actors.default = await get_actor(
+		profile_canister_id,
+		profile_interface,
 		default_identity
 	);
 });
@@ -108,12 +104,12 @@ test('SnapMain[mishicat].initialize_canisters()', async function (t) {
 	});
 });
 
-test('Username[mishicat].create_username(): with valid username => #ok - username', async function (t) {
+test('Profile[mishicat].create_username(): with valid username => #ok - username', async function (t) {
 	const username = fake.word();
 
-	const response = await username_actors.mishicat.create_username(username.toLowerCase());
+	const { ok: username_ } = await profile_actors.mishicat.create_username(username.toLowerCase());
 
-	t.equal(response.ok.username, username.toLowerCase());
+	t.equal(username_, username.toLowerCase());
 });
 
 test('SnapMain[mishicat].create_user_snap_storage(): should create initial storage for snaps => #ok - true', async function (t) {
@@ -180,12 +176,12 @@ test('ImageAssetStaging[mishicat].create_asset(): with image and valid identity 
 	}
 });
 
-test('Username[motoko].create_username(): with valid username => #ok - username', async function (t) {
+test('Profile[motoko].create_username(): with valid username => #ok - username', async function (t) {
 	const username = fake.word();
 
-	const response = await username_actors.motoko.create_username(username.toLowerCase());
+	const { ok: username_ } = await profile_actors.mishicat.create_username(username.toLowerCase());
 
-	t.equal(response.ok.username, username.toLowerCase());
+	t.equal(username_, username.toLowerCase());
 });
 
 test('SnapMain[motoko].create_user_snap_storage(): should create initial storage for snaps => #ok - true', async function (t) {

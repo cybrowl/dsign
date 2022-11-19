@@ -8,8 +8,7 @@ const {
 	assets_img_staging_interface,
 	project_main_interface,
 	snap_main_interface,
-	test_project_interface,
-	username_interface
+	test_project_interface
 } = require('../test-utils/actor_interface.cjs');
 
 // Canister Ids
@@ -17,8 +16,7 @@ const {
 	assets_img_staging_canister_id,
 	project_main_canister_id,
 	snap_main_canister_id,
-	test_project_canister_id,
-	username_canister_id
+	test_project_canister_id
 } = require('../test-utils/actor_canister_ids.cjs');
 
 // Identities
@@ -35,7 +33,6 @@ let assets_img_staging_actors = {};
 let snap_main_actor = {};
 let project_main_actor = {};
 let project_actor = {};
-let username_actors = {};
 
 let img_asset_ids = [];
 
@@ -53,12 +50,6 @@ test('Setup Actors', async function () {
 	project_main_actor.mishicat = await get_actor(
 		project_main_canister_id,
 		project_main_interface,
-		mishicat_identity
-	);
-
-	username_actors.mishicat = await get_actor(
-		username_canister_id,
-		username_interface,
 		mishicat_identity
 	);
 
@@ -123,14 +114,6 @@ test('Project[mishicat].delete_snaps_from_project(): with wrong caller => #err -
 });
 
 // CREATE SNAP
-test('Username[mishicat].create_username(): should create username => #ok - username', async function (t) {
-	const username = fake.word();
-
-	const response = await username_actors.mishicat.create_username(username.toLowerCase());
-
-	t.equal(response.ok.username, username.toLowerCase());
-});
-
 test('SnapMain[mishicat].create_user_snap_storage(): should create initial storage for snaps => #ok - true', async function (t) {
 	const response = await snap_main_actor.mishicat.create_user_snap_storage();
 
