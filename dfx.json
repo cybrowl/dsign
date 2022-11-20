@@ -20,6 +20,7 @@
     "assets_img_staging": {
       "main": "src/service_assets_img/ImageAssetStaging.mo",
       "type": "motoko",
+      "args": "--max-stable-pages=65536",
       "dependencies": [
         "logger"
       ]

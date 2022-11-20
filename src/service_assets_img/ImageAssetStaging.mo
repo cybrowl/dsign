@@ -6,6 +6,7 @@ import HashMap "mo:base/HashMap";
 import Nat "mo:base/Nat";
 import Prim "mo:⛔";
 import Principal "mo:base/Principal";
+import ExperimentalStableMemory "mo:base/ExperimentalStableMemory";
 import Result "mo:base/Result";
 import Time "mo:base/Time";
 
@@ -27,7 +28,7 @@ actor ImageAssetStaging = {
 		Hash.hash
 	);
 
-	let VERSION : Nat = 3;
+	let VERSION : Nat = 4;
 
 	public shared ({ caller }) func create_asset(img : Types.Img) : async Nat {
 		//TODO: check username to stop spam
@@ -92,6 +93,7 @@ actor ImageAssetStaging = {
 			assets_size = assets.size();
 			memory = Prim.rts_memory_size();
 			heap = Prim.rts_heap_size();
+			stable_mem = ExperimentalStableMemory.size();
 		};
 	};
 

@@ -8,7 +8,6 @@ const snap_main_canister_id = canister_ids.snap_main.local;
 const test_assets_canister_id = canister_ids.test_assets.local;
 const test_image_assets_canister_id = canister_ids.test_image_assets.local;
 const test_project_canister_id = canister_ids.test_project.local;
-const username_canister_id = canister_ids.username.local;
 
 module.exports = {
 	assets_file_chunks_canister_id,
@@ -18,6 +17,5 @@ module.exports = {
 	snap_main_canister_id,
 	test_assets_canister_id,
 	test_image_assets_canister_id,
-	test_project_canister_id,
-	username_canister_id
+	test_project_canister_id
 };

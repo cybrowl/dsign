@@ -6,6 +6,7 @@ const { Ed25519KeyIdentity } = require('@dfinity/identity');
 // Actor Interface
 const {
 	assets_img_staging_interface,
+	profile_interface,
 	project_main_interface,
 	snap_main_interface,
 	test_project_interface
@@ -14,6 +15,7 @@ const {
 // Canister Ids
 const {
 	assets_img_staging_canister_id,
+	profile_canister_id,
 	project_main_canister_id,
 	snap_main_canister_id,
 	test_project_canister_id
@@ -30,9 +32,10 @@ const { generate_images } = require('../test-utils/utils.cjs');
 let images = generate_images();
 
 let assets_img_staging_actors = {};
-let snap_main_actor = {};
-let project_main_actor = {};
+let profile_actors = {};
 let project_actor = {};
+let project_main_actor = {};
+let snap_main_actor = {};
 
 let img_asset_ids = [];
 
@@ -47,15 +50,15 @@ test('Setup Actors', async function () {
 		mishicat_identity
 	);
 
-	project_main_actor.mishicat = await get_actor(
-		project_main_canister_id,
-		project_main_interface,
+	profile_actors.mishicat = await get_actor(
+		profile_canister_id,
+		profile_interface,
 		mishicat_identity
 	);
 
-	snap_main_actor.mishicat = await get_actor(
-		snap_main_canister_id,
-		snap_main_interface,
+	project_main_actor.mishicat = await get_actor(
+		project_main_canister_id,
+		project_main_interface,
 		mishicat_identity
 	);
 
@@ -74,6 +77,12 @@ test('Setup Actors', async function () {
 	project_actor.mishicat = await get_actor(
 		test_project_canister_id,
 		test_project_interface,
+		mishicat_identity
+	);
+
+	snap_main_actor.mishicat = await get_actor(
+		snap_main_canister_id,
+		snap_main_interface,
 		mishicat_identity
 	);
 });
@@ -138,6 +147,14 @@ test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - 
 	} catch (error) {
 		console.log('error: ', error);
 	}
+});
+
+test('Profile[mishicat].create_username(): with valid username => #ok - username', async function (t) {
+	const username = fake.word();
+
+	const { ok: username_ } = await profile_actors.mishicat.create_username(username.toLowerCase());
+
+	t.equal(username_, username.toLowerCase());
 });
 
 test('SnapMain[mishicat].create_snap(): should create snap without file asset => #ok - snap', async function (t) {
@@ -227,7 +244,7 @@ test('ProjectMain[mishicat].create_user_project_storage(): should create initial
 });
 
 test('ProjectMain[mishicat].get_all_projects(): when user has zero projects => #err - NoProjects', async function (t) {
-	let { err: error } = await project_main_actor.mishicat.get_all_projects();
+	let { err: error } = await project_main_actor.mishicat.get_all_projects([]);
 
 	t.deepEqual(error, { NoProjects: true });
 });
@@ -250,7 +267,7 @@ test('ProjectMain[mishicat].create_project(): with no snaps => #ok - project', a
 });
 
 test('ProjectMain[mishicat].get_all_projects(): should have both projects => #ok - projects', async function (t) {
-	let { ok: projects } = await project_main_actor.mishicat.get_all_projects();
+	let { ok: projects } = await project_main_actor.mishicat.get_all_projects([]);
 
 	let first_project = projects[0];
 	let second_project = projects[1];
@@ -263,7 +280,7 @@ test('ProjectMain[mishicat].get_all_projects(): should have both projects => #ok
 });
 
 test('ProjectMain[mishicat].update_project_details(): ', async function (t) {
-	let { ok: projects } = await project_main_actor.mishicat.get_all_projects();
+	let { ok: projects } = await project_main_actor.mishicat.get_all_projects([]);
 
 	let first_project = projects[0];
 	let project_ref = { id: first_project.id, canister_id: first_project.canister_id };
@@ -271,7 +288,7 @@ test('ProjectMain[mishicat].update_project_details(): ', async function (t) {
 		{ name: ['Updated Project One'] },
 		project_ref
 	);
-	let { ok: updated_projects } = await project_main_actor.mishicat.get_all_projects();
+	let { ok: updated_projects } = await project_main_actor.mishicat.get_all_projects([]);
 
 	t.deepEqual(updated_project, 'Updated Project Details');
 	t.equal(updated_projects[0].name, 'Updated Project One');
@@ -307,7 +324,7 @@ test('ProjectMain[mishicat].delete_snaps_from_project(): with snaps => #ok - Del
 		snaps_delete,
 		project_ref
 	);
-	let { ok: projects } = await project_main_actor.mishicat.get_all_projects();
+	let { ok: projects } = await project_main_actor.mishicat.get_all_projects([]);
 	const { ok: snaps_after_delete } = await snap_main_actor.mishicat.get_all_snaps();
 
 	t.equal(projects[0].snaps.length, 0);
@@ -317,7 +334,7 @@ test('ProjectMain[mishicat].delete_snaps_from_project(): with snaps => #ok - Del
 
 test('ProjectMain[mishicat].add_snaps_to_project(): should move all snaps to project one', async function (t) {
 	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
-	const { ok: projects } = await project_main_actor.mishicat.get_all_projects();
+	const { ok: projects } = await project_main_actor.mishicat.get_all_projects([]);
 
 	const snap_refs = snaps.reduce(function (acc, snap) {
 		acc.push({
@@ -337,7 +354,7 @@ test('ProjectMain[mishicat].add_snaps_to_project(): should move all snaps to pro
 
 	t.equal(response.ok, 'Added Snaps To Project');
 
-	let { ok: all_projects } = await project_main_actor.mishicat.get_all_projects();
+	let { ok: all_projects } = await project_main_actor.mishicat.get_all_projects([]);
 	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
 
 	t.equal(all_projects[0].snaps.length, 3);
@@ -347,7 +364,7 @@ test('ProjectMain[mishicat].add_snaps_to_project(): should move all snaps to pro
 
 test('ProjectMain[mishicat].delete_snaps_from_project(): should all delete snaps from project one', async function (t) {
 	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
-	const { ok: projects_before } = await project_main_actor.mishicat.get_all_projects();
+	const { ok: projects_before } = await project_main_actor.mishicat.get_all_projects([]);
 
 	const snap_refs = snaps.reduce(function (acc, snap) {
 		acc.push({
@@ -370,7 +387,7 @@ test('ProjectMain[mishicat].delete_snaps_from_project(): should all delete snaps
 
 	t.equal(response.ok, 'Deleted Snaps From Project');
 
-	let { ok: projects_after } = await project_main_actor.mishicat.get_all_projects();
+	let { ok: projects_after } = await project_main_actor.mishicat.get_all_projects([]);
 	const { ok: snaps_after } = await snap_main_actor.mishicat.get_all_snaps();
 
 	t.equal(projects_after[0].snaps.length, 0);
@@ -379,7 +396,7 @@ test('ProjectMain[mishicat].delete_snaps_from_project(): should all delete snaps
 
 test('ProjectMain[mishicat].add_snaps_to_project(): should move all snaps to project two', async function (t) {
 	const { ok: snaps } = await snap_main_actor.mishicat.get_all_snaps();
-	const { ok: projects } = await project_main_actor.mishicat.get_all_projects();
+	const { ok: projects } = await project_main_actor.mishicat.get_all_projects([]);
 
 	const snap_refs = snaps.reduce(function (acc, snap) {
 		acc.push({
@@ -399,7 +416,7 @@ test('ProjectMain[mishicat].add_snaps_to_project(): should move all snaps to pro
 
 	t.equal(response.ok, 'Added Snaps To Project');
 
-	let { ok: all_projects } = await project_main_actor.mishicat.get_all_projects();
+	let { ok: all_projects } = await project_main_actor.mishicat.get_all_projects([]);
 	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
 
 	t.equal(all_projects[1].snaps.length, 3);
@@ -410,7 +427,7 @@ test('ProjectMain[mishicat].add_snaps_to_project(): should move all snaps to pro
 test('ProjectMain[mishicat].delete_projects(): should create and delete project', async function (t) {
 	const snaps = [];
 	await project_main_actor.mishicat.create_project('Deleted Project', snaps);
-	let { ok: projects } = await project_main_actor.mishicat.get_all_projects();
+	let { ok: projects } = await project_main_actor.mishicat.get_all_projects([]);
 	let project = projects[2];
 	let delete_response = await project_main_actor.mishicat.delete_projects([project.id]);
 
@@ -418,7 +435,7 @@ test('ProjectMain[mishicat].delete_projects(): should create and delete project'
 });
 
 test('ProjectMain[mishicat].get_all_projects(): ', async function (t) {
-	let { ok: projects } = await project_main_actor.mishicat.get_all_projects();
+	let { ok: projects } = await project_main_actor.mishicat.get_all_projects([]);
 	let get_ids_response = await project_main_actor.mishicat.get_project_ids();
 
 	t.equal(projects.length, 2);
