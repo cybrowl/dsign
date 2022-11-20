@@ -241,16 +241,12 @@ actor Profile = {
 				case (#ok images) {
 					let image = images[0];
 
-					let profile_modified = {
-						avatar = {
-							id = image.id;
-							canister_id = image.canister_id;
-							url = image.url;
-							exists = true;
-						};
-						created = profile.created;
-						username = profile.username;
-					};
+					let profile_modified = { profile with avatar = {
+						id = image.id;
+						canister_id = image.canister_id;
+						url = image.url;
+						exists = true;
+					}};
 
 					profiles.put(caller, profile_modified);
 
@@ -258,13 +254,9 @@ actor Profile = {
 				};
 			};
 		} else {
-			let img_avatar_canister_id = profile.avatar.canister_id;
-			let stored_asset_id = profile.avatar.id;
+			let image_assets_actor = actor (profile.avatar.canister_id) : ImageAssetsActor;
 
-			let image_assets_actor = actor (img_avatar_canister_id) : ImageAssetsActor;
-
-			let asset_id = img_asset_ids[0];
-			ignore image_assets_actor.update_image(asset_id, stored_asset_id, "avatar", caller);
+			ignore image_assets_actor.update_image(img_asset_ids[0], profile.avatar.id, "avatar", caller);
 
 			return #ok("updated avatar");
 		};

@@ -60,7 +60,7 @@ test('Profile[mishicat].get_profile(): before user creates profile => #err - Pro
 	t.deepEqual(response.err, { ProfileNotFound: null });
 });
 
-test('Username[mishicat].create_username(): create first with valid username => #ok - username', async function (t) {
+test('Profile[mishicat].create_username(): create first with valid username => #ok - username', async function (t) {
 	const username = fake.word();
 
 	const { ok: created_username } = await profile_actors.mishicat.create_username(
@@ -91,10 +91,10 @@ test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - 
 	}
 });
 
-test('Profile[mishicat].update_profile_avatar(): with image => #ok - avatar_url', async function (t) {
-	const response = await profile_actors.mishicat.update_profile_avatar(img_asset_ids);
+test('Profile[mishicat].update_profile_avatar(): with image => #ok - updated avatar', async function (t) {
+	const { ok: avatar_url } = await profile_actors.mishicat.update_profile_avatar(img_asset_ids);
 
-	console.log('response', response);
+	t.equal(avatar_url.length > 0, true);
 });
 
 test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function (t) {
@@ -115,7 +115,7 @@ test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - 
 });
 
 test('Profile[mishicat].update_profile_avatar(): with new image => #ok - updated avatar', async function (t) {
-	const response = await profile_actors.mishicat.update_profile_avatar(img_asset_ids);
+	const { ok: update_msg } = await profile_actors.mishicat.update_profile_avatar(img_asset_ids);
 
-	console.log('response', response);
+	t.equal(update_msg == 'updated avatar', true);
 });
