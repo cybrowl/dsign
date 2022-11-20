@@ -1,4 +1,4 @@
-import Buffer "mo:base/Buffer";
+import { Buffer; toArray } "mo:base/Buffer";
 import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
@@ -54,7 +54,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 			return #err(#NotAuthorized);
 		};
 
-		let images_ref = Buffer.Buffer<ImageRef>(0);
+		let images_ref = Buffer<ImageRef>(0);
 
 		for (asset_id in img_asset_ids.vals()) {
 			switch (await ImageAssetStaging.get_asset(asset_id, owner)) {
@@ -89,7 +89,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 		};
 
 		ignore ImageAssetStaging.delete_assets(img_asset_ids, owner);
-		return #ok(images_ref.toArray());
+		return #ok(toArray(images_ref));
 	};
 
 	public shared ({ caller }) func update_image(

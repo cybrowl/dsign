@@ -234,7 +234,7 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 			};
 		};
 
-		return snaps_list.toArray();
+		return Buffer.toArray(snaps_list);
 	};
 
 	// ------------------------- Canister Management -------------------------

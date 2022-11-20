@@ -1,6 +1,6 @@
 import Array "mo:base/Array";
 import Blob "mo:base/Blob";
-import Buffer "mo:base/Buffer";
+import { Buffer; toArray } "mo:base/Buffer";
 import Debug "mo:base/Debug";
 import Error "mo:base/Error";
 import HashMap "mo:base/HashMap";
@@ -37,7 +37,7 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 
 	// ------------------------- Create Asset -------------------------
 	public shared ({ caller }) func create_asset_from_chunks(args : Types.CreateAssetArgs) : async Result.Result<Types.AssetRef, Text> {
-		var asset_data = Buffer.Buffer<Blob>(0);
+		var asset_data = Buffer<Blob>(0);
 		var all_chunks_match_owner : Bool = true;
 
 		var created : Int = 0;
@@ -88,7 +88,7 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 			canister_id = canister_id;
 			content_type = args.content_type;
 			created = created;
-			data_chunks = asset_data.toArray();
+			data_chunks = toArray(asset_data);
 			data_chunks_size = asset_data.size();
 			file_name = file_name;
 			id = asset_id;

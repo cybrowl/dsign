@@ -135,7 +135,7 @@ actor ProjectMain {
 			};
 			case (#ok project) {
 				project_ids.add(project.id);
-				user_project_ids_storage.put(project_canister_id, project_ids.toArray());
+				user_project_ids_storage.put(project_canister_id, Buffer.toArray(project_ids));
 
 				ignore add_project_to_snaps(project);
 
@@ -369,7 +369,7 @@ actor ProjectMain {
 					return #err(#NoProjects(true));
 				};
 
-				return #ok(all_projects.toArray());
+				return #ok(Buffer.toArray(all_projects));
 			};
 			case (_) {
 				return #err(#UserNotFound(true));
@@ -390,7 +390,7 @@ actor ProjectMain {
 					};
 				};
 
-				return #ok(all_project_ids.toArray());
+				return #ok(Buffer.toArray(all_project_ids));
 			};
 			case (_) {
 				return #err("user not found");

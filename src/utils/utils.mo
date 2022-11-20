@@ -25,7 +25,7 @@ module {
 			};
 		};
 
-		return all_ids.toArray();
+		return Buffer.toArray(all_ids);
 	};
 
 	public func all_ids_match(my_ids : [Text], ids_to_match : [Text]) : Matches {
@@ -43,7 +43,7 @@ module {
 
 		let matches = {
 			all_match = result;
-			ids_not_found = ids_not_found.toArray();
+			ids_not_found = Buffer.toArray(ids_not_found);
 		};
 
 		return matches;

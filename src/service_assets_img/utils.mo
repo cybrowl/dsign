@@ -1,6 +1,6 @@
 import Array "mo:base/Array";
 import Blob "mo:base/Blob";
-import Buffer "mo:base/Buffer";
+import { Buffer; toArray } "mo:base/Buffer";
 import Iter "mo:base/Iter";
 import Text "mo:base/Text";
 
@@ -20,7 +20,7 @@ module {
 
 	public func is_valid_image(img : Blob) : Bool {
 		var img_arr = Blob.toArray(img);
-		var compare = Buffer.Buffer<Nat8>(0);
+		var compare = Buffer<Nat8>(0);
 
 		let gif : [Nat8] = [71, 73, 70, 56];
 		let jpeg : [Nat8] = [255, 216, 255, 224];
@@ -31,7 +31,7 @@ module {
 			compare.add(img_arr[i]);
 		};
 
-		let compareArr = compare.toArray();
+		let compareArr = toArray(compare);
 
 		let isGIF = Array.equal(gif, compareArr, isEq);
 		let isJPEG = Array.equal(jpeg, compareArr, isEq);

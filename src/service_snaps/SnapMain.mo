@@ -183,7 +183,7 @@ actor SnapMain {
 			};
 			case (#ok snap) {
 				snap_ids.add(snap.id);
-				user_snap_ids_storage.put(snap_canister_id, snap_ids.toArray());
+				user_snap_ids_storage.put(snap_canister_id, Buffer.toArray(snap_ids));
 
 				#ok("Created Snap");
 			};
@@ -261,7 +261,7 @@ actor SnapMain {
 					};
 				};
 
-				return #ok(all_snaps.toArray());
+				return #ok(Buffer.toArray(all_snaps));
 			};
 			case (_) {
 				#err(#UserNotFound(true));
@@ -299,7 +299,7 @@ actor SnapMain {
 						};
 					};
 				};
-				return #ok(all_snaps.toArray());
+				return #ok(Buffer.toArray(all_snaps));
 
 			};
 			case (_) {
@@ -322,7 +322,7 @@ actor SnapMain {
 					};
 				};
 
-				return #ok(all_snap_ids.toArray());
+				return #ok(Buffer.toArray(all_snap_ids));
 			};
 			case (_) {
 				return #err("user not found");

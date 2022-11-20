@@ -1,13 +1,13 @@
-import B "mo:base/Buffer";
+import { Buffer; toArray } "mo:base/Buffer";
 import Time "mo:base/Time";
 import Types "./types";
 
 actor Logger = {
-	type Tags = Types.Tags;
-	type Payload = Types.Payload;
 	type Log = Types.Log;
+	type Payload = Types.Payload;
+	type Tags = Types.Tags;
 
-	var logs = B.Buffer<Log>(2);
+	var logs = Buffer<Log>(0);
 
 	public query func ping() : async Text {
 		return "meow";
@@ -24,6 +24,6 @@ actor Logger = {
 	};
 
 	public query func get_logs() : async [Log] {
-		return logs.toArray();
+		return toArray(logs);
 	};
 };

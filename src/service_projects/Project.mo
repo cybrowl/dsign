@@ -182,7 +182,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 					username = project.username;
 					owner = project.owner;
 					name = project.name;
-					snaps = updated_snaps.toArray();
+					snaps = Buffer.toArray(updated_snaps);
 				};
 
 				projects.put(project_id, project_updated);
@@ -257,7 +257,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 						created = project.created;
 						username = project.username;
 						name = project.name;
-						snaps = snap_list.toArray();
+						snaps = Buffer.toArray(snap_list);
 					};
 
 					projects_list.add(project_public);
@@ -265,7 +265,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 			};
 		};
 
-		return projects_list.toArray();
+		return Buffer.toArray(projects_list);
 	};
 
 	public query func get_projects_actor(project_ids : [ProjectID]) : async [Project] {
@@ -280,7 +280,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 			};
 		};
 
-		return projects_list.toArray();
+		return Buffer.toArray(projects_list);
 	};
 
 	// ------------------------- CANISTER MANAGEMENT -------------------------
