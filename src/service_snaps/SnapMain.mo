@@ -142,6 +142,11 @@ actor SnapMain {
 		var images_ref = [image_ref];
 		switch (await image_assets_actor.save_images(args.img_asset_ids, "snap", caller)) {
 			case (#err err) {
+				ignore Logger.log_event(
+					tags,
+					debug_show ("image_assets_actor.save_images", err)
+				);
+
 				return #err(#ErrorCall(debug_show (err)));
 			};
 			case (#ok images_ref_) {
@@ -165,6 +170,11 @@ actor SnapMain {
 
 				switch (await assets_actor.create_asset_from_chunks(file_asset_args)) {
 					case (#err err) {
+						ignore Logger.log_event(
+							tags,
+							debug_show ("assets_actor.create_asset_from_chunks", err)
+						);
+
 						return #err(#ErrorCall(debug_show (err)));
 					};
 					case (#ok file_asset_) {
@@ -179,6 +189,11 @@ actor SnapMain {
 		// save snap
 		switch (await snap_actor.create_snap(args, images_ref, file_asset, caller)) {
 			case (#err err) {
+				ignore Logger.log_event(
+					tags,
+					debug_show ("snap_actor.create_snap", err)
+				);
+
 				return #err(#ErrorCall(debug_show (err)));
 			};
 			case (#ok snap) {
@@ -371,7 +386,7 @@ actor SnapMain {
 		let tags = [ACTOR_NAME, "initialize_canisters"];
 		let snap_main_principal = Principal.fromActor(SnapMain);
 
-		let is_prod = Text.equal(
+			let is_prod = Text.equal(
 			Principal.toText(snap_main_principal),
 			"lyswl-7iaaa-aaaag-aatya-cai"
 		);

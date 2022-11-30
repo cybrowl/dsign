@@ -11,8 +11,9 @@ import Time "mo:base/Time";
 import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
-import Profile "canister:profile";
+import Explore "canister:explore";
 import Logger "canister:logger";
+import Profile "canister:profile";
 
 import Types "./types";
 import ProjectTypes "../service_projects/types";
@@ -83,6 +84,8 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 				views = 0;
 			};
 		};
+
+		ignore Explore.save_snap(snap);
 
 		snaps.put(snap_id, snap);
 

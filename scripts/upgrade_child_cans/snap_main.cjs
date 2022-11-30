@@ -146,7 +146,7 @@ const installCode = async () => {
 			is_prod: false,
 			canister_id: snap_main_canister_id,
 			can_interface: snap_main_interface,
-			child_canister_principal: Principal.fromText('s55qq-oqaaa-aaaaa-aaakq-cai'),
+			child_canister_principal: Principal.fromText('s24we-diaaa-aaaaa-aaaka-cai'),
 			wasm: get_wasm('test_snap'),
 			arg: IDL.encode(
 				[IDL.Principal, IDL.Principal],

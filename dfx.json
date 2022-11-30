@@ -25,6 +25,13 @@
         "logger"
       ]
     },
+    "explore": {
+      "main": "src/service_explore/Explore.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger"
+      ]
+    },
     "profile": {
       "main": "src/service_profile/Profile.mo",
       "type": "motoko",
@@ -47,6 +54,7 @@
       "dependencies": [
         "assets_file_chunks",
         "assets_img_staging",
+        "explore",
         "logger",
         "profile"
       ]
@@ -81,6 +89,7 @@
       "main": "src/service_snaps/Snap.mo",
       "type": "motoko",
       "dependencies": [
+        "explore",
         "logger",
         "profile"
       ]
@@ -93,11 +102,5 @@
     }
   },
   "dfx": "0.12.0",
-  "networks": {
-    "local": {
-      "bind": "127.0.0.1:8000",
-      "type": "ephemeral"
-    }
-  },
   "version": 1
 }

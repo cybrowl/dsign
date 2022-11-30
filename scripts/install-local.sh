@@ -12,6 +12,7 @@ export PROFILE_ID=$(dfx canister id profile)
 
 # projects
 dfx deploy project_main
+export PROJECT_MAIN_PRINCIPAL=$(dfx canister id project_main)
 
 # logger
 dfx deploy logger
@@ -20,11 +21,16 @@ dfx deploy logger
 dfx deploy snap_main
 export SNAP_MAIN_PRINCIPAL=$(dfx canister id snap_main)
 
+# explore
+dfx deploy explore
+
 # front end
 dfx deploy dsign_assets
 
 # test canisters
-dfx deploy test_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
-dfx deploy test_image_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
+# dfx deploy test_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
+# dfx deploy test_image_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
+# dfx deploy test_project --argument='(principal "'${PROJECT_MAIN_PRINCIPAL}'", false)'
+# dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principal "'${PROJECT_MAIN_PRINCIPAL}'")'
 
 # killall dfx replica nodemanager
