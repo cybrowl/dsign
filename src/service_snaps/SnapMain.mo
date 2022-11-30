@@ -386,17 +386,25 @@ actor SnapMain {
 		let tags = [ACTOR_NAME, "initialize_canisters"];
 		let snap_main_principal = Principal.fromActor(SnapMain);
 
-			let is_prod = Text.equal(
+		let is_prod = Text.equal(
 			Principal.toText(snap_main_principal),
 			"lyswl-7iaaa-aaaag-aatya-cai"
 		);
 
+		let has_assets_canister_id : Bool = assets_canister_id.size() > 0;
+		let has_image_assets_canister_id : Bool = image_assets_canister_id.size() > 0;
+		let has_snap_canister_id : Bool = snap_canister_id.size() > 0;
 		let has_project_main_canister_id : Bool = project_main_canister_id.size() > 0;
 
 		if (has_project_main_canister_id == false) {
 			switch (args.project_main_canister_id) {
 				case (null) {
 					project_main_canister_id := "";
+
+					ignore Logger.log_event(
+						tags,
+						debug_show (("project_main_canister_id NOT found"))
+					);
 				};
 				case (?project_main_canister_id_) {
 					project_main_canister_id := project_main_canister_id_;
@@ -406,71 +414,44 @@ actor SnapMain {
 
 		let project_main_principal = Principal.fromText(project_main_canister_id);
 
-		// create assets canister
-		if (assets_canister_id.size() < 1) {
-			switch (args.assets_canister_id) {
-				case (null) {
-					await create_assets_canister(snap_main_principal, is_prod);
-				};
-				case (?assets_canister_id_) {
-					assets_canister_id := assets_canister_id_;
-				};
-			};
+		// create canisters
+		if (has_assets_canister_id == false) {
+			await create_assets_canister(snap_main_principal, is_prod);
 
 			ignore Logger.log_event(
 				tags,
 				debug_show (("created, assets_canister_id: ", assets_canister_id))
 			);
-		} else {
-			ignore Logger.log_event(
-				tags,
-				debug_show (("exists, assets_canister_id: ", assets_canister_id))
-			);
 		};
 
-		// create image assets canister
-		if (image_assets_canister_id.size() < 1) {
-			switch (args.image_assets_canister_id) {
-				case (null) {
-					await create_image_assets_canister(snap_main_principal, is_prod);
-				};
-				case (?image_assets_canister_id_) {
-					image_assets_canister_id := image_assets_canister_id_;
-				};
-			};
+		if (has_image_assets_canister_id == false) {
+			await create_image_assets_canister(snap_main_principal, is_prod);
 
 			ignore Logger.log_event(
 				tags,
 				debug_show (("created, image_assets_canister_id: ", image_assets_canister_id))
 			);
-		} else {
-			ignore Logger.log_event(
-				tags,
-				debug_show (("exists, image_assets_canister_id: ", image_assets_canister_id))
-			);
 		};
 
-		// create snap canister
-		if (snap_canister_id.size() < 1) {
-			switch (args.snap_canister_id) {
-				case (null) {
-					await create_snap_canister(snap_main_principal, project_main_principal);
-				};
-				case (?snap_canister_id_) {
-					snap_canister_id := snap_canister_id_;
-				};
-			};
+		if (has_snap_canister_id == false) {
+			await create_snap_canister(snap_main_principal, project_main_principal);
 
 			ignore Logger.log_event(
 				tags,
 				debug_show (("created, snap_canister_id: ", snap_canister_id))
 			);
-		} else {
-			ignore Logger.log_event(
-				tags,
-				debug_show (("exists, snap_canister_id: ", snap_canister_id))
-			);
 		};
+
+		let child_canisters = {
+			assets_canister_id = assets_canister_id;
+			image_assets_canister_id = image_assets_canister_id;
+			snap_canister_id = snap_canister_id;
+		};
+
+		ignore Logger.log_event(
+			tags,
+			debug_show (("child_canisters: ", child_canisters))
+		);
 	};
 
 	// UPDATE CHILD CANISTERS

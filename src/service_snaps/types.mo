@@ -95,9 +95,6 @@ module {
 	};
 
 	public type InitArgs = {
-		assets_canister_id : ?Text;
-		image_assets_canister_id : ?Text;
-		snap_canister_id : ?Text;
 		project_main_canister_id : ?Text;
 	};
 
