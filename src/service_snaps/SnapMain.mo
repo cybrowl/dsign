@@ -256,7 +256,7 @@ actor SnapMain {
 	//TODO: update_snap_likes
 
 	public shared ({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], ErrGetAllSnaps> {
-		let tags = [ACTOR_NAME, "get_all_snaps"];
+		let log_tags = [ACTOR_NAME, "get_all_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_snap_ids_storage) {
@@ -267,7 +267,7 @@ actor SnapMain {
 					let snaps = await snap_actor.get_all_snaps(snap_ids);
 
 					ignore Logger.log_event(
-						tags,
+						log_tags,
 						debug_show ("snap_ids: ", snap_ids)
 					);
 

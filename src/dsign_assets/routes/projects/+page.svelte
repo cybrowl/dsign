@@ -34,7 +34,6 @@
 
 	let isAuthenticated = false;
 
-	let number_snaps_selected = 0;
 	let project = { snaps: [] };
 
 	onMount(async () => {
@@ -261,7 +260,7 @@
 		<AccountSettingsModal />
 	{/if}
 	{#if $modal_visible.snaps_move}
-		<SnapsMoveModal {number_snaps_selected} {project} />
+		<SnapsMoveModal {project} />
 	{/if}
 	{#if $modal_visible.snap_creation}
 		<SnapCreationModal />

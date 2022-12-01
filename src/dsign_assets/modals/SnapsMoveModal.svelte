@@ -1,4 +1,6 @@
 <script>
+	import get from 'lodash/get.js';
+
 	import Modal from 'dsign-components/components/Modal.svelte';
 	import SnapsMove from 'dsign-components/components/SnapsMove.svelte';
 
@@ -13,9 +15,21 @@
 	import { modal_visible } from '../store/modal';
 	import { notification, notification_visible } from '../store/notification';
 
-	export let number_snaps_selected = 0;
 	export let project = { snaps: [] };
 
+	const snaps = $projects_tabs.isSnapsSelected
+		? get($snap_store, 'snaps', [])
+		: get(project, 'snaps', []);
+
+	const selected_snaps = snaps.filter((snap) => snap.isSelected === true);
+	const selected_snaps_list = selected_snaps.map((snap) => {
+		return {
+			id: snap.id,
+			canister_id: snap.canister_id
+		};
+	});
+
+	let number_snaps_selected = selected_snaps.length;
 	let hideDetails = true;
 	let isMoveModal = true;
 
@@ -39,11 +53,7 @@
 		});
 	}
 
-	async function handleMoveSubmit(e) {
-		const { selected_project } = e.detail;
-
-		handleCloseSnapsMoveModal();
-
+	function showNotification(selected_project) {
 		const hide_notification_delay_sec = $projects_tabs.isSnapsSelected ? 10000 : 8000;
 
 		notification_visible.set({
@@ -60,101 +70,71 @@
 				moving_snaps: false
 			});
 		}, hide_notification_delay_sec);
+	}
+
+	async function handleMoveSubmit(e) {
+		const { selected_project } = e.detail;
+
+		handleCloseSnapsMoveModal();
+
+		showNotification(selected_project);
+
+		if (selected_snaps_list.length == 0) {
+			//TODO: show error notification - no snaps selected
+			return;
+		}
+
+		try {
+			let project_from_ref = {
+				id: project.id,
+				canister_id: project.canister_id
+			};
+
+			let project_to_ref = {
+				id: selected_project.id,
+				canister_id: selected_project.canister_id
+			};
+
+			if ($projects_tabs.isSnapsSelected) {
+				const { ok: added_snap_to_project, err: err_adding_snaps_to_projet } =
+					await $actor_project_main.actor.add_snaps_to_project(selected_snaps_list, project_to_ref);
+			} else {
+				const { ok: moved_snaps } = await $actor_project_main.actor.move_snaps_from_project(
+					selected_snaps_list,
+					project_from_ref,
+					project_to_ref
+				);
+			}
+
+			const { ok: all_projects, err: err_all_projects } =
+				await $actor_project_main.actor.get_all_projects([]);
+
+			const { ok: all_snaps, err: err_all_snaps } =
+				await $actor_snap_main.actor.get_all_snaps_without_project();
+
+			if (all_projects) {
+				project_store.set({ isFetching: false, projects: [...all_projects] });
+
+				local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
+
+				notification_visible.set({
+					moving_snaps: false
+				});
+			}
+
+			if (all_snaps) {
+				snap_store.set({ isFetching: false, snaps: [...all_snaps] });
+				local_storage_snaps.set({ all_snaps_count: all_snaps.length || 1 });
+			}
+		} catch (error) {
+			console.log('call => handleMoveSubmit error: ', error);
+		}
 
 		projects_tabs.set({
 			isSnapsSelected: false,
 			isProjectsSelected: true,
 			isProjectSelected: false
 		});
-
-		const selected_snaps = $snap_store.snaps.filter((snap) => snap.isSelected === true);
-		const selected_snaps_list = selected_snaps.map((snap) => {
-			return {
-				id: snap.id,
-				canister_id: snap.canister_id
-			};
-		});
-
-		const project_selected_snaps = project.snaps.filter((snap) => snap.isSelected === true);
-		const project_selected_snaps_list = project_selected_snaps.map((snap) => {
-			return {
-				id: snap.id,
-				canister_id: snap.canister_id
-			};
-		});
-
-		// From Snaps
-		if (selected_snaps_list.length > 0) {
-			try {
-				let project_ref = {
-					id: selected_project.id,
-					canister_id: selected_project.canister_id
-				};
-
-				await $actor_project_main.actor.add_snaps_to_project(selected_snaps_list, project_ref);
-
-				const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects(
-					[]
-				);
-
-				console.log('all_projects', all_projects);
-
-				const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
-
-				if (all_projects) {
-					project_store.set({ isFetching: false, projects: [...all_projects] });
-
-					local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
-
-					notification_visible.set({
-						moving_snaps: false
-					});
-				}
-
-				if (all_snaps) {
-					snap_store.set({ isFetching: false, snaps: [...all_snaps] });
-					local_storage_snaps.set({ all_snaps_count: all_snaps.length || 1 });
-				}
-			} catch (error) {
-				console.log('call => handleMoveSubmit error: ', error);
-			}
-		}
-
-		// From Another Project
-		if (project_selected_snaps_list.length > 0) {
-			try {
-				let project_to_ref = {
-					id: selected_project.id,
-					canister_id: selected_project.canister_id
-				};
-
-				let project_from_ref = {
-					id: project.id,
-					canister_id: project.canister_id
-				};
-
-				const { ok: moved_snaps } = await $actor_project_main.actor.move_snaps_from_project(
-					project_selected_snaps_list,
-					project_from_ref,
-					project_to_ref
-				);
-
-				const { ok: all_projects, err: error } = await $actor_project_main.actor.get_all_projects(
-					[]
-				);
-				if (all_projects) {
-					project_store.set({ isFetching: false, projects: [...all_projects] });
-
-					local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
-
-					notification_visible.set({
-						moving_snaps: false
-					});
-				}
-			} catch (error) {
-				console.log('call => handleMoveSubmit error: ', error);
-			}
-		}
 	}
 </script>
 
