@@ -50,15 +50,6 @@ module {
 		};
 	};
 
-	public type ProjectPublic = {
-		id : Text;
-		canister_id : Text;
-		created : Time;
-		username : Text;
-		name : Text;
-		snaps : [Snap];
-	};
-
 	public type Project = {
 		id : Text;
 		canister_id : Text;
@@ -67,6 +58,34 @@ module {
 		owner : UserPrincipal;
 		name : Text;
 		snaps : [SnapRef];
+	};
+
+	public type SnapPublic = {
+		canister_id : Text;
+		created : Time;
+		file_asset : AssetRef;
+		id : SnapID;
+		image_cover_location : Nat8;
+		images : [ImageRef];
+		project : ?ProjectPublic;
+		tags : ?[Text];
+		title : Text;
+		username : Username;
+		owner : Null;
+		metrics : {
+			likes : Nat;
+			views : Nat;
+		};
+	};
+
+	public type ProjectPublic = {
+		id : Text;
+		canister_id : Text;
+		created : Time;
+		username : Text;
+		name : Text;
+		owner : Null;
+		snaps : [SnapPublic];
 	};
 
 	public type UpdateProject = {

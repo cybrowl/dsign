@@ -30,6 +30,7 @@ actor SnapMain {
 	type ImageRef = Types.ImageRef;
 	type InitArgs = Types.InitArgs;
 	type Snap = Types.Snap;
+	type SnapPublic = Types.SnapPublic;
 	type SnapCanisterID = Types.SnapCanisterID;
 	type SnapID = Types.SnapID;
 	type SnapIDStorage = Types.SnapIDStorage;
@@ -255,12 +256,12 @@ actor SnapMain {
 
 	//TODO: update_snap_likes
 
-	public shared ({ caller }) func get_all_snaps() : async Result.Result<[Snap], ErrGetAllSnaps> {
+	public shared ({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], ErrGetAllSnaps> {
 		let log_tags = [ACTOR_NAME, "get_all_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_snap_ids_storage) {
-				let all_snaps = Buffer.Buffer<Snap>(0);
+				let all_snaps = Buffer.Buffer<SnapPublic>(0);
 
 				for ((canister_id, snap_ids) in user_snap_ids_storage.entries()) {
 					let snap_actor = actor (canister_id) : SnapActor;
@@ -284,7 +285,7 @@ actor SnapMain {
 		};
 	};
 
-	public shared ({ caller }) func get_all_snaps_without_project() : async Result.Result<[Snap], ErrGetAllSnaps> {
+	public shared ({ caller }) func get_all_snaps_without_project() : async Result.Result<[SnapPublic], ErrGetAllSnaps> {
 		let tags = [ACTOR_NAME, "get_all_snaps_without_project"];
 
 		//TODO: add username as optional arg
@@ -292,7 +293,7 @@ actor SnapMain {
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_snap_ids_storage) {
-				let all_snaps = Buffer.Buffer<Snap>(0);
+				let all_snaps = Buffer.Buffer<SnapPublic>(0);
 
 				for ((canister_id, snap_ids) in user_snap_ids_storage.entries()) {
 					let snap_actor = actor (canister_id) : SnapActor;

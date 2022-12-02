@@ -27,16 +27,17 @@ actor ProjectMain {
 	type ErrUpdateProject = Types.ErrUpdateProject;
 	type ICInterface = Types.ICInterface;
 	type Project = Types.Project;
-	type ProjectPublic = Types.ProjectPublic;
-	type ProjectActor = Types.ProjectActor;
 	type ProjectCanisterID = Types.ProjectCanisterID;
 	type ProjectID = Types.ProjectID;
 	type ProjectIDStorage = Types.ProjectIDStorage;
+	type ProjectPublic = Types.ProjectPublic;
 	type ProjectRef = Types.ProjectRef;
-	type SnapActor = SnapTypes.SnapActor;
 	type SnapRef = Types.SnapRef;
 	type UpdateProject = Types.UpdateProject;
 	type UserPrincipal = Types.UserPrincipal;
+
+	type ProjectActor = Types.ProjectActor;
+	type SnapActor = SnapTypes.SnapActor;
 
 	let ACTOR_NAME : Text = "ProjectMain";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;

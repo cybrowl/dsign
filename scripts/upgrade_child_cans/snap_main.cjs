@@ -7,7 +7,6 @@ const { Secp256k1KeyIdentity } = require('@dfinity/identity');
 const sha256 = require('sha256');
 const fs = require('fs');
 const Path = require('path');
-
 const { snap_main_interface } = require('../../test-utils/actor_interface.cjs');
 const {
 	snap_main_canister_id,

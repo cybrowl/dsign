@@ -40,7 +40,6 @@ module {
 		created : Time;
 		username : Text;
 		name : Text;
-		owner : Text;
 		snaps : [SnapRef];
 	};
 
@@ -55,7 +54,7 @@ module {
 		tags : ?[Text];
 		title : Text;
 		username : Username;
-		owner : Text;
+		owner : Null;
 		metrics : {
 			likes : Nat;
 			views : Nat;
@@ -125,6 +124,6 @@ module {
 		delete_snaps : shared ([SnapID]) -> async ();
 		delete_project_from_snaps : shared ([SnapRef]) -> async ();
 		add_project_to_snaps : shared ([SnapRef], ProjectRef) -> async ();
-		get_all_snaps : query ([SnapID]) -> async [Snap];
+		get_all_snaps : query ([SnapID]) -> async [SnapPublic];
 	};
 };

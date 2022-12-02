@@ -25,14 +25,26 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	type ErrDeleteSnapsFromProject = Types.ErrDeleteSnapsFromProject;
 	type ErrUpdateProject = Types.ErrUpdateProject;
 	type Project = Types.Project;
-	type ProjectRef = Types.ProjectRef;
 	type ProjectID = Types.ProjectID;
-	type ProjectPublic = Types.ProjectPublic;
-	type SnapActor = SnapTypes.SnapActor;
-	type Snap = SnapTypes.Snap;
+	type ProjectRef = Types.ProjectRef;
+	type Snap = Types.Snap;
 	type SnapRef = Types.SnapRef;
+	type Time = Types.Time;
 	type UpdateProject = Types.UpdateProject;
 	type UserPrincipal = Types.UserPrincipal;
+
+	type SnapActor = SnapTypes.SnapActor;
+	type SnapPublic = SnapTypes.SnapPublic;
+
+	public type ProjectPublic = {
+		id : Text;
+		canister_id : Text;
+		created : Time;
+		username : Text;
+		name : Text;
+		owner : Null;
+		snaps : [SnapPublic];
+	};
 
 	let ACTOR_NAME : Text = "Project";
 	let VERSION : Nat = 2;
@@ -230,6 +242,8 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	};
 
 	public shared func get_projects(project_ids : [ProjectID]) : async [ProjectPublic] {
+		let log_tags = [ACTOR_NAME, "get_projects"];
+
 		var projects_list = Buffer.Buffer<ProjectPublic>(0);
 
 		for (project_id in project_ids.vals()) {
@@ -237,7 +251,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 				case null {};
 				case (?project) {
 
-					var snap_list = Buffer.Buffer<Snap>(0);
+					var snap_list = Buffer.Buffer<SnapPublic>(0);
 
 					for (snap in project.snaps.vals()) {
 						let snap_actor = actor (snap.canister_id) : SnapActor;
@@ -257,8 +271,11 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 						created = project.created;
 						username = project.username;
 						name = project.name;
+						owner = null;
 						snaps = Buffer.toArray(snap_list);
 					};
+
+					ignore Logger.log_event(log_tags, debug_show (project_public));
 
 					projects_list.add(project_public);
 				};

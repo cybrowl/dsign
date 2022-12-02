@@ -4,15 +4,13 @@ export PROJECT_MAIN_PRINCIPAL=$(dfx canister id project_main)
 
 # GENERATE WASM FOR LOCAL
 
-# dfx deploy explore --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'")'
-# dfx deploy test_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
-# dfx deploy test_image_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
-dfx deploy test_project --argument='(principal "'${PROJECT_MAIN_PRINCIPAL}'", false)'
+dfx deploy test_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
+dfx deploy test_image_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
 dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principal "'${PROJECT_MAIN_PRINCIPAL}'")'
+dfx deploy snap_main
 
-# dfx canister call test_assets version
-# dfx canister call test_image_assets version
-dfx canister call test_project version
+dfx canister call test_assets version
+dfx canister call test_image_assets version
 dfx canister call test_snap version
 
 npm run generate_test_interface

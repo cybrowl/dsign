@@ -89,7 +89,7 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 		snaps.put(snap_id, snap);
 
 		let project_public : ?ProjectPublic = null;
-		let snap_public : SnapPublic = { snap and {} with owner = ""; project = project_public };
+		let snap_public : SnapPublic = { snap and {} with owner = null; project = project_public };
 
 		ignore Logger.log_event(
 			log_tags,
@@ -169,23 +169,21 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 
 		switch (await project_actor.get_projects_actor([project_ref.id])) {
 			case (projects) {
-				let project = projects[0];
-
 				for (snap_ref in snaps_ref.vals()) {
 					switch (snaps.get(snap_ref.id)) {
 						case (null) {};
 						case (?snap) {
 							// update snap
-							let snap_updated : Snap = { snap and {} with project = Option.make(project) };
+							let snap_updated : Snap = { snap and {} with project = Option.make(projects[0]) };
 							snaps.put(snap.id, snap_updated);
 
 							// update snap for explore
 							let project_public : ProjectPublic = {
-								project and {} with owner = "";
+								projects[0] and {} with owner = null;
 							};
 							let snap_public : SnapPublic = {
 								snap_updated and {} with project = Option.make(project_public);
-								owner = "";
+								owner = null;
 							};
 							ignore Explore.save_snap(snap_public);
 						};
@@ -195,8 +193,8 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 		};
 	};
 
-	public query func get_all_snaps(snap_ids : [SnapID]) : async [Snap] {
-		var snaps_list = Buffer.Buffer<Snap>(0);
+	public query func get_all_snaps(snap_ids : [SnapID]) : async [SnapPublic] {
+		var snaps_list = Buffer.Buffer<SnapPublic>(0);
 
 		for (snap_id in snap_ids.vals()) {
 			switch (snaps.get(snap_id)) {
@@ -215,7 +213,6 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 									created = project.created;
 									username = project.username;
 									name = project.name;
-									owner = "";
 									snaps = [];
 								};
 
@@ -225,7 +222,7 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 						};
 					};
 
-					let snap_public : Snap = { snap and {} with owner = null };
+					let snap_public : SnapPublic = { snap and {} with owner = null; project = project_public };
 
 					snaps_list.add(snap_public);
 				};
