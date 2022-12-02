@@ -117,10 +117,6 @@
 				identity: $auth_client.getIdentity()
 			})
 		}));
-
-		if (should_refresh) {
-			location.reload();
-		}
 	}
 
 	function login() {
@@ -128,9 +124,7 @@
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'
 				: 'http://localhost:8000/?canisterId=s55qq-oqaaa-aaaaa-aaakq-cai',
-			onSuccess: () => {
-				handleAuth(true);
-			}
+			onSuccess: handleAuth
 		});
 	}
 

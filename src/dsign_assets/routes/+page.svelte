@@ -35,13 +35,6 @@
 
 		isAuthenticated = await authClient.isAuthenticated();
 
-		console.log('isAuthenticated', isAuthenticated);
-		console.log('explore_store', $actor_explore.loggedIn);
-
-		if (isAuthenticated === false) {
-			page_navigation.set({ navItems: [{ name: 'Explore', href: '', isSelected: true }] });
-		}
-
 		try {
 			const all_snaps = await $actor_explore.actor.get_all_snaps();
 

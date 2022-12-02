@@ -35,6 +35,8 @@
 				const username = get(profile, 'username', 'x');
 
 				goto(`/profile/${username}`);
+			} else {
+				goto('/');
 			}
 		} catch (error) {
 			console.log('error', error);

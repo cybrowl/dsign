@@ -34,15 +34,7 @@
 		name: ''
 	};
 	let isProfileOwner = false;
-	let profile_info = {
-		profile: {
-			avatar: {
-				url: ''
-			},
-			username: ''
-		},
-		projects: []
-	};
+	let profile = {};
 
 	// execution
 	page_navigation_update.select_item(3);
@@ -53,24 +45,25 @@
 		isAuthenticated = await authClient.isAuthenticated();
 
 		try {
+			const { ok: profile_, err: err_profile } = await $actor_profile.actor.get_profile_public(
+				$page.params.slug
+			);
+			profile = profile_;
+
 			if (isAuthenticated) {
-				Promise.all([
-					$actor_profile.actor.get_profile(),
-					$actor_profile.actor.get_profile_public($page.params.slug)
-				]).then(([profile_owner, profile_public]) => {
-					const { ok: profile_owner_ } = profile_owner;
-					const { ok: profile_public_ } = profile_public;
+				const { ok: profile_, err: err_profile } = await $actor_profile.actor.get_profile();
+				const username = get(profile_, 'username', 'x');
 
-					isProfileOwner = profile_owner_.username === $page.params.slug;
-					profile_info.profile = profile_public_;
-				});
-
-				const { ok: all_projects, err: err_all_projects } =
-					await $actor_project_main.actor.get_all_projects([$page.params.slug]);
-
-				if (all_projects) {
-					project_store.set({ isFetching: false, projects: [...all_projects] });
+				if (username === $page.params.slug) {
+					isProfileOwner = true;
 				}
+			}
+
+			const { ok: all_projects, err: err_all_projects } =
+				await $actor_project_main.actor.get_all_projects([$page.params.slug]);
+
+			if (all_projects) {
+				project_store.set({ isFetching: false, projects: [...all_projects] });
 			}
 		} catch (error) {
 			// Show error notification
@@ -133,9 +126,9 @@
 	<!-- ProfileInfo -->
 	<div class="relative col-start-2 col-end-4 row-start-2 row-end-3">
 		<ProfileInfo
-			avatar={get(profile_info, 'profile.avatar.url', '')}
+			avatar={get(profile, 'avatar.url', '')}
 			is_authenticated={isProfileOwner}
-			username={get(profile_info, 'profile.username', '')}
+			username={get(profile, 'username', '')}
 			on:editProfile={openAccountSettingsModal}
 		/>
 	</div>
