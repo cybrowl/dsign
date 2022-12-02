@@ -54,9 +54,7 @@
 				const { ok: profile_, err: err_profile } = await $actor_profile.actor.get_profile();
 				const username = get(profile_, 'username', 'x');
 
-				if (username === $page.params.slug) {
-					isProfileOwner = true;
-				}
+				isProfileOwner = username === $page.params.slug;
 			}
 
 			const { ok: all_projects, err: err_all_projects } =

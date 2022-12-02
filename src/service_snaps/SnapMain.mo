@@ -10,7 +10,6 @@ import Text "mo:base/Text";
 import Result "mo:base/Result";
 
 import Assets "../service_assets/Assets";
-import Explore "canister:explore";
 import FileAssetChunks "canister:assets_file_chunks";
 import ImageAssets "../service_assets_img/ImageAssets";
 import ImageAssetStaging "canister:assets_img_staging";
@@ -200,10 +199,6 @@ actor SnapMain {
 			case (#ok snap) {
 				snap_ids.add(snap.id);
 				user_snap_ids_storage.put(snap_canister_id, Buffer.toArray(snap_ids));
-
-				let snap_public : Snap = { snap and {} with owner = null };
-
-				ignore Explore.save_snap(snap_public);
 
 				#ok("Created Snap");
 			};

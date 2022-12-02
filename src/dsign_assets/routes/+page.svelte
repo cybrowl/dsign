@@ -36,6 +36,10 @@
 		isAuthenticated = await authClient.isAuthenticated();
 
 		try {
+			const res = await $actor_explore.actor.length();
+
+			console.log('res', res);
+
 			const all_snaps = await $actor_explore.actor.get_all_snaps();
 
 			console.log('all_snaps', all_snaps);

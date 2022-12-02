@@ -8,12 +8,12 @@ import Time "mo:base/Time";
 import Types "./types";
 
 actor Explore = {
-	type Snap = Types.Snap;
-	type SnapID = Types.SnapID;
 	type SnapCanisterId = Types.SnapCanisterId;
+	type SnapID = Types.SnapID;
+	type SnapPublic = Types.SnapPublic;
 
-	var snaps : HashMap.HashMap<SnapID, Snap> = HashMap.HashMap(0, Text.equal, Text.hash);
-	stable var snaps_stable_storage : [(SnapID, Snap)] = [];
+	var snaps : HashMap.HashMap<SnapID, SnapPublic> = HashMap.HashMap(0, Text.equal, Text.hash);
+	stable var snaps_stable_storage : [(SnapID, SnapPublic)] = [];
 
 	var snaps_authorized_can_ids : HashMap.HashMap<SnapCanisterId, SnapCanisterId> = HashMap.HashMap(0, Text.equal, Text.hash);
 
@@ -21,13 +21,13 @@ actor Explore = {
 		return "pong";
 	};
 
-	public shared func save_snap(snap : Snap) : async Text {
+	public shared func save_snap(snap : SnapPublic) : async Text {
 		snaps.put(snap.id, snap);
 
 		return "meow";
 	};
 
-	public query func get_all_snaps() : async [Snap] {
+	public query func get_all_snaps() : async [SnapPublic] {
 		return Iter.toArray(snaps.vals());
 	};
 
@@ -41,7 +41,7 @@ actor Explore = {
 	};
 
 	system func postupgrade() {
-		snaps := HashMap.fromIter<SnapID, Snap>(
+		snaps := HashMap.fromIter<SnapID, SnapPublic>(
 			snaps_stable_storage.vals(),
 			0,
 			Text.equal,

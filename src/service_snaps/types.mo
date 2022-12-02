@@ -40,7 +40,26 @@ module {
 		created : Time;
 		username : Text;
 		name : Text;
-		snaps : [Snap];
+		owner : Text;
+		snaps : [SnapRef];
+	};
+
+	public type SnapPublic = {
+		canister_id : Text;
+		created : Time;
+		file_asset : AssetRef;
+		id : SnapID;
+		image_cover_location : Nat8;
+		images : [ImageRef];
+		project : ?ProjectPublic;
+		tags : ?[Text];
+		title : Text;
+		username : Username;
+		owner : Text;
+		metrics : {
+			likes : Nat;
+			views : Nat;
+		};
 	};
 
 	public type SnapRef = {

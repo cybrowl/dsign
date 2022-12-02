@@ -53,8 +53,6 @@
 				account_settings: !options.account_settings
 			};
 		});
-
-		location.reload();
 	}
 
 	async function handleLogOut() {
@@ -109,6 +107,8 @@
 		}));
 
 		local_storage_remove('profile');
+
+		location.reload();
 
 		handleCloseModal();
 	}

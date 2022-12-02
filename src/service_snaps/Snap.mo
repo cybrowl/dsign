@@ -11,6 +11,7 @@ import Time "mo:base/Time";
 import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
+import Explore "canister:explore";
 import Logger "canister:logger";
 import Profile "canister:profile";
 
@@ -26,6 +27,7 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 	type ProjectPublic = Types.ProjectPublic;
 	type ProjectRef = ProjectTypes.ProjectRef;
 	type Snap = Types.Snap;
+	type SnapPublic = Types.SnapPublic;
 	type SnapID = Types.SnapID;
 	type SnapRef = Types.SnapRef;
 	type UserPrincipal = Types.UserPrincipal;
@@ -47,6 +49,7 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 		file_asset : AssetRef,
 		owner : UserPrincipal
 	) : async Result.Result<Snap, ErrCreateSnap> {
+		let log_tags = [ACTOR_NAME, "create_snap"];
 
 		if (snap_main != caller) {
 			return #err(#Unauthorized);
@@ -84,6 +87,16 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 		};
 
 		snaps.put(snap_id, snap);
+
+		let project_public : ?ProjectPublic = null;
+		let snap_public : SnapPublic = { snap and {} with owner = ""; project = project_public };
+
+		ignore Logger.log_event(
+			log_tags,
+			debug_show (snap_public)
+		);
+
+		ignore Explore.save_snap(snap_public);
 
 		return #ok(snap);
 	};
@@ -162,22 +175,19 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 					switch (snaps.get(snap_ref.id)) {
 						case (null) {};
 						case (?snap) {
-							let update_snap : Snap = {
-								canister_id = snap.canister_id;
-								created = snap.created;
-								file_asset = snap.file_asset;
-								id = snap.id;
-								image_cover_location = snap.image_cover_location;
-								images = snap.images;
-								project = Option.make(project);
-								tags = snap.tags;
-								title = snap.title;
-								username = snap.username;
-								owner = snap.owner;
-								metrics = snap.metrics;
-							};
+							// update snap
+							let snap_updated : Snap = { snap and {} with project = Option.make(project) };
+							snaps.put(snap.id, snap_updated);
 
-							snaps.put(snap.id, update_snap);
+							// update snap for explore
+							let project_public : ProjectPublic = {
+								project and {} with owner = "";
+							};
+							let snap_public : SnapPublic = {
+								snap_updated and {} with project = Option.make(project_public);
+								owner = "";
+							};
+							ignore Explore.save_snap(snap_public);
 						};
 					};
 				};
@@ -205,6 +215,7 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 									created = project.created;
 									username = project.username;
 									name = project.name;
+									owner = "";
 									snaps = [];
 								};
 
