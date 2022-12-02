@@ -11,7 +11,6 @@ import Time "mo:base/Time";
 import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
-import Explore "canister:explore";
 import Logger "canister:logger";
 import Profile "canister:profile";
 
@@ -28,7 +27,6 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 	type ProjectRef = ProjectTypes.ProjectRef;
 	type Snap = Types.Snap;
 	type SnapID = Types.SnapID;
-	type SnapPublic = Types.SnapPublic;
 	type SnapRef = Types.SnapRef;
 	type UserPrincipal = Types.UserPrincipal;
 
@@ -78,14 +76,12 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 			tags = null;
 			title = args.title;
 			username = username;
-			owner = owner;
+			owner = Option.make(owner);
 			metrics = {
 				likes = 0;
 				views = 0;
 			};
 		};
-
-		ignore Explore.save_snap(snap);
 
 		snaps.put(snap_id, snap);
 
@@ -189,8 +185,8 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 		};
 	};
 
-	public query func get_all_snaps(snap_ids : [SnapID]) : async [SnapPublic] {
-		var snaps_list = Buffer.Buffer<SnapPublic>(0);
+	public query func get_all_snaps(snap_ids : [SnapID]) : async [Snap] {
+		var snaps_list = Buffer.Buffer<Snap>(0);
 
 		for (snap_id in snap_ids.vals()) {
 			switch (snaps.get(snap_id)) {
@@ -218,19 +214,7 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 						};
 					};
 
-					let snap_public : SnapPublic = {
-						canister_id = snap.canister_id;
-						created = snap.created;
-						file_asset = snap.file_asset;
-						id = snap.id;
-						image_cover_location = snap.image_cover_location;
-						images = snap.images;
-						project = project_public;
-						tags = snap.tags;
-						title = snap.title;
-						username = snap.username;
-						metrics = snap.metrics;
-					};
+					let snap_public : Snap = { snap and {} with owner = null };
 
 					snaps_list.add(snap_public);
 				};

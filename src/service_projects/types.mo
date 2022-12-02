@@ -13,6 +13,7 @@ module {
 	public type UserPrincipal = Principal;
 	public type ProjectCanisterID = Text;
 	public type ProjectID = Text;
+	public type Username = Text;
 	public type ProjectIDStorage = HashMap.HashMap<ProjectCanisterID, [ProjectID]>;
 	public type SnapID = Text;
 
@@ -31,17 +32,18 @@ module {
 		canister_id : Text;
 	};
 
-	public type SnapPublic = {
+	public type Snap = {
 		canister_id : Text;
 		created : Time;
 		file_asset : AssetRef;
 		id : SnapID;
 		image_cover_location : Nat8;
 		images : [ImageRef];
-		project : ?ProjectPublic;
+		project : ?Project;
 		tags : ?[Text];
 		title : Text;
-		username : Text;
+		username : Username;
+		owner : ?Principal;
 		metrics : {
 			likes : Nat;
 			views : Nat;
@@ -54,7 +56,7 @@ module {
 		created : Time;
 		username : Text;
 		name : Text;
-		snaps : [SnapPublic];
+		snaps : [Snap];
 	};
 
 	public type Project = {

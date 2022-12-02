@@ -8,6 +8,7 @@
 	import {
 		actor_assets_file_chunks,
 		actor_assets_img_staging,
+		actor_explore,
 		actor_profile,
 		actor_project_main,
 		actor_snap_main,
@@ -52,6 +53,8 @@
 				account_settings: !options.account_settings
 			};
 		});
+
+		location.reload();
 	}
 
 	async function handleLogOut() {
@@ -69,6 +72,14 @@
 			loggedIn: false,
 			actor: createActor({
 				actor_name: 'assets_img_staging',
+				identity: $auth_client.getIdentity()
+			})
+		}));
+
+		actor_explore.update(() => ({
+			loggedIn: false,
+			actor: createActor({
+				actor_name: 'explore',
 				identity: $auth_client.getIdentity()
 			})
 		}));
@@ -100,8 +111,6 @@
 		local_storage_remove('profile');
 
 		handleCloseModal();
-
-		window.location.href = '/';
 	}
 </script>
 

@@ -40,29 +40,12 @@ module {
 		created : Time;
 		username : Text;
 		name : Text;
-		snaps : [SnapPublic];
+		snaps : [Snap];
 	};
 
 	public type SnapRef = {
 		id : Text;
 		canister_id : Text;
-	};
-
-	public type SnapPublic = {
-		canister_id : Text;
-		created : Time;
-		file_asset : AssetRef;
-		id : SnapID;
-		image_cover_location : Nat8;
-		images : [ImageRef];
-		project : ?ProjectPublic;
-		tags : ?[Text];
-		title : Text;
-		username : Username;
-		metrics : {
-			likes : Nat;
-			views : Nat;
-		};
 	};
 
 	public type Snap = {
@@ -76,7 +59,7 @@ module {
 		tags : ?[Text];
 		title : Text;
 		username : Username;
-		owner : Principal;
+		owner : ?Principal;
 		metrics : {
 			likes : Nat;
 			views : Nat;
@@ -123,6 +106,6 @@ module {
 		delete_snaps : shared ([SnapID]) -> async ();
 		delete_project_from_snaps : shared ([SnapRef]) -> async ();
 		add_project_to_snaps : shared ([SnapRef], ProjectRef) -> async ();
-		get_all_snaps : query ([SnapID]) -> async [SnapPublic];
+		get_all_snaps : query ([SnapID]) -> async [Snap];
 	};
 };

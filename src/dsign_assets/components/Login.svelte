@@ -9,6 +9,7 @@
 	import {
 		actor_assets_file_chunks,
 		actor_assets_img_staging,
+		actor_explore,
 		actor_profile,
 		actor_project_main,
 		actor_snap_main,
@@ -42,6 +43,11 @@
 				loggedIn: false
 			}));
 
+			actor_explore.update((args) => ({
+				...args,
+				loggedIn: false
+			}));
+
 			actor_profile.update((args) => ({
 				...args,
 				loggedIn: false
@@ -63,7 +69,7 @@
 		}
 	});
 
-	function handleAuth() {
+	function handleAuth(should_refresh = false) {
 		actor_assets_file_chunks.update(() => ({
 			loggedIn: true,
 			actor: createActor({
@@ -76,6 +82,14 @@
 			loggedIn: true,
 			actor: createActor({
 				actor_name: 'assets_img_staging',
+				identity: $auth_client.getIdentity()
+			})
+		}));
+
+		actor_explore.update(() => ({
+			loggedIn: true,
+			actor: createActor({
+				actor_name: 'explore',
 				identity: $auth_client.getIdentity()
 			})
 		}));
@@ -103,6 +117,10 @@
 				identity: $auth_client.getIdentity()
 			})
 		}));
+
+		if (should_refresh) {
+			location.reload();
+		}
 	}
 
 	function login() {
@@ -110,7 +128,9 @@
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'
 				: 'http://localhost:8000/?canisterId=s55qq-oqaaa-aaaaa-aaakq-cai',
-			onSuccess: handleAuth
+			onSuccess: () => {
+				handleAuth(true);
+			}
 		});
 	}
 

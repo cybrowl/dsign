@@ -120,26 +120,26 @@ const installCode = async () => {
 	];
 
 	let local_canisters = [
-		{
-			name: 'image_assets',
-			description: 'upgrades child canister using test_image_assets wasm',
-			is_prod: false,
-			canister_id: snap_main_canister_id,
-			can_interface: snap_main_interface,
-			child_canister_principal: Principal.fromText('s24we-diaaa-aaaaa-aaaka-cai'),
-			wasm: get_wasm('test_image_assets'),
-			arg: IDL.encode([IDL.Principal, IDL.Bool], [Principal.fromText(snap_main_canister_id), false])
-		},
-		{
-			name: 'assets',
-			description: 'upgrades child canister using test_assets wasm',
-			is_prod: false,
-			canister_id: snap_main_canister_id,
-			can_interface: snap_main_interface,
-			child_canister_principal: Principal.fromText('sp3hj-caaaa-aaaaa-aaajq-cai'),
-			wasm: get_wasm('test_assets'),
-			arg: IDL.encode([IDL.Principal, IDL.Bool], [Principal.fromText(snap_main_canister_id), false])
-		},
+		// {
+		// 	name: 'image_assets',
+		// 	description: 'upgrades child canister using test_image_assets wasm',
+		// 	is_prod: false,
+		// 	canister_id: snap_main_canister_id,
+		// 	can_interface: snap_main_interface,
+		// 	child_canister_principal: Principal.fromText('s24we-diaaa-aaaaa-aaaka-cai'),
+		// 	wasm: get_wasm('test_image_assets'),
+		// 	arg: IDL.encode([IDL.Principal, IDL.Bool], [Principal.fromText(snap_main_canister_id), false])
+		// },
+		// {
+		// 	name: 'assets',
+		// 	description: 'upgrades child canister using test_assets wasm',
+		// 	is_prod: false,
+		// 	canister_id: snap_main_canister_id,
+		// 	can_interface: snap_main_interface,
+		// 	child_canister_principal: Principal.fromText('sp3hj-caaaa-aaaaa-aaajq-cai'),
+		// 	wasm: get_wasm('test_assets'),
+		// 	arg: IDL.encode([IDL.Principal, IDL.Bool], [Principal.fromText(snap_main_canister_id), false])
+		// },
 		{
 			name: 'snap',
 			description: 'upgrades child canister using test_snap wasm',

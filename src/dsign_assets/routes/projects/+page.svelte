@@ -77,6 +77,8 @@
 				const { ok: all_projects, err: err_all_projects } = projects;
 				const { ok: all_snaps, err: err_all_snaps } = snaps;
 
+				console.log('all_snaps', all_snaps);
+
 				if (all_snaps) {
 					snap_store.set({ isFetching: false, snaps: [...all_snaps] });
 

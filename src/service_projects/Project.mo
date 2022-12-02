@@ -29,7 +29,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	type ProjectID = Types.ProjectID;
 	type ProjectPublic = Types.ProjectPublic;
 	type SnapActor = SnapTypes.SnapActor;
-	type SnapPublic = SnapTypes.SnapPublic;
+	type Snap = SnapTypes.Snap;
 	type SnapRef = Types.SnapRef;
 	type UpdateProject = Types.UpdateProject;
 	type UserPrincipal = Types.UserPrincipal;
@@ -237,7 +237,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 				case null {};
 				case (?project) {
 
-					var snap_list = Buffer.Buffer<SnapPublic>(0);
+					var snap_list = Buffer.Buffer<Snap>(0);
 
 					for (snap in project.snaps.vals()) {
 						let snap_actor = actor (snap.canister_id) : SnapActor;
