@@ -50,6 +50,7 @@
       "main": "src/service_projects/ProjectMain.mo",
       "type": "motoko",
       "dependencies": [
+        "canister_child_ledger",
         "logger",
         "profile"
       ]
