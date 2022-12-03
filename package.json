@@ -10,6 +10,7 @@
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "logs": "npm run generate_test_interface && tape test-utils/debug/debug.test.cjs",
     "preview": "vite preview",
+    "u-p": "sh ./scripts/deploy_test_cans/profile.sh && node ./scripts/upgrade_child_cans/profile.cjs",
     "u-pm": "sh ./scripts/deploy_test_cans/project_main.sh && node ./scripts/upgrade_child_cans/project_main.cjs",
     "u-sm": "sh ./scripts/deploy_test_cans/snap_main.sh && node ./scripts/upgrade_child_cans/snap_main.cjs",
     "test-all": "bash ./scripts/test-all.sh",

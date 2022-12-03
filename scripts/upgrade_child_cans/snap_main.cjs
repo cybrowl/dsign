@@ -162,7 +162,7 @@ const installCode = async () => {
 	let run_in_prod = false;
 
 	if (run_in_prod === false) {
-		console.log('======== Running in local canisters =========');
+		console.log('======== Installing Local Snap Main Child Canisters =========');
 
 		const canister_child_ledger_actor = await get_actor(
 			canister_child_ledger_canister_id,
@@ -177,7 +177,7 @@ const installCode = async () => {
 		});
 
 		const local_canisters = snap_main_canisters.map((canister) => {
-			const canister_map = {
+			const arg_map = {
 				assets: IDL.encode(
 					[IDL.Principal, IDL.Bool],
 					[Principal.fromText(snap_main_canister_id), false]
@@ -192,8 +192,6 @@ const installCode = async () => {
 				)
 			};
 
-			const arg_ = canister_map[canister.name];
-
 			return {
 				name: canister.name,
 				is_prod: canister.isProd,
@@ -201,11 +199,9 @@ const installCode = async () => {
 				can_interface: snap_main_interface,
 				child_canister_principal: Principal.fromText(canister.id),
 				wasm: get_wasm(`test_${canister.name}`),
-				arg: arg_
+				arg: arg_map[canister.name]
 			};
 		});
-
-		console.log('local_canisters: ', local_canisters);
 
 		local_canisters.forEach(async (canister) => {
 			const actor = await get_actor(canister.canister_id, canister.can_interface, canister.is_prod);

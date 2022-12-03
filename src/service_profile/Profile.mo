@@ -7,10 +7,13 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
+import CanisterChildLedger "canister:canister_child_ledger";
 import ImageAssets "../service_assets_img/ImageAssets";
 import Logger "canister:logger";
 
 import Types "./types";
+import CanisterLedgerTypes "../types/canister_child_ledger.types";
+
 import Utils "./utils";
 
 actor Profile = {
@@ -21,6 +24,8 @@ actor Profile = {
 	type Profile = Types.Profile;
 	type Username = Types.Username;
 	type UserPrincipal = Types.UserPrincipal;
+
+	type CanisterChild = CanisterLedgerTypes.CanisterChild;
 
 	let ACTOR_NAME : Text = "Profile";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
@@ -241,12 +246,14 @@ actor Profile = {
 				case (#ok images) {
 					let image = images[0];
 
-					let profile_modified = { profile with avatar = {
-						id = image.id;
-						canister_id = image.canister_id;
-						url = image.url;
-						exists = true;
-					}};
+					let profile_modified = {
+						profile with avatar = {
+							id = image.id;
+							canister_id = image.canister_id;
+							url = image.url;
+							exists = true;
+						};
+					};
 
 					profiles.put(caller, profile_modified);
 
@@ -306,6 +313,16 @@ actor Profile = {
 		let principal = Principal.fromActor(image_assets_actor);
 
 		image_assets_canister_id := Principal.toText(principal);
+
+		let canister_child : CanisterChild = {
+			created = Time.now();
+			id = image_assets_canister_id;
+			name = "image_assets";
+			parent_name = ACTOR_NAME;
+			isProd = is_prod;
+		};
+
+		ignore CanisterChildLedger.save_canister(canister_child);
 
 		await Logger.log_event(
 			tags,

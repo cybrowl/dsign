@@ -42,6 +42,7 @@
       "type": "motoko",
       "dependencies": [
         "assets_img_staging",
+        "canister_child_ledger",
         "logger"
       ]
     },

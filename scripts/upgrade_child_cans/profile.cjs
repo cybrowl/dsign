@@ -8,8 +8,14 @@ const sha256 = require('sha256');
 const fs = require('fs');
 const Path = require('path');
 
-const { profile_interface } = require('../../test-utils/actor_interface.cjs');
-const { profile_canister_id } = require('../../test-utils/actor_canister_ids.cjs');
+const {
+	canister_child_ledger_interface,
+	profile_interface
+} = require('../../test-utils/actor_interface.cjs');
+const {
+	canister_child_ledger_canister_id,
+	profile_canister_id
+} = require('../../test-utils/actor_canister_ids.cjs');
 const canister_ids = require('../../canister_ids.json');
 
 const parseIdentity = (keyPath) => {
@@ -69,47 +75,66 @@ const get_actor = async (canisterId, can_interface, is_prod) => {
 };
 
 const installCode = async () => {
-	console.log('Installing canisters...');
+	let run_in_prod = false;
 
-	let canisters = {
-		local: {
-			name: 'profile',
-			description: 'upgrades child canister test_image_assets',
-			is_prod: false,
-			canister_id: profile_canister_id,
-			can_interface: profile_interface,
-			child_canister_text: 'si2b5-pyaaa-aaaaa-aaaja-cai',
-			child_canister_principal: Principal.fromText('si2b5-pyaaa-aaaaa-aaaja-cai'),
-			wasm: get_wasm('test_image_assets'),
-			arg: IDL.encode([IDL.Principal, IDL.Bool], [Principal.fromText(profile_canister_id), false])
-		},
-		prod: {
-			name: 'profile',
-			description: 'upgrades child canister test_image_assets',
-			is_prod: true,
-			canister_id: canister_ids['profile'].ic,
-			can_interface: profile_interface,
-			child_canister_text: 'lewm2-iiaaa-aaaag-aat2a-cai',
-			child_canister_principal: Principal.fromText('lewm2-iiaaa-aaaag-aat2a-cai'),
-			wasm: get_wasm_prod('test_image_assets'),
-			arg: IDL.encode(
-				[IDL.Principal, IDL.Bool],
-				[Principal.fromText(canister_ids['profile'].ic), true]
-			)
-		}
-	};
+	if (run_in_prod === false) {
+		console.log('======== Installing Local Profile Child Canisters =========');
 
-	let profile = canisters.prod;
+		const canister_child_ledger_actor = await get_actor(
+			canister_child_ledger_canister_id,
+			canister_child_ledger_interface,
+			false
+		);
 
-	const actor = await get_actor(profile.canister_id, profile.can_interface, profile.is_prod);
+		const canister_children = await canister_child_ledger_actor.get_canisters();
 
-	const res = await actor.install_code(
-		profile.child_canister_principal,
-		[...profile.arg],
-		profile.wasm
-	);
+		const snap_main_canisters = canister_children.filter((canister) => {
+			return canister.parent_name == 'Profile';
+		});
 
-	console.log('res: ', res);
+		const local_canisters = snap_main_canisters.map((canister) => {
+			const arg_map = {
+				image_assets: IDL.encode(
+					[IDL.Principal, IDL.Bool],
+					[Principal.fromText(profile_canister_id), false]
+				)
+			};
+
+			return {
+				name: canister.name,
+				is_prod: canister.isProd,
+				canister_id: profile_canister_id,
+				can_interface: profile_interface,
+				child_canister_principal: Principal.fromText(canister.id),
+				wasm: get_wasm(`test_${canister.name}`),
+				arg: arg_map[canister.name]
+			};
+		});
+
+		local_canisters.forEach(async (canister) => {
+			const actor = await get_actor(canister.canister_id, canister.can_interface, canister.is_prod);
+
+			const res = await actor.install_code(
+				canister.child_canister_principal,
+				[...canister.arg],
+				canister.wasm
+			);
+
+			console.log('done => ', res);
+		});
+	} else {
+		console.log('======== Installing Prod Profile Child Canisters =========');
+
+		// prod_canisters.forEach(async (canister) => {
+		// 	const actor = await get_actor(canister.canister_id, canister.can_interface, canister.is_prod);
+		// 	const res = await actor.install_code(
+		// 		canister.child_canister_principal,
+		// 		[...canister.arg],
+		// 		canister.wasm
+		// 	);
+		// 	console.log('res: ', res);
+		// });
+	}
 };
 
 const init = async () => {
