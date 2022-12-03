@@ -88,11 +88,11 @@ const installCode = async () => {
 
 		const canister_children = await canister_child_ledger_actor.get_canisters();
 
-		const snap_main_canisters = canister_children.filter((canister) => {
+		const profile_canisters = canister_children.filter((canister) => {
 			return canister.parent_name == 'Profile';
 		});
 
-		const local_canisters = snap_main_canisters.map((canister) => {
+		const local_canisters = profile_canisters.map((canister) => {
 			const arg_map = {
 				image_assets: IDL.encode(
 					[IDL.Principal, IDL.Bool],
