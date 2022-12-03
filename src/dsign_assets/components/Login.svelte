@@ -21,58 +21,64 @@
 
 	const env = environment();
 	const isProd = env['DFX_NETWORK'] === 'ic' || false;
+	let authClient;
 
 	onMount(async () => {
-		let authClient = await AuthClient.create();
+		authClient = await AuthClient.create();
 		let isAuthenticated = await authClient.isAuthenticated();
 
 		auth_client.set(authClient);
 
 		if (isAuthenticated) {
+			console.log('isAuthenticated: ', isAuthenticated);
 			handleAuth();
 		} else {
-			actor_assets_file_chunks.update((args) => ({
-				...args,
-				loggedIn: false
-			}));
-
-			actor_assets_img_staging.update((args) => ({
-				...args,
-				loggedIn: false
-			}));
-
-			actor_explore.update((args) => ({
-				...args,
-				loggedIn: false
-			}));
-
-			actor_profile.update((args) => ({
-				...args,
-				loggedIn: false
-			}));
-
-			actor_project_main.update((args) => ({
-				...args,
-				loggedIn: false
-			}));
-
-			actor_snap_main.update((args) => ({
-				...args,
-				loggedIn: false
-			}));
-
-			local_storage_remove('profile');
-			local_storage_remove('projects');
-			local_storage_remove('snaps');
+			handleLogout();
 		}
 	});
+
+	function handleLogout() {
+		actor_assets_file_chunks.update((args) => ({
+			...args,
+			loggedIn: false
+		}));
+
+		actor_assets_img_staging.update((args) => ({
+			...args,
+			loggedIn: false
+		}));
+
+		actor_explore.update((args) => ({
+			...args,
+			loggedIn: false
+		}));
+
+		actor_profile.update((args) => ({
+			...args,
+			loggedIn: false
+		}));
+
+		actor_project_main.update((args) => ({
+			...args,
+			loggedIn: false
+		}));
+
+		actor_snap_main.update((args) => ({
+			...args,
+			loggedIn: false
+		}));
+
+		local_storage_remove('profile');
+		local_storage_remove('projects');
+		local_storage_remove('snaps');
+	}
 
 	function handleAuth() {
 		actor_assets_file_chunks.update(() => ({
 			loggedIn: true,
 			actor: createActor({
 				actor_name: 'assets_file_chunks',
-				identity: $auth_client.getIdentity()
+				identity: authClient.getIdentity()
 			})
 		}));
 
@@ -80,7 +86,7 @@
 			loggedIn: true,
 			actor: createActor({
 				actor_name: 'assets_img_staging',
-				identity: $auth_client.getIdentity()
+				identity: authClient.getIdentity()
 			})
 		}));
 
@@ -88,7 +94,7 @@
 			loggedIn: true,
 			actor: createActor({
 				actor_name: 'explore',
-				identity: $auth_client.getIdentity()
+				identity: authClient.getIdentity()
 			})
 		}));
 
@@ -96,7 +102,7 @@
 			loggedIn: true,
 			actor: createActor({
 				actor_name: 'profile',
-				identity: $auth_client.getIdentity()
+				identity: authClient.getIdentity()
 			})
 		}));
 
@@ -104,7 +110,7 @@
 			loggedIn: true,
 			actor: createActor({
 				actor_name: 'project_main',
-				identity: $auth_client.getIdentity()
+				identity: authClient.getIdentity()
 			})
 		}));
 
@@ -112,15 +118,13 @@
 			loggedIn: true,
 			actor: createActor({
 				actor_name: 'snap_main',
-				identity: $auth_client.getIdentity()
+				identity: authClient.getIdentity()
 			})
 		}));
 	}
 
 	function login() {
-		console.log('$auth_client: ', $auth_client);
-
-		$auth_client.login({
+		authClient.login({
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'
 				: 'http://localhost:8080/?canisterId=rwlgt-iiaaa-aaaaa-aaaaa-cai',
