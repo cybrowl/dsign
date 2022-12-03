@@ -56,7 +56,7 @@ const get_wasm_prod = (name) => {
 };
 
 const get_actor = async (canisterId, can_interface, is_prod) => {
-	const host = is_prod ? `https://${canisterId}.ic0.app/` : `http://127.0.0.1:8000`;
+	const host = is_prod ? `https://${canisterId}.ic0.app/` : `http://127.0.0.1:8080`;
 
 	const agent = new HttpAgent({ fetch, host, identity: dev_identity });
 
@@ -145,7 +145,7 @@ const installCode = async () => {
 			is_prod: false,
 			canister_id: snap_main_canister_id,
 			can_interface: snap_main_interface,
-			child_canister_principal: Principal.fromText('s24we-diaaa-aaaaa-aaaka-cai'),
+			child_canister_principal: Principal.fromText('wzp7w-lyaaa-aaaaa-aaara-cai'),
 			wasm: get_wasm('test_snap'),
 			arg: IDL.encode(
 				[IDL.Principal, IDL.Principal],

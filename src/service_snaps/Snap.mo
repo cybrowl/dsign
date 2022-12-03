@@ -174,15 +174,15 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 						case (null) {};
 						case (?snap) {
 							// update snap
-							let snap_updated : Snap = { snap and {} with project = Option.make(projects[0]) };
+							let snap_updated : Snap = { snap with project = Option.make(projects[0]) };
 							snaps.put(snap.id, snap_updated);
 
 							// update snap for explore
 							let project_public : ProjectPublic = {
-								projects[0] and {} with owner = null;
+								projects[0] with owner = null;
 							};
 							let snap_public : SnapPublic = {
-								snap_updated and {} with project = Option.make(project_public);
+								snap_updated with project = Option.make(project_public);
 								owner = null;
 							};
 							ignore Explore.save_snap(snap_public);

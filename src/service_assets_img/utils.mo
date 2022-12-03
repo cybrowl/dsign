@@ -65,7 +65,7 @@ module {
 		if (isProduction == false) {
 			url := Text.join(
 				"",
-				(["http://localhost:8000/image/", asset_type, "/", image_id, "?canisterId=", canister_id].vals())
+				(["http://localhost:8080/image/", asset_type, "/", image_id, "?canisterId=", canister_id].vals())
 			);
 		};
 

@@ -123,7 +123,7 @@
 		$auth_client.login({
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'
-				: 'http://localhost:8000/?canisterId=s55qq-oqaaa-aaaaa-aaakq-cai',
+				: 'http://localhost:8080/?canisterId=rwlgt-iiaaa-aaaaa-aaaaa-cai',
 			onSuccess: handleAuth
 		});
 	}

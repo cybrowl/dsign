@@ -23,7 +23,7 @@ let success = run([
 			it(
 				"should get asset id from local env",
 				do {
-					let url = "http://127.0.0.1:8000/asset/asset_id?canisterId=qoctq-giaaa-aaaaa-aaaea-cai";
+					let url = "http://127.0.0.1:8080/asset/asset_id?canisterId=qoctq-giaaa-aaaaa-aaaea-cai";
 					let expected = "asset_id";
 					let asset_id = Utils.get_asset_id(url);
 					assertTrue(Text.equal(asset_id, expected));

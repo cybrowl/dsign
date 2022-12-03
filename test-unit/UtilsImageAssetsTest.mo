@@ -74,7 +74,7 @@ let success = run([
 			it(
 				"should return image id [local]",
 				do {
-					let url = "http://localhost:8000/image/snap/77R4744E1K56EFF1GEG31R09EE?canisterId=6cnwd-nyaaa-aaaaa-aabfa-cai";
+					let url = "http://localhost:8080/image/snap/77R4744E1K56EFF1GEG31R09EE?canisterId=6cnwd-nyaaa-aaaaa-aabfa-cai";
 					let expected = "77R4744E1K56EFF1GEG31R09EE";
 					let image_id = Utils.get_image_id(url);
 					assertTrue(Text.equal(image_id, expected));
@@ -113,7 +113,7 @@ let success = run([
 					let image_id = "77R4744E1K56EFF1GEG31R09EE";
 					let asset_type = "snap";
 					let isProduction = false;
-					let expected = "http://localhost:8000/image/snap/77R4744E1K56EFF1GEG31R09EE?canisterId=6cnwd-nyaaa-aaaaa-aabfa-cai";
+					let expected = "http://localhost:8080/image/snap/77R4744E1K56EFF1GEG31R09EE?canisterId=6cnwd-nyaaa-aaaaa-aabfa-cai";
 					let url = Utils.generate_image_url(canister_id, image_id, asset_type, isProduction);
 					assertTrue(Text.equal(url, expected));
 				}

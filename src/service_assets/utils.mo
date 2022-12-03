@@ -26,7 +26,7 @@ module {
 		if (args.is_prod == false) {
 			url := Text.join(
 				"",
-				(["http://localhost:8000/asset/", args.asset_id, "?canisterId=", args.canister_id].vals())
+				(["http://localhost:8080/asset/", args.asset_id, "?canisterId=", args.canister_id].vals())
 			);
 		};
 
