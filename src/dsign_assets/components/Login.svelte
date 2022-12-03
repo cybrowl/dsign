@@ -23,12 +23,10 @@
 	const isProd = env['DFX_NETWORK'] === 'ic' || false;
 
 	onMount(async () => {
-		// on component load check if user logged in
 		let authClient = await AuthClient.create();
+		let isAuthenticated = await authClient.isAuthenticated();
 
 		auth_client.set(authClient);
-
-		let isAuthenticated = await authClient.isAuthenticated();
 
 		if (isAuthenticated) {
 			handleAuth();
@@ -69,7 +67,7 @@
 		}
 	});
 
-	function handleAuth(should_refresh = false) {
+	function handleAuth() {
 		actor_assets_file_chunks.update(() => ({
 			loggedIn: true,
 			actor: createActor({
@@ -120,6 +118,8 @@
 	}
 
 	function login() {
+		console.log('$auth_client: ', $auth_client);
+
 		$auth_client.login({
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'

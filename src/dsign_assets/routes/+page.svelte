@@ -6,7 +6,6 @@
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 
-	import AccountCreationModal from '../modals/AccountCreationModal.svelte';
 	import AccountSettingsModal from '../modals/AccountSettingsModal.svelte';
 	import SnapCreationModal from '../modals/SnapCreationModal.svelte';
 
@@ -36,19 +35,15 @@
 		isAuthenticated = await authClient.isAuthenticated();
 
 		try {
-			const res = await $actor_explore.actor.length();
-
-			console.log('res', res);
-
 			const all_snaps = await $actor_explore.actor.get_all_snaps();
-
-			console.log('all_snaps', all_snaps);
 
 			if (all_snaps) {
 				explore_store.set({ isFetching: false, snaps: [...all_snaps] });
 			}
 		} catch (error) {
-			console.log('error', error);
+			console.log('error: call', error);
+
+			await authClient.logout();
 		}
 	});
 </script>
@@ -68,11 +63,6 @@
 	<!-- AccountSettingsModal -->
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
-	{/if}
-
-	<!-- AccountCreationModal -->
-	{#if $modal_visible.account_creation}
-		<AccountCreationModal />
 	{/if}
 
 	<!-- SnapCreationModal -->

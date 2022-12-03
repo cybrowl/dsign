@@ -56,8 +56,6 @@
 	}
 
 	async function handleLogOut() {
-		await $auth_client.logout();
-
 		actor_assets_file_chunks.update(() => ({
 			loggedIn: false,
 			actor: createActor({
@@ -105,6 +103,8 @@
 				identity: $auth_client.getIdentity()
 			})
 		}));
+
+		await $auth_client.logout();
 
 		local_storage_remove('profile');
 

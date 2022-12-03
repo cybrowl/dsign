@@ -5,7 +5,7 @@
 
 	import { actor_profile } from '../store/actors';
 
-	import { modal_visible } from '../store/modal';
+	import modal_update from '$stores_ref/modal_update';
 	import { local_storage_profile } from '../store/local_storage';
 
 	let hasAccount = true;
@@ -14,6 +14,7 @@
 		try {
 			let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
 
+			console.log('err_profile: ', err_profile);
 			if (err_profile) {
 				hasAccount = false;
 			}
@@ -30,30 +31,15 @@
 
 		// account creation modal should be visible when user hasn't created an account
 		if (!hasAccount) {
-			modal_visible.update((options) => {
-				return {
-					...options,
-					account_creation: !options.account_creation
-				};
-			});
+			modal_update.change_visibility('account_creation');
 		}
 	});
 
 	async function openSettingsModal() {
 		if (hasAccount) {
-			modal_visible.update((options) => {
-				return {
-					...options,
-					account_settings: !options.account_settings
-				};
-			});
+			modal_update.change_visibility('account_settings');
 		} else {
-			modal_visible.update((options) => {
-				return {
-					...options,
-					account_creation: !options.account_creation
-				};
-			});
+			modal_update.change_visibility('account_creation');
 		}
 	}
 </script>
