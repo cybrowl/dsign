@@ -8,16 +8,14 @@
 	import { modal_visible } from '../store/modal';
 	import { local_storage_profile } from '../store/local_storage';
 
-	let hasAccount = false;
-
-	let profilePromise = $actor_profile.actor.get_profile();
+	let hasAccount = true;
 
 	onMount(async () => {
 		try {
-			let { ok: profile } = await profilePromise;
+			let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
 
-			if (profile) {
-				hasAccount = true;
+			if (err_profile) {
+				hasAccount = false;
 			}
 
 			// save to local storage every time
@@ -26,6 +24,7 @@
 				username: get(profile, 'username', '')
 			});
 		} catch (error) {
+			hasAccount = false;
 			console.log('error: ', error);
 		}
 
