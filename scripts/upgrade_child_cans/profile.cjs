@@ -16,7 +16,7 @@ const {
 	canister_child_ledger_canister_id,
 	profile_canister_id
 } = require('../../test-utils/actor_canister_ids.cjs');
-const canister_ids = require('../../canister_ids.json');
+// const canister_ids = require('../../canister_ids.json');
 
 const parseIdentity = (keyPath) => {
 	const rawKey = fs
@@ -54,10 +54,10 @@ const get_wasm = (name) => {
 	return [...new Uint8Array(buffer)];
 };
 
-const get_wasm_prod = (name) => {
-	const buffer = readFileSync(`${process.cwd()}/.dfx/ic/canisters/${name}/${name}.wasm`);
-	return [...new Uint8Array(buffer)];
-};
+// const get_wasm_prod = (name) => {
+// 	const buffer = readFileSync(`${process.cwd()}/.dfx/ic/canisters/${name}/${name}.wasm`);
+// 	return [...new Uint8Array(buffer)];
+// };
 
 const get_actor = async (canisterId, can_interface, is_prod) => {
 	const host = is_prod ? `https://${canisterId}.ic0.app/` : `http://127.0.0.1:8080`;
