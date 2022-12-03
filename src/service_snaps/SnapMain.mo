@@ -7,9 +7,11 @@ import Iter "mo:base/Iter";
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
+import Time "mo:base/Time";
 import Result "mo:base/Result";
 
 import Assets "../service_assets/Assets";
+import CanisterChildLedger "canister:canister_child_ledger";
 import FileAssetChunks "canister:assets_file_chunks";
 import ImageAssets "../service_assets_img/ImageAssets";
 import ImageAssetStaging "canister:assets_img_staging";
@@ -17,6 +19,7 @@ import Logger "canister:logger";
 import Snap "Snap";
 
 import Types "./types";
+import CanisterLedgerTypes "../types/canister_child_ledger.types";
 import Utils "../utils/utils";
 
 actor SnapMain {
@@ -39,6 +42,8 @@ actor SnapMain {
 	type AssetsActor = Types.AssetsActor;
 	type ImageAssetsActor = Types.ImageAssetsActor;
 	type SnapActor = Types.SnapActor;
+
+	type CanisterChild = CanisterLedgerTypes.CanisterChild;
 
 	let ACTOR_NAME : Text = "SnapMain";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
@@ -358,6 +363,16 @@ actor SnapMain {
 		let principal = Principal.fromActor(assets_actor);
 
 		assets_canister_id := Principal.toText(principal);
+
+		let canister_child : CanisterChild = {
+			created = Time.now();
+			id = assets_canister_id;
+			name = "assets";
+			parent_name = ACTOR_NAME;
+			isProd = is_prod;
+		};
+
+		ignore CanisterChildLedger.save_canister(canister_child);
 	};
 
 	private func create_image_assets_canister(snap_main_principal : Principal, is_prod : Bool) : async () {
@@ -366,11 +381,22 @@ actor SnapMain {
 		let principal = Principal.fromActor(image_assets_actor);
 
 		image_assets_canister_id := Principal.toText(principal);
+
+		let canister_child : CanisterChild = {
+			created = Time.now();
+			id = image_assets_canister_id;
+			name = "image_assets";
+			parent_name = ACTOR_NAME;
+			isProd = is_prod;
+		};
+
+		ignore CanisterChildLedger.save_canister(canister_child);
 	};
 
 	private func create_snap_canister(
 		snap_main_principal : Principal,
-		project_main_principal : Principal
+		project_main_principal : Principal,
+		is_prod : Bool
 	) : async () {
 		Cycles.add(CYCLE_AMOUNT);
 		let snap_actor = await Snap.Snap(
@@ -380,6 +406,16 @@ actor SnapMain {
 
 		let principal = Principal.fromActor(snap_actor);
 		snap_canister_id := Principal.toText(principal);
+
+		let canister_child : CanisterChild = {
+			created = Time.now();
+			id = snap_canister_id;
+			name = "snap";
+			parent_name = ACTOR_NAME;
+			isProd = is_prod;
+		};
+
+		ignore CanisterChildLedger.save_canister(canister_child);
 	};
 
 	// INIT CANISTERS
@@ -435,7 +471,7 @@ actor SnapMain {
 		};
 
 		if (has_snap_canister_id == false) {
-			await create_snap_canister(snap_main_principal, project_main_principal);
+			await create_snap_canister(snap_main_principal, project_main_principal, is_prod);
 
 			ignore Logger.log_event(
 				tags,

@@ -7,9 +7,18 @@ const { Secp256k1KeyIdentity } = require('@dfinity/identity');
 const sha256 = require('sha256');
 const fs = require('fs');
 const Path = require('path');
-const { project_main_interface } = require('../../test-utils/actor_interface.cjs');
-const { project_main_canister_id } = require('../../test-utils/actor_canister_ids.cjs');
+
+const {
+	canister_child_ledger_interface,
+	project_main_interface
+} = require('../../test-utils/actor_interface.cjs');
+const {
+	canister_child_ledger_canister_id,
+	project_main_canister_id
+} = require('../../test-utils/actor_canister_ids.cjs');
 const canister_ids = require('../../canister_ids.json');
+
+global.fetch = fetch;
 
 const parseIdentity = (keyPath) => {
 	const rawKey = fs
@@ -76,7 +85,7 @@ const installCode = async () => {
 	// 		description: 'upgrades child canister using test_project wasm',
 	// 		is_prod: true,
 	// 		canister_id: canister_ids['project_main'].ic,
-	// 		can_interface: project_main_interface,
+	// 		can_interface: canister_child_ledger_interface, ,
 	// 		child_canister_principal: Principal.fromText('txssk-maaaa-aaaaa-aaanq-cai'),
 	// 		wasm: get_wasm_prod('test_project'),
 	// 		arg: IDL.encode([IDL.Principal], [Principal.fromText(canister_ids['project_main'].ic)])
@@ -104,17 +113,27 @@ const installCode = async () => {
 	if (run_in_prod === false) {
 		console.log('Running in local canisters.');
 
-		local_canisters.forEach(async (canister) => {
-			const actor = await get_actor(canister.canister_id, canister.can_interface, canister.is_prod);
+		const canister_child_ledger_actor = await get_actor(
+			canister_child_ledger_canister_id,
+			canister_child_ledger_interface,
+			false
+		);
 
-			const res = await actor.install_code(
-				canister.child_canister_principal,
-				[...canister.arg],
-				canister.wasm
-			);
+		const canister_children = await canister_child_ledger_actor.get_canisters();
 
-			console.log('res: ', res);
-		});
+		console.log('canister_children', canister_children);
+
+		// local_canisters.forEach(async (canister) => {
+		// 	const actor = await get_actor(canister.canister_id, canister.can_interface, canister.is_prod);
+
+		// 	const res = await actor.install_code(
+		// 		canister.child_canister_principal,
+		// 		[...canister.arg],
+		// 		canister.wasm
+		// 	);
+
+		// 	console.log('res: ', res);
+		// });
 	} else {
 		console.log('Running in prod canisters.');
 

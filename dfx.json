@@ -25,6 +25,11 @@
         "logger"
       ]
     },
+    "canister_child_ledger": {
+      "main": "src/service_canister_child_ledger/CanisterChildLedger.mo",
+      "type": "motoko",
+      "dependencies": []
+    },
     "explore": {
       "main": "src/service_explore/Explore.mo",
       "type": "motoko",
@@ -54,6 +59,7 @@
       "dependencies": [
         "assets_file_chunks",
         "assets_img_staging",
+        "canister_child_ledger",
         "explore",
         "logger",
         "profile"

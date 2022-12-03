@@ -114,6 +114,8 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 				};
 			};
 		};
+
+		ignore Explore.delete_snaps(snap_ids);
 	};
 
 	// NOTE: only called from Project Main

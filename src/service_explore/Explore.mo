@@ -24,7 +24,18 @@ actor Explore = {
 	public shared func save_snap(snap : SnapPublic) : async Text {
 		snaps.put(snap.id, snap);
 
-		return "meow";
+		return "Saved Snap";
+	};
+
+	public shared func delete_snaps(snap_ids : [SnapID]) : async () {
+		for (snap_id in snap_ids.vals()) {
+			switch (snaps.get(snap_id)) {
+				case null {};
+				case (?snap) {
+					snaps.delete(snap_id);
+				};
+			};
+		};
 	};
 
 	public query func get_all_snaps() : async [SnapPublic] {
