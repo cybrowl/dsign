@@ -21,7 +21,7 @@
 	import { actor_profile, actor_project_main } from '$stores_ref/actors';
 	import { project_store } from '$stores_ref/fetch_store';
 
-	import { local_storage_profile } from '$stores_ref/local_storage';
+	import { local_storage_profile, local_storage_projects } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
 	import modal_update from '$stores_ref/modal_update';
 	import { page_navigation } from '$stores_ref/page_navigation';
@@ -43,6 +43,15 @@
 		let authClient = await AuthClient.create();
 
 		isAuthenticated = await authClient.isAuthenticated();
+
+		if ($project_store.projects.length === 0) {
+			project_store.update(({ projects }) => {
+				return {
+					isFetching: true,
+					projects: projects
+				};
+			});
+		}
 
 		try {
 			const { ok: profile_, err: err_profile } = await $actor_profile.actor.get_profile_public(
@@ -153,6 +162,19 @@
 
 	<!-- Projects -->
 	{#if $profile_tabs.isProjectsSelected}
+		<!-- Fetching Projects -->
+		{#if $project_store.isFetching === true}
+			<div
+				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
+			>
+				{#each { length: $local_storage_projects.all_projects_count } as _, i}
+					<ProjectCard isLoadingProject={true} />
+				{/each}
+			</div>
+		{/if}
+
+		<!-- Project -->
 		<div
 			class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
 			row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"

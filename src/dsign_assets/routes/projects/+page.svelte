@@ -61,6 +61,15 @@
 			});
 		}
 
+		if ($project_store.projects.length === 0) {
+			project_store.update(({ projects }) => {
+				return {
+					isFetching: true,
+					projects: projects
+				};
+			});
+		}
+
 		if ($project_store.projects.length > 0) {
 			projects_tabs.set({
 				isSnapsSelected: false,
@@ -357,6 +366,19 @@
 
 	<!-- Projects -->
 	{#if $projects_tabs.isProjectsSelected}
+		<!-- Fetching Projects -->
+		{#if $project_store.isFetching === true}
+			<div
+				class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
+				row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
+			>
+				{#each { length: $local_storage_projects.all_projects_count } as _, i}
+					<ProjectCard isLoadingProject={true} />
+				{/each}
+			</div>
+		{/if}
+
+		<!-- Projects -->
 		<div
 			class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
 			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
