@@ -129,6 +129,12 @@ actor Profile = {
 					url = "";
 					exists = false;
 				};
+				banner = {
+					id = "";
+					canister_id = "";
+					url = "";
+					exists = false;
+				};
 				created = Time.now();
 				username = username;
 			};
@@ -216,59 +222,88 @@ actor Profile = {
 
 	// ------------------------- Profile Methods -------------------------
 	public shared ({ caller }) func update_profile_avatar(img_asset_ids : [Nat]) : async Result.Result<Text, ErrProfile> {
-		var profile = {
-			avatar = {
-				id = "";
-				canister_id = "";
-				url = "";
-				exists = false;
-			};
-			created = Time.now();
-			username = "";
-		};
-
 		switch (profiles.get(caller)) {
 			case (null) {
 				return #err(#ProfileNotFound);
 			};
-			case (?profile_) {
-				profile := profile_;
-			};
-		};
+			case (?profile) {
+				if (profile.avatar.exists == false) {
+					let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
 
-		if (profile.avatar.exists == false) {
-			let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
+					switch (await image_assets_actor.save_images(img_asset_ids, "avatar", caller)) {
+						case (#err err) {
+							return #err(#ErrorCall(debug_show (err)));
+						};
+						case (#ok images) {
+							let image = images[0];
 
-			switch (await image_assets_actor.save_images(img_asset_ids, "avatar", caller)) {
-				case (#err err) {
-					return #err(#ErrorCall(debug_show (err)));
-				};
-				case (#ok images) {
-					let image = images[0];
+							let profile_modified = {
+								profile with avatar = {
+									id = image.id;
+									canister_id = image.canister_id;
+									url = image.url;
+									exists = true;
+								};
+							};
 
-					let profile_modified = {
-						profile with avatar = {
-							id = image.id;
-							canister_id = image.canister_id;
-							url = image.url;
-							exists = true;
+							profiles.put(caller, profile_modified);
+
+							return #ok(profile_modified.avatar.url);
 						};
 					};
+				} else {
+					let image_assets_actor = actor (profile.avatar.canister_id) : ImageAssetsActor;
 
-					profiles.put(caller, profile_modified);
+					ignore image_assets_actor.update_image(img_asset_ids[0], profile.avatar.id, "avatar", caller);
 
-					return #ok(profile_modified.avatar.url);
+					return #ok("updated avatar");
 				};
 			};
-		} else {
-			let image_assets_actor = actor (profile.avatar.canister_id) : ImageAssetsActor;
-
-			ignore image_assets_actor.update_image(img_asset_ids[0], profile.avatar.id, "avatar", caller);
-
-			return #ok("updated avatar");
 		};
+
 	};
 
+	public shared ({ caller }) func update_profile_banner(img_asset_ids : [Nat]) : async Result.Result<Text, ErrProfile> {
+		switch (profiles.get(caller)) {
+			case (null) {
+				return #err(#ProfileNotFound);
+			};
+			case (?profile) {
+				if (profile.banner.exists == false) {
+					let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
+
+					switch (await image_assets_actor.save_images(img_asset_ids, "banner", caller)) {
+						case (#err err) {
+							return #err(#ErrorCall(debug_show (err)));
+						};
+						case (#ok images) {
+							let image = images[0];
+
+							let profile_modified = {
+								profile with banner = {
+									id = image.id;
+									canister_id = image.canister_id;
+									url = image.url;
+									exists = true;
+								};
+							};
+
+							profiles.put(caller, profile_modified);
+
+							return #ok(profile_modified.banner.url);
+						};
+					};
+				} else {
+					let image_assets_actor = actor (profile.banner.canister_id) : ImageAssetsActor;
+
+					ignore image_assets_actor.update_image(img_asset_ids[0], profile.banner.id, "banner", caller);
+
+					return #ok("updated banner");
+				};
+			};
+		};
+
+	};
 	//TODO: update_profile
 
 	public query ({ caller }) func get_profile() : async Result.Result<Profile, ErrProfile> {

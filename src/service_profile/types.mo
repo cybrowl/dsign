@@ -17,6 +17,12 @@ module {
 			url : Text;
 			exists : Bool;
 		};
+		banner : {
+			id : Text;
+			canister_id : Text;
+			url : Text;
+			exists : Bool;
+		};
 		created : Int;
 		username : Username;
 	};
