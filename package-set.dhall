@@ -16,14 +16,14 @@ let additions = [
   },
   {
     name = "io",
-    repo = "https://github.com/aviate-labs/io.mo",
+    repo = "https://github.com/cybrowl/io.mo",
     version = "main",
     dependencies = [ "base" ]
   },
   {
     name = "rand",
-    repo = "https://github.com/aviate-labs/rand.mo",
-    version = "be7f60e428a3805141cd4e2741c2b493086bca0f",
+    repo = "https://github.com/cybrowl/rand.mo.git",
+    version = "main",
     dependencies = [ "base" ]
   },
   {

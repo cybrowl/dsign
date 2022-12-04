@@ -30,7 +30,6 @@
 		auth_client.set(authClient);
 
 		if (isAuthenticated) {
-			console.log('isAuthenticated: ', isAuthenticated);
 			handleAuth();
 		} else {
 			handleLogout();
