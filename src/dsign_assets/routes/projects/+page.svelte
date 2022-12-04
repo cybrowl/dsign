@@ -6,9 +6,10 @@
 	import Login from '../../components/Login.svelte';
 	import Notification from 'dsign-components/components/Notification.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
+	import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
+	import ProjectCardEmpty from 'dsign-components/components/ProjectCardEmpty.svelte';
 	import ProjectEditActionsBar from 'dsign-components/components/ProjectEditActionsBar.svelte';
 	import ProjectsTabs from 'dsign-components/components/ProjectsTabs.svelte';
-	import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 	import SnapCardEmpty from 'dsign-components/components/SnapCardEmpty.svelte';
 
@@ -26,6 +27,7 @@
 	import { local_storage_snaps, local_storage_projects } from '../../store/local_storage';
 
 	import { modal_visible } from '../../store/modal';
+	import modal_update from '$stores_ref/modal_update';
 	import { notification_visible, notification } from '../../store/notification';
 	import { page_navigation } from '../../store/page_navigation';
 	import { project_store, snap_store } from '../../store/fetch_store';
@@ -211,12 +213,7 @@
 		const selected_snaps = snaps.filter((snap) => snap.isSelected === true);
 
 		if (selected_snaps.length > 0) {
-			modal_visible.update((options) => {
-				return {
-					...options,
-					snaps_move: !options.snaps_move
-				};
-			});
+			modal_update.change_visibility('snaps_move');
 		}
 	}
 
@@ -234,23 +231,13 @@
 	}
 
 	function handleProjectRenameModalOpen(e) {
-		modal_visible.update((options) => {
-			return {
-				...options,
-				project_rename: !options.project_rename
-			};
-		});
+		modal_update.change_visibility('project_rename');
 
 		project = get(e, 'detail');
 	}
 
 	async function handleProjectDeleteModalOpen(e) {
-		modal_visible.update((options) => {
-			return {
-				...options,
-				project_options: !options.project_options
-			};
-		});
+		modal_update.change_visibility('project_options');
 
 		project = get(e, 'detail');
 	}
@@ -344,7 +331,9 @@
 				class="col-start-2 col-end-12 grid grid-cols-4 
 			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 			>
-				<SnapCardEmpty />
+				<SnapCardEmpty
+					on:clickSnapCardEmpty={() => modal_update.change_visibility('snap_creation')}
+				/>
 			</div>
 		{/if}
 
@@ -372,6 +361,18 @@
 				{#each { length: $local_storage_projects.all_projects_count } as _, i}
 					<ProjectCard isLoadingProject={true} />
 				{/each}
+			</div>
+		{/if}
+
+		<!-- No Projects Found -->
+		{#if $project_store.projects.length === 0 && $project_store.isFetching === false}
+			<div
+				class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
+				row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
+			>
+				<ProjectCardEmpty
+					on:clickProjectCardEmpty={() => modal_update.change_visibility('project_creation')}
+				/>
 			</div>
 		{/if}
 
