@@ -36,8 +36,10 @@
 
 			let { ok: profile } = await $actor_profile.actor.get_profile();
 
+			const randomNumber = Math.floor(Math.random() * 1000);
 			local_storage_profile.set({
-				avatar_url: get(profile, 'avatar.url', '') + '&' + Math.floor(Math.random() * 100),
+				avatar_url: get(profile, 'avatar.url', '') + '&' + randomNumber,
+				banner_url: get(profile, 'banner.url', '') || '/default_profile_banner.png',
 				username: get(profile, 'username', ''),
 				website: ''
 			});

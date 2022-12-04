@@ -17,7 +17,7 @@
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 
 	// stores
-	import { actor_profile, actor_project_main } from '$stores_ref/actors';
+	import { actor_assets_img_staging, actor_profile, actor_project_main } from '$stores_ref/actors';
 	import { project_store } from '$stores_ref/fetch_store';
 
 	import { local_storage_profile, local_storage_projects } from '$stores_ref/local_storage';
@@ -44,12 +44,7 @@
 		isAuthenticated = await authClient.isAuthenticated();
 
 		if ($project_store.projects.length === 0) {
-			project_store.update(({ projects }) => {
-				return {
-					isFetching: true,
-					projects: projects
-				};
-			});
+			project_store.set({ isFetching: true, projects: [] });
 		}
 
 		try {
@@ -57,6 +52,12 @@
 				$page.params.slug
 			);
 			profile = profile_;
+
+			local_storage_profile.set({
+				avatar_url: get(profile, 'avatar.url', ''),
+				banner_url: get(profile, 'banner.url', '') || '/default_profile_banner.png',
+				username: get(profile, 'username', '')
+			});
 
 			if (isAuthenticated) {
 				const { ok: profile_, err: err_profile } = await $actor_profile.actor.get_profile();
@@ -103,6 +104,34 @@
 			isProjectSelected: true
 		});
 	}
+
+	async function handleProfileBannerChange(event) {
+		let files = event.detail;
+
+		const selectedFile = files[0];
+
+		const imageAsUnit8ArrayBuffer = new Uint8Array(await selectedFile.arrayBuffer());
+		const create_asset_args = {
+			data: [...imageAsUnit8ArrayBuffer],
+			file_format: selectedFile.type
+		};
+
+		try {
+			let img_asset_id = await $actor_assets_img_staging.actor.create_asset(create_asset_args);
+			await $actor_profile.actor.update_profile_banner([img_asset_id]);
+
+			let { ok: profile_ } = await $actor_profile.actor.get_profile();
+
+			const randomNumber = Math.floor(Math.random() * 1000);
+			local_storage_profile.set({
+				avatar_url: get(profile_, 'avatar.url', ''),
+				banner_url: get(profile_, 'banner.url', '') + '&' + randomNumber,
+				username: get(profile_, 'username', '')
+			});
+		} catch (error) {
+			console.log('error', error);
+		}
+	}
 </script>
 
 <svelte:head>
@@ -129,7 +158,7 @@
 	<!-- ProfileInfo -->
 	<div class="relative col-start-2 col-end-4 row-start-2 row-end-3">
 		<ProfileInfo
-			avatar={get(profile, 'avatar.url', '')}
+			avatar={$local_storage_profile.avatar_url}
 			is_authenticated={isProfileOwner}
 			username={get(profile, 'username', '')}
 			on:editProfile={openAccountSettingsModal}
@@ -140,7 +169,8 @@
 	<div class="col-start-4 col-end-12 row-start-2 row-end-3">
 		<ProfileBanner
 			is_authenticated={isProfileOwner}
-			profile_banner_url="/default_profile_banner.png"
+			profile_banner_url={$local_storage_profile.banner_url}
+			on:profileBannerChange={handleProfileBannerChange}
 		/>
 	</div>
 
