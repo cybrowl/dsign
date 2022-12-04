@@ -76,7 +76,7 @@
 	{#if $explore_store.snaps.length > 0}
 		<div
 			class="col-start-2 col-end-12 grid grid-cols-4 
-						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
+						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-20 mt-2 mb-24"
 		>
 			{#each $explore_store.snaps as snap}
 				<SnapCard {snap} showUsername={true} />
