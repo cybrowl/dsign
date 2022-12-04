@@ -1,6 +1,5 @@
 <!-- src/routes/favorites.svelte -->
 <script>
-	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
 	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
 	import Login from '../../components/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
@@ -35,11 +34,6 @@
 	<!-- AccountSettingsModal -->
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
-	{/if}
-
-	<!-- AccountCreationModal -->
-	{#if $modal_visible.account_creation}
-		<AccountCreationModal />
 	{/if}
 
 	<!-- SnapCreationModal -->

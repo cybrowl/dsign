@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import Avatar from 'dsign-components/components/Avatar.svelte';
 	import get from 'lodash/get.js';
 
@@ -8,15 +9,12 @@
 	import modal_update from '$stores_ref/modal_update';
 	import { local_storage_profile } from '../store/local_storage';
 
-	let hasAccount = true;
-
 	onMount(async () => {
 		try {
 			let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
 
-			console.log('err_profile: ', err_profile);
 			if (err_profile) {
-				hasAccount = false;
+				goto('/account_creation');
 			}
 
 			// save to local storage every time
@@ -25,22 +23,12 @@
 				username: get(profile, 'username', '')
 			});
 		} catch (error) {
-			hasAccount = false;
-			console.log('error: ', error);
-		}
-
-		// account creation modal should be visible when user hasn't created an account
-		if (!hasAccount) {
-			modal_update.change_visibility('account_creation');
+			goto('/');
 		}
 	});
 
 	async function openSettingsModal() {
-		if (hasAccount) {
-			modal_update.change_visibility('account_settings');
-		} else {
-			modal_update.change_visibility('account_creation');
-		}
+		modal_update.change_visibility('account_settings');
 	}
 </script>
 

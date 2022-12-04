@@ -79,7 +79,7 @@
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 		>
 			{#each $explore_store.snaps as snap}
-				<SnapCard {snap} />
+				<SnapCard {snap} showUsername={true} />
 			{/each}
 		</div>
 	{/if}

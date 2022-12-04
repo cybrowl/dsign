@@ -6,7 +6,6 @@
 	import get from 'lodash/get';
 
 	// components
-	import AccountCreationModal from '$modals_ref/AccountCreationModal.svelte';
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import Login from '$components_ref/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
@@ -71,6 +70,8 @@
 
 			if (all_projects) {
 				project_store.set({ isFetching: false, projects: [...all_projects] });
+			} else {
+				project_store.set({ isFetching: false, projects: [] });
 			}
 		} catch (error) {
 			// Show error notification
@@ -118,11 +119,6 @@
 	<!-- AccountSettingsModal -->
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
-	{/if}
-
-	<!-- AccountCreationModal -->
-	{#if $modal_visible.account_creation}
-		<AccountCreationModal />
 	{/if}
 
 	<!-- SnapCreationModal -->

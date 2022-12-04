@@ -12,7 +12,6 @@
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 	import SnapCardEmpty from 'dsign-components/components/SnapCardEmpty.svelte';
 
-	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
 	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
 	import SnapsMoveModal from '../../modals/SnapsMoveModal.svelte';
 	import ProjectCreationModal from '../../modals/ProjectCreationModal.svelte';
@@ -87,14 +86,13 @@
 					const { ok: all_projects, err: err_all_projects } = projects;
 					const { ok: all_snaps, err: err_all_snaps } = snaps;
 
-					console.log('all_snaps', all_snaps);
-					console.log('all_projects', all_projects);
-
 					if (all_snaps) {
 						snap_store.set({ isFetching: false, snaps: [...all_snaps] });
 
 						local_storage_snaps.set({ all_snaps_count: all_snaps.length || 1 });
 					} else {
+						snap_store.set({ isFetching: false, snaps: [] });
+
 						if (err_all_snaps['UserNotFound'] === true) {
 							await $actor_snap_main.actor.create_user_snap_storage();
 						}
@@ -105,6 +103,8 @@
 
 						local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
 					} else {
+						project_store.set({ isFetching: false, projects: [] });
+
 						if (err_all_projects['UserNotFound'] === true) {
 							await $actor_project_main.actor.create_user_project_storage();
 						}
@@ -269,9 +269,6 @@
 	</div>
 
 	<!-- Modals -->
-	{#if $modal_visible.account_creation}
-		<AccountCreationModal />
-	{/if}
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}

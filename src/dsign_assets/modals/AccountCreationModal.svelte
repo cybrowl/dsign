@@ -61,7 +61,7 @@
 	}
 </script>
 
-<Modal isModalLocked={isCreatingAccount}>
+<Modal isModalLocked={true}>
 	{#if createdAccount}
 		{#if isVisible}
 			<AccountCreationSuccess />
