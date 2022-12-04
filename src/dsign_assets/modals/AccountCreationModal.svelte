@@ -17,7 +17,6 @@
 	let username_input_err = '';
 	let hasError = false;
 	let isCreatingAccount = false;
-	let isVisible = true;
 
 	onMount(async () => {
 		await $actor_project_main.actor.create_user_project_storage();
@@ -47,7 +46,6 @@
 				createdAccount = true;
 
 				setTimeout(function () {
-					isVisible = false;
 					location.replace('/projects');
 				}, 2000);
 			}
@@ -63,9 +61,7 @@
 
 <Modal isModalLocked={true}>
 	{#if createdAccount}
-		{#if isVisible}
-			<AccountCreationSuccess />
-		{/if}
+		<AccountCreationSuccess />
 	{:else}
 		<AccountCreation
 			on:click={handleAccountCreation}

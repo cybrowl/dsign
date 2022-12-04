@@ -113,6 +113,7 @@
 					}
 				});
 			} catch (error) {
+				location.replace('/');
 				console.log('error: call', error);
 			}
 		} else {
