@@ -20,7 +20,7 @@
 	import { actor_assets_img_staging, actor_profile, actor_project_main } from '$stores_ref/actors';
 	import { project_store } from '$stores_ref/fetch_store';
 
-	import { local_storage_profile, local_storage_projects } from '$stores_ref/local_storage';
+	import { local_storage_profile_public, local_storage_projects } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
 	import modal_update from '$stores_ref/modal_update';
 	import { page_navigation } from '$stores_ref/page_navigation';
@@ -53,10 +53,10 @@
 			);
 			profile = profile_;
 
-			local_storage_profile.set({
-				avatar_url: get(profile, 'avatar.url', ''),
-				banner_url: get(profile, 'banner.url', '') || '/default_profile_banner.png',
-				username: get(profile, 'username', '')
+			local_storage_profile_public.set({
+				avatar_url: get(profile_, 'avatar.url', ''),
+				banner_url: get(profile_, 'banner.url', '') || '/default_profile_banner.png',
+				username: get(profile_, 'username', '')
 			});
 
 			if (isAuthenticated) {
@@ -123,7 +123,7 @@
 			let { ok: profile_ } = await $actor_profile.actor.get_profile();
 
 			const randomNumber = Math.floor(Math.random() * 1000);
-			local_storage_profile.set({
+			local_storage_profile_public.set({
 				avatar_url: get(profile_, 'avatar.url', ''),
 				banner_url: get(profile_, 'banner.url', '') + '&' + randomNumber,
 				username: get(profile_, 'username', '')
@@ -158,7 +158,7 @@
 	<!-- ProfileInfo -->
 	<div class="relative col-start-2 col-end-4 row-start-2 row-end-3">
 		<ProfileInfo
-			avatar={$local_storage_profile.avatar_url}
+			avatar={$local_storage_profile_public.avatar_url}
 			is_authenticated={isProfileOwner}
 			username={get(profile, 'username', '')}
 			on:editProfile={openAccountSettingsModal}
@@ -169,7 +169,7 @@
 	<div class="col-start-4 col-end-12 row-start-2 row-end-3">
 		<ProfileBanner
 			is_authenticated={isProfileOwner}
-			profile_banner_url={$local_storage_profile.banner_url}
+			profile_banner_url={$local_storage_profile_public.banner_url}
 			on:profileBannerChange={handleProfileBannerChange}
 		/>
 	</div>

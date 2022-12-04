@@ -6,6 +6,13 @@ export const local_storage_profile = writable('profile', {
 	banner_url: '',
 	username: ''
 });
+
+export const local_storage_profile_public = writable('profile_public', {
+	avatar_url: '',
+	banner_url: '',
+	username: ''
+});
+
 export const local_storage_snaps = writable('snaps', { all_snaps_count: '1' });
 export const local_storage_projects = writable('projects', { all_projects_count: '1' });
 
