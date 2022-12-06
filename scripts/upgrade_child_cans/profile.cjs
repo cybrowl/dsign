@@ -142,7 +142,7 @@ const installCode = async () => {
 			const arg_map = {
 				image_assets: IDL.encode(
 					[IDL.Principal, IDL.Bool],
-					[Principal.fromText(canister_ids['profile'].ic), false]
+					[Principal.fromText(canister_ids['profile'].ic), true]
 				)
 			};
 
