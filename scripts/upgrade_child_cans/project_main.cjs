@@ -127,7 +127,7 @@ const installCode = async () => {
 			console.log('done => ', res);
 		});
 	} else {
-		console.log('Running in prod canisters.');
+		console.log('======== Installing Prod Project Main Child Canisters =========');
 
 		// prod_canisters.forEach(async (canister) => {
 		// 	const actor = await get_actor(canister.canister_id, canister.can_interface, canister.is_prod);
