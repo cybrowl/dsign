@@ -517,7 +517,7 @@ actor SnapMain {
 			await ic.install_code({
 				arg = arg;
 				wasm_module = wasm_module;
-				mode = #upgrade;
+				mode = #reinstall;
 				canister_id = canister_id;
 			});
 
