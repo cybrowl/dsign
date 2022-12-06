@@ -17,6 +17,3 @@ dfx canister call snap_main version
 npm run generate_test_interface
 
 # GENERATE WASM FOR NETWORK IC
-# dfx deploy --network=ic --wallet=l2eht-qyaaa-aaaag-aaarq-cai test_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", true)'
-# dfx deploy --network=ic --wallet=l2eht-qyaaa-aaaag-aaarq-cai test_image_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", true)'
-# dfx deploy --network=ic --wallet=l2eht-qyaaa-aaaag-aaarq-cai test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principal "'${PROJECT_MAIN_PRINCIPAL}'")'

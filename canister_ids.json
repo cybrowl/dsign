@@ -11,6 +11,9 @@
   "dsign_assets": {
     "ic": "kqlfj-siaaa-aaaag-aaawq-cai"
   },
+  "explore": {
+    "ic": "72zia-7aaaa-aaaag-aa37a-cai"
+  },
   "logger": {
     "ic": "jaypp-oiaaa-aaaag-aaa6q-cai"
   },
@@ -29,10 +32,10 @@
   "test_image_assets": {
     "ic": "k47zz-giaaa-aaaag-aat6a-cai"
   },
+  "test_project": {
+    "ic": "75you-syaaa-aaaag-aa37q-cai"
+  },
   "test_snap": {
     "ic": "nakl5-yaaaa-aaaag-aay5a-cai"
-  },
-  "username": {
-    "ic": "jco6x-byaaa-aaaag-aatxa-cai"
   }
 }
