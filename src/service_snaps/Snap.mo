@@ -91,11 +91,6 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 		let project_public : ?ProjectPublic = null;
 		let snap_public : SnapPublic = { snap and {} with owner = null; project = project_public };
 
-		ignore Logger.log_event(
-			log_tags,
-			debug_show (snap_public)
-		);
-
 		ignore Explore.save_snap(snap_public);
 
 		return #ok(snap);

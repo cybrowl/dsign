@@ -275,8 +275,6 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 						snaps = Buffer.toArray(snap_list);
 					};
 
-					ignore Logger.log_event(log_tags, debug_show (project_public));
-
 					projects_list.add(project_public);
 				};
 			};

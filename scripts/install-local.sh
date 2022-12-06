@@ -34,3 +34,13 @@ dfx deploy test_image_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", 
 dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principal "'${PROJECT_MAIN_PRINCIPAL}'")'
 
 # killall dfx replica nodemanager
+
+# dfx canister --network ic call canister_child_ledger save_canister \
+# '(record {
+#     created = 1_670_321_001_063_287_000; 
+#     id = "lrr5x-jaaaa-aaaag-aatzq-cai"; 
+#     name = "snap"; 
+#     parent_name = "SnapMain"; 
+#     isProd = true;
+#     })'
+

@@ -29,7 +29,7 @@
     "@dfinity/candid": "^0.14.1",
     "@dfinity/identity": "^0.14.1",
     "@dfinity/principal": "^0.14.1",
-    "dsign-components": "^0.17.0",
+    "dsign-components": "^0.17.1",
     "lodash": "^4.17.21",
     "svelte-local-storage-store": "^0.2.6"
   },

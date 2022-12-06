@@ -5,6 +5,9 @@
   "assets_img_staging": {
     "ic": "jlnvl-xqaaa-aaaag-aatwq-cai"
   },
+  "canister_child_ledger": {
+    "ic": "7t2d4-jiaaa-aaaag-aa36q-cai"
+  },
   "dsign_assets": {
     "ic": "kqlfj-siaaa-aaaag-aaawq-cai"
   },

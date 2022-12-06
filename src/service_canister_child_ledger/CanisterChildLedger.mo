@@ -50,7 +50,7 @@ actor CanisterChildLedger = {
 		let project_main_principal = Principal.fromActor(CanisterChildLedger);
 		let is_production = Text.equal(
 			Principal.toText(project_main_principal),
-			"lyswl-7iaaa-aaaag-aatya-cai"
+			"7t2d4-jiaaa-aaaag-aa36q-cai"
 		);
 
 		is_prod := is_production;
@@ -58,11 +58,13 @@ actor CanisterChildLedger = {
 		let profile : Text = "kxkd5-7qaaa-aaaag-aaawa-cai";
 		let project_main : Text = "nhlnj-vyaaa-aaaag-aay5q-cai";
 		let snap_main : Text = "lyswl-7iaaa-aaaag-aatya-cai";
+		let author : Text = "ru737-xk264-4nswf-o6lzb-3juxx-ixp63-objgb-l4io2-yievs-5ezxe-kqe";
 
-		if (authorized.size() < 3) {
+		if (authorized.size() < 4) {
 			authorized.put(profile, profile);
 			authorized.put(project_main, project_main);
 			authorized.put(snap_main, snap_main);
+			authorized.put(author, author);
 
 			return "added";
 		} else {
