@@ -13,6 +13,7 @@
 	import ProfileInfo from 'dsign-components/components/ProfileInfo.svelte';
 	import ProfileTabs from 'dsign-components/components/ProfileTabs.svelte';
 	import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
+	import ProjectPublicEmpty from 'dsign-components/components/ProjectPublicEmpty.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 
@@ -197,6 +198,16 @@
 				{#each { length: $local_storage_projects.all_projects_count } as _, i}
 					<ProjectCard isLoadingProject={true} />
 				{/each}
+			</div>
+		{/if}
+
+		<!-- No Projects Found -->
+		{#if $project_store.projects.length === 0 && $project_store.isFetching === false}
+			<div
+				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
+			>
+				<ProjectPublicEmpty />
 			</div>
 		{/if}
 
