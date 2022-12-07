@@ -254,9 +254,26 @@ actor Profile = {
 				} else {
 					let image_assets_actor = actor (profile.avatar.canister_id) : ImageAssetsActor;
 
-					ignore image_assets_actor.update_image(img_asset_ids[0], profile.avatar.id, "avatar", caller);
+					switch (await image_assets_actor.update_image(img_asset_ids[0], profile.avatar.id, "avatar", caller)) {
+						case (#err err) {
+							return #err(#ErrorCall(debug_show (err)));
+						};
+						case (#ok image) {
 
-					return #ok("updated avatar");
+							let profile_modified = {
+								profile with avatar = {
+									id = image.id;
+									canister_id = image.canister_id;
+									url = image.url;
+									exists = true;
+								};
+							};
+
+							profiles.put(caller, profile_modified);
+
+							return #ok(profile_modified.avatar.url);
+						};
+					};
 				};
 			};
 		};
