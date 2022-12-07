@@ -1,6 +1,5 @@
 <script>
 	import { onMount } from 'svelte';
-	import { AuthClient } from '@dfinity/auth-client';
 
 	import Login from '../components/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
@@ -9,12 +8,10 @@
 	import AccountSettingsModal from '../modals/AccountSettingsModal.svelte';
 	import SnapCreationModal from '../modals/SnapCreationModal.svelte';
 
-	import { modal_visible } from '../store/modal';
-	import { page_navigation } from '../store/page_navigation';
+	import { modal_visible } from '$stores_ref/modal';
+	import { page_navigation } from '$stores_ref/page_navigation';
 	import { actor_explore } from '$stores_ref/actors.js';
 	import { explore_store } from '$stores_ref/fetch_store.js';
-
-	let isAuthenticated = false;
 
 	page_navigation.update(({ navItems }) => {
 		navItems.forEach((navItem) => {
@@ -27,17 +24,9 @@
 		};
 	});
 
-	console.log('explore_store', $actor_explore.loggedIn);
-
 	onMount(async () => {
-		let authClient = await AuthClient.create();
-
-		isAuthenticated = await authClient.isAuthenticated();
-
 		try {
 			const all_snaps = await $actor_explore.actor.get_all_snaps();
-
-			console.log('all_snaps: ', all_snaps);
 
 			if (all_snaps) {
 				explore_store.set({ isFetching: false, snaps: [...all_snaps] });

@@ -224,7 +224,7 @@ actor Profile = {
 	public shared ({ caller }) func update_profile_avatar(img_asset_ids : [Nat]) : async Result.Result<Text, ErrProfile> {
 		switch (profiles.get(caller)) {
 			case (null) {
-				return #err(#ProfileNotFound);
+				return #err(#ProfileNotFound(true));
 			};
 			case (?profile) {
 				if (profile.avatar.exists == false) {
@@ -283,7 +283,7 @@ actor Profile = {
 	public shared ({ caller }) func update_profile_banner(img_asset_ids : [Nat]) : async Result.Result<Text, ErrProfile> {
 		switch (profiles.get(caller)) {
 			case (null) {
-				return #err(#ProfileNotFound);
+				return #err(#ProfileNotFound(true));
 			};
 			case (?profile) {
 				if (profile.banner.exists == false) {
@@ -326,7 +326,7 @@ actor Profile = {
 	public query ({ caller }) func get_profile() : async Result.Result<Profile, ErrProfile> {
 		switch (profiles.get(caller)) {
 			case (null) {
-				#err(#ProfileNotFound);
+				#err(#ProfileNotFound(true));
 			};
 			case (?profile) {
 				return #ok(profile);
@@ -339,7 +339,7 @@ actor Profile = {
 			case (?principal) {
 				switch (profiles.get(principal)) {
 					case (null) {
-						#err(#ProfileNotFound);
+						#err(#ProfileNotFound(true));
 					};
 					case (?profile) {
 						return #ok(profile);

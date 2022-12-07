@@ -1,10 +1,52 @@
 <!-- src/routes/account_creation.svelte -->
 <script>
-	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
+	import { onMount } from 'svelte';
+	import { AuthClient } from '@dfinity/auth-client';
+
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import Login from '../../components/Login.svelte';
 
-	import { page_navigation } from '../../store/page_navigation';
+	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
+
+	import { page_navigation } from '$stores_ref/page_navigation';
+	import {
+		actor_profile,
+		actor_project_main,
+		actor_snap_main,
+		createActor
+	} from '$stores_ref/actors';
+
+	onMount(async () => {
+		let authClient = await AuthClient.create();
+
+		const isAuthenticated = await authClient.isAuthenticated();
+
+		if (isAuthenticated) {
+			actor_profile.update(() => ({
+				loggedIn: true,
+				actor: createActor({
+					actor_name: 'profile',
+					identity: authClient.getIdentity()
+				})
+			}));
+
+			actor_project_main.update(() => ({
+				loggedIn: true,
+				actor: createActor({
+					actor_name: 'project_main',
+					identity: authClient.getIdentity()
+				})
+			}));
+
+			actor_snap_main.update(() => ({
+				loggedIn: true,
+				actor: createActor({
+					actor_name: 'snap_main',
+					identity: authClient.getIdentity()
+				})
+			}));
+		}
+	});
 </script>
 
 <svelte:head>

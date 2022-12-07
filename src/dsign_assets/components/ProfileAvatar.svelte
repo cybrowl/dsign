@@ -14,7 +14,9 @@
 			let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
 
 			if (err_profile) {
-				goto('/account_creation');
+				if (err_profile['ProfileNotFound'] === true) {
+					goto('/account_creation');
+				}
 			}
 
 			// save to local storage every time

@@ -18,7 +18,12 @@
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 
 	// stores
-	import { actor_assets_img_staging, actor_profile, actor_project_main } from '$stores_ref/actors';
+	import {
+		actor_assets_img_staging,
+		actor_profile,
+		actor_project_main,
+		createActor
+	} from '$stores_ref/actors';
 	import { project_store } from '$stores_ref/fetch_store';
 
 	import { local_storage_profile_public, local_storage_projects } from '$stores_ref/local_storage';
@@ -43,6 +48,32 @@
 		let authClient = await AuthClient.create();
 
 		isAuthenticated = await authClient.isAuthenticated();
+
+		if (isAuthenticated) {
+			actor_profile.update(() => ({
+				loggedIn: true,
+				actor: createActor({
+					actor_name: 'profile',
+					identity: authClient.getIdentity()
+				})
+			}));
+
+			actor_project_main.update(() => ({
+				loggedIn: true,
+				actor: createActor({
+					actor_name: 'project_main',
+					identity: authClient.getIdentity()
+				})
+			}));
+
+			actor_assets_img_staging.update(() => ({
+				loggedIn: true,
+				actor: createActor({
+					actor_name: 'assets_img_staging',
+					identity: authClient.getIdentity()
+				})
+			}));
+		}
 
 		if ($project_store.projects.length === 0) {
 			project_store.set({ isFetching: true, projects: [] });

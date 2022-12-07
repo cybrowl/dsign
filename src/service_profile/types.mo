@@ -28,7 +28,7 @@ module {
 	};
 
 	public type ErrProfile = {
-		#ProfileNotFound;
+		#ProfileNotFound : Bool;
 		#PrincipalNotFoundForUsername;
 		#ErrorCall : Text;
 	};

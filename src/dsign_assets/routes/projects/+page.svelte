@@ -21,17 +21,17 @@
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
 	// actors
-	import { actor_project_main, actor_snap_main } from '../../store/actors';
+	import { actor_project_main, actor_snap_main, createActor } from '$stores_ref/actors';
 
 	// local storage
-	import { local_storage_snaps, local_storage_projects } from '../../store/local_storage';
+	import { local_storage_snaps, local_storage_projects } from '$stores_ref/local_storage';
 
-	import { modal_visible } from '../../store/modal';
+	import { modal_visible } from '$stores_ref/modal';
 	import modal_update from '$stores_ref/modal_update';
-	import { notification_visible, notification } from '../../store/notification';
-	import { page_navigation } from '../../store/page_navigation';
-	import { project_store, snap_store } from '../../store/fetch_store';
-	import { projects_tabs, is_edit_active } from '../../store/page_state';
+	import { notification_visible, notification } from '$stores_ref/notification';
+	import { page_navigation } from '$stores_ref/page_navigation';
+	import { project_store, snap_store } from '$stores_ref/fetch_store';
+	import { projects_tabs, is_edit_active } from '$stores_ref/page_state';
 
 	let isAuthenticated = false;
 
@@ -42,6 +42,23 @@
 
 		isAuthenticated = await authClient.isAuthenticated();
 
+		if (isAuthenticated) {
+			actor_project_main.update(() => ({
+				loggedIn: true,
+				actor: createActor({
+					actor_name: 'project_main',
+					identity: authClient.getIdentity()
+				})
+			}));
+
+			actor_snap_main.update(() => ({
+				loggedIn: true,
+				actor: createActor({
+					actor_name: 'snap_main',
+					identity: authClient.getIdentity()
+				})
+			}));
+		}
 		page_navigation.update(({ navItems }) => {
 			navItems.forEach((navItem) => {
 				navItem.isSelected = false;
