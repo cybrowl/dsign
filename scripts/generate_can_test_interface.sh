@@ -23,6 +23,11 @@ cp .dfx/local/canisters/explore/explore.did.js .dfx/local/canisters/explore/expl
 sed -i '' 's/export//g' .dfx/local/canisters/explore/explore.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/explore/explore.did.test.cjs
 
+# favorite_main
+cp .dfx/local/canisters/favorite_main/favorite_main.did.js .dfx/local/canisters/favorite_main/favorite_main.did.test.cjs
+sed -i '' 's/export//g' .dfx/local/canisters/favorite_main/favorite_main.did.test.cjs
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/favorite_main/favorite_main.did.test.cjs
+
 # logger
 cp .dfx/local/canisters/logger/logger.did.js .dfx/local/canisters/logger/logger.did.test.cjs
 sed -i '' 's/export//g' .dfx/local/canisters/logger/logger.did.test.cjs

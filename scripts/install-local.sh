@@ -21,6 +21,10 @@ dfx deploy logger
 dfx deploy snap_main
 export SNAP_MAIN_PRINCIPAL=$(dfx canister id snap_main)
 
+# snaps
+dfx deploy favorite_main
+export FAVORITE_MAIN_PRINCIPAL=$(dfx canister id favorite_main)
+
 # explore
 dfx deploy explore
 

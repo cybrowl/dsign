@@ -1,13 +1,18 @@
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
+import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
+import Time "mo:base/Time";
 
 import Types "./types";
+import CanisterLedgerTypes "../types/canister_child_ledger.types";
 
+import CanisterChildLedger "canister:canister_child_ledger";
+import Favorite "Favorite";
 import Logger "canister:logger";
 
 actor FavoriteMain {
@@ -20,7 +25,10 @@ actor FavoriteMain {
 
 	type FavoriteActor = Types.FavoriteActor;
 
+	type CanisterChild = CanisterLedgerTypes.CanisterChild;
+
 	let ACTOR_NAME : Text = "FavoriteMain";
+	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
 	let VERSION : Nat = 1;
 
 	var user_canisters_ref : HashMap.HashMap<Principal, FavoriteIDStorage> = HashMap.HashMap(
@@ -83,6 +91,49 @@ actor FavoriteMain {
 		return VERSION;
 	};
 
+	private func create_favorite_canister(favorite_main_principal : Principal, is_prod : Bool) : async () {
+		Cycles.add(CYCLE_AMOUNT);
+		let favorite_actor = await Favorite.Favorite(favorite_main_principal);
+		let principal = Principal.fromActor(favorite_actor);
+
+		favorite_canister_id := Principal.toText(principal);
+
+		let canister_child : CanisterChild = {
+			created = Time.now();
+			id = favorite_canister_id;
+			name = "favorite";
+			parent_name = ACTOR_NAME;
+			isProd = is_prod;
+		};
+
+		ignore CanisterChildLedger.save_canister(canister_child);
+	};
+
+	public shared (msg) func initialize_canisters() : async Text {
+		let tags = [ACTOR_NAME, "initialize_canisters"];
+		let favorite_main_principal = Principal.fromActor(FavoriteMain);
+		let is_prod = Text.equal(
+			Principal.toText(favorite_main_principal),
+			"lyswl-7iaaa-aaaag-aatya-cai"
+		);
+
+		if (favorite_canister_id.size() > 1) {
+			ignore Logger.log_event(
+				tags,
+				debug_show (("favorite_canister_id already set: ", favorite_canister_id))
+			);
+
+			return favorite_canister_id;
+		} else {
+			ignore Logger.log_event(tags, debug_show ("no arg, creating favorite_canister_id"));
+
+			await create_favorite_canister(favorite_main_principal, is_prod);
+
+			return favorite_canister_id;
+		}
+
+	};
+
 	// ------------------------- SYSTEM METHODS -------------------------
 	system func preupgrade() {
 		var anon_principal = Principal.fromText("2vxsx-fae");
@@ -114,8 +165,8 @@ actor FavoriteMain {
 				Text.hash
 			);
 
-			for ((favorite_canister_id, snap_ids) in favorite_ids_storage.vals()) {
-				favorite_ids_storage_temp.put(favorite_canister_id, snap_ids);
+			for ((favorite_canister_id, favorite_ids) in favorite_ids_storage.vals()) {
+				favorite_ids_storage_temp.put(favorite_canister_id, favorite_ids);
 			};
 
 			user_canisters_ref_temp.put(user_principal, favorite_ids_storage_temp);
