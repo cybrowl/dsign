@@ -47,9 +47,9 @@ actor CanisterChildLedger = {
 	};
 
 	public shared func initialize_authorized_principals() : async Text {
-		let project_main_principal = Principal.fromActor(CanisterChildLedger);
+		let canister_child_ledger = Principal.fromActor(CanisterChildLedger);
 		let is_production = Text.equal(
-			Principal.toText(project_main_principal),
+			Principal.toText(canister_child_ledger),
 			"7t2d4-jiaaa-aaaag-aa36q-cai"
 		);
 
