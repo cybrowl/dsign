@@ -37,6 +37,14 @@
         "logger"
       ]
     },
+    "favorite_main": {
+      "main": "src/service_favorites/FavoriteMain.mo",
+      "type": "motoko",
+      "dependencies": [
+        "canister_child_ledger",
+        "logger"
+      ]
+    },
     "profile": {
       "main": "src/service_profile/Profile.mo",
       "type": "motoko",
