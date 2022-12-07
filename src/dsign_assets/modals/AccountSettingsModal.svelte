@@ -110,7 +110,7 @@
 
 		local_storage_remove('profile');
 
-		location.reload();
+		location.replace('/');
 
 		handleCloseModal();
 	}
