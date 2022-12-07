@@ -41,6 +41,31 @@ actor FavoriteMain {
 	stable var favorite_canister_id : Text = "";
 
 	// ------------------------- FAVORITES MANAGEMENT -------------------------
+	public shared ({ caller }) func create_user_favorite_storage() : async Bool {
+		let tags = [ACTOR_NAME, "create_user_favorite_storage"];
+
+		switch (user_canisters_ref.get(caller)) {
+			case (?favorite_canister_ids) {
+				ignore Logger.log_event(tags, "exists, user_favorite_storage");
+
+				return false;
+			};
+			case (_) {
+				var favorite_ids_storage : FavoriteIDStorage = HashMap.HashMap(
+					0,
+					Text.equal,
+					Text.hash
+				);
+
+				user_canisters_ref.put(caller, favorite_ids_storage);
+
+				ignore Logger.log_event(tags, "created, user_favorite_storage");
+
+				return true;
+			};
+		};
+	};
+
 	public shared ({ caller }) func save_snap(snap : SnapPublic) : async Result.Result<Text, ErrSaveFavorite> {
 		let tags = [ACTOR_NAME, "save_snap"];
 
