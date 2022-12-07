@@ -149,7 +149,7 @@
 		</div>
 	{:else}
 		<Button secondary={true} label="Sign In" on:click={login} class="mr-4" />
-		<Button primary={true} label="Let's get started!" />
+		<Button primary={true} label="Let's get started!" on:click={login} />
 	{/if}
 </span>
 
