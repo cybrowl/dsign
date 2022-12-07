@@ -1,7 +1,6 @@
 <script>
 	import { AuthClient } from '@dfinity/auth-client';
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
 	import Button from 'dsign-components/components/Button.svelte';
 	import environment from 'environment';
 	import ProfileAvatar from './ProfileAvatar.svelte';

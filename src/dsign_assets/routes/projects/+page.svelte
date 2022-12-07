@@ -1,5 +1,6 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { AuthClient } from '@dfinity/auth-client';
 	import get from 'lodash/get.js';
 
@@ -130,11 +131,11 @@
 					}
 				});
 			} catch (error) {
-				location.replace('/');
+				goto('/');
 				console.log('error: call', error);
 			}
 		} else {
-			window.location.href = '/';
+			goto('/');
 		}
 	});
 
