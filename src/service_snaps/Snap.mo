@@ -114,14 +114,18 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			};
 			case (?snap) {
 
-				// TODO: only update metrics if caller is favorite main
 				let snap_metrics_updated = {
 					likes = snap.metrics.likes + 1;
 					views = snap.metrics.views;
 				};
 
-				var project_public : ?ProjectPublic = null;
+				let snap_updated = {
+					snap with metrics = snap_metrics_updated;
+				};
 
+				snaps.put(snap.id, snap_updated);
+
+				var project_public : ?ProjectPublic = null;
 				switch (snap.project) {
 					case (null) {};
 					case (?project) {
@@ -131,15 +135,15 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 					};
 				};
 
-				let snap_updated = {
+				let snap_public_updated = {
 					snap with metrics = snap_metrics_updated;
 					project = project_public;
 					owner = null;
 				};
 
-				ignore Explore.save_snap(snap_updated : SnapPublic);
+				ignore Explore.save_snap(snap_public_updated : SnapPublic);
 
-				return #ok(snap_updated);
+				return #ok(snap_public_updated);
 			};
 		};
 	};
