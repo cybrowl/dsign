@@ -15,6 +15,8 @@ import CanisterChildLedger "canister:canister_child_ledger";
 import Favorite "Favorite";
 import Logger "canister:logger";
 
+import Utils "../utils/utils";
+
 actor FavoriteMain {
 	type ErrDeleteFavorite = Types.ErrDeleteFavorite;
 	type ErrGetFavorite = Types.ErrGetFavorite;
@@ -22,6 +24,7 @@ actor FavoriteMain {
 	type FavoriteCanisterID = Types.FavoriteCanisterID;
 	type FavoriteID = Types.FavoriteID;
 	type FavoriteIDStorage = Types.FavoriteIDStorage;
+	type SnapID = Types.SnapID;
 	type SnapPublic = Types.SnapPublic;
 
 	type FavoriteActor = Types.FavoriteActor;
@@ -121,6 +124,39 @@ actor FavoriteMain {
 		};
 	};
 
+	public shared ({ caller }) func delete_snap(snap_id_delete : SnapID) : async Result.Result<Text, ErrDeleteFavorite> {
+		let tags = [ACTOR_NAME, "delete_snap"];
+
+		switch (user_canisters_ref.get(caller)) {
+			case (?user_favorites_ids_storage) {
+				let my_ids = Utils.get_all_ids(user_favorites_ids_storage);
+				let matches = Utils.all_ids_match(my_ids, [snap_id_delete]);
+
+				if (matches.all_match == false) {
+					return #err(#FavoriteIdsDoNotMatch(true));
+				};
+
+				for ((canister_id, snap_ids) in user_favorites_ids_storage.entries()) {
+					let favorite_actor = actor (canister_id) : FavoriteActor;
+
+					ignore favorite_actor.delete_snap(snap_id_delete);
+
+					let snap_ids_not_deleted = Utils.get_non_exluded_ids(
+						snap_ids,
+						[snap_id_delete]
+					);
+
+					user_favorites_ids_storage.put(canister_id, snap_ids_not_deleted);
+				};
+
+				return #ok("Deleted Snaps");
+			};
+			case (_) {
+				#err(#UserNotFound(true));
+			};
+		};
+	};
+
 	public shared ({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], ErrGetFavorite> {
 		let tags = [ACTOR_NAME, "get_all_snaps"];
 
@@ -144,7 +180,7 @@ actor FavoriteMain {
 				};
 
 				if (all_snaps.size() == 0) {
-					return #err(#NoSnaps(true));
+					return #err(#SnapsEmpty(true));
 				};
 
 				return #ok(toArray(all_snaps));

@@ -86,6 +86,13 @@
         "logger", "assets_file_chunks"
       ]
     },
+    "test_favorite": {
+      "main": "src/service_favorites/Favorite.mo",
+      "type": "motoko",
+      "dependencies": [
+        "logger"
+      ]
+    },
     "test_image_assets": {
       "main": "src/service_assets_img/ImageAssets.mo",
       "type": "motoko",

@@ -24,13 +24,15 @@ module {
 
 	public type ErrGetFavorite = {
 		#ErrorCall : Text;
-		#NoSnaps : Bool;
+		#SnapsEmpty : Bool;
 		#NotAuthorized : Bool;
 		#UserNotFound : Bool;
 	};
 
 	public type ErrDeleteFavorite = {
 		#NotAuthorized : Bool;
+		#UserNotFound : Bool;
+		#FavoriteIdsDoNotMatch : Bool;
 		#SnapNotFound : Bool;
 	};
 

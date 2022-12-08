@@ -23,11 +23,11 @@ actor class Favorite(favorite_main : Principal) = this {
 	stable var snaps_stable_storage : [(SnapID, SnapPublic)] = [];
 
 	public shared ({ caller }) func save_snap(snap : SnapPublic) : async Result.Result<SnapPublic, ErrSaveFavorite> {
-		let log_tags = [ACTOR_NAME, "create_favorite"];
-
 		if (favorite_main != caller) {
 			return #err(#NotAuthorized(true));
 		};
+
+		snaps.delete(snap.id);
 
 		snaps.put(snap.id, snap);
 

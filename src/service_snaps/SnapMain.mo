@@ -234,12 +234,14 @@ actor SnapMain {
 							ignore assets_actor.delete_asset(snap.file_asset.id);
 						};
 
-						for (image in snap.images.vals()) {
-							if (Text.size(image.canister_id) > 1) {
-								let image_assets_actor = actor (image.canister_id) : ImageAssetsActor;
-								ignore image_assets_actor.delete_image(image.id);
-							};
-						};
+						// TODO: add images to a queue to be deleted later
+
+						// for (image in snap.images.vals()) {
+						// 	if (Text.size(image.canister_id) > 1) {
+						// 		let image_assets_actor = actor (image.canister_id) : ImageAssetsActor;
+						// 		ignore image_assets_actor.delete_image(image.id);
+						// 	};
+						// };
 					};
 
 					await snap_actor.delete_snaps(snap_ids_delete);
