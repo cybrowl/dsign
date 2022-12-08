@@ -1,5 +1,5 @@
 import Array "mo:base/Array";
-import Buffer "mo:base/Buffer";
+import { Buffer; fromArray; toArray } "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
@@ -17,9 +17,10 @@ import Logger "canister:logger";
 
 actor FavoriteMain {
 	type ErrDeleteFavorite = Types.ErrDeleteFavorite;
+	type ErrGetFavorite = Types.ErrGetFavorite;
 	type ErrSaveFavorite = Types.ErrSaveFavorite;
-	type FavoriteID = Types.FavoriteID;
 	type FavoriteCanisterID = Types.FavoriteCanisterID;
+	type FavoriteID = Types.FavoriteID;
 	type FavoriteIDStorage = Types.FavoriteIDStorage;
 	type SnapPublic = Types.SnapPublic;
 
@@ -81,13 +82,13 @@ actor FavoriteMain {
 			};
 		};
 
-		var favorite_ids = Buffer.Buffer<FavoriteID>(0);
+		var favorite_ids = Buffer<FavoriteID>(0);
 		var favorite_ids_found = false;
 		switch (user_favorite_ids_storage.get(favorite_canister_id)) {
 			case (?favorite_ids_) {
 				ignore Logger.log_event(tags, debug_show ("favorite_ids found"));
 
-				favorite_ids := Buffer.fromArray(favorite_ids_);
+				favorite_ids := fromArray(favorite_ids_);
 				favorite_ids_found := true;
 			};
 			case (_) {
@@ -104,9 +105,43 @@ actor FavoriteMain {
 			};
 			case (#ok snap) {
 				favorite_ids.add(snap.id);
-				user_favorite_ids_storage.put(favorite_canister_id, Buffer.toArray(favorite_ids));
+				user_favorite_ids_storage.put(favorite_canister_id, toArray(favorite_ids));
 
 				#ok("Saved Favorite");
+			};
+		};
+	};
+
+	public shared ({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], ErrGetFavorite> {
+		let tags = [ACTOR_NAME, "get_all_snaps"];
+
+		switch (user_canisters_ref.get(caller)) {
+			case (?favorite_canister_ids) {
+				let all_snaps = Buffer<SnapPublic>(0);
+
+				for ((canister_id, snap_ids) in favorite_canister_ids.entries()) {
+					let favorite_actor = actor (canister_id) : FavoriteActor;
+
+					switch (await favorite_actor.get_all_snaps(snap_ids)) {
+						case (#err err) {
+							return #err(#ErrorCall(debug_show (err)));
+						};
+						case (#ok snaps) {
+							for (snap in snaps.vals()) {
+								all_snaps.add(snap);
+							};
+						};
+					};
+				};
+
+				if (all_snaps.size() == 0) {
+					return #err(#NoSnaps(true));
+				};
+
+				return #ok(toArray(all_snaps));
+			};
+			case (_) {
+				return #err(#UserNotFound(true));
 			};
 		};
 	};

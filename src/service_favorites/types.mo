@@ -15,19 +15,27 @@ module {
 	public type SnapRef = SnapTypes.SnapRef;
 
 	public type ErrSaveFavorite = {
+		#ErrorCall : Text;
 		#NotAuthorized : Bool;
 		#UserNotFound : Bool;
+	};
+
+	public type ErrGetFavorite = {
 		#ErrorCall : Text;
+		#NoSnaps : Bool;
+		#NotAuthorized : Bool;
+		#UserNotFound : Bool;
 	};
 
 	public type ErrDeleteFavorite = {
-		#SnapNotFound : Bool;
 		#NotAuthorized : Bool;
+		#SnapNotFound : Bool;
 	};
 
 	// Actor Interface
 	public type FavoriteActor = actor {
 		save_snap : shared (SnapPublic, Principal) -> async Result.Result<SnapPublic, ErrSaveFavorite>;
 		delete_snap : shared (SnapID) -> async Result.Result<SnapPublic, ErrDeleteFavorite>;
+		get_all_snaps : query ([SnapID]) -> async Result.Result<[SnapPublic], ErrGetFavorite>;
 	};
 };

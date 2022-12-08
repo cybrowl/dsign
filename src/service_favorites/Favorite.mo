@@ -1,4 +1,4 @@
-import { Buffer } "mo:base/Buffer";
+import { Buffer; toArray } "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
@@ -10,6 +10,7 @@ import Types "./types";
 
 actor class Favorite(favorite_main : Principal) = this {
 	type ErrDeleteFavorite = Types.ErrDeleteFavorite;
+	type ErrGetFavorite = Types.ErrGetFavorite;
 	type ErrSaveFavorite = Types.ErrSaveFavorite;
 	type SnapCanisterId = Types.SnapCanisterId;
 	type SnapID = Types.SnapID;
@@ -20,8 +21,6 @@ actor class Favorite(favorite_main : Principal) = this {
 
 	var snaps : HashMap.HashMap<SnapID, SnapPublic> = HashMap.HashMap(0, Text.equal, Text.hash);
 	stable var snaps_stable_storage : [(SnapID, SnapPublic)] = [];
-
-	var snaps_authorized_can_ids : HashMap.HashMap<SnapCanisterId, SnapCanisterId> = HashMap.HashMap(0, Text.equal, Text.hash);
 
 	public shared ({ caller }) func save_snap(snap : SnapPublic) : async Result.Result<SnapPublic, ErrSaveFavorite> {
 		let log_tags = [ACTOR_NAME, "create_favorite"];
@@ -52,8 +51,24 @@ actor class Favorite(favorite_main : Principal) = this {
 		};
 	};
 
-	public query func get_all_snaps() : async [SnapPublic] {
-		return Iter.toArray(snaps.vals());
+	public query ({ caller }) func get_all_snaps(snap_ids : [SnapID]) : async Result.Result<[SnapPublic], ErrGetFavorite> {
+		if (favorite_main != caller) {
+			return #err(#NotAuthorized(true));
+		};
+
+		var snaps_list = Buffer<SnapPublic>(0);
+
+		for (snap_id in snap_ids.vals()) {
+			switch (snaps.get(snap_id)) {
+				case null {};
+				case (?snap) {
+
+					snaps_list.add(snap);
+				};
+			};
+		};
+
+		return #ok(toArray(snaps_list));
 	};
 
 	public query func length() : async Nat {
