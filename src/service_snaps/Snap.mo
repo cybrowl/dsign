@@ -37,7 +37,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	type ProjectActor = ProjectTypes.ProjectActor;
 
 	let ACTOR_NAME : Text = "Snap";
-	let VERSION : Nat = 1;
+	let VERSION : Nat = 2;
 
 	private let rr = XorShift.toReader(XorShift.XorShift64(null));
 	private let se = Source.Source(rr, 0);
@@ -98,17 +98,17 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		return #ok(snap);
 	};
 
-	// NOTE: only called from Favorite Main and Snap Main
-	public shared ({ caller }) func update_snap(
-		update_args : SnapUpdateArgs
+	// NOTE: only called from Favorite Main
+	public shared ({ caller }) func update_snap_metrics(
+		snap_id : SnapID
 	) : async Result.Result<SnapPublic, ErrUpdateSnap> {
 		let tags = [ACTOR_NAME, "update_snap"];
 
-		if (favorite_main != caller or snap_main != caller) {
+		if (favorite_main != caller) {
 			return #err(#NotAuthorized(true));
 		};
 
-		switch (snaps.get(update_args.id)) {
+		switch (snaps.get(snap_id)) {
 			case (null) {
 				return #err(#SnapNotFound(true));
 			};

@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
+	import { AuthClient } from '@dfinity/auth-client';
 
 	import Login from '../components/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
@@ -10,7 +11,7 @@
 
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation } from '$stores_ref/page_navigation';
-	import { actor_explore } from '$stores_ref/actors.js';
+	import { actor_explore, actor_favorite_main, createActor } from '$stores_ref/actors.js';
 	import { explore_store } from '$stores_ref/fetch_store.js';
 
 	page_navigation.update(({ navItems }) => {
@@ -25,18 +26,55 @@
 	});
 
 	onMount(async () => {
+		let authClient = await AuthClient.create();
+
+		const isAuthenticated = await authClient.isAuthenticated();
+
+		if (isAuthenticated) {
+			actor_favorite_main.update(() => ({
+				loggedIn: true,
+				actor: createActor({
+					actor_name: 'favorite_main',
+					identity: authClient.getIdentity()
+				})
+			}));
+		}
+
 		try {
 			const all_snaps = await $actor_explore.actor.get_all_snaps();
 
 			if (all_snaps) {
 				explore_store.set({ isFetching: false, snaps: [...all_snaps] });
 			}
+
+			const response = await $actor_favorite_main.actor.version();
+
+			console.log('fav: ', response);
 		} catch (error) {
 			console.log('error: call', error);
 
 			await authClient.logout();
 		}
 	});
+
+	async function handleClickLike(e) {
+		const snap_liked = e.detail;
+
+		try {
+			const { ok: saved_snap, err: err_save_snap } = await $actor_favorite_main.actor.save_snap(
+				snap_liked
+			);
+
+			console.log('saved_snap: ', saved_snap);
+			console.log('err_save_snap: ', err_save_snap);
+
+			if (err_save_snap && err_save_snap['UserNotFound'] === true) {
+				await $actor_favorite_main.actor.create_user_favorite_storage();
+			}
+		} catch (error) {
+			console.log('error: call', error);
+		}
+	}
 </script>
 
 <!-- Explore -->
@@ -68,7 +106,7 @@
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-20 mt-2 mb-24"
 		>
 			{#each $explore_store.snaps as snap}
-				<SnapCard {snap} showUsername={true} />
+				<SnapCard {snap} showUsername={true} on:clickLike={handleClickLike} />
 			{/each}
 		</div>
 	{/if}

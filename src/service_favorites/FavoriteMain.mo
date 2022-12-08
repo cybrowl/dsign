@@ -98,24 +98,17 @@ actor FavoriteMain {
 		};
 
 		let snap_actor = actor (snap.canister_id) : SnapActor;
-		let snap_update_args = {
-			id = snap.id;
-			image_cover_location = null;
-			images = null;
-			tags = null;
-			title = null;
-		};
 
-		switch (await snap_actor.update_snap(snap_update_args)) {
+		switch (await snap_actor.update_snap_metrics(snap.id)) {
 			case (#err err) {
-				return #err(#ErrorCall(debug_show (err)));
+				return #err(#ErrorCall(debug_show ("snap_actor", err)));
 			};
 			case (#ok snap) {
 				let favorite_actor = actor (favorite_canister_id) : FavoriteActor;
 
 				switch (await favorite_actor.save_snap(snap, caller)) {
 					case (#err err) {
-						return #err(#ErrorCall(debug_show (err)));
+						return #err(#ErrorCall(debug_show ("favorite_actor", err)));
 					};
 					case (#ok snap) {
 						favorite_ids.add(snap.id);

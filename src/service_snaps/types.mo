@@ -136,7 +136,7 @@ module {
 	// Actor Interface
 	public type SnapActor = actor {
 		create_snap : shared (CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, ErrCreateSnap>;
-		update_snap : shared (SnapUpdateArgs) -> async Result.Result<SnapPublic, ErrUpdateSnap>;
+		update_snap_metrics : shared (SnapID) -> async Result.Result<SnapPublic, ErrUpdateSnap>;
 		delete_snaps : shared ([SnapID]) -> async ();
 		delete_project_from_snaps : shared ([SnapRef]) -> async ();
 		add_project_to_snaps : shared ([SnapRef], ProjectRef) -> async ();
