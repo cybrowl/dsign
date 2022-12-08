@@ -14,6 +14,8 @@ module {
 	public type SnapPublic = SnapTypes.SnapPublic;
 	public type SnapRef = SnapTypes.SnapRef;
 
+	public type SnapActor = SnapTypes.SnapActor;
+
 	public type ErrSaveFavorite = {
 		#ErrorCall : Text;
 		#NotAuthorized : Bool;

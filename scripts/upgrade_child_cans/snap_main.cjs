@@ -14,6 +14,7 @@ const {
 } = require('../../test-utils/actor_interface.cjs');
 const {
 	canister_child_ledger_canister_id,
+	favorite_main_canister_id,
 	snap_main_canister_id,
 	project_main_canister_id
 } = require('../../test-utils/actor_canister_ids.cjs');
@@ -78,7 +79,7 @@ const get_actor = async (canisterId, can_interface, is_prod) => {
 const installCode = async () => {
 	console.log('Installing canisters...');
 
-	let run_in_prod = true;
+	let run_in_prod = false;
 
 	if (run_in_prod === false) {
 		console.log('======== Installing Local Snap Main Child Canisters =========');
@@ -106,8 +107,12 @@ const installCode = async () => {
 					[Principal.fromText(snap_main_canister_id), false]
 				),
 				snap: IDL.encode(
-					[IDL.Principal, IDL.Principal],
-					[Principal.fromText(snap_main_canister_id), Principal.fromText(project_main_canister_id)]
+					[IDL.Principal, IDL.Principal, IDL.Principal],
+					[
+						Principal.fromText(snap_main_canister_id),
+						Principal.fromText(project_main_canister_id),
+						Principal.fromText(favorite_main_canister_id)
+					]
 				)
 			};
 
@@ -159,10 +164,11 @@ const installCode = async () => {
 					[Principal.fromText(canister_ids['snap_main'].ic), true]
 				),
 				snap: IDL.encode(
-					[IDL.Principal, IDL.Principal],
+					[IDL.Principal, IDL.Principal, IDL.Principal],
 					[
 						Principal.fromText(canister_ids['snap_main'].ic),
-						Principal.fromText(canister_ids['project_main'].ic)
+						Principal.fromText(canister_ids['project_main'].ic),
+						Principal.fromText(canister_ids['favorite_main'].ic)
 					]
 				)
 			};

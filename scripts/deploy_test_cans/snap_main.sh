@@ -1,10 +1,11 @@
 export SNAP_MAIN_PRINCIPAL=$(dfx canister id snap_main)
 export PROJECT_MAIN_PRINCIPAL=$(dfx canister id project_main)
+export FAVORITE_MAIN_PRINCIPAL=$(dfx canister id favorite_main)
 
 # deploy
 dfx deploy test_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
 dfx deploy test_image_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
-dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principal "'${PROJECT_MAIN_PRINCIPAL}'")'
+dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principal "'${PROJECT_MAIN_PRINCIPAL}'"), principal "'${FAVORITE_MAIN_PRINCIPAL}'")'
 dfx deploy snap_main
 
 # check version

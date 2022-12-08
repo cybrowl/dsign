@@ -76,7 +76,7 @@ const get_actor = async (canisterId, can_interface, is_prod) => {
 };
 
 const installCode = async () => {
-	let run_in_prod = true;
+	let run_in_prod = false;
 
 	if (run_in_prod === false) {
 		console.log('======== Installing Local Profile Child Canisters =========');

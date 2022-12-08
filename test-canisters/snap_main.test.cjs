@@ -17,6 +17,7 @@ const {
 const {
 	assets_file_chunks_canister_id,
 	assets_img_staging_canister_id,
+	favorite_main_canister_id,
 	profile_canister_id,
 	project_main_canister_id,
 	snap_main_canister_id
@@ -41,7 +42,7 @@ let profile_actors = {};
 let chunk_ids = [];
 let img_asset_ids = [];
 
-test('Setup Actors', async function (t) {
+test('Setup Actors', async function () {
 	console.log('=========== Snap Main ===========');
 
 	assets_file_chunks_actors.mishicat = await get_actor(
@@ -95,11 +96,9 @@ test('Setup Actors', async function (t) {
 	);
 });
 
-test('SnapMain[mishicat].initialize_canisters()', async function (t) {
+test('SnapMain[mishicat].initialize_canisters()', async function () {
 	await snap_main_actor.mishicat.initialize_canisters({
-		assets_canister_id: [],
-		image_assets_canister_id: [],
-		snap_canister_id: [],
+		favorite_main_canister_id: [favorite_main_canister_id],
 		project_main_canister_id: [project_main_canister_id]
 	});
 });
@@ -157,7 +156,7 @@ test('SnapMain[mishicat].create_snap(): with invalid img asset ref => #err - Ass
 	t.deepEqual(response.err, { ErrorCall: '#AssetNotFound' });
 });
 
-test('ImageAssetStaging[mishicat].create_asset(): with image and valid identity => #ok - img_asset_ids', async function (t) {
+test('ImageAssetStaging[mishicat].create_asset(): with image and valid identity => #ok - img_asset_ids', async function () {
 	let promises = [];
 
 	images.forEach(async function (image) {
@@ -268,7 +267,7 @@ test('FileAssetChunks[mishicat].create_chunk(): upload chunks from file to canis
 	t.equal(hasChunkIds, true);
 });
 
-test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function (t) {
+test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function () {
 	let promises = [];
 
 	images.forEach(async function (image) {
@@ -306,7 +305,7 @@ test('SnapMain[mishicat].create_snap(): with file and images => #ok - snap', asy
 	t.deepEqual(response.ok, 'Created Snap');
 });
 
-test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function (t) {
+test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function () {
 	let promises = [];
 
 	images.forEach(async function (image) {

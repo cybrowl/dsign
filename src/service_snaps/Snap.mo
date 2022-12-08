@@ -18,18 +18,20 @@ import Profile "canister:profile";
 import Types "./types";
 import ProjectTypes "../service_projects/types";
 
-actor class Snap(snap_main : Principal, project_main : Principal) = this {
+actor class Snap(snap_main : Principal, project_main : Principal, favorite_main : Principal) = this {
 	type AssetRef = Types.AssetRef;
 	type CreateSnapArgs = Types.CreateSnapArgs;
 	type ErrCreateSnap = Types.ErrCreateSnap;
+	type ErrUpdateSnap = Types.ErrUpdateSnap;
 	type ImageRef = Types.ImageRef;
 	type Project = ProjectTypes.Project;
 	type ProjectPublic = Types.ProjectPublic;
 	type ProjectRef = ProjectTypes.ProjectRef;
 	type Snap = Types.Snap;
-	type SnapPublic = Types.SnapPublic;
 	type SnapID = Types.SnapID;
+	type SnapPublic = Types.SnapPublic;
 	type SnapRef = Types.SnapRef;
+	type SnapUpdateArgs = Types.SnapUpdateArgs;
 	type UserPrincipal = Types.UserPrincipal;
 
 	type ProjectActor = ProjectTypes.ProjectActor;
@@ -94,6 +96,52 @@ actor class Snap(snap_main : Principal, project_main : Principal) = this {
 		ignore Explore.save_snap(snap_public);
 
 		return #ok(snap);
+	};
+
+	// NOTE: only called from Favorite Main and Snap Main
+	public shared ({ caller }) func update_snap(
+		update_args : SnapUpdateArgs
+	) : async Result.Result<SnapPublic, ErrUpdateSnap> {
+		let tags = [ACTOR_NAME, "update_snap"];
+
+		if (favorite_main != caller or snap_main != caller) {
+			return #err(#NotAuthorized(true));
+		};
+
+		switch (snaps.get(update_args.id)) {
+			case (null) {
+				return #err(#SnapNotFound(true));
+			};
+			case (?snap) {
+
+				// TODO: only update metrics if caller is favorite main
+				let snap_metrics_updated = {
+					likes = snap.metrics.likes + 1;
+					views = snap.metrics.views;
+				};
+
+				var project_public : ?ProjectPublic = null;
+
+				switch (snap.project) {
+					case (null) {};
+					case (?project) {
+						project_public := ?{
+							project with owner = null;
+						};
+					};
+				};
+
+				let snap_updated = {
+					snap with metrics = snap_metrics_updated;
+					project = project_public;
+					owner = null;
+				};
+
+				ignore Explore.save_snap(snap_updated : SnapPublic);
+
+				return #ok(snap_updated);
+			};
+		};
 	};
 
 	public shared ({ caller }) func delete_snaps(snap_ids : [SnapID]) : async () {

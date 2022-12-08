@@ -64,6 +64,7 @@ actor SnapMain {
 
 	// this doesn't change after init
 	stable var project_main_canister_id : Text = "";
+	stable var favorite_main_canister_id : Text = "";
 
 	private let ic : ICInterface = actor "aaaaa-aa";
 
@@ -396,12 +397,14 @@ actor SnapMain {
 	private func create_snap_canister(
 		snap_main_principal : Principal,
 		project_main_principal : Principal,
+		favorite_main_principal : Principal,
 		is_prod : Bool
 	) : async () {
 		Cycles.add(CYCLE_AMOUNT);
 		let snap_actor = await Snap.Snap(
 			snap_main_principal,
-			project_main_principal
+			project_main_principal,
+			favorite_main_principal
 		);
 
 		let principal = Principal.fromActor(snap_actor);
@@ -432,6 +435,7 @@ actor SnapMain {
 		let has_image_assets_canister_id : Bool = image_assets_canister_id.size() > 0;
 		let has_snap_canister_id : Bool = snap_canister_id.size() > 0;
 		let has_project_main_canister_id : Bool = project_main_canister_id.size() > 0;
+		let has_favorite_main_canister_id : Bool = favorite_main_canister_id.size() > 0;
 
 		if (has_project_main_canister_id == false) {
 			switch (args.project_main_canister_id) {
@@ -449,7 +453,24 @@ actor SnapMain {
 			};
 		};
 
+		if (has_favorite_main_canister_id == false) {
+			switch (args.favorite_main_canister_id) {
+				case (null) {
+					favorite_main_canister_id := "";
+
+					ignore Logger.log_event(
+						tags,
+						debug_show (("favorite_main_canister_id NOT found"))
+					);
+				};
+				case (?favorite_main_canister_id_) {
+					favorite_main_canister_id := favorite_main_canister_id_;
+				};
+			};
+		};
+
 		let project_main_principal = Principal.fromText(project_main_canister_id);
+		let favorite_main_principal = Principal.fromText(favorite_main_canister_id);
 
 		// create canisters
 		if (has_assets_canister_id == false) {
@@ -471,7 +492,7 @@ actor SnapMain {
 		};
 
 		if (has_snap_canister_id == false) {
-			await create_snap_canister(snap_main_principal, project_main_principal, is_prod);
+			await create_snap_canister(snap_main_principal, project_main_principal, favorite_main_principal, is_prod);
 
 			ignore Logger.log_event(
 				tags,

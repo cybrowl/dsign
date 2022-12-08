@@ -84,6 +84,14 @@ module {
 		};
 	};
 
+	public type SnapUpdateArgs = {
+		id : SnapID;
+		image_cover_location : ?Nat8;
+		images : ?[ImageRef];
+		tags : ?[Text];
+		title : ?Text;
+	};
+
 	public type CreateSnapArgs = {
 		title : Text;
 		image_cover_location : Nat8;
@@ -97,6 +105,7 @@ module {
 
 	public type InitArgs = {
 		project_main_canister_id : ?Text;
+		favorite_main_canister_id : ?Text;
 	};
 
 	public type ErrCreateSnap = {
@@ -107,6 +116,12 @@ module {
 		#Unauthorized;
 		#UserNotFound;
 		#ErrorCall : Text;
+	};
+
+	public type ErrUpdateSnap = {
+		#ErrorCall : Text;
+		#NotAuthorized : Bool;
+		#SnapNotFound : Bool;
 	};
 
 	public type ErrGetAllSnaps = {
@@ -121,6 +136,7 @@ module {
 	// Actor Interface
 	public type SnapActor = actor {
 		create_snap : shared (CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, ErrCreateSnap>;
+		update_snap : shared (SnapUpdateArgs) -> async Result.Result<SnapPublic, ErrUpdateSnap>;
 		delete_snaps : shared ([SnapID]) -> async ();
 		delete_project_from_snaps : shared ([SnapRef]) -> async ();
 		add_project_to_snaps : shared ([SnapRef], ProjectRef) -> async ();

@@ -25,6 +25,7 @@ actor FavoriteMain {
 	type SnapPublic = Types.SnapPublic;
 
 	type FavoriteActor = Types.FavoriteActor;
+	type SnapActor = Types.SnapActor;
 
 	type CanisterChild = CanisterLedgerTypes.CanisterChild;
 
@@ -96,18 +97,33 @@ actor FavoriteMain {
 			};
 		};
 
-		let favorite_actor = actor (favorite_canister_id) : FavoriteActor;
+		let snap_actor = actor (snap.canister_id) : SnapActor;
+		let snap_update_args = {
+			id = snap.id;
+			image_cover_location = null;
+			images = null;
+			tags = null;
+			title = null;
+		};
 
-		// save snap to as favorite
-		switch (await favorite_actor.save_snap(snap, caller)) {
+		switch (await snap_actor.update_snap(snap_update_args)) {
 			case (#err err) {
 				return #err(#ErrorCall(debug_show (err)));
 			};
 			case (#ok snap) {
-				favorite_ids.add(snap.id);
-				user_favorite_ids_storage.put(favorite_canister_id, toArray(favorite_ids));
+				let favorite_actor = actor (favorite_canister_id) : FavoriteActor;
 
-				#ok("Saved Favorite");
+				switch (await favorite_actor.save_snap(snap, caller)) {
+					case (#err err) {
+						return #err(#ErrorCall(debug_show (err)));
+					};
+					case (#ok snap) {
+						favorite_ids.add(snap.id);
+						user_favorite_ids_storage.put(favorite_canister_id, toArray(favorite_ids));
+
+						#ok("Saved Favorite");
+					};
+				};
 			};
 		};
 	};
