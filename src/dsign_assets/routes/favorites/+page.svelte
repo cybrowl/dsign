@@ -61,6 +61,24 @@
 			console.log(error);
 		}
 	});
+
+	async function handleClickLike(e) {
+		const snap_liked = e.detail;
+
+		try {
+			const { ok: delete_snap, err: err_delete_snap } =
+				await $actor_favorite_main.actor.delete_snap(snap_liked.id);
+
+			console.log('delete_snap: ', delete_snap);
+			console.log('err_delete_snap: ', err_delete_snap);
+
+			if (err_delete_snap && err_delete_snap['UserNotFound'] === true) {
+				await $actor_favorite_main.actor.create_user_favorite_storage();
+			}
+		} catch (error) {
+			console.log('error: call', error);
+		}
+	}
 </script>
 
 <svelte:head>
@@ -103,7 +121,7 @@
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-20 mt-2 mb-24"
 		>
 			{#each $favorite_store.snaps as snap}
-				<SnapCard {snap} showUsername={true} />
+				<SnapCard {snap} showUsername={true} on:clickLike={handleClickLike} />
 			{/each}
 		</div>
 	{/if}

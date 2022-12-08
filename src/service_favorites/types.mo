@@ -3,6 +3,7 @@ import Principal "mo:base/Principal";
 import ProjectTypes "../service_projects/types";
 import Result "mo:base/Result";
 import SnapTypes "../service_snaps/types";
+import ICInterfaceTypes "../types/ic.types";
 
 module {
 	public type FavoriteCanisterID = Text;
@@ -15,6 +16,9 @@ module {
 	public type SnapRef = SnapTypes.SnapRef;
 
 	public type SnapActor = SnapTypes.SnapActor;
+
+	public type ICInterface = ICInterfaceTypes.Self;
+	public type ICInterfaceStatusResponse = ICInterfaceTypes.StatusResponse;
 
 	public type ErrSaveFavorite = {
 		#ErrorCall : Text;

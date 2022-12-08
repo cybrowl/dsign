@@ -27,8 +27,6 @@ actor class Favorite(favorite_main : Principal) = this {
 			return #err(#NotAuthorized(true));
 		};
 
-		snaps.delete(snap.id);
-
 		snaps.put(snap.id, snap);
 
 		return #ok(snap);

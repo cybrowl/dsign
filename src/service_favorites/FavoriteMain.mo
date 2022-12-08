@@ -1,5 +1,6 @@
 import Array "mo:base/Array";
-import { Buffer; fromArray; toArray } "mo:base/Buffer";
+import { Buffer; fromArray; toArray; removeDuplicates } "mo:base/Buffer";
+import Buff "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
@@ -24,6 +25,8 @@ actor FavoriteMain {
 	type FavoriteCanisterID = Types.FavoriteCanisterID;
 	type FavoriteID = Types.FavoriteID;
 	type FavoriteIDStorage = Types.FavoriteIDStorage;
+	type ICInterface = Types.ICInterface;
+	type ICInterfaceStatusResponse = Types.ICInterfaceStatusResponse;
 	type SnapID = Types.SnapID;
 	type SnapPublic = Types.SnapPublic;
 
@@ -42,6 +45,8 @@ actor FavoriteMain {
 		Principal.hash
 	);
 	stable var user_canisters_ref_storage : [var (Principal, [(FavoriteCanisterID, [FavoriteID])])] = [var];
+
+	private let ic : ICInterface = actor "aaaaa-aa";
 
 	stable var favorite_canister_id : Text = "";
 
@@ -115,6 +120,9 @@ actor FavoriteMain {
 					};
 					case (#ok snap) {
 						favorite_ids.add(snap.id);
+
+						removeDuplicates<FavoriteID>(favorite_ids, Text.compare);
+
 						user_favorite_ids_storage.put(favorite_canister_id, toArray(favorite_ids));
 
 						#ok("Saved Favorite");
@@ -237,6 +245,27 @@ actor FavoriteMain {
 			return favorite_canister_id;
 		}
 
+	};
+
+	public shared ({ caller }) func install_code(
+		canister_id : Principal,
+		arg : Blob,
+		wasm_module : Blob
+	) : async Text {
+		let principal = Principal.toText(caller);
+
+		if (Text.equal(principal, "be7if-4i5lo-xnuq5-6ilpw-aedq2-epko6-gdmew-kzcse-7qpey-wztpj-qqe")) {
+			await ic.install_code({
+				arg = arg;
+				wasm_module = wasm_module;
+				mode = #upgrade;
+				canister_id = canister_id;
+			});
+
+			return "success";
+		};
+
+		return "not_authorized";
 	};
 
 	// ------------------------- SYSTEM METHODS -------------------------
