@@ -15,6 +15,8 @@ test('DFX Config: generateCanisterAliases()', async function (t) {
 		$IDLcanister_child_ledger:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/canister_child_ledger/canister_child_ledger.did.js',
 		$IDLexplore: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/explore/explore.did.js',
+		$IDLfavorite_main:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/favorite_main/favorite_main.did.js',
 		$IDLprofile: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile/profile.did.js',
 		$IDLproject_main:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/project_main/project_main.did.js',
