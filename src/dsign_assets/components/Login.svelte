@@ -8,14 +8,16 @@
 	import Button from 'dsign-components/components/Button.svelte';
 
 	import { actor_profile } from '$stores_ref/actors';
-	import { auth_client } from '$stores_ref/auth_client';
-	import { local_storage_profile, local_storage_remove } from '$stores_ref/local_storage';
+	import { auth_client, auth_profile } from '$stores_ref/auth_client';
+	import { local_storage_profile } from '$stores_ref/local_storage';
 	import modal_update from '$stores_ref/modal_update';
 
 	const env = environment();
 	const isProd = env['DFX_NETWORK'] === 'ic' || false;
 
 	onMount(async () => {
+		await auth_profile();
+
 		if ($actor_profile.loggedIn) {
 			try {
 				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
