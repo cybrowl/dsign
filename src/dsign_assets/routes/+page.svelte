@@ -1,4 +1,5 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import get from 'lodash/get.js';
 
@@ -43,17 +44,17 @@
 			try {
 				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
 
+				if (err_profile) {
+					if (err_profile['ProfileNotFound'] === true) {
+						goto('/account_creation');
+					}
+				}
+
 				if (profile) {
 					local_storage_profile.set({
 						avatar_url: get(profile, 'avatar.url', ''),
 						username: get(profile, 'username', '')
 					});
-				}
-
-				if (err_profile) {
-					if (err_profile['ProfileNotFound'] === true) {
-						goto('/account_creation');
-					}
 				}
 			} catch (error) {
 				// goto('/');
