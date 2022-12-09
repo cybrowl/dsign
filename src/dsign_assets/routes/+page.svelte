@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
+	import get from 'lodash/get.js';
 
 	import Login from '../components/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
@@ -8,8 +9,9 @@
 	import AccountSettingsModal from '../modals/AccountSettingsModal.svelte';
 	import SnapCreationModal from '../modals/SnapCreationModal.svelte';
 
-	import { actor_explore, actor_favorite_main } from '$stores_ref/actors.js';
+	import { actor_explore, actor_profile, actor_favorite_main } from '$stores_ref/actors.js';
 	import { explore_store } from '$stores_ref/fetch_store.js';
+	import { local_storage_profile } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation } from '$stores_ref/page_navigation';
 
@@ -35,6 +37,27 @@
 			console.error('error: call', error);
 
 			// await authClient.logout();
+		}
+
+		if ($actor_profile.loggedIn) {
+			try {
+				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
+
+				if (profile) {
+					local_storage_profile.set({
+						avatar_url: get(profile, 'avatar.url', ''),
+						username: get(profile, 'username', '')
+					});
+				}
+
+				if (err_profile) {
+					if (err_profile['ProfileNotFound'] === true) {
+						goto('/account_creation');
+					}
+				}
+			} catch (error) {
+				// goto('/');
+			}
 		}
 
 		if ($actor_favorite_main.loggedIn) {

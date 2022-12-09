@@ -2,11 +2,9 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
-	import { AuthClient } from '@dfinity/auth-client';
 	import get from 'lodash/get';
 
 	// components
-	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import Login from '$components_ref/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import ProfileBanner from 'dsign-components/components/ProfileBanner.svelte';
@@ -15,26 +13,20 @@
 	import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
 	import ProjectPublicEmpty from 'dsign-components/components/ProjectPublicEmpty.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
+
+	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 
-	// stores
-	import {
-		actor_assets_img_staging,
-		actor_profile,
-		actor_project_main,
-		createActor
-	} from '$stores_ref/actors';
-	import { project_store } from '$stores_ref/fetch_store';
-
+	import { actor_assets_img_staging, actor_profile, actor_project_main } from '$stores_ref/actors';
 	import { local_storage_profile_public, local_storage_projects } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
-	import modal_update from '$stores_ref/modal_update';
 	import { page_navigation } from '$stores_ref/page_navigation';
-	import page_navigation_update from '$stores_ref/page_navigation_update';
 	import { profile_tabs } from '$stores_ref/page_state';
+	import { project_store } from '$stores_ref/fetch_store';
+	import modal_update from '$stores_ref/modal_update';
+	import page_navigation_update from '$stores_ref/page_navigation_update';
 
 	// variables
-	let isAuthenticated = false;
 	let project = {
 		name: ''
 	};
@@ -44,41 +36,11 @@
 	// execution
 	page_navigation_update.select_item(3);
 
+	if ($project_store.projects.length === 0) {
+		project_store.set({ isFetching: true, projects: [] });
+	}
+
 	onMount(async () => {
-		let authClient = await AuthClient.create();
-
-		isAuthenticated = await authClient.isAuthenticated();
-
-		if (isAuthenticated) {
-			actor_profile.update(() => ({
-				loggedIn: true,
-				actor: createActor({
-					actor_name: 'profile',
-					identity: authClient.getIdentity()
-				})
-			}));
-
-			actor_project_main.update(() => ({
-				loggedIn: true,
-				actor: createActor({
-					actor_name: 'project_main',
-					identity: authClient.getIdentity()
-				})
-			}));
-
-			actor_assets_img_staging.update(() => ({
-				loggedIn: true,
-				actor: createActor({
-					actor_name: 'assets_img_staging',
-					identity: authClient.getIdentity()
-				})
-			}));
-		}
-
-		if ($project_store.projects.length === 0) {
-			project_store.set({ isFetching: true, projects: [] });
-		}
-
 		try {
 			const { ok: profile_, err: err_profile } = await $actor_profile.actor.get_profile_public(
 				$page.params.slug
@@ -91,7 +53,7 @@
 				username: get(profile_, 'username', '')
 			});
 
-			if (isAuthenticated) {
+			if ($actor_profile.loggedIn) {
 				const { ok: profile_, err: err_profile } = await $actor_profile.actor.get_profile();
 				const username = get(profile_, 'username', 'x');
 

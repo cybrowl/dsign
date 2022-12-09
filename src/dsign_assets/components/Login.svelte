@@ -10,21 +10,16 @@
 	import { actor_profile } from '$stores_ref/actors';
 	import { auth_client } from '$stores_ref/auth_client';
 	import { local_storage_profile, local_storage_remove } from '$stores_ref/local_storage';
-	import { modal_visible } from '$stores_ref/modal';
 	import modal_update from '$stores_ref/modal_update';
 
 	const env = environment();
 	const isProd = env['DFX_NETWORK'] === 'ic' || false;
 
 	onMount(async () => {
-		console.log('Login: onMount: actor_profile: ', $actor_profile.loggedIn);
-
 		if ($actor_profile.loggedIn) {
 			try {
 				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
 
-				console.log('profile: ', profile);
-				console.log('err_profile: ', err_profile);
 				if (profile) {
 					local_storage_profile.set({
 						avatar_url: get(profile, 'avatar.url', ''),
@@ -38,7 +33,7 @@
 					}
 				}
 			} catch (error) {
-				// goto('/');
+				location.replace('/');
 			}
 		}
 	});
@@ -57,12 +52,7 @@
 	}
 
 	async function openSnapCreationModal() {
-		modal_visible.update((options) => {
-			return {
-				...options,
-				snap_creation: !options.snap_creation
-			};
-		});
+		modal_update.change_visibility('snap_creation');
 	}
 
 	async function openSettingsModal() {

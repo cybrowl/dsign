@@ -2,15 +2,12 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import get from 'lodash/get';
-	import { AuthClient } from '@dfinity/auth-client';
 
 	// components
 	import Login from '$components_ref/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 
-	// stores
 	import { actor_profile } from '$stores_ref/actors.js';
-
 	import { local_storage_profile } from '$stores_ref/local_storage';
 	import { page_navigation } from '$stores_ref/page_navigation';
 	import page_navigation_update from '$stores_ref/page_navigation_update';
@@ -26,20 +23,15 @@
 	page_navigation_update.select_item(3);
 
 	onMount(async () => {
-		let authClient = await AuthClient.create();
-		let isAuthenticated = await authClient.isAuthenticated();
-
-		try {
-			if (isAuthenticated) {
+		if ($actor_profile.loggedIn) {
+			try {
 				let { ok: profile, err: err_get_profile } = await $actor_profile.actor.get_profile();
 				const username = get(profile, 'username', 'x');
 
 				goto(`/profile/${username}`);
-			} else {
-				goto('/');
-			}
-		} catch (error) {
-			console.log('error', error);
+			} catch (error) {}
+		} else {
+			goto('/');
 		}
 	});
 </script>
