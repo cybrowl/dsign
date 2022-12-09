@@ -104,38 +104,40 @@
 		<SnapCreationModal />
 	{/if}
 
-	<!-- Fetching Snaps -->
-	{#if $favorite_store.isFetching === true}
-		<div
-			class="col-start-2 col-end-12 grid grid-cols-4 
+	{#if $actor_favorite_main.loggedIn}
+		<!-- Fetching Snaps -->
+		{#if $favorite_store.isFetching === true}
+			<div
+				class="col-start-2 col-end-12 grid grid-cols-4 
 		row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
-		>
-			{#each { length: $local_storage_favorites.all_favorites_count } as _, i}
-				<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />
-			{/each}
-		</div>
-	{/if}
+			>
+				{#each { length: $local_storage_favorites.all_favorites_count } as _, i}
+					<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />
+				{/each}
+			</div>
+		{/if}
 
-	<!-- No Snaps Found -->
-	{#if $favorite_store.snaps.length === 0 && $favorite_store.isFetching === false}
-		<div
-			class="col-start-2 col-end-12 grid grid-cols-4 
+		<!-- No Snaps Found -->
+		{#if $favorite_store.snaps.length === 0 && $favorite_store.isFetching === false}
+			<div
+				class="col-start-2 col-end-12 grid grid-cols-4 
 			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
-		>
-			<SnapCardEmpty />
-		</div>
-	{/if}
+			>
+				<SnapCardEmpty />
+			</div>
+		{/if}
 
-	<!-- Snaps -->
-	{#if $favorite_store.snaps.length > 0}
-		<div
-			class="col-start-2 col-end-12 grid grid-cols-4 
+		<!-- Snaps -->
+		{#if $favorite_store.snaps.length > 0}
+			<div
+				class="col-start-2 col-end-12 grid grid-cols-4 
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-20 mt-2 mb-24"
-		>
-			{#each $favorite_store.snaps as snap}
-				<SnapCard {snap} showUsername={true} showMetrics={false} on:clickLike={handleClickLike} />
-			{/each}
-		</div>
+			>
+				{#each $favorite_store.snaps as snap}
+					<SnapCard {snap} showUsername={true} showMetrics={false} on:clickLike={handleClickLike} />
+				{/each}
+			</div>
+		{/if}
 	{/if}
 </main>
 

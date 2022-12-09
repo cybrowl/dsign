@@ -273,21 +273,21 @@
 		<ProjectRenameModal {project} />
 	{/if}
 
-	<!-- Notification -->
-	{#if $notification_visible.moving_snaps}
-		<div class="absolute col-start-9 col-end-12 row-start-1 row-end-2 bottom-0 right-0">
-			<Notification
-				is_visible={$notification_visible.moving_snaps}
-				hide_delay_sec={$notification.hide_delay_sec}
-			>
-				<p>Moving snap(s) to</p>
-				<p><strong>{$notification.project_name}</strong></p>
-			</Notification>
-		</div>
-	{/if}
+	{#if $actor_snap_main.loggedIn || $actor_project_main.loggedIn}
+		<!-- Notification -->
+		{#if $notification_visible.moving_snaps}
+			<div class="absolute col-start-9 col-end-12 row-start-1 row-end-2 bottom-0 right-0">
+				<Notification
+					is_visible={$notification_visible.moving_snaps}
+					hide_delay_sec={$notification.hide_delay_sec}
+				>
+					<p>Moving snap(s) to</p>
+					<p><strong>{$notification.project_name}</strong></p>
+				</Notification>
+			</div>
+		{/if}
 
-	<!-- ProjectsTabs & ProjectEditActionsBar -->
-	{#if $auth_client.isAuthenticated}
+		<!-- ProjectsTabs & ProjectEditActionsBar -->
 		<div
 			class="hidden lg:flex col-start-2 col-end-12 row-start-2 row-end-3 mx-4 
 					self-end justify-between items-center h-10"
@@ -307,102 +307,102 @@
 				/>
 			{/if}
 		</div>
-	{/if}
-
-	<!-- Snaps -->
-	{#if $projects_tabs.isSnapsSelected}
-		<!-- Fetching Snaps -->
-		{#if $snap_store.isFetching === true}
-			<div
-				class="col-start-2 col-end-12 grid grid-cols-4 
-				row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
-			>
-				{#each { length: $local_storage_snaps.all_snaps_count } as _, i}
-					<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />
-				{/each}
-			</div>
-		{/if}
-
-		<!-- No Snaps Found -->
-		{#if $snap_store.snaps.length === 0 && $snap_store.isFetching === false}
-			<div
-				class="col-start-2 col-end-12 grid grid-cols-4 
-			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
-			>
-				<SnapCardEmpty
-					on:clickSnapCardEmpty={() => modal_update.change_visibility('snap_creation')}
-				/>
-			</div>
-		{/if}
 
 		<!-- Snaps -->
-		{#if $snap_store.snaps.length > 0}
-			<div
-				class="col-start-2 col-end-12 grid grid-cols-4 
+		{#if $projects_tabs.isSnapsSelected}
+			<!-- Fetching Snaps -->
+			{#if $snap_store.isFetching === true}
+				<div
+					class="col-start-2 col-end-12 grid grid-cols-4 
+				row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
+				>
+					{#each { length: $local_storage_snaps.all_snaps_count } as _, i}
+						<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />
+					{/each}
+				</div>
+			{/if}
+
+			<!-- No Snaps Found -->
+			{#if $snap_store.snaps.length === 0 && $snap_store.isFetching === false}
+				<div
+					class="col-start-2 col-end-12 grid grid-cols-4 
+			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
+				>
+					<SnapCardEmpty
+						on:clickSnapCardEmpty={() => modal_update.change_visibility('snap_creation')}
+					/>
+				</div>
+			{/if}
+
+			<!-- Snaps -->
+			{#if $snap_store.snaps.length > 0}
+				<div
+					class="col-start-2 col-end-12 grid grid-cols-4 
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
-			>
-				{#each $snap_store.snaps as snap}
-					<SnapCard {snap} isEditMode={$is_edit_active} />
-				{/each}
-			</div>
-		{/if}
-	{/if}
-
-	<!-- Projects -->
-	{#if $projects_tabs.isProjectsSelected}
-		<!-- Fetching Projects -->
-		{#if $project_store.isFetching === true}
-			<div
-				class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
-				row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
-			>
-				{#each { length: $local_storage_projects.all_projects_count } as _, i}
-					<ProjectCard isLoadingProject={true} />
-				{/each}
-			</div>
-		{/if}
-
-		<!-- No Projects Found -->
-		{#if $project_store.projects.length === 0 && $project_store.isFetching === false}
-			<div
-				class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
-				row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
-			>
-				<ProjectCardEmpty
-					on:clickProjectCardEmpty={() => modal_update.change_visibility('project_creation')}
-				/>
-			</div>
+				>
+					{#each $snap_store.snaps as snap}
+						<SnapCard {snap} isEditMode={$is_edit_active} />
+					{/each}
+				</div>
+			{/if}
 		{/if}
 
 		<!-- Projects -->
-		<div
-			class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
-			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
-		>
-			{#each $project_store.projects as project}
-				<ProjectCard
-					{project}
-					showOptionsPopover={true}
-					on:clickProject={handleProjectClick}
-					on:clickRenameProject={handleProjectRenameModalOpen}
-					on:clickDeleteProject={handleProjectDeleteModalOpen}
-				/>
-			{/each}
-		</div>
-	{/if}
+		{#if $projects_tabs.isProjectsSelected}
+			<!-- Fetching Projects -->
+			{#if $project_store.isFetching === true}
+				<div
+					class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
+				row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
+				>
+					{#each { length: $local_storage_projects.all_projects_count } as _, i}
+						<ProjectCard isLoadingProject={true} />
+					{/each}
+				</div>
+			{/if}
 
-	<!-- Project -->
-	{#if $projects_tabs.isProjectSelected}
-		<!-- Snaps -->
-		{#if project.snaps && project.snaps.length > 0}
+			<!-- No Projects Found -->
+			{#if $project_store.projects.length === 0 && $project_store.isFetching === false}
+				<div
+					class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
+				row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
+				>
+					<ProjectCardEmpty
+						on:clickProjectCardEmpty={() => modal_update.change_visibility('project_creation')}
+					/>
+				</div>
+			{/if}
+
+			<!-- Projects -->
 			<div
-				class="col-start-2 col-end-12 grid grid-cols-4 
-						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
+				class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
+			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 			>
-				{#each project.snaps as snap}
-					<SnapCard {snap} isEditMode={$is_edit_active} />
+				{#each $project_store.projects as project}
+					<ProjectCard
+						{project}
+						showOptionsPopover={true}
+						on:clickProject={handleProjectClick}
+						on:clickRenameProject={handleProjectRenameModalOpen}
+						on:clickDeleteProject={handleProjectDeleteModalOpen}
+					/>
 				{/each}
 			</div>
+		{/if}
+
+		<!-- Project -->
+		{#if $projects_tabs.isProjectSelected}
+			<!-- Snaps -->
+			{#if project.snaps && project.snaps.length > 0}
+				<div
+					class="col-start-2 col-end-12 grid grid-cols-4 
+						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
+				>
+					{#each project.snaps as snap}
+						<SnapCard {snap} isEditMode={$is_edit_active} />
+					{/each}
+				</div>
+			{/if}
 		{/if}
 	{/if}
 </main>
