@@ -1,20 +1,19 @@
 <!-- src/routes/favorites.svelte -->
 <script>
 	import { onMount } from 'svelte';
-	import { AuthClient } from '@dfinity/auth-client';
 
 	import Login from '../../components/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
+	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 
 	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
-	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 
-	import { modal_visible } from '$stores_ref/modal';
-	import { page_navigation } from '$stores_ref/page_navigation';
-	import { actor_favorite_main, createActor } from '$stores_ref/actors';
+	import { actor_favorite_main } from '$stores_ref/actors';
 	import { favorite_store } from '$stores_ref/fetch_store';
 	import { local_storage_favorites } from '$stores_ref/local_storage';
+	import { modal_visible } from '$stores_ref/modal';
+	import { page_navigation } from '$stores_ref/page_navigation';
 
 	page_navigation.update(({ navItems }) => {
 		navItems.forEach((navItem) => {
@@ -27,38 +26,26 @@
 		};
 	});
 
+	if ($favorite_store.snaps.length === 0) {
+		favorite_store.set({ isFetching: true, snaps: [] });
+	}
+
 	onMount(async () => {
-		let authClient = await AuthClient.create();
+		if ($actor_favorite_main.loggedIn) {
+			try {
+				const { ok: all_favs, err: err_get_all_favs } =
+					await $actor_favorite_main.actor.get_all_snaps();
 
-		const isAuthenticated = await authClient.isAuthenticated();
+				if (all_favs) {
+					favorite_store.set({ isFetching: false, snaps: [...all_favs] });
+					local_storage_favorites.set({ all_favorites_count: all_favs.length || 1 });
+				}
 
-		if (isAuthenticated) {
-			actor_favorite_main.update(() => ({
-				loggedIn: true,
-				actor: createActor({
-					actor_name: 'favorite_main',
-					identity: authClient.getIdentity()
-				})
-			}));
-		}
-
-		if ($favorite_store.snaps.length === 0) {
-			favorite_store.set({ isFetching: true, snaps: [] });
-		}
-
-		try {
-			const { ok: all_favs, err: err_get_all_favs } =
-				await $actor_favorite_main.actor.get_all_snaps();
-
-			if (all_favs) {
-				favorite_store.set({ isFetching: false, snaps: [...all_favs] });
-				local_storage_favorites.set({ all_favorites_count: all_favs.length || 1 });
+				console.log('all_favs: ', all_favs);
+				console.log('err_get_all_favs: ', err_get_all_favs);
+			} catch (error) {
+				console.log(error);
 			}
-
-			console.log('all_favs: ', all_favs);
-			console.log('err_get_all_favs: ', err_get_all_favs);
-		} catch (error) {
-			console.log(error);
 		}
 	});
 
