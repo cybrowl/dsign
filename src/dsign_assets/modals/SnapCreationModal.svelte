@@ -6,16 +6,15 @@
 	import SnapCreationPublishing from 'dsign-components/components/SnapCreationPublishing.svelte';
 	import Modal from 'dsign-components/components/Modal.svelte';
 
-	// actors
 	import {
 		actor_assets_file_chunks,
 		actor_assets_img_staging,
 		actor_snap_main
-	} from '../store/actors';
-
-	import { snap_store } from '../store/fetch_store';
-	import { projects_tabs } from '../store/page_state';
-	import { modal_visible } from '../store/modal';
+	} from '$stores_ref/actors';
+	import { auth_assets_file_chunks, auth_assets_img_staging } from '$stores_ref/auth_client';
+	import { modal_visible } from '$stores_ref/modal';
+	import { projects_tabs } from '$stores_ref/page_state';
+	import { snap_store } from '$stores_ref/fetch_store';
 
 	let is_publishing = false;
 
@@ -87,6 +86,8 @@
 	}
 
 	async function handleSnapCreation(e) {
+		await Promise.all([auth_assets_file_chunks(), auth_assets_img_staging()]);
+
 		const snap = get(e, 'detail');
 		let img_asset_ids = [];
 		let file_asset = [];
@@ -114,21 +115,23 @@
 			file_asset
 		};
 
-		const created_snap_res = await $actor_snap_main.actor.create_snap(create_snap_args);
+		if ($actor_snap_main.loggedIn) {
+			const created_snap_res = await $actor_snap_main.actor.create_snap(create_snap_args);
 
-		const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
+			const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
 
-		if (all_snaps) {
-			snap_store.set({ isFetching: false, snaps: [...all_snaps] });
+			if (all_snaps) {
+				snap_store.set({ isFetching: false, snaps: [...all_snaps] });
 
-			projects_tabs.set({
-				isSnapsSelected: true,
-				isProjectsSelected: false,
-				isProjectSelected: false
-			});
+				projects_tabs.set({
+					isSnapsSelected: true,
+					isProjectsSelected: false,
+					isProjectSelected: false
+				});
+			}
+
+			handleCloseModal(all_snaps);
 		}
-
-		handleCloseModal(all_snaps);
 	}
 </script>
 

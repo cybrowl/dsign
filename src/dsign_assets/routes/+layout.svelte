@@ -5,8 +5,8 @@
 
 	// actors
 	import {
-		actor_assets_file_chunks,
-		actor_assets_img_staging,
+		// actor_assets_file_chunks,
+		// actor_assets_img_staging,
 		// actor_explore,
 		// actor_favorite_main,
 		// actor_profile,
@@ -25,21 +25,21 @@
 		if (isAuthenticated) {
 			console.log('LAYOUT: isAuthenticated: ', isAuthenticated);
 
-			actor_assets_file_chunks.update(() => ({
-				loggedIn: true,
-				actor: createActor({
-					actor_name: 'assets_file_chunks',
-					identity: authClient.getIdentity()
-				})
-			}));
+			// actor_assets_file_chunks.update(() => ({
+			// 	loggedIn: true,
+			// 	actor: createActor({
+			// 		actor_name: 'assets_file_chunks',
+			// 		identity: authClient.getIdentity()
+			// 	})
+			// }));
 
-			actor_assets_img_staging.update(() => ({
-				loggedIn: true,
-				actor: createActor({
-					actor_name: 'assets_img_staging',
-					identity: authClient.getIdentity()
-				})
-			}));
+			// actor_assets_img_staging.update(() => ({
+			// 	loggedIn: true,
+			// 	actor: createActor({
+			// 		actor_name: 'assets_img_staging',
+			// 		identity: authClient.getIdentity()
+			// 	})
+			// }));
 
 			// actor_explore.update(() => ({
 			// 	loggedIn: true,
