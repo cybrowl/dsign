@@ -20,8 +20,8 @@
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 	import SnapsMoveModal from '../../modals/SnapsMoveModal.svelte';
 
-	import { auth_client } from '$stores_ref/auth_client';
 	import { actor_project_main, actor_snap_main } from '$stores_ref/actors';
+	import { auth_client, auth_snap_main, auth_project_main } from '$stores_ref/auth_client';
 	import { local_storage_snaps, local_storage_projects } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
@@ -70,6 +70,8 @@
 	}
 
 	onMount(async () => {
+		await Promise.all([auth_project_main(), auth_snap_main()]);
+
 		if ($actor_snap_main.loggedIn && $actor_project_main.loggedIn) {
 			try {
 				Promise.all([

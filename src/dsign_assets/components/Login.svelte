@@ -39,7 +39,7 @@
 	});
 
 	function handleAuth() {
-		location.replace('/');
+		location.replace('/projects');
 	}
 
 	function login() {
