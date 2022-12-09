@@ -91,7 +91,10 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		snaps.put(snap_id, snap);
 
 		let project_public : ?ProjectPublic = null;
-		let snap_public : SnapPublic = { snap and {} with owner = null; project = project_public };
+		let snap_public : SnapPublic = {
+			snap and {} with owner = null;
+			project = project_public;
+		};
 
 		ignore Explore.save_snap(snap_public);
 
@@ -223,7 +226,9 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 						case (null) {};
 						case (?snap) {
 							// update snap
-							let snap_updated : Snap = { snap with project = Option.make(projects[0]) };
+							let snap_updated : Snap = {
+								snap with project = Option.make(projects[0]);
+							};
 							snaps.put(snap.id, snap_updated);
 
 							// update snap for explore
@@ -271,7 +276,10 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 						};
 					};
 
-					let snap_public : SnapPublic = { snap and {} with owner = null; project = project_public };
+					let snap_public : SnapPublic = {
+						snap and {} with owner = null;
+						project = project_public;
+					};
 
 					snaps_list.add(snap_public);
 				};

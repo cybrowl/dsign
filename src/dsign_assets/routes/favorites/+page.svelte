@@ -121,7 +121,7 @@
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-20 mt-2 mb-24"
 		>
 			{#each $favorite_store.snaps as snap}
-				<SnapCard {snap} showUsername={true} on:clickLike={handleClickLike} />
+				<SnapCard {snap} showUsername={true} showMetrics={false} on:clickLike={handleClickLike} />
 			{/each}
 		</div>
 	{/if}

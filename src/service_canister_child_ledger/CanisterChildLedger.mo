@@ -55,16 +55,18 @@ actor CanisterChildLedger = {
 
 		is_prod := is_production;
 
+		let author : Text = "ru737-xk264-4nswf-o6lzb-3juxx-ixp63-objgb-l4io2-yievs-5ezxe-kqe";
+		let favorite_main : Text = "a7b5k-xiaaa-aaaag-aa6ja-cai";
 		let profile : Text = "kxkd5-7qaaa-aaaag-aaawa-cai";
 		let project_main : Text = "nhlnj-vyaaa-aaaag-aay5q-cai";
 		let snap_main : Text = "lyswl-7iaaa-aaaag-aatya-cai";
-		let author : Text = "ru737-xk264-4nswf-o6lzb-3juxx-ixp63-objgb-l4io2-yievs-5ezxe-kqe";
 
-		if (authorized.size() < 4) {
+		if (authorized.size() < 5) {
+			authorized.put(author, author);
+			authorized.put(favorite_main, favorite_main);
 			authorized.put(profile, profile);
 			authorized.put(project_main, project_main);
 			authorized.put(snap_main, snap_main);
-			authorized.put(author, author);
 
 			return "added";
 		} else {

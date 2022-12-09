@@ -227,7 +227,7 @@ actor FavoriteMain {
 		let favorite_main_principal = Principal.fromActor(FavoriteMain);
 		let is_prod = Text.equal(
 			Principal.toText(favorite_main_principal),
-			"lyswl-7iaaa-aaaag-aatya-cai"
+			"a7b5k-xiaaa-aaaag-aa6ja-cai"
 		);
 
 		if (favorite_canister_id.size() > 1) {
