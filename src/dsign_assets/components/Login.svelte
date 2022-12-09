@@ -41,7 +41,7 @@
 	});
 
 	function handleAuth() {
-		location.replace('/projects');
+		goto('/projects');
 	}
 
 	function login() {
