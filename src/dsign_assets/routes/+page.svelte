@@ -1,6 +1,5 @@
 <script>
 	import { onMount } from 'svelte';
-	import { AuthClient } from '@dfinity/auth-client';
 
 	import Login from '../components/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
@@ -9,10 +8,10 @@
 	import AccountSettingsModal from '../modals/AccountSettingsModal.svelte';
 	import SnapCreationModal from '../modals/SnapCreationModal.svelte';
 
+	import { actor_explore, actor_favorite_main } from '$stores_ref/actors.js';
+	import { explore_store } from '$stores_ref/fetch_store.js';
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation } from '$stores_ref/page_navigation';
-	import { actor_explore, actor_favorite_main, createActor } from '$stores_ref/actors.js';
-	import { explore_store } from '$stores_ref/fetch_store.js';
 
 	page_navigation.update(({ navItems }) => {
 		navItems.forEach((navItem) => {
@@ -26,34 +25,25 @@
 	});
 
 	onMount(async () => {
-		let authClient = await AuthClient.create();
-
-		const isAuthenticated = await authClient.isAuthenticated();
-
-		if (isAuthenticated) {
-			actor_favorite_main.update(() => ({
-				loggedIn: true,
-				actor: createActor({
-					actor_name: 'favorite_main',
-					identity: authClient.getIdentity()
-				})
-			}));
-		}
-
 		try {
 			const all_snaps = await $actor_explore.actor.get_all_snaps();
 
 			if (all_snaps) {
 				explore_store.set({ isFetching: false, snaps: [...all_snaps] });
 			}
-
-			const response = await $actor_favorite_main.actor.version();
-
-			console.log('fav: ', response);
 		} catch (error) {
-			console.log('error: call', error);
+			console.error('error: call', error);
 
-			await authClient.logout();
+			// await authClient.logout();
+		}
+
+		if ($actor_favorite_main.loggedIn) {
+			try {
+				const response = await $actor_favorite_main.actor.version();
+				console.log('fav: ', response);
+			} catch (error) {
+				console.error('error: call', error);
+			}
 		}
 	});
 

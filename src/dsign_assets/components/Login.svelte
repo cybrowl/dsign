@@ -1,129 +1,54 @@
 <script>
-	import { AuthClient } from '@dfinity/auth-client';
+	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import Button from 'dsign-components/components/Button.svelte';
 	import environment from 'environment';
-	import ProfileAvatar from './ProfileAvatar.svelte';
-	import { modal_visible } from '../store/modal';
+	import get from 'lodash/get.js';
 
-	import {
-		actor_assets_file_chunks,
-		actor_assets_img_staging,
-		actor_explore,
-		actor_profile,
-		actor_project_main,
-		actor_snap_main,
-		createActor
-	} from '../store/actors';
+	import Avatar from 'dsign-components/components/Avatar.svelte';
+	import Button from 'dsign-components/components/Button.svelte';
 
-	import { auth_client } from '../store/auth_client';
-	import { local_storage_remove } from '../store/local_storage';
+	import { actor_profile } from '$stores_ref/actors';
+	import { auth_client } from '$stores_ref/auth_client';
+	import { local_storage_profile, local_storage_remove } from '$stores_ref/local_storage';
+	import { modal_visible } from '$stores_ref/modal';
+	import modal_update from '$stores_ref/modal_update';
 
 	const env = environment();
 	const isProd = env['DFX_NETWORK'] === 'ic' || false;
-	let authClient;
 
 	onMount(async () => {
-		authClient = await AuthClient.create();
-		let isAuthenticated = await authClient.isAuthenticated();
+		console.log('Login: onMount: actor_profile: ', $actor_profile.loggedIn);
 
-		auth_client.set(authClient);
+		if ($actor_profile.loggedIn) {
+			try {
+				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
 
-		if (isAuthenticated) {
-			handleAuth();
-		} else {
-			handleLogout();
+				console.log('profile: ', profile);
+				console.log('err_profile: ', err_profile);
+				if (profile) {
+					local_storage_profile.set({
+						avatar_url: get(profile, 'avatar.url', ''),
+						username: get(profile, 'username', '')
+					});
+				}
+
+				if (err_profile) {
+					if (err_profile['ProfileNotFound'] === true) {
+						goto('/account_creation');
+					}
+				}
+			} catch (error) {
+				// goto('/');
+			}
 		}
 	});
 
-	function handleLogout() {
-		actor_assets_file_chunks.update((args) => ({
-			...args,
-			loggedIn: false
-		}));
-
-		actor_assets_img_staging.update((args) => ({
-			...args,
-			loggedIn: false
-		}));
-
-		actor_explore.update((args) => ({
-			...args,
-			loggedIn: false
-		}));
-
-		actor_profile.update((args) => ({
-			...args,
-			loggedIn: false
-		}));
-
-		actor_project_main.update((args) => ({
-			...args,
-			loggedIn: false
-		}));
-
-		actor_snap_main.update((args) => ({
-			...args,
-			loggedIn: false
-		}));
-
-		local_storage_remove('profile');
-		local_storage_remove('projects');
-		local_storage_remove('snaps');
-	}
-
 	function handleAuth() {
-		actor_assets_file_chunks.update(() => ({
-			loggedIn: true,
-			actor: createActor({
-				actor_name: 'assets_file_chunks',
-				identity: authClient.getIdentity()
-			})
-		}));
-
-		actor_assets_img_staging.update(() => ({
-			loggedIn: true,
-			actor: createActor({
-				actor_name: 'assets_img_staging',
-				identity: authClient.getIdentity()
-			})
-		}));
-
-		actor_explore.update(() => ({
-			loggedIn: true,
-			actor: createActor({
-				actor_name: 'explore',
-				identity: authClient.getIdentity()
-			})
-		}));
-
-		actor_profile.update(() => ({
-			loggedIn: true,
-			actor: createActor({
-				actor_name: 'profile',
-				identity: authClient.getIdentity()
-			})
-		}));
-
-		actor_project_main.update(() => ({
-			loggedIn: true,
-			actor: createActor({
-				actor_name: 'project_main',
-				identity: authClient.getIdentity()
-			})
-		}));
-
-		actor_snap_main.update(() => ({
-			loggedIn: true,
-			actor: createActor({
-				actor_name: 'snap_main',
-				identity: authClient.getIdentity()
-			})
-		}));
+		location.replace('/');
 	}
 
 	function login() {
-		authClient.login({
+		$auth_client.login({
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'
 				: 'http://localhost:8080/?canisterId=rwlgt-iiaaa-aaaaa-aaaaa-cai',
@@ -139,13 +64,21 @@
 			};
 		});
 	}
+
+	async function openSettingsModal() {
+		modal_update.change_visibility('account_settings');
+	}
 </script>
 
 <span>
 	{#if $actor_profile.loggedIn}
 		<div class="flex items-center">
 			<Button label="Upload" primary={true} class="mr-4" on:click={openSnapCreationModal} />
-			<ProfileAvatar />
+			<Avatar
+				avatar={$local_storage_profile.avatar_url}
+				username={$local_storage_profile.username}
+				on:click={openSettingsModal}
+			/>
 		</div>
 	{:else}
 		<Button secondary={true} label="Sign In" on:click={login} class="mr-4" />

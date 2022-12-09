@@ -1,7 +1,6 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { AuthClient } from '@dfinity/auth-client';
 	import get from 'lodash/get.js';
 
 	import Login from '../../components/Login.svelte';
@@ -15,94 +14,71 @@
 	import SnapCardEmpty from 'dsign-components/components/SnapCardEmpty.svelte';
 
 	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
-	import SnapsMoveModal from '../../modals/SnapsMoveModal.svelte';
 	import ProjectCreationModal from '../../modals/ProjectCreationModal.svelte';
 	import ProjectOptionsDeleteModal from '../../modals/ProjectOptionsDeleteModal.svelte';
 	import ProjectRenameModal from '../../modals/ProjectRenameModal.svelte';
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
+	import SnapsMoveModal from '../../modals/SnapsMoveModal.svelte';
 
-	// actors
-	import { actor_project_main, actor_snap_main, createActor } from '$stores_ref/actors';
-
-	// local storage
+	import { auth_client } from '$stores_ref/auth_client';
+	import { actor_project_main, actor_snap_main } from '$stores_ref/actors';
 	import { local_storage_snaps, local_storage_projects } from '$stores_ref/local_storage';
-
 	import { modal_visible } from '$stores_ref/modal';
-	import modal_update from '$stores_ref/modal_update';
 	import { notification_visible, notification } from '$stores_ref/notification';
 	import { page_navigation } from '$stores_ref/page_navigation';
 	import { project_store, snap_store } from '$stores_ref/fetch_store';
 	import { projects_tabs, is_edit_active } from '$stores_ref/page_state';
-
-	let isAuthenticated = false;
+	import modal_update from '$stores_ref/modal_update';
 
 	let project = { snaps: [] };
 
-	onMount(async () => {
-		let authClient = await AuthClient.create();
+	page_navigation.update(({ navItems }) => {
+		navItems.forEach((navItem) => {
+			navItem.isSelected = false;
+		});
+		navItems[1].isSelected = true;
 
-		isAuthenticated = await authClient.isAuthenticated();
+		return {
+			navItems: navItems
+		};
+	});
 
-		if (isAuthenticated) {
-			actor_project_main.update(() => ({
-				loggedIn: true,
-				actor: createActor({
-					actor_name: 'project_main',
-					identity: authClient.getIdentity()
-				})
-			}));
-
-			actor_snap_main.update(() => ({
-				loggedIn: true,
-				actor: createActor({
-					actor_name: 'snap_main',
-					identity: authClient.getIdentity()
-				})
-			}));
-		}
-		page_navigation.update(({ navItems }) => {
-			navItems.forEach((navItem) => {
-				navItem.isSelected = false;
-			});
-			navItems[1].isSelected = true;
-
+	if ($snap_store.snaps.length === 0) {
+		snap_store.update(({ snaps }) => {
 			return {
-				navItems: navItems
+				isFetching: true,
+				snaps: snaps
 			};
 		});
+	}
 
-		if ($snap_store.snaps.length === 0) {
-			snap_store.update(({ snaps }) => {
-				return {
-					isFetching: true,
-					snaps: snaps
-				};
-			});
-		}
+	if ($project_store.projects.length === 0) {
+		project_store.update(({ projects }) => {
+			return {
+				isFetching: true,
+				projects: projects
+			};
+		});
+	}
 
-		if ($project_store.projects.length === 0) {
-			project_store.update(({ projects }) => {
-				return {
-					isFetching: true,
-					projects: projects
-				};
-			});
-		}
+	if ($project_store.projects.length > 0) {
+		projects_tabs.set({
+			isSnapsSelected: false,
+			isProjectsSelected: true,
+			isProjectSelected: false
+		});
+	}
 
-		if ($project_store.projects.length > 0) {
-			projects_tabs.set({
-				isSnapsSelected: false,
-				isProjectsSelected: true,
-				isProjectSelected: false
-			});
-		}
-
-		if (isAuthenticated) {
+	onMount(async () => {
+		if ($actor_snap_main.loggedIn && $actor_project_main.loggedIn) {
 			try {
 				Promise.all([
 					$actor_snap_main.actor.get_all_snaps_without_project(),
 					$actor_project_main.actor.get_all_projects([])
 				]).then(async ([snaps, projects]) => {
+					console.log('snaps: ', snaps);
+					console.log('projects: ', projects);
+
 					const { ok: all_projects, err: err_all_projects } = projects;
 					const { ok: all_snaps, err: err_all_snaps } = snaps;
 
@@ -131,6 +107,7 @@
 					}
 				});
 			} catch (error) {
+				console.log('error projects: ', error);
 				goto('/');
 				console.log('error: call', error);
 			}
@@ -308,7 +285,7 @@
 	{/if}
 
 	<!-- ProjectsTabs & ProjectEditActionsBar -->
-	{#if isAuthenticated}
+	{#if $auth_client.isAuthenticated}
 		<div
 			class="hidden lg:flex col-start-2 col-end-12 row-start-2 row-end-3 mx-4 
 					self-end justify-between items-center h-10"

@@ -9,6 +9,7 @@
 		actor_assets_file_chunks,
 		actor_assets_img_staging,
 		actor_explore,
+		actor_favorite_main,
 		actor_profile,
 		actor_project_main,
 		actor_snap_main,
@@ -58,6 +59,8 @@
 	}
 
 	async function handleLogOut() {
+		await $auth_client.logout();
+
 		actor_assets_file_chunks.update(() => ({
 			loggedIn: false,
 			actor: createActor({
@@ -98,6 +101,14 @@
 			})
 		}));
 
+		actor_favorite_main.update(() => ({
+			loggedIn: false,
+			actor: createActor({
+				actor_name: 'favorite_main',
+				identity: $auth_client.getIdentity()
+			})
+		}));
+
 		actor_snap_main.update(() => ({
 			loggedIn: false,
 			actor: createActor({
@@ -105,8 +116,6 @@
 				identity: $auth_client.getIdentity()
 			})
 		}));
-
-		await $auth_client.logout();
 
 		local_storage_remove('profile');
 
