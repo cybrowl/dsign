@@ -1,6 +1,5 @@
 <!-- src/routes/favorites.svelte -->
 <script>
-	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 
 	import Login from '../../components/Login.svelte';
@@ -12,31 +11,16 @@
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
 	import { actor_favorite_main } from '$stores_ref/actors';
-	import { auth_favorite_main } from '$stores_ref/auth_client';
-	import { favorite_store } from '$stores_ref/fetch_store';
+	import { auth_favorite_main, auth_err } from '$stores_ref/auth_client';
+	import { favorite_store, favorite_store_fetching } from '$stores_ref/fetch_store';
 	import { local_storage_favorites } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
-	import { page_navigation } from '$stores_ref/page_navigation';
+	import { page_navigation, navigate_to_home_with_notification } from '$stores_ref/page_navigation';
+	import page_navigation_update from '$stores_ref/page_navigation_update';
 
-	page_navigation.update(({ navItems }) => {
-		navItems.forEach((navItem) => {
-			navItem.isSelected = false;
-		});
-		navItems[2].isSelected = true;
+	page_navigation_update.select_item(2);
 
-		return {
-			navItems: navItems
-		};
-	});
-
-	if ($favorite_store.snaps.length === 0) {
-		favorite_store.update(({ snaps }) => {
-			return {
-				isFetching: true,
-				snaps: snaps
-			};
-		});
-	}
+	$favorite_store.snaps.length === 0 && favorite_store_fetching();
 
 	onMount(async () => {
 		await auth_favorite_main();
@@ -49,9 +33,15 @@
 				if (all_favs) {
 					favorite_store.set({ isFetching: false, snaps: [...all_favs] });
 					local_storage_favorites.set({ all_favorites_count: all_favs.length || 1 });
-				} else {
+				}
+
+				if (err_get_all_favs) {
 					favorite_store.set({ isFetching: false, snaps: [] });
 					local_storage_favorites.set({ all_favorites_count: 1 });
+
+					if (err_get_all_favs['UserNotFound'] === true) {
+						await $actor_favorite_main.actor.create_user_favorite_storage();
+					}
 				}
 
 				console.log('all_favs: ', all_favs);
@@ -60,7 +50,7 @@
 				console.log(error);
 			}
 		} else {
-			goto('/');
+			navigate_to_home_with_notification();
 		}
 	});
 
@@ -73,10 +63,6 @@
 
 			console.log('delete_snap: ', delete_snap);
 			console.log('err_delete_snap: ', err_delete_snap);
-
-			if (err_delete_snap && err_delete_snap['UserNotFound'] === true) {
-				await $actor_favorite_main.actor.create_user_favorite_storage();
-			}
 		} catch (error) {
 			console.log('error: call', error);
 		}

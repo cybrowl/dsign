@@ -1,4 +1,6 @@
+import { goto } from '$app/navigation';
 import { writable } from 'svelte/store';
+import { notification_visible, notification } from '$stores_ref/notification';
 
 export const nav_items = [
 	{ name: 'Explore', href: '', isSelected: false },
@@ -10,3 +12,16 @@ export const nav_items = [
 export const page_navigation = writable({
 	navItems: nav_items
 });
+
+export const navigate_to_home_with_notification = () => {
+	notification_visible.set({ auth_error: true });
+	notification.set({ message: 'Sign In to Access' });
+	setTimeout(() => {
+		notification.set({ message: '' });
+		notification_visible.set({
+			auth_error: false
+		});
+	}, 2000);
+
+	goto('/');
+};

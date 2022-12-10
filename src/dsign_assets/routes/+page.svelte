@@ -1,8 +1,8 @@
 <script>
-	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 
 	import Login from '../components/Login.svelte';
+	import Notification from 'dsign-components/components/Notification.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 
@@ -13,41 +13,24 @@
 	import { auth_favorite_main } from '$stores_ref/auth_client';
 	import { explore_store } from '$stores_ref/fetch_store.js';
 	import { modal_visible } from '$stores_ref/modal';
+	import { notification_visible, notification } from '$stores_ref/notification';
 	import { page_navigation } from '$stores_ref/page_navigation';
+	import page_navigation_update from '$stores_ref/page_navigation_update';
 
-	page_navigation.update(({ navItems }) => {
-		navItems.forEach((navItem) => {
-			navItem.isSelected = false;
-		});
-		navItems[0].isSelected = true;
-
-		return {
-			navItems: navItems
-		};
-	});
+	page_navigation_update.select_item(0);
 
 	onMount(async () => {
-		await auth_favorite_main();
+		if ($notification.message.length === 0) {
+			await auth_favorite_main();
+		}
 
 		try {
 			const all_snaps = await $actor_explore.actor.get_all_snaps();
-
 			if (all_snaps) {
 				explore_store.set({ isFetching: false, snaps: [...all_snaps] });
 			}
 		} catch (error) {
 			console.error('error: call', error);
-
-			// await authClient.logout();
-		}
-
-		if ($actor_favorite_main.loggedIn) {
-			try {
-				const response = await $actor_favorite_main.actor.version();
-				console.log('fav: ', response);
-			} catch (error) {
-				console.error('error: call', error);
-			}
 		}
 	});
 
@@ -58,9 +41,6 @@
 			const { ok: saved_snap, err: err_save_snap } = await $actor_favorite_main.actor.save_snap(
 				snap_liked
 			);
-
-			console.log('saved_snap: ', saved_snap);
-			console.log('err_save_snap: ', err_save_snap);
 
 			if (err_save_snap && err_save_snap['UserNotFound'] === true) {
 				await $actor_favorite_main.actor.create_user_favorite_storage();
@@ -91,6 +71,15 @@
 	<!-- SnapCreationModal -->
 	{#if $modal_visible.snap_creation}
 		<SnapCreationModal />
+	{/if}
+
+	<!-- Notification -->
+	{#if $notification_visible.auth_error}
+		<div class="absolute col-start-9 col-end-12 row-start-1 row-end-2 bottom-0 right-0">
+			<Notification is_visible={$notification_visible.auth_error} hide_delay_sec={2000}>
+				<p>{$notification.message}</p>
+			</Notification>
+		</div>
 	{/if}
 
 	<!-- Snaps -->

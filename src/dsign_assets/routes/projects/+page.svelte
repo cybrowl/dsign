@@ -21,45 +21,28 @@
 	import SnapsMoveModal from '../../modals/SnapsMoveModal.svelte';
 
 	import { actor_project_main, actor_snap_main } from '$stores_ref/actors';
-	import { auth_client, auth_snap_main, auth_project_main } from '$stores_ref/auth_client';
+	import { auth_snap_main, auth_project_main } from '$stores_ref/auth_client';
+	import {
+		project_store,
+		project_store_fetching,
+		snap_store,
+		snap_store_fetching
+	} from '$stores_ref/fetch_store';
 	import { local_storage_snaps, local_storage_projects } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
-	import { page_navigation } from '$stores_ref/page_navigation';
-	import { project_store, snap_store } from '$stores_ref/fetch_store';
+	import { page_navigation, navigate_to_home_with_notification } from '$stores_ref/page_navigation';
+
 	import { projects_tabs, is_edit_active } from '$stores_ref/page_state';
 	import modal_update from '$stores_ref/modal_update';
+	import page_navigation_update from '$stores_ref/page_navigation_update';
 
 	let project = { snaps: [] };
 
-	page_navigation.update(({ navItems }) => {
-		navItems.forEach((navItem) => {
-			navItem.isSelected = false;
-		});
-		navItems[1].isSelected = true;
+	page_navigation_update.select_item(1);
 
-		return {
-			navItems: navItems
-		};
-	});
-
-	if ($snap_store.snaps.length === 0) {
-		snap_store.update(({ snaps }) => {
-			return {
-				isFetching: true,
-				snaps: snaps
-			};
-		});
-	}
-
-	if ($project_store.projects.length === 0) {
-		project_store.update(({ projects }) => {
-			return {
-				isFetching: true,
-				projects: projects
-			};
-		});
-	}
+	$snap_store.snaps.length === 0 && snap_store_fetching();
+	$project_store.projects.length === 0 && project_store_fetching();
 
 	if ($project_store.projects.length > 0) {
 		projects_tabs.set({
@@ -114,7 +97,7 @@
 				console.log('error: call', error);
 			}
 		} else {
-			goto('/');
+			navigate_to_home_with_notification();
 		}
 	});
 
@@ -201,8 +184,12 @@
 
 		handleToggleEditMode({ detail: false });
 
-		await $actor_snap_main.actor.delete_snaps(selected_snaps_ids);
-		await fetchAllSnaps();
+		if ($actor_snap_main.loggedIn) {
+			await $actor_snap_main.actor.delete_snaps(selected_snaps_ids);
+			await fetchAllSnaps();
+		} else {
+			navigate_to_home_with_notification();
+		}
 	}
 
 	function handleSnapsMoveModalOpen() {
@@ -277,10 +264,7 @@
 		<!-- Notification -->
 		{#if $notification_visible.moving_snaps}
 			<div class="absolute col-start-9 col-end-12 row-start-1 row-end-2 bottom-0 right-0">
-				<Notification
-					is_visible={$notification_visible.moving_snaps}
-					hide_delay_sec={$notification.hide_delay_sec}
-				>
+				<Notification is_visible={$notification_visible.moving_snaps} hide_delay_sec={5000}>
 					<p>Moving snap(s) to</p>
 					<p><strong>{$notification.project_name}</strong></p>
 				</Notification>
