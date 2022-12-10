@@ -2,11 +2,9 @@
 	import Modal from 'dsign-components/components/Modal.svelte';
 	import ProjectOptionsDelete from 'dsign-components/components/ProjectOptionsDelete.svelte';
 
-	// actors
-	import { actor_project_main, actor_snap_main } from '../store/actors';
-
-	import { project_store } from '../store/fetch_store';
-	import { modal_visible } from '../store/modal';
+	import { actor_project_main, actor_snap_main } from '$stores_ref/actors';
+	import { modal_visible } from '$stores_ref/modal';
+	import { project_store } from '$stores_ref/fetch_store';
 
 	export let project = {
 		snaps: []

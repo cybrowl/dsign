@@ -9,8 +9,10 @@
 
 	import { actor_profile } from '$stores_ref/actors.js';
 	import { local_storage_profile } from '$stores_ref/local_storage';
-	import { page_navigation, navigate_to_home_with_notification } from '$stores_ref/page_navigation';
-	import page_navigation_update from '$stores_ref/page_navigation_update';
+	import page_navigation_update, {
+		page_navigation,
+		navigate_to_home_with_notification
+	} from '$stores_ref/page_navigation';
 
 	// variables
 	const username = get($local_storage_profile, 'username', '');

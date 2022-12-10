@@ -14,8 +14,7 @@
 	import { explore_store } from '$stores_ref/fetch_store.js';
 	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
-	import { page_navigation } from '$stores_ref/page_navigation';
-	import page_navigation_update from '$stores_ref/page_navigation_update';
+	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
 
 	page_navigation_update.select_item(0);
 

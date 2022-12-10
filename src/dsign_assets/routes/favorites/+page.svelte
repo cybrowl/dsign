@@ -11,12 +11,14 @@
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 
 	import { actor_favorite_main } from '$stores_ref/actors';
-	import { auth_favorite_main, auth_err } from '$stores_ref/auth_client';
+	import { auth_favorite_main } from '$stores_ref/auth_client';
 	import { favorite_store, favorite_store_fetching } from '$stores_ref/fetch_store';
 	import { local_storage_favorites } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
-	import { page_navigation, navigate_to_home_with_notification } from '$stores_ref/page_navigation';
-	import page_navigation_update from '$stores_ref/page_navigation_update';
+	import page_navigation_update, {
+		page_navigation,
+		navigate_to_home_with_notification
+	} from '$stores_ref/page_navigation';
 
 	page_navigation_update.select_item(2);
 

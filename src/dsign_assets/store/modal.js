@@ -9,3 +9,16 @@ export const modal_visible = writable({
 	project_options: false,
 	project_rename: false
 });
+
+function change_visibility(name) {
+	modal_visible.update((options) => {
+		return {
+			...options,
+			[name]: !options[name]
+		};
+	});
+}
+
+export default {
+	change_visibility
+};

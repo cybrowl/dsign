@@ -4,16 +4,12 @@
 	import Modal from 'dsign-components/components/Modal.svelte';
 	import SnapsMove from 'dsign-components/components/SnapsMove.svelte';
 
-	// actors
-	import { actor_project_main, actor_snap_main } from '../store/actors';
-
-	// local storage
-	import { local_storage_projects, local_storage_snaps } from '../store/local_storage';
-
-	import { project_store, snap_store } from '../store/fetch_store';
-	import { projects_tabs, is_edit_active } from '../store/page_state';
-	import { modal_visible } from '../store/modal';
-	import { notification, notification_visible } from '../store/notification';
+	import { actor_project_main, actor_snap_main } from '$stores_ref/actors';
+	import { local_storage_projects, local_storage_snaps } from '$stores_ref/local_storage';
+	import { modal_visible } from '$stores_ref/modal';
+	import { notification, notification_visible } from '$stores_ref/notification';
+	import { project_store, snap_store } from '$stores_ref/fetch_store';
+	import { projects_tabs, is_edit_active } from '$stores_ref/page_state';
 
 	export let project = { snaps: [] };
 

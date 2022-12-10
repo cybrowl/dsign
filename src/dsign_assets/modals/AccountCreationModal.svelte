@@ -5,7 +5,6 @@
 	import AccountCreationSuccess from 'dsign-components/components/AccountCreationSuccess.svelte';
 	import Modal from 'dsign-components/components/Modal.svelte';
 
-	// actors
 	import {
 		actor_favorite_main,
 		actor_profile,

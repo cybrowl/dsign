@@ -19,12 +19,10 @@
 
 	import { actor_assets_img_staging, actor_profile, actor_project_main } from '$stores_ref/actors';
 	import { local_storage_profile_public, local_storage_projects } from '$stores_ref/local_storage';
-	import { modal_visible } from '$stores_ref/modal';
-	import { page_navigation } from '$stores_ref/page_navigation';
 	import { profile_tabs } from '$stores_ref/page_state';
 	import { project_store } from '$stores_ref/fetch_store';
-	import modal_update from '$stores_ref/modal_update';
-	import page_navigation_update from '$stores_ref/page_navigation_update';
+	import modal_update, { modal_visible } from '$stores_ref/modal';
+	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
 
 	// variables
 	let project = {

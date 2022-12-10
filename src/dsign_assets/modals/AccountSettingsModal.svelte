@@ -13,7 +13,7 @@
 		auth_profile
 	} from '$stores_ref/auth_client';
 	import { local_storage_profile, local_storage_remove_all } from '$stores_ref/local_storage';
-	import modal_update from '$stores_ref/modal_update';
+	import modal_update from '$stores_ref/modal';
 
 	onMount(async () => {
 		await Promise.all([auth_profile(), auth_assets_img_staging()]);

@@ -10,7 +10,7 @@
 	import { actor_profile } from '$stores_ref/actors';
 	import { auth_client, auth_profile } from '$stores_ref/auth_client';
 	import { local_storage_profile } from '$stores_ref/local_storage';
-	import modal_update from '$stores_ref/modal_update';
+	import modal_update from '$stores_ref/modal';
 
 	const env = environment();
 	const isProd = env['DFX_NETWORK'] === 'ic' || false;

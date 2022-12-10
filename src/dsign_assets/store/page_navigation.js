@@ -25,3 +25,20 @@ export const navigate_to_home_with_notification = () => {
 
 	goto('/');
 };
+
+function select_item(num) {
+	page_navigation.update(({ navItems }) => {
+		navItems.forEach((navItem) => {
+			navItem.isSelected = false;
+		});
+		navItems[num].isSelected = true;
+
+		return {
+			navItems: navItems
+		};
+	});
+}
+
+export default {
+	select_item
+};

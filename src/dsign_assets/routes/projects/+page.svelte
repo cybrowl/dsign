@@ -29,13 +29,13 @@
 		snap_store_fetching
 	} from '$stores_ref/fetch_store';
 	import { local_storage_snaps, local_storage_projects } from '$stores_ref/local_storage';
-	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
-	import { page_navigation, navigate_to_home_with_notification } from '$stores_ref/page_navigation';
-
 	import { projects_tabs, is_edit_active } from '$stores_ref/page_state';
-	import modal_update from '$stores_ref/modal_update';
-	import page_navigation_update from '$stores_ref/page_navigation_update';
+	import modal_update, { modal_visible } from '$stores_ref/modal';
+	import page_navigation_update, {
+		page_navigation,
+		navigate_to_home_with_notification
+	} from '$stores_ref/page_navigation';
 
 	let project = { snaps: [] };
 
