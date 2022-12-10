@@ -39,3 +39,24 @@ export const project_store_fetching = function () {
 		};
 	});
 };
+
+function delete_projects(project) {
+	const project_snaps_ids = project.snaps.map((snap) => snap.id);
+
+	project_store.update(({ projects }) => {
+		const updated_projects = projects.filter((project_) => {
+			return project_.id !== project.id;
+		});
+
+		return {
+			isFetching: false,
+			projects: updated_projects
+		};
+	});
+
+	return project_snaps_ids;
+}
+
+export const projects_update = {
+	delete_projects: delete_projects
+};

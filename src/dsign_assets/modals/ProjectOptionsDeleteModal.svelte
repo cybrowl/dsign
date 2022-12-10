@@ -1,54 +1,52 @@
 <script>
+	import { onMount } from 'svelte';
+
 	import Modal from 'dsign-components/components/Modal.svelte';
 	import ProjectOptionsDelete from 'dsign-components/components/ProjectOptionsDelete.svelte';
 
 	import { actor_project_main, actor_snap_main } from '$stores_ref/actors';
-	import { modal_visible } from '$stores_ref/modal';
-	import { project_store } from '$stores_ref/fetch_store';
+	import { auth_snap_main, auth_project_main } from '$stores_ref/auth_client';
+	import { navigate_to_home_with_notification } from '$stores_ref/page_navigation';
+	import { projects_update } from '$stores_ref/fetch_store';
+	import modal_update from '$stores_ref/modal';
 
 	export let project = {
 		snaps: []
 	};
 
+	onMount(async () => {
+		await Promise.all([auth_snap_main(), auth_project_main()]);
+	});
+
 	function handleCloseModal() {
-		modal_visible.update((options) => {
-			return {
-				...options,
-				project_options: !options.project_options
-			};
-		});
+		modal_update.change_visibility('project_options');
 	}
 
 	async function handleDeleteProject() {
-		const project_snaps_ids = project.snaps.map((snap) => snap.id);
+		if ($actor_project_main.loggedIn && $actor_snap_main.loggedIn) {
+			const project_snaps_ids = projects_update.delete_projects(project);
 
-		project_store.update(({ projects }) => {
-			const updated_projects = projects.filter((project_) => {
-				return project_.id !== project.id;
-			});
+			modal_update.change_visibility('project_options');
 
-			return {
-				isFetching: false,
-				projects: updated_projects
-			};
-		});
+			try {
+				const { err: err_delete_projects } = await $actor_project_main.actor.delete_projects([
+					project.id
+				]);
 
-		modal_visible.update((options) => {
-			return {
-				...options,
-				project_options: !options.project_options
-			};
-		});
+				console.log('err_delete_projects: ', err_delete_projects);
 
-		try {
-			const { ok: success, err: error } = await $actor_project_main.actor.delete_projects([
-				project.id
-			]);
+				const { err: err_delete_snaps } = await $actor_snap_main.actor.delete_snaps(
+					project_snaps_ids
+				);
 
-			const { ok: deleted_snaps, err: deleted_snaps_err } =
-				await $actor_snap_main.actor.delete_snaps(project_snaps_ids);
-		} catch (error) {
-			console.log(error);
+				console.log('err_delete_snaps: ', err_delete_snaps);
+
+				//TODO: handle errors
+			} catch (error) {
+				console.log(error);
+			}
+		} else {
+			navigate_to_home_with_notification();
 		}
 	}
 </script>

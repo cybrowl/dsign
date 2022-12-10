@@ -26,6 +26,17 @@ export const navigate_to_home_with_notification = () => {
 	goto('/');
 };
 
+export const show_notification_with_msg = (message) => {
+	notification_visible.set({ service_error: true });
+	notification.set({ message: message });
+	setTimeout(() => {
+		notification.set({ message: '' });
+		notification_visible.set({
+			auth_error: false
+		});
+	}, 3000);
+};
+
 function select_item(num) {
 	page_navigation.update(({ navItems }) => {
 		navItems.forEach((navItem) => {
