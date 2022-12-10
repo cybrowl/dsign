@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 	import get from 'lodash/get';
 
-	// components
 	import Login from '$components_ref/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 
@@ -14,10 +13,8 @@
 		navigate_to_home_with_notification
 	} from '$stores_ref/page_navigation';
 
-	// variables
 	const username = get($local_storage_profile, 'username', '');
 
-	// execution
 	if (username.length > 0) {
 		goto(`/profile/${username}`);
 	}

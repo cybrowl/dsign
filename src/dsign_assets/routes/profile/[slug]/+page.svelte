@@ -24,14 +24,12 @@
 	import modal_update, { modal_visible } from '$stores_ref/modal';
 	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
 
-	// variables
 	let project = {
 		name: ''
 	};
 	let isProfileOwner = false;
 	let profile = {};
 
-	// execution
 	page_navigation_update.select_item(3);
 
 	if ($project_store.projects.length === 0) {
