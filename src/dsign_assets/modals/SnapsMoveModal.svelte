@@ -1,15 +1,18 @@
 <script>
+	import { onMount } from 'svelte';
+
 	import get from 'lodash/get.js';
 
 	import Modal from 'dsign-components/components/Modal.svelte';
 	import SnapsMove from 'dsign-components/components/SnapsMove.svelte';
 
 	import { actor_project_main, actor_snap_main } from '$stores_ref/actors';
+	import { auth_snap_main, auth_project_main } from '$stores_ref/auth_client';
 	import { local_storage_projects, local_storage_snaps } from '$stores_ref/local_storage';
-	import { modal_visible } from '$stores_ref/modal';
-	import { notification, notification_visible } from '$stores_ref/notification';
+	import { notification_update, notification_visible } from '$stores_ref/notification';
 	import { project_store, snap_store } from '$stores_ref/fetch_store';
 	import { projects_tabs, is_edit_active } from '$stores_ref/page_state';
+	import modal_update from '$stores_ref/modal';
 
 	export let project = { snaps: [] };
 
@@ -29,43 +32,18 @@
 	let hideDetails = true;
 	let isMoveModal = true;
 
+	onMount(async () => {
+		await Promise.all([auth_snap_main(), auth_project_main()]);
+	});
+
 	function handleCloseSnapsMoveModal() {
-		modal_visible.update((options) => {
-			return {
-				...options,
-				snaps_move: !options.snaps_move
-			};
-		});
+		modal_update.change_visibility('snaps_move');
 
 		is_edit_active.update((is_edit_active) => !is_edit_active);
 	}
 
-	function handleOpenCreateProjectModal() {
-		modal_visible.update((options) => {
-			return {
-				...options,
-				project_creation: !options.project_creation
-			};
-		});
-	}
-
-	function showNotification(selected_project) {
-		const hide_notification_delay_sec = $projects_tabs.isSnapsSelected ? 10000 : 8000;
-
-		notification_visible.set({
-			moving_snaps: true
-		});
-
-		notification.set({
-			hide_delay_sec: hide_notification_delay_sec,
-			project_name: selected_project.name
-		});
-
-		setTimeout(() => {
-			notification_visible.set({
-				moving_snaps: false
-			});
-		}, hide_notification_delay_sec);
+	function handleOpenProjectCreationModal() {
+		modal_update.change_visibility('project_creation');
 	}
 
 	async function handleMoveSubmit(e) {
@@ -73,64 +51,70 @@
 
 		handleCloseSnapsMoveModal();
 
-		showNotification(selected_project);
+		notification_update.show_notification_snap_move(selected_project);
 
 		if (selected_snaps_list.length == 0) {
 			//TODO: show error notification - no snaps selected
 			return;
 		}
 
-		try {
-			let project_from_ref = {
-				id: project.id,
-				canister_id: project.canister_id
-			};
+		if ($actor_project_main.loggedIn && $actor_snap_main.loggedIn) {
+			try {
+				let project_from_ref = {
+					id: project.id,
+					canister_id: project.canister_id
+				};
 
-			let project_to_ref = {
-				id: selected_project.id,
-				canister_id: selected_project.canister_id
-			};
+				let project_to_ref = {
+					id: selected_project.id,
+					canister_id: selected_project.canister_id
+				};
 
-			if ($projects_tabs.isSnapsSelected) {
-				const { ok: added_snap_to_project, err: err_adding_snaps_to_projet } =
-					await $actor_project_main.actor.add_snaps_to_project(selected_snaps_list, project_to_ref);
-			} else {
-				const { ok: moved_snaps } = await $actor_project_main.actor.move_snaps_from_project(
-					selected_snaps_list,
-					project_from_ref,
-					project_to_ref
-				);
+				if ($projects_tabs.isSnapsSelected) {
+					const { ok: added_snaps_to_project, err: err_add_snaps_to_project } =
+						await $actor_project_main.actor.add_snaps_to_project(
+							selected_snaps_list,
+							project_to_ref
+						);
+				} else {
+					const { ok: moved_snaps, err: err_move_snaps_from_project } =
+						await $actor_project_main.actor.move_snaps_from_project(
+							selected_snaps_list,
+							project_from_ref,
+							project_to_ref
+						);
+				}
+
+				const { ok: all_projects, err: err_all_projects } =
+					await $actor_project_main.actor.get_all_projects([]);
+
+				const { ok: all_snaps, err: err_all_snaps } =
+					await $actor_snap_main.actor.get_all_snaps_without_project();
+
+				if (all_projects) {
+					project_store.set({ isFetching: false, projects: [...all_projects] });
+
+					local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
+
+					notification_visible.set({
+						moving_snaps: false
+					});
+				}
+
+				if (all_snaps) {
+					snap_store.set({ isFetching: false, snaps: [...all_snaps] });
+					local_storage_snaps.set({ all_snaps_count: all_snaps.length || 1 });
+				}
+			} catch (error) {
+				//TODO: handle error
 			}
 
-			const { ok: all_projects, err: err_all_projects } =
-				await $actor_project_main.actor.get_all_projects([]);
-
-			const { ok: all_snaps, err: err_all_snaps } =
-				await $actor_snap_main.actor.get_all_snaps_without_project();
-
-			if (all_projects) {
-				project_store.set({ isFetching: false, projects: [...all_projects] });
-
-				local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
-
-				notification_visible.set({
-					moving_snaps: false
-				});
-			}
-
-			if (all_snaps) {
-				snap_store.set({ isFetching: false, snaps: [...all_snaps] });
-				local_storage_snaps.set({ all_snaps_count: all_snaps.length || 1 });
-			}
-		} catch (error) {
-			console.log('call => handleMoveSubmit error: ', error);
+			projects_tabs.set({
+				isSnapsSelected: false,
+				isProjectsSelected: true,
+				isProjectSelected: false
+			});
 		}
-
-		projects_tabs.set({
-			isSnapsSelected: false,
-			isProjectsSelected: true,
-			isProjectSelected: false
-		});
 	}
 </script>
 
@@ -141,7 +125,7 @@
 		{hideDetails}
 		{isMoveModal}
 		on:moveSubmit={handleMoveSubmit}
-		on:createProject={handleOpenCreateProjectModal}
+		on:createProject={handleOpenProjectCreationModal}
 	/>
 </Modal>
 
