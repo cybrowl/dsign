@@ -40,8 +40,24 @@
 		}
 	});
 
-	function handleAuth() {
-		goto('/projects');
+	async function handleAuth() {
+		await auth_profile();
+
+		try {
+			if ($actor_profile.loggedIn) {
+				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
+
+				if (profile) {
+					goto('/projects');
+				}
+
+				if (err_profile) {
+					if (err_profile['ProfileNotFound'] === true) {
+						goto('/account_creation');
+					}
+				}
+			}
+		} catch (error) {}
 	}
 
 	function login() {
