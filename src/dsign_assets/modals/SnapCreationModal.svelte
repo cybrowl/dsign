@@ -1,5 +1,5 @@
 <script>
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import get from 'lodash/get.js';
 
 	import SnapCreation from 'dsign-components/components/SnapCreation.svelte';
@@ -11,28 +11,32 @@
 		actor_assets_img_staging,
 		actor_snap_main
 	} from '$stores_ref/actors';
-	import { auth_assets_file_chunks, auth_assets_img_staging } from '$stores_ref/auth_client';
-	import { modal_visible } from '$stores_ref/modal';
+	import {
+		auth_assets_file_chunks,
+		auth_assets_img_staging,
+		auth_snap_main
+	} from '$stores_ref/auth_client';
 	import { projects_tabs } from '$stores_ref/page_state';
 	import { snap_store } from '$stores_ref/fetch_store';
+	import modal_update from '$stores_ref/modal';
 
 	let is_publishing = false;
+
+	onMount(async () => {
+		await Promise.all([auth_assets_file_chunks(), auth_assets_img_staging(), auth_snap_main()]);
+	});
 
 	onDestroy(() => (is_publishing = false));
 
 	function handleCloseModal() {
-		modal_visible.update((options) => {
-			return {
-				...options,
-				snap_creation: !options.snap_creation
-			};
-		});
+		modal_update.change_visibility('snap_creation');
 	}
 
 	async function commitImgAssetsToStaging(images) {
 		let promises = [];
 
 		images.forEach(async function (image) {
+			// note: image file_format is checked by assets_img_staging actor
 			const args = {
 				data: image,
 				file_format: 'png'
@@ -86,39 +90,44 @@
 	}
 
 	async function handleSnapCreation(e) {
-		await Promise.all([auth_assets_file_chunks(), auth_assets_img_staging()]);
-
 		const snap = get(e, 'detail');
+
 		let img_asset_ids = [];
 		let file_asset = [];
-
 		is_publishing = true;
 
-		img_asset_ids = await commitImgAssetsToStaging(snap.images);
+		if (
+			$actor_assets_file_chunks.loggedIn &&
+			$actor_assets_img_staging.loggedIn &&
+			$actor_snap_main.loggedIn
+		) {
+			img_asset_ids = await commitImgAssetsToStaging(snap.images);
 
-		let has_invalid_img = false;
+			let has_invalid_img = false;
 
-		img_asset_ids.forEach(function (val) {
-			if (val == 0) {
-				has_invalid_img = true;
+			img_asset_ids.forEach(function (val) {
+				if (val == 0) {
+					has_invalid_img = true;
+				}
+			});
+
+			if (snap.file !== null) {
+				file_asset = await commitFileAssetChunks(snap);
 			}
-		});
 
-		if (snap.file !== null) {
-			file_asset = await commitFileAssetChunks(snap);
-		}
+			const create_snap_args = {
+				title: snap.title,
+				image_cover_location: snap.cover_image_location,
+				img_asset_ids: img_asset_ids,
+				file_asset
+			};
 
-		const create_snap_args = {
-			title: snap.title,
-			image_cover_location: snap.cover_image_location,
-			img_asset_ids: img_asset_ids,
-			file_asset
-		};
+			const { ok: created_snap, err_create_snap } = await $actor_snap_main.actor.create_snap(
+				create_snap_args
+			);
 
-		if ($actor_snap_main.loggedIn) {
-			const created_snap_res = await $actor_snap_main.actor.create_snap(create_snap_args);
-
-			const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
+			const { ok: all_snaps, err: err_get_all_snaps_without_project } =
+				await $actor_snap_main.actor.get_all_snaps_without_project();
 
 			if (all_snaps) {
 				snap_store.set({ isFetching: false, snaps: [...all_snaps] });
@@ -130,7 +139,7 @@
 				});
 			}
 
-			handleCloseModal(all_snaps);
+			modal_update.change_visibility('snap_creation');
 		}
 	}
 </script>
