@@ -232,7 +232,7 @@ actor Profile = {
 
 					switch (await image_assets_actor.save_images(img_asset_ids, "avatar", caller)) {
 						case (#err err) {
-							return #err(#ErrorCall(debug_show (err)));
+							return #err(#ErrorCall(debug_show ("image_assets_actor", err)));
 						};
 						case (#ok images) {
 							let image = images[0];
@@ -256,7 +256,7 @@ actor Profile = {
 
 					switch (await image_assets_actor.update_image(img_asset_ids[0], profile.avatar.id, "avatar", caller)) {
 						case (#err err) {
-							return #err(#ErrorCall(debug_show (err)));
+							return #err(#ErrorCall(debug_show ("image_assets_actor", err)));
 						};
 						case (#ok image) {
 

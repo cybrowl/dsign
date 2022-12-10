@@ -1,24 +1,23 @@
 <script>
+	import { onMount } from 'svelte';
 	import get from 'lodash/get.js';
 
 	import AccountSettings from 'dsign-components/components/AccountSettings.svelte';
 	import Modal from 'dsign-components/components/Modal.svelte';
 
-	// actors
+	import { actor_assets_img_staging, actor_profile } from '$stores_ref/actors';
 	import {
-		actor_assets_file_chunks,
-		actor_assets_img_staging,
-		actor_explore,
-		actor_favorite_main,
-		actor_profile,
-		actor_project_main,
-		actor_snap_main,
-		createActor
-	} from '../store/actors';
+		auth_assets_img_staging,
+		auth_client,
+		auth_logout_all,
+		auth_profile
+	} from '$stores_ref/auth_client';
+	import { local_storage_profile, local_storage_remove_all } from '$stores_ref/local_storage';
+	import modal_update from '$stores_ref/modal_update';
 
-	import { auth_client } from '../store/auth_client';
-	import { modal_visible } from '../store/modal';
-	import { local_storage_profile, local_storage_remove } from '../store/local_storage';
+	onMount(async () => {
+		await Promise.all([auth_profile(), auth_assets_img_staging()]);
+	});
 
 	async function handleAvatarChange(event) {
 		let files = event.detail;
@@ -31,97 +30,46 @@
 			file_format: selectedFile.type
 		};
 
-		try {
-			let img_asset_id = await $actor_assets_img_staging.actor.create_asset(create_asset_args);
-			await $actor_profile.actor.update_profile_avatar([img_asset_id]);
+		if ($actor_assets_img_staging.loggedIn && $actor_profile.loggedIn) {
+			try {
+				// commit img asset to staging
+				let img_asset_id = await $actor_assets_img_staging.actor.create_asset(create_asset_args);
 
-			let { ok: profile } = await $actor_profile.actor.get_profile();
+				// update profile avatar
+				const { ok: avatar_url, err: err_update_avatar } =
+					await $actor_profile.actor.update_profile_avatar([img_asset_id]);
 
-			const randomNumber = Math.floor(Math.random() * 1000);
-			local_storage_profile.set({
-				avatar_url: get(profile, 'avatar.url', '') + '&' + randomNumber,
-				banner_url: get(profile, 'banner.url', '') || '/default_profile_banner.png',
-				username: get(profile, 'username', ''),
-				website: ''
-			});
-		} catch (error) {
-			console.log('error', error);
+				if (err_update_avatar) {
+					//TODO: add notification
+				}
+
+				let { ok: profile } = await $actor_profile.actor.get_profile();
+
+				const randomNumber = Math.floor(Math.random() * 1000);
+				local_storage_profile.set({
+					avatar_url: get(profile, 'avatar.url', '') + '&' + randomNumber,
+					banner_url: get(profile, 'banner.url', '') || '/default_profile_banner.png',
+					username: get(profile, 'username', ''),
+					website: ''
+				});
+			} catch (error) {
+				console.log('error', error);
+			}
 		}
 	}
 
 	function handleCloseModal() {
-		modal_visible.update((options) => {
-			return {
-				...options,
-				account_settings: !options.account_settings
-			};
-		});
+		modal_update.change_visibility('account_settings');
 	}
 
 	async function handleLogOut() {
 		await $auth_client.logout();
 
-		actor_assets_file_chunks.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'assets_file_chunks',
-				identity: $auth_client.getIdentity()
-			})
-		}));
+		await auth_logout_all();
 
-		actor_assets_img_staging.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'assets_img_staging',
-				identity: $auth_client.getIdentity()
-			})
-		}));
-
-		actor_explore.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'explore',
-				identity: $auth_client.getIdentity()
-			})
-		}));
-
-		actor_profile.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'profile',
-				identity: $auth_client.getIdentity()
-			})
-		}));
-
-		actor_project_main.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'project_main',
-				identity: $auth_client.getIdentity()
-			})
-		}));
-
-		actor_favorite_main.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'favorite_main',
-				identity: $auth_client.getIdentity()
-			})
-		}));
-
-		actor_snap_main.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'snap_main',
-				identity: $auth_client.getIdentity()
-			})
-		}));
-
-		local_storage_remove('profile');
+		local_storage_remove_all();
 
 		location.replace('/');
-
-		handleCloseModal();
 	}
 </script>
 

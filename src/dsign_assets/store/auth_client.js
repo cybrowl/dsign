@@ -118,3 +118,66 @@ export const auth_profile = async () => {
 		}));
 	}
 };
+
+export const auth_logout_all = async () => {
+	const authClient = await AuthClient.create();
+	const isAuthenticated = await authClient.isAuthenticated();
+
+	if (isAuthenticated === false) {
+		actor_assets_file_chunks.update(() => ({
+			loggedIn: false,
+			actor: createActor({
+				actor_name: 'assets_file_chunks',
+				identity: authClient.getIdentity()
+			})
+		}));
+
+		actor_assets_img_staging.update(() => ({
+			loggedIn: false,
+			actor: createActor({
+				actor_name: 'assets_img_staging',
+				identity: authClient.getIdentity()
+			})
+		}));
+
+		actor_explore.update(() => ({
+			loggedIn: false,
+			actor: createActor({
+				actor_name: 'explore',
+				identity: authClient.getIdentity()
+			})
+		}));
+
+		actor_profile.update(() => ({
+			loggedIn: false,
+			actor: createActor({
+				actor_name: 'profile',
+				identity: authClient.getIdentity()
+			})
+		}));
+
+		actor_project_main.update(() => ({
+			loggedIn: false,
+			actor: createActor({
+				actor_name: 'project_main',
+				identity: authClient.getIdentity()
+			})
+		}));
+
+		actor_favorite_main.update(() => ({
+			loggedIn: false,
+			actor: createActor({
+				actor_name: 'favorite_main',
+				identity: authClient.getIdentity()
+			})
+		}));
+
+		actor_snap_main.update(() => ({
+			loggedIn: false,
+			actor: createActor({
+				actor_name: 'snap_main',
+				identity: authClient.getIdentity()
+			})
+		}));
+	}
+};
