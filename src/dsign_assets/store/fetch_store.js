@@ -57,6 +57,27 @@ function delete_projects(project) {
 	return project_snaps_ids;
 }
 
+function rename_project(project, project_name) {
+	project_store.update(({ projects }) => {
+		const updated_projects = projects.map((project_) => {
+			if (project_.id === project.id) {
+				return {
+					...project_,
+					name: project_name
+				};
+			}
+
+			return project_;
+		});
+
+		return {
+			isFetching: false,
+			projects: updated_projects
+		};
+	});
+}
+
 export const projects_update = {
-	delete_projects: delete_projects
+	delete_projects,
+	rename_project
 };
