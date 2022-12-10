@@ -202,7 +202,6 @@
 		}
 	}
 
-	// Projects
 	function handleProjectClick(e) {
 		project = get(e, 'detail');
 
@@ -213,6 +212,11 @@
 			isProjectsSelected: false,
 			isProjectSelected: true
 		});
+	}
+
+	// Project Create/Rename/Delete Modal Open
+	function handleProjectCreateModalOpen() {
+		modal_update.change_visibility('project_creation');
 	}
 
 	function handleProjectRenameModalOpen(e) {
@@ -351,9 +355,7 @@
 					class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
 				row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 				>
-					<ProjectCardEmpty
-						on:clickProjectCardEmpty={() => modal_update.change_visibility('project_creation')}
-					/>
+					<ProjectCardEmpty on:clickProjectCardEmpty={handleProjectCreateModalOpen} />
 				</div>
 			{/if}
 
