@@ -132,7 +132,7 @@ actor Profile = {
 				banner = {
 					id = "";
 					canister_id = "";
-					url = "";
+					url = "/default_profile_banner.png";
 					exists = false;
 				};
 				created = Time.now();

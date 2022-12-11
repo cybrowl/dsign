@@ -18,9 +18,8 @@
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 
 	import { actor_assets_img_staging, actor_profile, actor_project_main } from '$stores_ref/actors';
-	import { local_storage_profile_public, local_storage_projects } from '$stores_ref/local_storage';
 	import { profile_tabs } from '$stores_ref/page_state';
-	import { project_store } from '$stores_ref/fetch_store';
+	import { project_store_public, project_store_public_fetching } from '$stores_ref/fetch_store';
 	import modal_update, { modal_visible } from '$stores_ref/modal';
 	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
 
@@ -32,8 +31,8 @@
 
 	page_navigation_update.select_item(3);
 
-	if ($project_store.projects.length === 0) {
-		project_store.set({ isFetching: true, projects: [] });
+	if ($project_store_public.projects.length === 0) {
+		project_store_public_fetching();
 	}
 
 	onMount(async () => {
@@ -42,12 +41,6 @@
 				$page.params.slug
 			);
 			profile = profile_;
-
-			local_storage_profile_public.set({
-				avatar_url: get(profile_, 'avatar.url', ''),
-				banner_url: get(profile_, 'banner.url', '') || '/default_profile_banner.png',
-				username: get(profile_, 'username', '')
-			});
 
 			if ($actor_profile.loggedIn) {
 				const { ok: profile_, err: err_profile } = await $actor_profile.actor.get_profile();
@@ -60,9 +53,9 @@
 				await $actor_project_main.actor.get_all_projects([$page.params.slug]);
 
 			if (all_projects) {
-				project_store.set({ isFetching: false, projects: [...all_projects] });
+				project_store_public.set({ isFetching: false, projects: [...all_projects] });
 			} else {
-				project_store.set({ isFetching: false, projects: [] });
+				project_store_public.set({ isFetching: false, projects: [] });
 			}
 		} catch (error) {
 			// Show error notification
@@ -71,7 +64,7 @@
 	});
 
 	onDestroy(() => {
-		project_store.set({ isFetching: true, projects: [] });
+		project_store_public.set({ isFetching: true, projects: [] });
 		profile_tabs.set({
 			isProjectsSelected: true,
 			isProjectSelected: false
@@ -113,11 +106,8 @@
 			let { ok: profile_ } = await $actor_profile.actor.get_profile();
 
 			const randomNumber = Math.floor(Math.random() * 1000);
-			local_storage_profile_public.set({
-				avatar_url: get(profile_, 'avatar.url', ''),
-				banner_url: get(profile_, 'banner.url', '') + '&' + randomNumber,
-				username: get(profile_, 'username', '')
-			});
+			profile = profile_;
+			profile.banner_url = profile_.banner_url + '&' + randomNumber;
 		} catch (error) {
 			console.log('error', error);
 		}
@@ -148,7 +138,7 @@
 	<!-- ProfileInfo -->
 	<div class="relative col-start-2 col-end-4 row-start-2 row-end-3">
 		<ProfileInfo
-			avatar={$local_storage_profile_public.avatar_url}
+			avatar={get(profile, 'avatar.url', '')}
 			is_authenticated={isProfileOwner}
 			username={get(profile, 'username', '')}
 			on:editProfile={openAccountSettingsModal}
@@ -159,7 +149,7 @@
 	<div class="col-start-4 col-end-12 row-start-2 row-end-3">
 		<ProfileBanner
 			is_authenticated={isProfileOwner}
-			profile_banner_url={$local_storage_profile_public.banner_url}
+			profile_banner_url={get(profile, 'banner.url', '')}
 			on:profileBannerChange={handleProfileBannerChange}
 		/>
 	</div>
@@ -179,19 +169,17 @@
 	<!-- Projects -->
 	{#if $profile_tabs.isProjectsSelected}
 		<!-- Fetching Projects -->
-		{#if $project_store.isFetching === true}
+		{#if $project_store_public.isFetching === true}
 			<div
 				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
-				{#each { length: $local_storage_projects.all_projects_count } as _, i}
-					<ProjectCard isLoadingProject={true} />
-				{/each}
+				<ProjectCard isLoadingProject={true} />
 			</div>
 		{/if}
 
 		<!-- No Projects Found -->
-		{#if $project_store.projects.length === 0 && $project_store.isFetching === false}
+		{#if $project_store_public.projects.length === 0 && $project_store_public.isFetching === false}
 			<div
 				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
@@ -205,7 +193,7 @@
 			class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
 			row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 		>
-			{#each $project_store.projects as project}
+			{#each $project_store_public.projects as project}
 				<ProjectCard {project} on:clickProject={handleProjectClick} />
 			{/each}
 		</div>

@@ -40,6 +40,16 @@ export const project_store_fetching = function () {
 	});
 };
 
+export const project_store_public = writable({ isFetching: false, projects: [] });
+export const project_store_public_fetching = function () {
+	project_store_public.update(({ projects }) => {
+		return {
+			isFetching: true,
+			projects: projects
+		};
+	});
+};
+
 function delete_projects(project) {
 	const project_snaps_ids = project.snaps.map((snap) => snap.id);
 
