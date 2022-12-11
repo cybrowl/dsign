@@ -5,7 +5,7 @@
 	import Login from '../../components/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
-	import SnapCardEmpty from 'dsign-components/components/SnapCardEmpty.svelte';
+	import SnapCardFavoriteEmpty from 'dsign-components/components/SnapCardFavoriteEmpty.svelte';
 
 	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
@@ -111,7 +111,7 @@
 				class="col-start-2 col-end-12 grid grid-cols-4 
 			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 			>
-				<SnapCardEmpty />
+				<SnapCardFavoriteEmpty />
 			</div>
 		{/if}
 

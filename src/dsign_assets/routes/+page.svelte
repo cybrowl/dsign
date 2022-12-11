@@ -14,7 +14,10 @@
 	import { explore_store } from '$stores_ref/fetch_store.js';
 	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
-	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
+	import page_navigation_update, {
+		page_navigation,
+		navigate_to_home_with_notification
+	} from '$stores_ref/page_navigation';
 
 	page_navigation_update.select_item(0);
 
@@ -48,6 +51,8 @@
 			} catch (error) {
 				//TODO: log error
 			}
+		} else {
+			navigate_to_home_with_notification();
 		}
 	}
 </script>
