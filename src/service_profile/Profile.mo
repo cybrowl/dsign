@@ -313,9 +313,15 @@ actor Profile = {
 				} else {
 					let image_assets_actor = actor (profile.banner.canister_id) : ImageAssetsActor;
 
-					ignore image_assets_actor.update_image(img_asset_ids[0], profile.banner.id, "banner", caller);
+					switch (await image_assets_actor.update_image(img_asset_ids[0], profile.banner.id, "banner", caller)) {
+						case (#err err) {
+							return #err(#ErrorCall(debug_show (err)));
+						};
+						case (#ok images) {
+							return #ok("updated banner");
+						};
+					}
 
-					return #ok("updated banner");
 				};
 			};
 		};

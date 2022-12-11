@@ -18,6 +18,7 @@
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 
 	import { actor_assets_img_staging, actor_profile, actor_project_main } from '$stores_ref/actors';
+	import { auth_assets_img_staging, auth_profile } from '$stores_ref/auth_client';
 	import { profile_tabs } from '$stores_ref/page_state';
 	import { project_store_public, project_store_public_fetching } from '$stores_ref/fetch_store';
 	import modal_update, { modal_visible } from '$stores_ref/modal';
@@ -36,6 +37,8 @@
 	}
 
 	onMount(async () => {
+		await Promise.all([auth_assets_img_staging(), auth_profile()]);
+
 		try {
 			const { ok: profile_, err: err_profile } = await $actor_profile.actor.get_profile_public(
 				$page.params.slug
@@ -91,25 +94,28 @@
 	async function handleProfileBannerChange(event) {
 		let files = event.detail;
 
-		const selectedFile = files[0];
+		if ($actor_assets_img_staging.loggedIn && $actor_profile.loggedIn) {
+			const selectedFile = files[0];
 
-		const imageAsUnit8ArrayBuffer = new Uint8Array(await selectedFile.arrayBuffer());
-		const create_asset_args = {
-			data: [...imageAsUnit8ArrayBuffer],
-			file_format: selectedFile.type
-		};
+			const imageAsUnit8ArrayBuffer = new Uint8Array(await selectedFile.arrayBuffer());
+			const create_asset_args = {
+				data: [...imageAsUnit8ArrayBuffer],
+				file_format: selectedFile.type
+			};
 
-		try {
-			let img_asset_id = await $actor_assets_img_staging.actor.create_asset(create_asset_args);
-			await $actor_profile.actor.update_profile_banner([img_asset_id]);
+			try {
+				let img_asset_id = await $actor_assets_img_staging.actor.create_asset(create_asset_args);
+				const { ok: update_profie, err: err_update_profile_banner } =
+					await $actor_profile.actor.update_profile_banner([img_asset_id]);
 
-			let { ok: profile_ } = await $actor_profile.actor.get_profile();
+				let { ok: profile_ } = await $actor_profile.actor.get_profile();
 
-			const randomNumber = Math.floor(Math.random() * 1000);
-			profile = profile_;
-			profile.banner_url = profile_.banner_url + '&' + randomNumber;
-		} catch (error) {
-			console.log('error', error);
+				const randomNumber = Math.floor(Math.random() * 1000);
+				profile = profile_;
+				profile.banner.url = profile_.banner.url + '&' + randomNumber;
+			} catch (error) {
+				console.log('error', error);
+			}
 		}
 	}
 </script>
