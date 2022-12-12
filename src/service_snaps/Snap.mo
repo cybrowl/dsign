@@ -219,6 +219,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 
 		let project_actor = actor (project_ref.canister_id) : ProjectActor;
 
+		//TODO: change to only call public method to grab data
 		switch (await project_actor.get_projects_actor([project_ref.id])) {
 			case (projects) {
 				for (snap_ref in snaps_ref.vals()) {

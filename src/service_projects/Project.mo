@@ -284,6 +284,8 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	};
 
 	public query func get_projects_actor(project_ids : [ProjectID]) : async [Project] {
+		//TODO: only allow authorized canisters to call this method
+
 		var projects_list = Buffer.Buffer<Project>(0);
 
 		for (project_id in project_ids.vals()) {

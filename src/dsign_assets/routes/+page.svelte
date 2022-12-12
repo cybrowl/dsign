@@ -28,6 +28,9 @@
 
 		try {
 			const all_snaps = await $actor_explore.actor.get_all_snaps();
+
+			console.log('all_snaps: ', all_snaps);
+
 			if (all_snaps) {
 				explore_store.set({ isFetching: false, snaps: [...all_snaps] });
 			}
