@@ -110,7 +110,7 @@
 			isProjectSelected: false
 		});
 
-		modal_update.change_visibility('snap_preview');
+		modal_update.set_visibility_false('snap_preview');
 	});
 
 	async function fetchAllSnaps() {

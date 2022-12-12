@@ -20,6 +20,16 @@ function change_visibility(name) {
 	});
 }
 
+function set_visibility_false(name) {
+	modal_visible.update((options) => {
+		return {
+			...options,
+			[name]: false
+		};
+	});
+}
+
 export default {
-	change_visibility
+	change_visibility,
+	set_visibility_false
 };
