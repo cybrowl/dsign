@@ -19,6 +19,7 @@
 	import ProjectRenameModal from '../../modals/ProjectRenameModal.svelte';
 	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
 	import SnapsMoveModal from '../../modals/SnapsMoveModal.svelte';
+	import SnapPreviewModal from '../../modals/SnapPreviewModal.svelte';
 
 	import { actor_project_main, actor_snap_main } from '$stores_ref/actors';
 	import { auth_snap_main, auth_project_main } from '$stores_ref/auth_client';
@@ -38,6 +39,7 @@
 	} from '$stores_ref/page_navigation';
 
 	let project = { snaps: [] };
+	let snap_preview = null;
 
 	page_navigation_update.select_item(1);
 
@@ -107,6 +109,8 @@
 			isProjectsSelected: false,
 			isProjectSelected: false
 		});
+
+		modal_update.change_visibility('snap_preview');
 	});
 
 	async function fetchAllSnaps() {
@@ -202,6 +206,13 @@
 		}
 	}
 
+	function handleSnapPreviewModalOpen(e) {
+		const snap = e.detail;
+		snap_preview = snap;
+
+		modal_update.change_visibility('snap_preview');
+	}
+
 	function handleProjectClick(e) {
 		project = get(e, 'detail');
 
@@ -254,6 +265,10 @@
 	{#if $modal_visible.snap_creation}
 		<SnapCreationModal />
 	{/if}
+	{#if $modal_visible.snap_preview && snap_preview}
+		<SnapPreviewModal snap={snap_preview} />
+	{/if}
+
 	{#if $modal_visible.project_creation}
 		<ProjectCreationModal />
 	{/if}
@@ -332,7 +347,11 @@
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 				>
 					{#each $snap_store.snaps as snap}
-						<SnapCard {snap} isEditMode={$is_edit_active} />
+						<SnapCard
+							{snap}
+							isEditMode={$is_edit_active}
+							on:clickCard={handleSnapPreviewModalOpen}
+						/>
 					{/each}
 				</div>
 			{/if}
