@@ -31,6 +31,12 @@ dfx deploy explore
 # front end
 dfx deploy dsign_assets
 
+# init
+dfx canister call profile initialize_canisters
+dfx canister call snap_main initialize_canisters
+dfx canister call project_main initialize_canisters
+dfx canister call favorite_main initialize_canisters
+
 # test canisters
 dfx deploy test_project --argument='(principal "'${PROJECT_MAIN_PRINCIPAL}'", false)'
 dfx deploy test_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'

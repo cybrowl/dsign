@@ -108,6 +108,7 @@ module {
 		favorite_main_canister_id : ?Text;
 	};
 
+	// Errors
 	public type ErrCreateSnap = {
 		#UserAnonymous;
 		#NoImageToSave;
@@ -124,13 +125,13 @@ module {
 		#SnapNotFound : Bool;
 	};
 
-	public type ErrGetAllSnaps = {
-		#UserNotFound : Bool;
-	};
-
 	public type ErrDeleteSnaps = {
 		#UserNotFound;
 		#SnapIdsDoNotMatch;
+	};
+
+	public type ErrGetAllSnaps = {
+		#UserNotFound : Bool;
 	};
 
 	// Actor Interface

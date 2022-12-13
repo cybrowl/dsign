@@ -92,6 +92,7 @@ module {
 		name : ?Text;
 	};
 
+	// Errors
 	public type ErrCreateProject = {
 		#NotAuthorized;
 		#UserAnonymous;
@@ -125,17 +126,17 @@ module {
 		#ErrorCall : Text;
 	};
 
-	public type ErrGetProjects = {
-		#UserNotFound : Bool;
-		#NoProjects : Bool;
-		#ErrorCall : Text;
-	};
-
 	public type ErrUpdateProject = {
 		#NotAuthorized;
 		#ProjectIdsDoNotMatch;
 		#ProjectNotFound;
 		#UserNotFound;
+		#ErrorCall : Text;
+	};
+
+	public type ErrGetProjects = {
+		#UserNotFound : Bool;
+		#NoProjects : Bool;
 		#ErrorCall : Text;
 	};
 

@@ -103,6 +103,7 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 		let asset_ref : Types.AssetRef = {
 			url = asset_url;
 			canister_id = canister_id;
+			file_name = file_name;
 			id = asset_id;
 			is_public = args.is_public;
 		};

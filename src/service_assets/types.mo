@@ -27,6 +27,7 @@ module {
 	public type AssetRef = {
 		canister_id : Text;
 		id : Text;
+		file_name : Text;
 		url : Text;
 		is_public : Bool;
 	};
