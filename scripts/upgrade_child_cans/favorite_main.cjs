@@ -126,48 +126,48 @@ const installCode = async () => {
 	} else {
 		console.log('======== Installing Prod Favorite Main Child Canisters =========');
 
-		// const canister_child_ledger_actor = await get_actor(
-		// 	canister_ids['canister_child_ledger'].ic,
-		// 	canister_child_ledger_interface,
-		// 	true
-		// );
+		const canister_child_ledger_actor = await get_actor(
+			canister_ids['canister_child_ledger'].ic,
+			canister_child_ledger_interface,
+			true
+		);
 
-		// const canister_children = await canister_child_ledger_actor.get_canisters();
+		const canister_children = await canister_child_ledger_actor.get_canisters();
 
-		// const favorite_main_canisters = canister_children.filter((canister) => {
-		// 	return canister.parent_name == 'ProjectMain';
-		// });
+		const favorite_main_canisters = canister_children.filter((canister) => {
+			return canister.parent_name == 'FavoriteMain';
+		});
 
-		// const prod_canisters = favorite_main_canisters.map((canister) => {
-		// 	const arg_map = {
-		// 		project: IDL.encode(
-		// 			[IDL.Principal, IDL.Bool],
-		// 			[Principal.fromText(canister_ids['project_main'].ic), false]
-		// 		)
-		// 	};
+		const prod_canisters = favorite_main_canisters.map((canister) => {
+			const arg_map = {
+				favorite: IDL.encode(
+					[IDL.Principal],
+					[Principal.fromText(canister_ids['favorite_main'].ic)]
+				)
+			};
 
-		// 	return {
-		// 		name: canister.name,
-		// 		is_prod: canister.isProd,
-		// 		canister_id: canister_ids['project_main'].ic,
-		// 		can_interface: project_main_interface,
-		// 		child_canister_principal: Principal.fromText(canister.id),
-		// 		wasm: get_wasm_prod(`test_${canister.name}`),
-		// 		arg: arg_map[canister.name]
-		// 	};
-		// });
+			return {
+				name: canister.name,
+				is_prod: canister.isProd,
+				canister_id: canister_ids['favorite_main'].ic,
+				can_interface: favorite_main_interface,
+				child_canister_principal: Principal.fromText(canister.id),
+				wasm: get_wasm_prod(`test_${canister.name}`),
+				arg: arg_map[canister.name]
+			};
+		});
 
-		// prod_canisters.forEach(async (canister) => {
-		// 	const actor = await get_actor(canister.canister_id, canister.can_interface, canister.is_prod);
+		prod_canisters.forEach(async (canister) => {
+			const actor = await get_actor(canister.canister_id, canister.can_interface, canister.is_prod);
 
-		// 	const res = await actor.install_code(
-		// 		canister.child_canister_principal,
-		// 		[...canister.arg],
-		// 		canister.wasm
-		// 	);
+			const res = await actor.install_code(
+				canister.child_canister_principal,
+				[...canister.arg],
+				canister.wasm
+			);
 
-		// 	console.log('done => ', res);
-		// });
+			console.log('done => ', res);
+		});
 	}
 };
 const init = async () => {
