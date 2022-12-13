@@ -383,6 +383,23 @@ actor ProjectMain {
 		};
 	};
 
+	public shared ({ caller }) func get_project(id : ProjectID, canister_id : ProjectCanisterID) : async Result.Result<ProjectPublic, Text> {
+		let tags = [ACTOR_NAME, "get_project"];
+
+		if (id.size() == 0 or id.size() > 40) {
+			return #err("Project ID is invalid");
+		};
+
+		if (canister_id.size() == 0 or canister_id.size() > 40) {
+			return #err("Project Canister ID is invalid");
+		};
+
+		let project_actor = actor (canister_id) : ProjectActor;
+		let project = await project_actor.get_projects([id]);
+
+		return #ok(project[0]);
+	};
+
 	public shared ({ caller }) func get_project_ids() : async Result.Result<[ProjectID], Text> {
 		let tags = [ACTOR_NAME, "get_project_ids"];
 

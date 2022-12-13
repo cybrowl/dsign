@@ -3,7 +3,6 @@
 	import { page } from '$app/stores';
 	import get from 'lodash/get';
 
-	// components
 	import Login from '$components_ref/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import ProfileBanner from 'dsign-components/components/ProfileBanner.svelte';
@@ -19,7 +18,11 @@
 	import { actor_assets_img_staging, actor_profile, actor_project_main } from '$stores_ref/actors';
 	import { auth_assets_img_staging, auth_profile } from '$stores_ref/auth_client';
 	import { profile_tabs } from '$stores_ref/page_state';
-	import { project_store_public, project_store_public_fetching } from '$stores_ref/fetch_store';
+	import {
+		project_store_public,
+		project_store_public_fetching,
+		projects_update
+	} from '$stores_ref/fetch_store';
 	import modal_update, { modal_visible } from '$stores_ref/modal';
 	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
 
@@ -55,9 +58,9 @@
 				await $actor_project_main.actor.get_all_projects([$page.params.slug]);
 
 			if (all_projects) {
-				project_store_public.set({ isFetching: false, projects: [...all_projects] });
+				projects_update.update_projects_public(all_projects);
 			} else {
-				project_store_public.set({ isFetching: false, projects: [] });
+				projects_update.update_projects_public([]);
 			}
 		} catch (error) {
 			// Show error notification
@@ -66,7 +69,7 @@
 	});
 
 	onDestroy(() => {
-		project_store_public.set({ isFetching: true, projects: [] });
+		projects_update.update_projects_public([]);
 		profile_tabs.set({
 			isProjectsSelected: true,
 			isProjectSelected: false

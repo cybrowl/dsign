@@ -40,12 +40,13 @@ export const project_store_fetching = function () {
 	});
 };
 
-export const project_store_public = writable({ isFetching: false, projects: [] });
+export const project_store_public = writable({ isFetching: false, projects: [], project: {} });
 export const project_store_public_fetching = function () {
-	project_store_public.update(({ projects }) => {
+	project_store_public.update(({ projects, project }) => {
 		return {
 			isFetching: true,
-			projects: projects
+			projects: projects,
+			project: project
 		};
 	});
 };
@@ -87,7 +88,29 @@ function rename_project(project, project_name) {
 	});
 }
 
+function update_project_public(project) {
+	project_store_public.update(({ projects }) => {
+		return {
+			isFetching: false,
+			projects: projects,
+			project: project
+		};
+	});
+}
+
+function update_projects_public(projects) {
+	project_store_public.update(({ project }) => {
+		return {
+			isFetching: false,
+			projects: projects,
+			project: project
+		};
+	});
+}
+
 export const projects_update = {
 	delete_projects,
-	rename_project
+	rename_project,
+	update_project_public,
+	update_projects_public
 };
