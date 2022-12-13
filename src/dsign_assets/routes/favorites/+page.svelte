@@ -1,4 +1,3 @@
-<!-- src/routes/favorites.svelte -->
 <script>
 	import { onMount } from 'svelte';
 

@@ -1,4 +1,3 @@
-<!-- src/routes/account_creation.svelte -->
 <script>
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import Login from '../../components/Login.svelte';

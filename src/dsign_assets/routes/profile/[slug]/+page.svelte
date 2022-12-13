@@ -1,4 +1,3 @@
-<!-- src/routes/profile.svelte -->
 <script>
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';

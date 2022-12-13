@@ -37,6 +37,18 @@ export const show_notification_with_msg = (message) => {
 	}, 3000);
 };
 
+function deselect_all() {
+	page_navigation.update(({ navItems }) => {
+		navItems.forEach((navItem) => {
+			navItem.isSelected = false;
+		});
+
+		return {
+			navItems: navItems
+		};
+	});
+}
+
 function select_item(num) {
 	page_navigation.update(({ navItems }) => {
 		navItems.forEach((navItem) => {
@@ -51,5 +63,6 @@ function select_item(num) {
 }
 
 export default {
+	deselect_all,
 	select_item
 };
