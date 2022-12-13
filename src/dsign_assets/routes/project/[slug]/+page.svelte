@@ -29,7 +29,7 @@
 	});
 
 	onDestroy(() => {
-		projects_update.update_projects_public([]);
+		projects_update.update_project_public([]);
 		profile_tabs.set({
 			isProjectsSelected: true,
 			isProjectSelected: false
