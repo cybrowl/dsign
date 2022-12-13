@@ -7,6 +7,7 @@
 
 	import Login from '$components_ref/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
+	import ProjectInfoHeader from 'dsign-components/components/ProjectInfoHeader.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 
 	import { actor_project_main } from '$stores_ref/actors';
@@ -59,7 +60,7 @@
 
 	<!-- Fetching Project -->
 	{#if $project_store_public.isFetching === true}
-		<!-- Fetching Project Name -->
+		<!-- Fetching Project Info Header -->
 		<div class="col-start-2 col-end-12 grid grid-cols-4 row-start-2 row-end-3 mt-2 mb-5">
 			<span class="h-9 w-48 bg-black-a" />
 		</div>
@@ -75,9 +76,9 @@
 
 	<!-- Project -->
 	{#if isEmpty($project_store_public.project) === false}
-		<!-- Project Name -->
-		<div class="col-start-2 col-end-12 grid grid-cols-4 row-start-2 row-end-3 mt-2 mb-5">
-			<h1 class="text-4xl	text-stone-grey">{$project_store_public.project.name}</h1>
+		<!-- Project Info Header -->
+		<div class="col-start-2 col-end-12 grid grid-cols-4 row-start-2 row-end-3 mb-5">
+			<ProjectInfoHeader project={$project_store_public.project} />
 		</div>
 
 		<!-- Snaps -->
