@@ -62,6 +62,8 @@
 					snap_liked
 				);
 
+				console.log('err_save_snap: ', err_save_snap);
+
 				if (err_save_snap && err_save_snap['UserNotFound'] === true) {
 					await $actor_favorite_main.actor.create_user_favorite_storage();
 				}

@@ -22,6 +22,7 @@ module {
 
 	public type ErrSaveFavorite = {
 		#ErrorCall : Text;
+		#SnapAlreadySaved : Bool;
 		#NotAuthorized : Bool;
 		#UserNotFound : Bool;
 	};

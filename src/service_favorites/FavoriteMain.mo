@@ -91,6 +91,13 @@ actor FavoriteMain {
 			};
 		};
 
+		let my_ids = Utils.get_all_ids(user_favorite_ids_storage);
+		let favorite_id_exists = Utils.some(my_ids, [snap.id]);
+
+		if (favorite_id_exists == true) {
+			return #err(#SnapAlreadySaved(true));
+		};
+
 		var favorite_ids = Buffer<FavoriteID>(0);
 		var favorite_ids_found = false;
 		switch (user_favorite_ids_storage.get(favorite_canister_id)) {

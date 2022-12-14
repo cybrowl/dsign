@@ -49,6 +49,18 @@ module {
 		return matches;
 	};
 
+	public func some(my_ids : [Text], ids_to_match : [Text]) : Bool {
+		for (id in ids_to_match.vals()) {
+			let found = Arr.contains(my_ids, id, Text.equal);
+
+			if (found == true) {
+				return true;
+			};
+		};
+
+		return false;
+	};
+
 	public func get_non_exluded_ids(ids : [Text], ids_to_exclude : [Text]) : [Text] {
 		let non_exluded_ids = Array.filter(
 			ids,
