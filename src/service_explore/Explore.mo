@@ -27,6 +27,8 @@ actor Explore = {
 		return "Saved Snap";
 	};
 
+	//TODO: given a list of snaps (id and canister id) it should call that canister to get latest snap
+
 	public shared func delete_snaps(snap_ids : [SnapID]) : async () {
 		for (snap_id in snap_ids.vals()) {
 			switch (snaps.get(snap_id)) {

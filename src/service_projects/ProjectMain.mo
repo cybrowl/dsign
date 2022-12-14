@@ -59,24 +59,6 @@ actor ProjectMain {
 
 	stable var project_canister_id : Text = "";
 
-	// ------------------------- PRIVATE METHODS -------------------------
-	private func add_project_to_snaps(project : Project) : async () {
-		let project_ref = {
-			id = project.id;
-			canister_id = project.canister_id;
-		};
-
-		for (snap in project.snaps.vals()) {
-			let snap_ref = {
-				id = snap.id;
-				canister_id = snap.canister_id;
-			};
-
-			let snap_actor = actor (snap.canister_id) : SnapActor;
-			ignore snap_actor.add_project_to_snaps([snap_ref], project_ref);
-		};
-	};
-
 	// ------------------------- PROJECTS MANAGEMENT -------------------------
 	public shared ({ caller }) func create_user_project_storage() : async Bool {
 		let tags = [ACTOR_NAME, "create_user_project_storage"];
@@ -142,8 +124,6 @@ actor ProjectMain {
 			case (#ok project) {
 				project_ids.add(project.id);
 				user_project_ids_storage.put(project_canister_id, Buffer.toArray(project_ids));
-
-				ignore add_project_to_snaps(project);
 
 				#ok("Created Project");
 			};
@@ -242,10 +222,11 @@ actor ProjectMain {
 						return #err(#ErrorCall(debug_show (err)));
 					};
 					case (#ok _) {
-						// add project to snaps
+
+						//TODO: make this faster by filtering out unique canister ids
 						for (snap in snaps.vals()) {
 							let snap_actor = actor (snap.canister_id) : SnapActor;
-							ignore snap_actor.add_project_to_snaps(snaps, project_ref);
+							ignore snap_actor.add_project_to_snaps(project_ref);
 						};
 
 						return #ok("Added Snaps To Project");
@@ -282,11 +263,11 @@ actor ProjectMain {
 					case (#err err) {
 						return #err(#ErrorCall(debug_show (err)));
 					};
-					case (#ok _) {
-						// add project to snaps
-						for (snap in snaps.vals()) {
+					case (#ok project) {
+						//TODO: make this faster by filtering out unique canister ids
+						for (snap in project.snaps.vals()) {
 							let snap_actor = actor (snap.canister_id) : SnapActor;
-							ignore snap_actor.add_project_to_snaps(snaps, project_to_ref);
+							ignore snap_actor.add_project_to_snaps(project_to_ref);
 						};
 					};
 				};
@@ -328,7 +309,14 @@ actor ProjectMain {
 					case (#err err) {
 						return #err(#ErrorCall(debug_show (err)));
 					};
-					case (#ok _) {
+					case (#ok project) {
+
+						//TODO: make this faster by filtering out unique canister ids
+						for (snap in project.snaps.vals()) {
+							let snap_actor = actor (snap.canister_id) : SnapActor;
+							ignore snap_actor.add_project_to_snaps(project_ref);
+						};
+
 						return #ok("Updated Project Details");
 					};
 				};

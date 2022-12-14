@@ -59,6 +59,10 @@
 
 		if ($actor_snap_main.loggedIn && $actor_project_main.loggedIn) {
 			try {
+				const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps();
+
+				console.log('all_snaps_: ', all_snaps);
+
 				Promise.all([
 					$actor_snap_main.actor.get_all_snaps_without_project(),
 					$actor_project_main.actor.get_all_projects([])

@@ -145,8 +145,8 @@ module {
 		create_project : shared (Text, ?[SnapRef], UserPrincipal) -> async Result.Result<Project, ErrCreateProject>;
 		delete_projects : shared ([ProjectID]) -> async ();
 		delete_snaps_from_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Text, ErrDeleteSnapsFromProject>;
-		add_snaps_to_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Text, ErrAddSnapsToProject>;
-		update_project_details : shared (UpdateProject, ProjectRef) -> async Result.Result<Text, ErrUpdateProject>;
+		add_snaps_to_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Project, ErrAddSnapsToProject>;
+		update_project_details : shared (UpdateProject, ProjectRef) -> async Result.Result<Project, ErrUpdateProject>;
 		get_projects : query ([ProjectID]) -> async [ProjectPublic];
 		get_projects_actor : query ([ProjectID]) -> async [Project];
 	};

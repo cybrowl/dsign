@@ -203,7 +203,6 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 
 	// NOTE: only called from Project Main
 	public shared ({ caller }) func add_project_to_snaps(
-		snaps_ref : [SnapRef],
 		project_ref : ProjectRef
 	) : async () {
 		let tags = [ACTOR_NAME, "add_project_to_snaps"];
@@ -222,24 +221,28 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		//TODO: change to only call public method to grab data
 		switch (await project_actor.get_projects_actor([project_ref.id])) {
 			case (projects) {
-				for (snap_ref in snaps_ref.vals()) {
+				let project = projects[0];
+
+				for (snap_ref in project.snaps.vals()) {
 					switch (snaps.get(snap_ref.id)) {
 						case (null) {};
 						case (?snap) {
 							// update snap
 							let snap_updated : Snap = {
-								snap with project = Option.make(projects[0]);
+								snap with project = Option.make(project);
 							};
 							snaps.put(snap.id, snap_updated);
 
 							// update snap for explore
 							let project_public : ProjectPublic = {
-								projects[0] with owner = null;
+								project with owner = null;
 							};
+
 							let snap_public : SnapPublic = {
 								snap_updated with project = Option.make(project_public);
 								owner = null;
 							};
+
 							ignore Explore.save_snap(snap_public);
 						};
 					};

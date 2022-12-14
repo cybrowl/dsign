@@ -164,7 +164,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 		snaps : [SnapRef],
 		project_id : ProjectID,
 		owner : UserPrincipal
-	) : async Result.Result<Text, ErrAddSnapsToProject> {
+	) : async Result.Result<Project, ErrAddSnapsToProject> {
 
 		let tags = [ACTOR_NAME, "add_snaps_to_project"];
 
@@ -201,7 +201,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 
 				ignore Logger.log_event(tags, "Snaps Added To Project");
 
-				return #ok("Snaps Added To Project");
+				return #ok(project);
 			};
 		};
 	};
@@ -209,7 +209,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	public shared ({ caller }) func update_project_details(
 		update_project_args : UpdateProject,
 		project_ref : ProjectRef
-	) : async Result.Result<Text, ErrUpdateProject> {
+	) : async Result.Result<Project, ErrUpdateProject> {
 
 		let tags = [ACTOR_NAME, "update_project_details"];
 
@@ -236,7 +236,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 
 				ignore Logger.log_event(tags, "Project Details Updated");
 
-				return #ok("Project Details Updated");
+				return #ok(project_updated);
 			};
 		};
 	};
