@@ -62,7 +62,7 @@
 	{#if $project_store_public.isFetching === true}
 		<!-- Fetching Project Info Header -->
 		<div class="col-start-2 col-end-12 grid grid-cols-4 row-start-2 row-end-3 mt-2 mb-5">
-			<span class="h-9 w-48 bg-black-a" />
+			<ProjectInfoHeader isFetching={true} />
 		</div>
 
 		<!-- Fetching Project Snaps -->
