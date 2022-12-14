@@ -61,7 +61,7 @@
 	<!-- Fetching Project -->
 	{#if $project_store_public.isFetching === true}
 		<!-- Fetching Project Info Header -->
-		<div class="col-start-2 col-end-12 grid grid-cols-4 row-start-2 row-end-3 mt-2 mb-5">
+		<div class="col-start-2 col-end-12 row-start-2 row-end-3 mt-2 mb-5">
 			<ProjectInfoHeader isFetching={true} />
 		</div>
 
@@ -77,15 +77,15 @@
 	<!-- Project -->
 	{#if isEmpty($project_store_public.project) === false}
 		<!-- Project Info Header -->
-		<div class="col-start-2 col-end-12 grid grid-cols-4 row-start-2 row-end-3 mb-5">
+		<div class="col-start-2 col-end-6 row-start-2 row-end-3 mb-5">
 			<ProjectInfoHeader project={$project_store_public.project} />
 		</div>
 
 		<!-- Snaps -->
 		{#if $project_store_public.project.snaps && $project_store_public.project.snaps.length > 0}
 			<div
-				class="col-start-2 col-end-12 grid grid-cols-4 
-							row-start-3 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
+				class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
+				row-start-3 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
 				{#each $project_store_public.project.snaps as snap}
 					<SnapCard {snap} />
