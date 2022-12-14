@@ -6,9 +6,9 @@
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 
-	import AccountSettingsModal from '../modals/AccountSettingsModal.svelte';
-	import SnapCreationModal from '../modals/SnapCreationModal.svelte';
-	import SnapPreviewModal from '../modals/SnapPreviewModal.svelte';
+	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
+	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
+	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
 	import { actor_explore, actor_favorite_main } from '$stores_ref/actors.js';
 	import { auth_favorite_main } from '$stores_ref/auth_client';

@@ -14,6 +14,7 @@
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
+	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
 	import { actor_assets_img_staging, actor_profile, actor_project_main } from '$stores_ref/actors';
 	import { auth_assets_img_staging, auth_profile } from '$stores_ref/auth_client';
@@ -31,6 +32,7 @@
 	};
 	let isProfileOwner = false;
 	let profile = {};
+	let snap_preview = null;
 
 	page_navigation_update.select_item(3);
 
@@ -70,6 +72,8 @@
 
 	onDestroy(() => {
 		projects_update.update_projects_public([]);
+		modal_update.set_visibility_false('snap_preview');
+
 		profile_tabs.set({
 			isProjectsSelected: true,
 			isProjectSelected: false
@@ -120,6 +124,13 @@
 			}
 		}
 	}
+
+	function handleSnapPreviewModalOpen(e) {
+		const snap = e.detail;
+		snap_preview = snap;
+
+		modal_update.change_visibility('snap_preview');
+	}
 </script>
 
 <svelte:head>
@@ -133,14 +144,14 @@
 		</PageNavigation>
 	</div>
 
-	<!-- AccountSettingsModal -->
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}
-
-	<!-- SnapCreationModal -->
 	{#if $modal_visible.snap_creation}
 		<SnapCreationModal />
+	{/if}
+	{#if $modal_visible.snap_preview && snap_preview}
+		<SnapPreviewModal snap={snap_preview} />
 	{/if}
 
 	<!-- ProfileInfo -->
@@ -216,7 +227,7 @@
 						row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
 				{#each project.snaps as snap}
-					<SnapCard {snap} />
+					<SnapCard {snap} on:clickCard={handleSnapPreviewModalOpen} />
 				{/each}
 			</div>
 		{/if}

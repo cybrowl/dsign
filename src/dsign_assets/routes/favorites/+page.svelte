@@ -6,18 +6,21 @@
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 	import SnapCardFavoriteEmpty from 'dsign-components/components/SnapCardFavoriteEmpty.svelte';
 
-	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
-	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
+	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
+	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
+	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
 	import { actor_favorite_main } from '$stores_ref/actors';
 	import { auth_favorite_main } from '$stores_ref/auth_client';
 	import { favorite_store, favorite_store_fetching } from '$stores_ref/fetch_store';
 	import { local_storage_favorites } from '$stores_ref/local_storage';
-	import { modal_visible } from '$stores_ref/modal';
+	import modal_update, { modal_visible } from '$stores_ref/modal';
 	import page_navigation_update, {
 		page_navigation,
 		navigate_to_home_with_notification
 	} from '$stores_ref/page_navigation';
+
+	let snap_preview = null;
 
 	page_navigation_update.select_item(2);
 
@@ -68,6 +71,13 @@
 			console.log('error: call', error);
 		}
 	}
+
+	function handleSnapPreviewModalOpen(e) {
+		const snap = e.detail;
+		snap_preview = snap;
+
+		modal_update.change_visibility('snap_preview');
+	}
 </script>
 
 <svelte:head>
@@ -81,14 +91,14 @@
 		</PageNavigation>
 	</div>
 
-	<!-- AccountSettingsModal -->
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}
-
-	<!-- SnapCreationModal -->
 	{#if $modal_visible.snap_creation}
 		<SnapCreationModal />
+	{/if}
+	{#if $modal_visible.snap_preview && snap_preview}
+		<SnapPreviewModal snap={snap_preview} />
 	{/if}
 
 	{#if $actor_favorite_main.loggedIn}
@@ -121,7 +131,13 @@
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-20 mt-2 mb-24"
 			>
 				{#each $favorite_store.snaps as snap}
-					<SnapCard {snap} showUsername={true} showMetrics={false} on:clickLike={handleClickLike} />
+					<SnapCard
+						{snap}
+						showUsername={true}
+						showMetrics={false}
+						on:clickCard={handleSnapPreviewModalOpen}
+						on:clickLike={handleClickLike}
+					/>
 				{/each}
 			</div>
 		{/if}

@@ -13,13 +13,13 @@
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 	import SnapCardEmpty from 'dsign-components/components/SnapCardEmpty.svelte';
 
-	import AccountSettingsModal from '../../modals/AccountSettingsModal.svelte';
-	import ProjectCreationModal from '../../modals/ProjectCreationModal.svelte';
-	import ProjectOptionsDeleteModal from '../../modals/ProjectOptionsDeleteModal.svelte';
-	import ProjectRenameModal from '../../modals/ProjectRenameModal.svelte';
-	import SnapCreationModal from '../../modals/SnapCreationModal.svelte';
-	import SnapsMoveModal from '../../modals/SnapsMoveModal.svelte';
-	import SnapPreviewModal from '../../modals/SnapPreviewModal.svelte';
+	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
+	import ProjectCreationModal from '$modals_ref/ProjectCreationModal.svelte';
+	import ProjectOptionsDeleteModal from '$modals_ref/ProjectOptionsDeleteModal.svelte';
+	import ProjectRenameModal from '$modals_ref/ProjectRenameModal.svelte';
+	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
+	import SnapsMoveModal from '$modals_ref/SnapsMoveModal.svelte';
+	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
 	import { actor_project_main, actor_snap_main } from '$stores_ref/actors';
 	import { auth_snap_main, auth_project_main } from '$stores_ref/auth_client';
@@ -268,7 +268,6 @@
 	{#if $modal_visible.snap_preview && snap_preview}
 		<SnapPreviewModal snap={snap_preview} />
 	{/if}
-
 	{#if $modal_visible.project_creation}
 		<ProjectCreationModal />
 	{/if}
@@ -407,7 +406,11 @@
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 				>
 					{#each project.snaps as snap}
-						<SnapCard {snap} isEditMode={$is_edit_active} />
+						<SnapCard
+							{snap}
+							isEditMode={$is_edit_active}
+							on:clickCard={handleSnapPreviewModalOpen}
+						/>
 					{/each}
 				</div>
 			{/if}
