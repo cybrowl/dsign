@@ -26,16 +26,14 @@ actor HealthMetrics = {
 	public shared (msg) func log_event(log_payload : Payload) : async () {
 		var log : Log = { time = Time.now(); parent_canister_id = ""; name = ""; metrics = [] };
 
-		if (log.metrics.size() > 0) {
-			log := {
-				time = Time.now();
-				parent_canister_id = log_payload.parent_canister_id;
-				name = log_payload.name;
-				metrics = log_payload.metrics;
-			};
-
-			logs.add(log);
+		log := {
+			time = Time.now();
+			parent_canister_id = log_payload.parent_canister_id;
+			name = log_payload.name;
+			metrics = log_payload.metrics;
 		};
+
+		logs.add(log);
 	};
 
 	public query func get_logs() : async [Log] {
