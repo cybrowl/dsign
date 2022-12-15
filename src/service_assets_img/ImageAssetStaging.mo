@@ -1,12 +1,13 @@
 import Array "mo:base/Array";
 import Debug "mo:base/Debug";
+import ExperimentalCycles "mo:base/ExperimentalCycles";
+import ExperimentalStableMemory "mo:base/ExperimentalStableMemory";
 import Float "mo:base/Float";
 import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
 import Nat "mo:base/Nat";
 import Prim "mo:⛔";
 import Principal "mo:base/Principal";
-import ExperimentalStableMemory "mo:base/ExperimentalStableMemory";
 import Result "mo:base/Result";
 import Time "mo:base/Time";
 
@@ -89,27 +90,22 @@ actor ImageAssetStaging = {
 		return VERSION;
 	};
 
-	public query func health() : async Types.Health {
+	public query func health() : async [(Text, Int)] {
 
-		let health_info : Types.Health = {
-			actor_name = ACTOR_NAME;
-			assets = {
-				name = "assets";
-				size = assets.size();
-			};
-			memory = {
-				name = "memory";
-				size = Prim.rts_memory_size();
-			};
-			heap = {
-				name = "heap";
-				size = Prim.rts_heap_size();
-			};
-			cycles_available = {
-				name = "cycles_available";
-				size = Prim.cyclesAvailable();
-			};
-		};
+		let rts_memory_size : Nat = Prim.rts_memory_size();
+		let mem_size : Float = Float.fromInt(rts_memory_size);
+		let memory_in_megabytes = Float.toInt(Float.abs(mem_size / 1_048_576));
+
+		let rts_heap_size : Nat = Prim.rts_heap_size();
+		let heap_size : Float = Float.fromInt(rts_heap_size);
+		let heap_in_megabytes = Float.toInt(Float.abs(heap_size / 1_048_576));
+
+		let health_info = [
+			("assets_num", assets.size()),
+			("cycles_balance", ExperimentalCycles.balance()),
+			("memory_in_mb", memory_in_megabytes),
+			("heap_in_mb", heap_in_megabytes)
+		];
 
 		return health_info;
 	};
