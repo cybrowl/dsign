@@ -10,6 +10,8 @@
 	import ProjectInfoHeader from 'dsign-components/components/ProjectInfoHeader.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 
+	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
+
 	import { actor_project_main } from '$stores_ref/actors';
 	import { profile_tabs } from '$stores_ref/page_state';
 	import {
@@ -17,7 +19,10 @@
 		project_store_public_fetching,
 		projects_update
 	} from '$stores_ref/fetch_store';
+	import modal_update, { modal_visible } from '$stores_ref/modal';
 	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
+
+	let snap_preview = null;
 
 	page_navigation_update.deselect_all();
 
@@ -45,6 +50,13 @@
 			isProjectSelected: false
 		});
 	});
+
+	function handleSnapPreviewModalOpen(e) {
+		const snap = e.detail;
+		snap_preview = snap;
+
+		modal_update.change_visibility('snap_preview');
+	}
 </script>
 
 <svelte:head>
@@ -57,6 +69,11 @@
 			<Login />
 		</PageNavigation>
 	</div>
+
+	<!-- SnapPreviewModal -->
+	{#if $modal_visible.snap_preview && snap_preview}
+		<SnapPreviewModal snap={snap_preview} />
+	{/if}
 
 	<!-- Fetching Project -->
 	{#if $project_store_public.isFetching === true}
@@ -88,7 +105,7 @@
 				row-start-3 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
 				{#each $project_store_public.project.snaps as snap}
-					<SnapCard {snap} />
+					<SnapCard {snap} on:clickCard={handleSnapPreviewModalOpen} />
 				{/each}
 			</div>
 		{/if}
