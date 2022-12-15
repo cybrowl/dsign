@@ -33,9 +33,9 @@ actor HealthMetrics = {
 				name = log_payload.name;
 				metrics = log_payload.metrics;
 			};
-		};
 
-		logs.add(log);
+			logs.add(log);
+		};
 	};
 
 	public query func get_logs() : async [Log] {
