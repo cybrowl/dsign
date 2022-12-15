@@ -9,6 +9,9 @@ dfx deploy assets_img_staging
 # logger
 dfx deploy logger
 
+# canister child ledger
+dfx deploy canister_child_ledger
+
 # health_metrics
 dfx deploy health_metrics
 
@@ -49,7 +52,7 @@ dfx canister call favorite_main initialize_canisters
 dfx deploy test_project --argument='(principal "'${PROJECT_MAIN_PRINCIPAL}'", false)'
 dfx deploy test_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
 dfx deploy test_image_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
-dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principal "'${PROJECT_MAIN_PRINCIPAL}'")'
+dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principal "'${PROJECT_MAIN_PRINCIPAL}'", principal "'${FAVORITE_MAIN_PRINCIPAL}'")'
 
 # killall dfx replica nodemanager
 

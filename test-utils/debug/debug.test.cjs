@@ -1,12 +1,9 @@
 const test = require('tape');
-const fetch = require('node-fetch');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
 
 const { getActor } = require('../actor.cjs');
 const canisterIds = require('../../.dfx/local/canister_ids.json');
 const { idlFactory } = require('../../.dfx/local/canisters/logger/logger.did.test.cjs');
-
-global.fetch = fetch;
 
 let Mishi = Ed25519KeyIdentity.generate();
 

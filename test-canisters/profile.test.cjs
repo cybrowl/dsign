@@ -1,9 +1,6 @@
 const test = require('tape');
-const fetch = require('node-fetch');
 const fake = require('fake-words');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
-
-global.fetch = fetch;
 
 // Actor Interface
 const {
@@ -51,11 +48,12 @@ test('Setup Actors', async function (t) {
 });
 
 test('Profile[mishicat].initialize_canisters()', async function (t) {
-	await profile_actors.mishicat.initialize_canisters();
+	const response = await profile_actors.mishicat.initialize_canisters();
 });
 
 test('Profile[mishicat].get_profile(): before user creates profile => #err - ProfileNotFound', async function (t) {
 	const response = await profile_actors.mishicat.get_profile();
+	console.log('response: ', response);
 
 	t.deepEqual(response.err, { ProfileNotFound: true });
 });

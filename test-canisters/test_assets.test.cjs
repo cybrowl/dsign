@@ -1,8 +1,5 @@
 const test = require('tape');
-const fetch = require('node-fetch');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
-
-global.fetch = fetch;
 
 // Actor Interface
 const {

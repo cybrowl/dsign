@@ -1,7 +1,6 @@
 const { Principal } = require('@dfinity/principal');
 const { IDL } = require('@dfinity/candid');
 const { readFileSync } = require('fs');
-const fetch = require('node-fetch');
 const { HttpAgent, Actor } = require('@dfinity/agent');
 const { Secp256k1KeyIdentity } = require('@dfinity/identity');
 const sha256 = require('sha256');
@@ -63,7 +62,7 @@ const get_wasm_prod = (name) => {
 const get_actor = async (canisterId, can_interface, is_prod) => {
 	const host = is_prod ? `https://${canisterId}.ic0.app/` : `http://127.0.0.1:8080`;
 
-	const agent = new HttpAgent({ fetch, host, identity: dev_identity });
+	const agent = new HttpAgent({ host, identity: dev_identity });
 
 	if (!is_prod) {
 		await agent.fetchRootKey();

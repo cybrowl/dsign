@@ -1,9 +1,6 @@
 const test = require('tape');
 const fake = require('fake-words');
-const fetch = require('node-fetch');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
-
-global.fetch = fetch;
 
 // Actor Interface
 const {
@@ -98,8 +95,8 @@ test('Setup Actors', async function () {
 
 test('SnapMain[mishicat].initialize_canisters()', async function () {
 	await snap_main_actor.mishicat.initialize_canisters({
-		favorite_main_canister_id: [favorite_main_canister_id],
-		project_main_canister_id: [project_main_canister_id]
+		favorite_main_canister_id: favorite_main_canister_id,
+		project_main_canister_id: project_main_canister_id
 	});
 });
 
