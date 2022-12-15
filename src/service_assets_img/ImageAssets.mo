@@ -17,6 +17,7 @@ import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
 import Logger "canister:logger";
+import HealthMetrics "canister:health_metrics";
 import ImageAssetStaging "canister:assets_img_staging";
 
 import Types "./types";
@@ -28,6 +29,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	type HttpResponse = Types.HttpResponse;
 	type ImageID = Types.ImageID;
 	type ImageRef = Types.ImageRef;
+	type Payload = Types.Payload;
 
 	type AssetImgErr = {
 		#NotAuthorized;
@@ -202,6 +204,14 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 			("memory_in_mb", memory_in_megabytes),
 			("heap_in_mb", heap_in_megabytes)
 		];
+
+		let log_payload : Payload = {
+			metrics = health_info;
+			name = ACTOR_NAME;
+			parent_canister_id = Principal.toText(controller);
+		};
+
+		ignore HealthMetrics.log_event(log_payload);
 
 		return health_info;
 	};

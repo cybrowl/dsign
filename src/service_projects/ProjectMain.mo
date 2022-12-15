@@ -432,7 +432,7 @@ actor ProjectMain {
 		ignore CanisterChildLedger.save_canister(canister_child);
 	};
 
-	public shared (msg) func initialize_canisters(projectCanisterId : ?Text) : async Text {
+	public shared (msg) func initialize_canisters() : async Text {
 		let tags = [ACTOR_NAME, "initialize_canisters"];
 		let project_main_principal = Principal.fromActor(ProjectMain);
 		let is_prod = Text.equal(
@@ -447,25 +447,12 @@ actor ProjectMain {
 			);
 
 			return project_canister_id;
+		} else {
+			ignore Logger.log_event(tags, debug_show ("no arg, creating project_canister_id"));
+
+			await create_project_canister(project_main_principal, is_prod);
+			return project_canister_id;
 		};
-
-		switch (projectCanisterId) {
-			case (null) {
-				ignore Logger.log_event(tags, debug_show ("no arg, creating project_canister_id"));
-
-				await create_project_canister(project_main_principal, is_prod);
-			};
-			case (?projectCanisterId_) {
-				project_canister_id := projectCanisterId_;
-
-				ignore Logger.log_event(
-					tags,
-					debug_show (("arg, project_canister_id: ", project_canister_id))
-				);
-			};
-		};
-
-		return project_canister_id;
 	};
 
 	// UPDATE CHILD CANISTER

@@ -20,6 +20,13 @@ module {
 		url : Text;
 	};
 
+	// Logs
+	public type Payload = {
+		metrics : [(Text, Int)];
+		name : Text;
+		parent_canister_id : Text;
+	};
+
 	// HTTP
 	public type HeaderField = (Text, Text);
 	public type HttpRequest = {

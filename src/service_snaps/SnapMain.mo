@@ -440,35 +440,11 @@ actor SnapMain {
 		let has_favorite_main_canister_id : Bool = favorite_main_canister_id.size() > 0;
 
 		if (has_project_main_canister_id == false) {
-			switch (args.project_main_canister_id) {
-				case (null) {
-					project_main_canister_id := "";
-
-					ignore Logger.log_event(
-						tags,
-						debug_show (("project_main_canister_id NOT found"))
-					);
-				};
-				case (?project_main_canister_id_) {
-					project_main_canister_id := project_main_canister_id_;
-				};
-			};
+			project_main_canister_id := args.project_main_canister_id;
 		};
 
 		if (has_favorite_main_canister_id == false) {
-			switch (args.favorite_main_canister_id) {
-				case (null) {
-					favorite_main_canister_id := "";
-
-					ignore Logger.log_event(
-						tags,
-						debug_show (("favorite_main_canister_id NOT found"))
-					);
-				};
-				case (?favorite_main_canister_id_) {
-					favorite_main_canister_id := favorite_main_canister_id_;
-				};
-			};
+			favorite_main_canister_id := args.favorite_main_canister_id;
 		};
 
 		let project_main_principal = Principal.fromText(project_main_canister_id);

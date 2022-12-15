@@ -104,8 +104,8 @@ module {
 	};
 
 	public type InitArgs = {
-		project_main_canister_id : ?Text;
-		favorite_main_canister_id : ?Text;
+		project_main_canister_id : Text;
+		favorite_main_canister_id : Text;
 	};
 
 	// Errors
