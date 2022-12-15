@@ -20,10 +20,32 @@ module {
 		url : Text;
 	};
 
+	type AssetsSize = {
+		name : Text;
+		size : Nat;
+	};
+
+	type Memory = {
+		name : Text;
+		size : Nat;
+	};
+
+	type Heap = {
+		name : Text;
+		size : Nat;
+	};
+
+	type CyclesAvailable = {
+		name : Text;
+		size : Nat;
+	};
+
 	public type Health = {
-		memory : Nat;
-		heap : Nat;
-		assets_size : Nat;
+		actor_name : Text;
+		assets : AssetsSize;
+		memory : Memory;
+		heap : Heap;
+		cycles_available : CyclesAvailable;
 	};
 
 	// HTTP

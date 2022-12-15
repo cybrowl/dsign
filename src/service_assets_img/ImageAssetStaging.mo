@@ -28,6 +28,7 @@ actor ImageAssetStaging = {
 		Hash.hash
 	);
 
+	let ACTOR_NAME : Text = "ImageAssetsStaging";
 	let VERSION : Nat = 4;
 
 	public shared ({ caller }) func create_asset(img : Types.Img) : async Nat {
@@ -89,12 +90,28 @@ actor ImageAssetStaging = {
 	};
 
 	public query func health() : async Types.Health {
-		return {
-			assets_size = assets.size();
-			memory = Prim.rts_memory_size();
-			heap = Prim.rts_heap_size();
-			stable_mem = ExperimentalStableMemory.size();
+
+		let health_info : Types.Health = {
+			actor_name = ACTOR_NAME;
+			assets = {
+				name = "assets";
+				size = assets.size();
+			};
+			memory = {
+				name = "memory";
+				size = Prim.rts_memory_size();
+			};
+			heap = {
+				name = "heap";
+				size = Prim.rts_heap_size();
+			};
+			cycles_available = {
+				name = "cycles_available";
+				size = Prim.cyclesAvailable();
+			};
 		};
+
+		return health_info;
 	};
 
 	public query func is_full() : async Bool {

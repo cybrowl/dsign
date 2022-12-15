@@ -1,8 +1,13 @@
 import { Buffer; toArray } "mo:base/Buffer";
 import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
+import ExperimentalCycles "mo:base/ExperimentalCycles";
+import ExperimentalStableMemory "mo:base/ExperimentalStableMemory";
+import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
+import Nat "mo:base/Nat";
+import Prim "mo:⛔";
 import Principal "mo:base/Principal";
 import Rand "mo:base/Random";
 import Result "mo:base/Result";
@@ -31,7 +36,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	};
 
 	let ACTOR_NAME : Text = "ImageAssets";
-	let VERSION : Nat = 3;
+	let VERSION : Nat = 4;
 
 	private let rr = XorShift.toReader(XorShift.XorShift64(null));
 	private let se = Source.Source(rr, 0);
@@ -179,6 +184,26 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	public shared func health() : async [(Text, Int)] {
+
+		let rts_memory_size : Nat = Prim.rts_memory_size();
+		let mem_size : Float = Float.fromInt(rts_memory_size);
+		let memory_in_megabytes = Float.toInt(Float.abs(mem_size / 1_048_576));
+
+		let rts_heap_size : Nat = Prim.rts_heap_size();
+		let heap_size : Float = Float.fromInt(rts_heap_size);
+		let heap_in_megabytes = Float.toInt(Float.abs(heap_size / 1_048_576));
+
+		let health_info = [
+			("assets_num", image_assets.size()),
+			("cycles_balance", ExperimentalCycles.balance()),
+			("memory_in_mb", memory_in_megabytes),
+			("heap_in_mb", heap_in_megabytes)
+		];
+
+		return health_info;
 	};
 
 	// ------------------------- System Methods -------------------------
