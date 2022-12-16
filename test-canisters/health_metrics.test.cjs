@@ -39,7 +39,7 @@ test('HealthMetrics[mishicat].length(): ', async function (t) {
 });
 
 test('HealthMetrics[mishicat].get_logs(): ', async function (t) {
-	const response = await health_metrics_actors.mishicat.get_latest_logs(2);
+	const response = await health_metrics_actors.mishicat.get_latest_logs(5);
 
 	// loop and log response
 	for (let i = 0; i < response.length; i++) {

@@ -29,7 +29,17 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	type HttpResponse = Types.HttpResponse;
 	type ImageID = Types.ImageID;
 	type ImageRef = Types.ImageRef;
-	type Payload = Types.Payload;
+	public type Payload = {
+		metrics : {
+			assets_num : Int;
+			cycles_balance : Int;
+			memory_in_mb : Int;
+			heap_in_mb : Int;
+		};
+		name : Text;
+		child_canister_id : Text;
+		parent_canister_id : Text;
+	};
 
 	type AssetImgErr = {
 		#NotAuthorized;
@@ -188,7 +198,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 		return VERSION;
 	};
 
-	public shared func health() : async [(Text, Int)] {
+	public shared func health() : async Payload {
 
 		let rts_memory_size : Nat = Prim.rts_memory_size();
 		let mem_size : Float = Float.fromInt(rts_memory_size);
@@ -197,23 +207,24 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 		let rts_heap_size : Nat = Prim.rts_heap_size();
 		let heap_size : Float = Float.fromInt(rts_heap_size);
 		let heap_in_megabytes = Float.toInt(Float.abs(heap_size / 1_048_576));
-
-		let health_info = [
-			("assets_num", image_assets.size()),
-			("cycles_balance", ExperimentalCycles.balance()),
-			("memory_in_mb", memory_in_megabytes),
-			("heap_in_mb", heap_in_megabytes)
-		];
+		let child_canister_id = Principal.toText(Principal.fromActor(this));
+		let parent_canister_id = Principal.toText(controller);
 
 		let log_payload : Payload = {
-			metrics = health_info;
+			metrics = {
+				assets_num = image_assets.size();
+				cycles_balance = ExperimentalCycles.balance();
+				memory_in_mb = memory_in_megabytes;
+				heap_in_mb = heap_in_megabytes;
+			};
 			name = ACTOR_NAME;
-			parent_canister_id = Principal.toText(controller);
+			child_canister_id = child_canister_id;
+			parent_canister_id = parent_canister_id;
 		};
 
 		ignore HealthMetrics.log_event(log_payload);
 
-		return health_info;
+		return log_payload;
 	};
 
 	// ------------------------- System Methods -------------------------

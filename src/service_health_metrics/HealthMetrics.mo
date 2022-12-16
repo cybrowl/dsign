@@ -4,14 +4,26 @@ import Time "mo:base/Time";
 
 actor HealthMetrics = {
 	public type Payload = {
-		metrics : [(Text, Int)];
+		metrics : {
+			assets_num : Int;
+			cycles_balance : Int;
+			memory_in_mb : Int;
+			heap_in_mb : Int;
+		};
 		name : Text;
+		child_canister_id : Text;
 		parent_canister_id : Text;
 	};
 
 	public type Log = {
-		metrics : [(Text, Int)];
+		metrics : {
+			assets_num : Int;
+			cycles_balance : Int;
+			memory_in_mb : Int;
+			heap_in_mb : Int;
+		};
 		name : Text;
+		child_canister_id : Text;
 		parent_canister_id : Text;
 		time : Int;
 	};
@@ -27,10 +39,9 @@ actor HealthMetrics = {
 	public shared (msg) func log_event(log_payload : Payload) : async () {
 		// TODO: some auth check here
 
-		var log : Log = { time = Time.now(); parent_canister_id = ""; name = ""; metrics = [] };
-
-		log := {
+		let log = {
 			time = Time.now();
+			child_canister_id = log_payload.child_canister_id;
 			parent_canister_id = log_payload.parent_canister_id;
 			name = log_payload.name;
 			metrics = log_payload.metrics;
