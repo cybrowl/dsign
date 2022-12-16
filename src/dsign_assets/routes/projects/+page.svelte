@@ -260,24 +260,32 @@
 	</div>
 
 	<!-- Modals -->
+
+	<!-- AccountSettingsModal -->
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}
+	<!-- SnapsMoveModal -->
 	{#if $modal_visible.snaps_move}
 		<SnapsMoveModal {project} />
 	{/if}
+	<!-- SnapCreationModal -->
 	{#if $modal_visible.snap_creation}
 		<SnapCreationModal />
 	{/if}
+	<!-- SnapPreviewModal -->
 	{#if $modal_visible.snap_preview && snap_preview}
 		<SnapPreviewModal snap={snap_preview} />
 	{/if}
+	<!-- ProjectCreationModal -->
 	{#if $modal_visible.project_creation}
 		<ProjectCreationModal />
 	{/if}
+	<!-- ProjectOptionsDeleteModal -->
 	{#if $modal_visible.project_options}
 		<ProjectOptionsDeleteModal {project} />
 	{/if}
+	<!-- ProjectRenameModal -->
 	{#if $modal_visible.project_rename}
 		<ProjectRenameModal {project} />
 	{/if}

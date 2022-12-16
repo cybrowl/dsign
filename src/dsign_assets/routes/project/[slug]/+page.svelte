@@ -10,6 +10,7 @@
 	import ProjectInfoHeader from 'dsign-components/components/ProjectInfoHeader.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 
+	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
 	import { actor_project_main } from '$stores_ref/actors';
@@ -70,6 +71,12 @@
 		</PageNavigation>
 	</div>
 
+	<!-- Modals -->
+
+	<!-- AccountSettingsModal -->
+	{#if $modal_visible.account_settings}
+		<AccountSettingsModal />
+	{/if}
 	<!-- SnapPreviewModal -->
 	{#if $modal_visible.snap_preview && snap_preview}
 		<SnapPreviewModal snap={snap_preview} />
