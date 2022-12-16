@@ -17,6 +17,7 @@
     "test-all": "bash ./scripts/test-all.sh",
     "test-config": "tape test-env/dfx.config.test.cjs",
     "test-ex": "npm run generate_test_interface && tape test-canisters/explore.test.cjs",
+    "test-ha": "npm run generate_test_interface && tape test-canisters/health_metrics.test.cjs",
     "test-ta": "npm run generate_test_interface && tape test-canisters/test_assets.test.cjs",
     "test-sm": "npm run generate_test_interface && tape test-canisters/snap_main.test.cjs",
     "test-p": "npm run generate_test_interface && tape test-canisters/profile.test.cjs",
@@ -30,7 +31,7 @@
     "@dfinity/candid": "^0.14.1",
     "@dfinity/identity": "^0.14.1",
     "@dfinity/principal": "^0.14.1",
-    "dsign-components": "^0.20.12",
+    "dsign-components": "^0.20.13",
     "lodash": "^4.17.21",
     "svelte-local-storage-store": "^0.2.6"
   },
