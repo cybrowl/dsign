@@ -29,17 +29,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	type HttpResponse = Types.HttpResponse;
 	type ImageID = Types.ImageID;
 	type ImageRef = Types.ImageRef;
-	public type Payload = {
-		metrics : {
-			assets_num : Int;
-			cycles_balance : Int;
-			memory_in_mb : Int;
-			heap_in_mb : Int;
-		};
-		name : Text;
-		child_canister_id : Text;
-		parent_canister_id : Text;
-	};
+	type Payload = Types.Payload;
 
 	type AssetImgErr = {
 		#NotAuthorized;
@@ -211,12 +201,12 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 		let parent_canister_id = Principal.toText(controller);
 
 		let log_payload : Payload = {
-			metrics = {
-				assets_num = image_assets.size();
-				cycles_balance = ExperimentalCycles.balance();
-				memory_in_mb = memory_in_megabytes;
-				heap_in_mb = heap_in_megabytes;
-			};
+			metrics = [
+				("assets_num", image_assets.size()),
+				("cycles_balance", ExperimentalCycles.balance()),
+				("memory_in_mb", memory_in_megabytes),
+				("heap_in_mb", heap_in_megabytes)
+			];
 			name = ACTOR_NAME;
 			child_canister_id = child_canister_id;
 			parent_canister_id = parent_canister_id;

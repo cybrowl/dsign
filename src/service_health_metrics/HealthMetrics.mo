@@ -4,24 +4,14 @@ import Time "mo:base/Time";
 
 actor HealthMetrics = {
 	public type Payload = {
-		metrics : {
-			assets_num : Int;
-			cycles_balance : Int;
-			memory_in_mb : Int;
-			heap_in_mb : Int;
-		};
+		metrics : [(Text, Int)];
 		name : Text;
 		child_canister_id : Text;
 		parent_canister_id : Text;
 	};
 
 	public type Log = {
-		metrics : {
-			assets_num : Int;
-			cycles_balance : Int;
-			memory_in_mb : Int;
-			heap_in_mb : Int;
-		};
+		metrics : [(Text, Int)];
 		name : Text;
 		child_canister_id : Text;
 		parent_canister_id : Text;
