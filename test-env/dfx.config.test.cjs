@@ -17,8 +17,6 @@ test('DFX Config: generateCanisterAliases()', async function (t) {
 		$IDLexplore: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/explore/explore.did.js',
 		$IDLfavorite_main:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/favorite_main/favorite_main.did.js',
-		$IDLhealth_metrics:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/health_metrics/health_metrics.did.js',
 		$IDLprofile: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile/profile.did.js',
 		$IDLproject_main:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/project_main/project_main.did.js',

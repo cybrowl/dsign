@@ -14,9 +14,6 @@ const {
 	idlFactory: favorite_main_interface
 } = require('../.dfx/local/canisters/favorite_main/favorite_main.did.test.cjs');
 const {
-	idlFactory: health_metrics_interface
-} = require('../.dfx/local/canisters/health_metrics/health_metrics.did.test.cjs');
-const {
 	idlFactory: profile_interface
 } = require('../.dfx/local/canisters/profile/profile.did.test.cjs');
 const {
@@ -41,7 +38,6 @@ module.exports = {
 	canister_child_ledger_interface,
 	explore_interface,
 	favorite_main_interface,
-	health_metrics_interface,
 	profile_interface,
 	project_main_interface,
 	snap_main_interface,

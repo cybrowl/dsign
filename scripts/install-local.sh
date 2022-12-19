@@ -12,9 +12,6 @@ dfx deploy logger
 # canister child ledger
 dfx deploy canister_child_ledger
 
-# health_metrics
-dfx deploy health_metrics
-
 # profile
 dfx deploy profile
 export PROFILE_PRINCIPAL=$(dfx canister id profile)

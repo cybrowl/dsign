@@ -78,7 +78,7 @@ const get_actor = async (canisterId, can_interface, is_prod) => {
 const installCode = async () => {
 	console.log('Installing canisters...');
 
-	let run_in_prod = false;
+	let run_in_prod = true;
 
 	if (run_in_prod === false) {
 		console.log('======== Installing Local Snap Main Child Canisters =========');

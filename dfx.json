@@ -1,136 +1,97 @@
 {
-  "canisters": {
-    "dsign_assets": {
-      "dependencies": [],
-      "frontend": {
-        "entrypoint": "build/index.html"
-      },
-      "source": [
-        "build"
-      ],
-      "type": "assets"
-    },
-    "assets_file_chunks": {
-      "main": "src/service_assets/FileAssetChunks.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger"
-      ]
-    },
-    "assets_img_staging": {
-      "main": "src/service_assets_img/ImageAssetStaging.mo",
-      "type": "motoko",
-      "args": "--max-stable-pages=65536",
-      "dependencies": [
-        "logger"
-      ]
-    },
-    "canister_child_ledger": {
-      "main": "src/service_canister_child_ledger/CanisterChildLedger.mo",
-      "type": "motoko",
-      "dependencies": []
-    },
-    "explore": {
-      "main": "src/service_explore/Explore.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger"
-      ]
-    },
-    "favorite_main": {
-      "main": "src/service_favorites/FavoriteMain.mo",
-      "type": "motoko",
-      "dependencies": [
-        "canister_child_ledger",
-        "logger"
-      ]
-    },
-    "health_metrics": {
-      "main": "src/service_health_metrics/HealthMetrics.mo",
-      "type": "motoko"
-    },
-    "profile": {
-      "main": "src/service_profile/Profile.mo",
-      "type": "motoko",
-      "dependencies": [
-        "assets_img_staging",
-        "canister_child_ledger",
-        "health_metrics",
-        "logger"
-      ]
-    },
-    "project_main": {
-      "main": "src/service_projects/ProjectMain.mo",
-      "type": "motoko",
-      "dependencies": [
-        "canister_child_ledger",
-        "logger",
-        "profile"
-      ]
-    },
-    "snap_main": {
-      "main": "src/service_snaps/SnapMain.mo",
-      "type": "motoko",
-      "dependencies": [
-        "assets_file_chunks",
-        "assets_img_staging",
-        "canister_child_ledger",
-        "explore",
-        "health_metrics",
-        "logger",
-        "profile"
-      ]
-    },
-    "logger": {
-      "main": "src/service_logger/logger.mo",
-      "type": "motoko"
-    },
-    "test_assets": {
-      "main": "src/service_assets/Assets.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger", "assets_file_chunks"
-      ]
-    },
-    "test_favorite": {
-      "main": "src/service_favorites/Favorite.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger"
-      ]
-    },
-    "test_image_assets": {
-      "main": "src/service_assets_img/ImageAssets.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger", "assets_img_staging", "health_metrics"
-      ]
-    },
-    "test_project": {
-      "main": "src/service_projects/Project.mo",
-      "type": "motoko",
-      "dependencies": [
-        "logger",
-        "profile"
-      ]
-    },
-    "test_snap": {
-      "main": "src/service_snaps/Snap.mo",
-      "type": "motoko",
-      "dependencies": [
-        "explore",
-        "logger",
-        "health_metrics",
-        "profile"
-      ]
-    }
-  },
-  "defaults": {
-    "build": {
-      "args": "",
-      "packtool": "vessel sources"
-    }
-  },
-  "dfx": "0.12.0",
-  "version": 1
+	"canisters": {
+		"dsign_assets": {
+			"dependencies": [],
+			"frontend": {
+				"entrypoint": "build/index.html"
+			},
+			"source": ["build"],
+			"type": "assets"
+		},
+		"assets_file_chunks": {
+			"main": "src/service_assets/FileAssetChunks.mo",
+			"type": "motoko",
+			"dependencies": ["logger"]
+		},
+		"assets_img_staging": {
+			"main": "src/service_assets_img/ImageAssetStaging.mo",
+			"type": "motoko",
+			"args": "--max-stable-pages=65536",
+			"dependencies": ["logger"]
+		},
+		"canister_child_ledger": {
+			"main": "src/service_canister_child_ledger/CanisterChildLedger.mo",
+			"type": "motoko",
+			"dependencies": []
+		},
+		"explore": {
+			"main": "src/service_explore/Explore.mo",
+			"type": "motoko",
+			"dependencies": ["logger"]
+		},
+		"favorite_main": {
+			"main": "src/service_favorites/FavoriteMain.mo",
+			"type": "motoko",
+			"dependencies": ["canister_child_ledger", "logger"]
+		},
+		"profile": {
+			"main": "src/service_profile/Profile.mo",
+			"type": "motoko",
+			"dependencies": ["assets_img_staging", "canister_child_ledger", "logger"]
+		},
+		"project_main": {
+			"main": "src/service_projects/ProjectMain.mo",
+			"type": "motoko",
+			"dependencies": ["canister_child_ledger", "logger", "profile"]
+		},
+		"snap_main": {
+			"main": "src/service_snaps/SnapMain.mo",
+			"type": "motoko",
+			"dependencies": [
+				"assets_file_chunks",
+				"assets_img_staging",
+				"canister_child_ledger",
+				"explore",
+				"logger",
+				"profile"
+			]
+		},
+		"logger": {
+			"main": "src/service_logger/logger.mo",
+			"type": "motoko"
+		},
+		"test_assets": {
+			"main": "src/service_assets/Assets.mo",
+			"type": "motoko",
+			"dependencies": ["logger", "assets_file_chunks"]
+		},
+		"test_favorite": {
+			"main": "src/service_favorites/Favorite.mo",
+			"type": "motoko",
+			"dependencies": ["logger"]
+		},
+		"test_image_assets": {
+			"main": "src/service_assets_img/ImageAssets.mo",
+			"type": "motoko",
+			"dependencies": ["logger", "assets_img_staging"]
+		},
+		"test_project": {
+			"main": "src/service_projects/Project.mo",
+			"type": "motoko",
+			"dependencies": ["logger", "profile"]
+		},
+		"test_snap": {
+			"main": "src/service_snaps/Snap.mo",
+			"type": "motoko",
+			"dependencies": ["explore", "logger", "profile"]
+		}
+	},
+	"defaults": {
+		"build": {
+			"args": "",
+			"packtool": "vessel sources"
+		}
+	},
+	"dfx": "0.12.0",
+	"version": 1
 }
