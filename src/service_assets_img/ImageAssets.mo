@@ -203,7 +203,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 
 		let log_payload : Payload = {
 			metrics = [
-				("assets_num", image_assets.size()),
+				("images_num", image_assets.size()),
 				("cycles_balance", ExperimentalCycles.balance()),
 				("memory_in_mb", memory_in_megabytes),
 				("heap_in_mb", heap_in_megabytes)
