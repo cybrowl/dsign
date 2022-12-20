@@ -1,5 +1,6 @@
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
+import ExperimentalCycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
@@ -13,8 +14,10 @@ import Logger "canister:logger";
 
 import Types "./types";
 import CanisterLedgerTypes "../types/canister_child_ledger.types";
+import HealthMetricsTypes "../types/health_metrics.types";
 
 import Utils "./utils";
+import UtilsShared "../utils/utils";
 
 actor Profile = {
 	type ErrProfile = Types.ErrProfile;
@@ -26,12 +29,15 @@ actor Profile = {
 	type UserPrincipal = Types.UserPrincipal;
 
 	type CanisterChild = CanisterLedgerTypes.CanisterChild;
+	type HealthMetricsActor = HealthMetricsTypes.HealthMetricsActor;
+	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "Profile";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
 	let VERSION : Nat = 2;
 
 	private let ic : ICInterface = actor "aaaaa-aa";
+	stable var health_metrics_canister_id : Text = "ree2h-zaaaa-aaaag-aba5q-cai";
 
 	// ------------------------- Variables -------------------------
 	// usernames
@@ -363,6 +369,30 @@ actor Profile = {
 		return VERSION;
 	};
 
+	public shared func health() : async Payload {
+		let memory_in_mb = UtilsShared.get_memory_in_mb();
+		let heap_in_mb = UtilsShared.get_heap_in_mb();
+
+		let profile_principal = Principal.fromActor(Profile);
+
+		let log_payload : Payload = {
+			metrics = [
+				("profiles_num", profiles.size()),
+				("cycles_balance", ExperimentalCycles.balance()),
+				("memory_in_mb", memory_in_mb),
+				("heap_in_mb", heap_in_mb)
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(profile_principal);
+			parent_canister_id = "";
+		};
+
+		let health_metrics_actor = actor (health_metrics_canister_id) : HealthMetricsActor;
+		ignore health_metrics_actor.log_event(log_payload);
+
+		return log_payload;
+	};
+
 	private func create_image_assets_canister(profile_principal : Principal, is_prod : Bool) : async () {
 		let tags = [ACTOR_NAME, "create_image_assets_canister"];
 
@@ -425,6 +455,10 @@ actor Profile = {
 				tags,
 				debug_show (("image_assets_canister_id: ", image_assets_canister_id))
 			);
+		};
+
+		if (is_prod == false) {
+			health_metrics_canister_id := "tcvdh-niaaa-aaaaa-aaaoa-cai";
 		};
 	};
 
