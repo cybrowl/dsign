@@ -9,6 +9,7 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import CanisterIdsLedger "canister:canister_ids_ledger";
+import HealthMetrics "canister:health_metrics";
 import ImageAssets "../service_assets_img/ImageAssets";
 import Logger "canister:logger";
 
@@ -29,7 +30,6 @@ actor Profile = {
 	type UserPrincipal = Types.UserPrincipal;
 
 	type CanisterChild = CanisterIdsLedgerTypes.CanisterInfo;
-	type HealthMetricsActor = HealthMetricsTypes.HealthMetricsActor;
 	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "Profile";
@@ -387,8 +387,7 @@ actor Profile = {
 			parent_canister_id = "";
 		};
 
-		let health_metrics_actor = actor (health_metrics_canister_id) : HealthMetricsActor;
-		ignore health_metrics_actor.log_event(log_payload);
+		ignore HealthMetrics.log_event(log_payload);
 
 		return log_payload;
 	};

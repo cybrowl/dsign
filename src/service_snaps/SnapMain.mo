@@ -14,6 +14,7 @@ import Result "mo:base/Result";
 import Assets "../service_assets/Assets";
 import CanisterIdsLedger "canister:canister_ids_ledger";
 import FileAssetChunks "canister:assets_file_chunks";
+import HealthMetrics "canister:health_metrics";
 import ImageAssets "../service_assets_img/ImageAssets";
 import ImageAssetStaging "canister:assets_img_staging";
 import Logger "canister:logger";
@@ -43,7 +44,6 @@ actor SnapMain {
 	type UserPrincipal = Types.UserPrincipal;
 
 	type AssetsActor = Types.AssetsActor;
-	type HealthMetricsActor = HealthMetricsTypes.HealthMetricsActor;
 	type ImageAssetsActor = Types.ImageAssetsActor;
 	type SnapActor = Types.SnapActor;
 
@@ -518,8 +518,7 @@ actor SnapMain {
 			parent_canister_id = "";
 		};
 
-		let health_metrics_actor = actor (health_metrics_canister_id) : HealthMetricsActor;
-		ignore health_metrics_actor.log_event(log_payload);
+		ignore HealthMetrics.log_event(log_payload);
 
 		return log_payload;
 	};

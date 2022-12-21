@@ -1,47 +1,50 @@
 {
-  "assets_file_chunks": {
-    "ic": "jfpyd-maaaa-aaaag-aatxq-cai"
-  },
-  "assets_img_staging": {
-    "ic": "jlnvl-xqaaa-aaaag-aatwq-cai"
-  },
-  "canister_child_ledger": {
-    "ic": "7t2d4-jiaaa-aaaag-aa36q-cai"
-  },
-  "dsign_assets": {
-    "ic": "kqlfj-siaaa-aaaag-aaawq-cai"
-  },
-  "explore": {
-    "ic": "72zia-7aaaa-aaaag-aa37a-cai"
-  },
-  "favorite_main": {
-    "ic": "a7b5k-xiaaa-aaaag-aa6ja-cai"
-  },
-  "logger": {
-    "ic": "jaypp-oiaaa-aaaag-aaa6q-cai"
-  },
-  "profile": {
-    "ic": "kxkd5-7qaaa-aaaag-aaawa-cai"
-  },
-  "project_main": {
-    "ic": "nhlnj-vyaaa-aaaag-aay5q-cai"
-  },
-  "snap_main": {
-    "ic": "lyswl-7iaaa-aaaag-aatya-cai"
-  },
-  "test_assets": {
-    "ic": "k367n-lqaaa-aaaag-aat6q-cai"
-  },
-  "test_favorite": {
-    "ic": "mjsqf-ciaaa-aaaag-aa7ha-cai"
-  },
-  "test_image_assets": {
-    "ic": "k47zz-giaaa-aaaag-aat6a-cai"
-  },
-  "test_project": {
-    "ic": "75you-syaaa-aaaag-aa37q-cai"
-  },
-  "test_snap": {
-    "ic": "nakl5-yaaaa-aaaag-aay5a-cai"
-  }
+	"assets_file_chunks": {
+		"ic": "jfpyd-maaaa-aaaag-aatxq-cai"
+	},
+	"assets_img_staging": {
+		"ic": "jlnvl-xqaaa-aaaag-aatwq-cai"
+	},
+	"canister_child_ledger": {
+		"ic": "7t2d4-jiaaa-aaaag-aa36q-cai"
+	},
+	"dsign_assets": {
+		"ic": "kqlfj-siaaa-aaaag-aaawq-cai"
+	},
+	"explore": {
+		"ic": "72zia-7aaaa-aaaag-aa37a-cai"
+	},
+	"favorite_main": {
+		"ic": "a7b5k-xiaaa-aaaag-aa6ja-cai"
+	},
+	"health_metrics": {
+		"ic": "ree2h-zaaaa-aaaag-aba5q-cai"
+	},
+	"logger": {
+		"ic": "jaypp-oiaaa-aaaag-aaa6q-cai"
+	},
+	"profile": {
+		"ic": "kxkd5-7qaaa-aaaag-aaawa-cai"
+	},
+	"project_main": {
+		"ic": "nhlnj-vyaaa-aaaag-aay5q-cai"
+	},
+	"snap_main": {
+		"ic": "lyswl-7iaaa-aaaag-aatya-cai"
+	},
+	"test_assets": {
+		"ic": "k367n-lqaaa-aaaag-aat6q-cai"
+	},
+	"test_favorite": {
+		"ic": "mjsqf-ciaaa-aaaag-aa7ha-cai"
+	},
+	"test_image_assets": {
+		"ic": "k47zz-giaaa-aaaag-aat6a-cai"
+	},
+	"test_project": {
+		"ic": "75you-syaaa-aaaag-aa37q-cai"
+	},
+	"test_snap": {
+		"ic": "nakl5-yaaaa-aaaag-aay5a-cai"
+	}
 }

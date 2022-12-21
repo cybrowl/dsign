@@ -16,6 +16,7 @@ import Text "mo:base/Text";
 import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
+import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 import ImageAssetStaging "canister:assets_img_staging";
 
@@ -30,7 +31,6 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	type ImageID = Types.ImageID;
 	type ImageRef = Types.ImageRef;
 	type Payload = Types.Payload;
-	type HealthMetricsActor = HealthMetricsTypes.HealthMetricsActor;
 
 	type AssetImgErr = {
 		#NotAuthorized;
@@ -215,8 +215,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 			parent_canister_id = parent_canister_id;
 		};
 
-		let health_metrics_actor = actor (health_metrics_canister_id) : HealthMetricsActor;
-		ignore health_metrics_actor.log_event(log_payload);
+		ignore HealthMetrics.log_event(log_payload);
 
 		return log_payload;
 	};

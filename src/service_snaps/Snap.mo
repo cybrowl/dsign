@@ -13,6 +13,7 @@ import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
 import Explore "canister:explore";
+import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 import Profile "canister:profile";
 
@@ -40,7 +41,6 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	type ProjectRef = ProjectTypes.ProjectRef;
 	type Payload = HealthMetricsTypes.Payload;
 
-	type HealthMetricsActor = HealthMetricsTypes.HealthMetricsActor;
 	type ProjectActor = ProjectTypes.ProjectActor;
 
 	let ACTOR_NAME : Text = "Snap";
@@ -325,8 +325,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			parent_canister_id = "";
 		};
 
-		let health_metrics_actor = actor (health_metrics_canister_id) : HealthMetricsActor;
-		ignore health_metrics_actor.log_event(log_payload);
+		ignore HealthMetrics.log_event(log_payload);
 
 		return log_payload;
 	};

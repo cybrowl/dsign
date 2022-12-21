@@ -26,22 +26,27 @@
 		"explore": {
 			"main": "src/service_explore/Explore.mo",
 			"type": "motoko",
-			"dependencies": ["logger"]
+			"dependencies": ["health_metrics", "logger"]
 		},
 		"favorite_main": {
 			"main": "src/service_favorites/FavoriteMain.mo",
 			"type": "motoko",
-			"dependencies": ["canister_ids_ledger", "logger"]
+			"dependencies": ["canister_ids_ledger", "health_metrics", "logger"]
+		},
+		"health_metrics": {
+			"main": "src/service_health_metrics/HealthMetrics.mo",
+			"type": "motoko",
+			"dependencies": []
 		},
 		"profile": {
 			"main": "src/service_profile/Profile.mo",
 			"type": "motoko",
-			"dependencies": ["assets_img_staging", "canister_ids_ledger", "logger"]
+			"dependencies": ["assets_img_staging", "canister_ids_ledger", "health_metrics", "logger"]
 		},
 		"project_main": {
 			"main": "src/service_projects/ProjectMain.mo",
 			"type": "motoko",
-			"dependencies": ["canister_ids_ledger", "logger", "profile"]
+			"dependencies": ["canister_ids_ledger", "health_metrics", "logger", "profile"]
 		},
 		"snap_main": {
 			"main": "src/service_snaps/SnapMain.mo",
@@ -50,6 +55,7 @@
 				"assets_file_chunks",
 				"assets_img_staging",
 				"canister_ids_ledger",
+				"health_metrics",
 				"explore",
 				"logger",
 				"profile"
@@ -72,7 +78,7 @@
 		"test_image_assets": {
 			"main": "src/service_assets_img/ImageAssets.mo",
 			"type": "motoko",
-			"dependencies": ["logger", "assets_img_staging"]
+			"dependencies": ["logger", "assets_img_staging", "health_metrics"]
 		},
 		"test_project": {
 			"main": "src/service_projects/Project.mo",
@@ -82,7 +88,7 @@
 		"test_snap": {
 			"main": "src/service_snaps/Snap.mo",
 			"type": "motoko",
-			"dependencies": ["explore", "logger", "profile"]
+			"dependencies": ["explore", "health_metrics", "logger", "profile"]
 		}
 	},
 	"defaults": {

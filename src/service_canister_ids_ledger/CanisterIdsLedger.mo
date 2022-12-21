@@ -71,7 +71,7 @@ actor CanisterChildLedger = {
 		if (is_production == true) {
 			return "ree2h-zaaaa-aaaag-aba5q-cai";
 		} else {
-			return "tqtu6-byaaa-aaaaa-aaana-cai";
+			return "txssk-maaaa-aaaaa-aaanq-cai";
 		};
 	};
 
