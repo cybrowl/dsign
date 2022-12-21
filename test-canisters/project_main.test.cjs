@@ -87,12 +87,6 @@ test('Setup Actors', async function () {
 	);
 });
 
-test('ProjectMain[mishicat].initialize_canisters()', async function (t) {
-	let project_canister_id = await project_main_actor.mishicat.initialize_canisters();
-
-	// t.equal(project_canister_id, test_project_canister_id);
-});
-
 // NOT AUTHORIZED
 test('Project[mishicat].create_project(): with wrong caller => #err - NotAuthorized', async function (t) {
 	const response = await project_actor.mishicat.create_project(

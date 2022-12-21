@@ -93,13 +93,6 @@ test('Setup Actors', async function () {
 	);
 });
 
-test('SnapMain[mishicat].initialize_canisters()', async function () {
-	await snap_main_actor.mishicat.initialize_canisters({
-		favorite_main_canister_id: favorite_main_canister_id,
-		project_main_canister_id: project_main_canister_id
-	});
-});
-
 test('Profile[mishicat].create_username(): with valid username => #ok - username', async function (t) {
 	const username = fake.word();
 

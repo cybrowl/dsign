@@ -47,10 +47,6 @@ test('Setup Actors', async function (t) {
 	profile_actors.motoko = await get_actor(profile_canister_id, profile_interface, motoko_identity);
 });
 
-test('Profile[mishicat].initialize_canisters()', async function (t) {
-	const response = await profile_actors.mishicat.initialize_canisters();
-});
-
 test('Profile[mishicat].get_profile(): before user creates profile => #err - ProfileNotFound', async function (t) {
 	const response = await profile_actors.mishicat.get_profile();
 	console.log('response: ', response);
