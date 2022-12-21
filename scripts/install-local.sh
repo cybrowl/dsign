@@ -9,8 +9,8 @@ dfx deploy assets_img_staging
 # logger
 dfx deploy logger
 
-# canister child ledger
-dfx deploy canister_child_ledger
+# canister ids ledger
+dfx deploy canister_ids_ledger
 
 # profile
 dfx deploy profile
@@ -30,19 +30,27 @@ export FAVORITE_MAIN_PRINCIPAL=$(dfx canister id favorite_main)
 
 # explore
 dfx deploy explore
+export EXPLORE_PRINCIPAL=$(dfx canister id explore)
 
 # front end
 dfx deploy dsign_assets
 
 # init
-dfx canister call profile initialize_canisters 
-dfx canister call snap_main initialize_canisters \
+dfx canister call canister_ids_ledger set_canister_ids \
 '(record {
-    favorite_main_canister_id = "'${FAVORITE_MAIN_PRINCIPAL}'";
-    project_main_canister_id = "'${PROJECT_MAIN_PRINCIPAL}'";
+    explore = "'${EXPLORE_PRINCIPAL}'";
+    favorite_main = "'${FAVORITE_MAIN_PRINCIPAL}'";
+    profile = "'${PROFILE_PRINCIPAL}'";
+    project_main = "'${PROJECT_MAIN_PRINCIPAL}'";
+    snap_main = "'${SNAP_MAIN_PRINCIPAL}'";
     })'
 
+dfx canister call profile initialize_canisters 
+
+dfx canister call snap_main initialize_canisters
+
 dfx canister call project_main initialize_canisters
+
 dfx canister call favorite_main initialize_canisters
 
 # test canisters

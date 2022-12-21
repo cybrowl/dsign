@@ -13,10 +13,10 @@ cp .dfx/local/canisters/assets_img_staging/assets_img_staging.did.js .dfx/local/
 sed -i '' 's/export//g' .dfx/local/canisters/assets_img_staging/assets_img_staging.did.test.cjs
 echo "module.exports = { idlFactory };" >> .dfx/local/canisters/assets_img_staging/assets_img_staging.did.test.cjs
 
-# canister_child_ledger
-cp .dfx/local/canisters/canister_child_ledger/canister_child_ledger.did.js .dfx/local/canisters/canister_child_ledger/canister_child_ledger.did.test.cjs
-sed -i '' 's/export//g' .dfx/local/canisters/canister_child_ledger/canister_child_ledger.did.test.cjs
-echo "module.exports = { idlFactory };" >> .dfx/local/canisters/canister_child_ledger/canister_child_ledger.did.test.cjs
+# canister_ids_ledger
+cp .dfx/local/canisters/canister_ids_ledger/canister_ids_ledger.did.js .dfx/local/canisters/canister_ids_ledger/canister_ids_ledger.did.test.cjs
+sed -i '' 's/export//g' .dfx/local/canisters/canister_ids_ledger/canister_ids_ledger.did.test.cjs
+echo "module.exports = { idlFactory };" >> .dfx/local/canisters/canister_ids_ledger/canister_ids_ledger.did.test.cjs
 
 # explore
 cp .dfx/local/canisters/explore/explore.did.js .dfx/local/canisters/explore/explore.did.test.cjs

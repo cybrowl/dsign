@@ -36,18 +36,18 @@ actor SnapMain {
 	type ICInterfaceStatusResponse = Types.ICInterfaceStatusResponse;
 	type ImageRef = Types.ImageRef;
 	type Snap = Types.Snap;
-	type SnapPublic = Types.SnapPublic;
 	type SnapCanisterID = Types.SnapCanisterID;
 	type SnapID = Types.SnapID;
 	type SnapIDStorage = Types.SnapIDStorage;
+	type SnapPublic = Types.SnapPublic;
 	type UserPrincipal = Types.UserPrincipal;
 
 	type AssetsActor = Types.AssetsActor;
+	type HealthMetricsActor = HealthMetricsTypes.HealthMetricsActor;
 	type ImageAssetsActor = Types.ImageAssetsActor;
 	type SnapActor = Types.SnapActor;
 
 	type CanisterInfo = CanisterIdsLedgerTypes.CanisterInfo;
-	type HealthMetricsActor = HealthMetricsTypes.HealthMetricsActor;
 	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "SnapMain";
