@@ -1,7 +1,7 @@
 module {
 	public type Time = Int;
 
-	public type CanisterChild = {
+	public type CanisterInfo = {
 		created : Time;
 		id : Text;
 		name : Text;

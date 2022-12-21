@@ -103,7 +103,7 @@ module {
 		};
 	};
 
-	public type InitArgs = {
+	public type SnapInitArgs = {
 		project_main_canister_id : Text;
 		favorite_main_canister_id : Text;
 	};

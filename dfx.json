@@ -16,13 +16,12 @@
 		"assets_img_staging": {
 			"main": "src/service_assets_img/ImageAssetStaging.mo",
 			"type": "motoko",
-			"args": "--max-stable-pages=65536",
 			"dependencies": ["logger"]
 		},
-		"canister_child_ledger": {
-			"main": "src/service_canister_child_ledger/CanisterChildLedger.mo",
+		"canister_ids_ledger": {
+			"main": "src/service_canister_ids_ledger/CanisterIdsLedger.mo",
 			"type": "motoko",
-			"dependencies": []
+			"dependencies": ["logger"]
 		},
 		"explore": {
 			"main": "src/service_explore/Explore.mo",
@@ -32,17 +31,17 @@
 		"favorite_main": {
 			"main": "src/service_favorites/FavoriteMain.mo",
 			"type": "motoko",
-			"dependencies": ["canister_child_ledger", "logger"]
+			"dependencies": ["canister_ids_ledger", "logger"]
 		},
 		"profile": {
 			"main": "src/service_profile/Profile.mo",
 			"type": "motoko",
-			"dependencies": ["assets_img_staging", "canister_child_ledger", "logger"]
+			"dependencies": ["assets_img_staging", "canister_ids_ledger", "logger"]
 		},
 		"project_main": {
 			"main": "src/service_projects/ProjectMain.mo",
 			"type": "motoko",
-			"dependencies": ["canister_child_ledger", "logger", "profile"]
+			"dependencies": ["canister_ids_ledger", "logger", "profile"]
 		},
 		"snap_main": {
 			"main": "src/service_snaps/SnapMain.mo",
@@ -50,7 +49,7 @@
 			"dependencies": [
 				"assets_file_chunks",
 				"assets_img_staging",
-				"canister_child_ledger",
+				"canister_ids_ledger",
 				"explore",
 				"logger",
 				"profile"

@@ -8,12 +8,12 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
-import CanisterChildLedger "canister:canister_child_ledger";
+import CanisterIdsLedger "canister:canister_ids_ledger";
 import ImageAssets "../service_assets_img/ImageAssets";
 import Logger "canister:logger";
 
 import Types "./types";
-import CanisterLedgerTypes "../types/canister_child_ledger.types";
+import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
 import HealthMetricsTypes "../types/health_metrics.types";
 
 import Utils "./utils";
@@ -28,7 +28,7 @@ actor Profile = {
 	type Username = Types.Username;
 	type UserPrincipal = Types.UserPrincipal;
 
-	type CanisterChild = CanisterLedgerTypes.CanisterChild;
+	type CanisterChild = CanisterIdsLedgerTypes.CanisterInfo;
 	type HealthMetricsActor = HealthMetricsTypes.HealthMetricsActor;
 	type Payload = HealthMetricsTypes.Payload;
 
@@ -37,7 +37,7 @@ actor Profile = {
 	let VERSION : Nat = 2;
 
 	private let ic : ICInterface = actor "aaaaa-aa";
-	stable var health_metrics_canister_id : Text = "ree2h-zaaaa-aaaag-aba5q-cai";
+	stable var health_metrics_canister_id : Text = "";
 
 	// ------------------------- Variables -------------------------
 	// usernames
@@ -410,7 +410,7 @@ actor Profile = {
 			isProd = is_prod;
 		};
 
-		ignore CanisterChildLedger.save_canister(canister_child);
+		ignore CanisterIdsLedger.save_canister(canister_child);
 
 		await Logger.log_event(
 			tags,
@@ -457,9 +457,7 @@ actor Profile = {
 			);
 		};
 
-		if (is_prod == false) {
-			health_metrics_canister_id := "tcvdh-niaaa-aaaaa-aaaoa-cai";
-		};
+		health_metrics_canister_id := await CanisterIdsLedger.get_health_metrics_id();
 	};
 
 	// ------------------------- System Methods -------------------------

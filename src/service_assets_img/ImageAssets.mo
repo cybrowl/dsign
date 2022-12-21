@@ -51,6 +51,8 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	);
 	stable var image_assets_stable_storage : [(ImageID, AssetImg)] = [];
 
+	stable var health_metrics_canister_id : Text = "tqtu6-byaaa-aaaaa-aaana-cai";
+
 	public shared ({ caller }) func save_images(
 		img_asset_ids : [Nat],
 		asset_type : Text,
@@ -213,7 +215,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 			parent_canister_id = parent_canister_id;
 		};
 
-		let health_metrics_actor = actor ("ree2h-zaaaa-aaaag-aba5q-cai") : HealthMetricsActor;
+		let health_metrics_actor = actor (health_metrics_canister_id) : HealthMetricsActor;
 		ignore health_metrics_actor.log_event(log_payload);
 
 		return log_payload;

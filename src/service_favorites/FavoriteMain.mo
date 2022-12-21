@@ -9,10 +9,10 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
+import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
 import Types "./types";
-import CanisterLedgerTypes "../types/canister_child_ledger.types";
 
-import CanisterChildLedger "canister:canister_child_ledger";
+import CanisterIdsLedger "canister:canister_ids_ledger";
 import Favorite "Favorite";
 import Logger "canister:logger";
 
@@ -33,7 +33,7 @@ actor FavoriteMain {
 	type FavoriteActor = Types.FavoriteActor;
 	type SnapActor = Types.SnapActor;
 
-	type CanisterChild = CanisterLedgerTypes.CanisterChild;
+	type CanisterInfo = CanisterIdsLedgerTypes.CanisterInfo;
 
 	let ACTOR_NAME : Text = "FavoriteMain";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
@@ -218,7 +218,7 @@ actor FavoriteMain {
 
 		favorite_canister_id := Principal.toText(principal);
 
-		let canister_child : CanisterChild = {
+		let canister_child : CanisterInfo = {
 			created = Time.now();
 			id = favorite_canister_id;
 			name = "favorite";
@@ -226,7 +226,7 @@ actor FavoriteMain {
 			isProd = is_prod;
 		};
 
-		ignore CanisterChildLedger.save_canister(canister_child);
+		ignore CanisterIdsLedger.save_canister(canister_child);
 	};
 
 	public shared (msg) func initialize_canisters() : async Text {

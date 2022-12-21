@@ -10,13 +10,13 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
-import CanisterChildLedger "canister:canister_child_ledger";
+import CanisterIdsLedger "canister:canister_ids_ledger";
 import Logger "canister:logger";
 import Profile "canister:profile";
 import Project "Project";
 
 import Types "./types";
-import CanisterLedgerTypes "../types/canister_child_ledger.types";
+import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
 import SnapTypes "../service_snaps/types";
 
 import Utils "../utils/utils";
@@ -42,7 +42,7 @@ actor ProjectMain {
 	type ProjectActor = Types.ProjectActor;
 	type SnapActor = SnapTypes.SnapActor;
 
-	type CanisterChild = CanisterLedgerTypes.CanisterChild;
+	type CanisterInfo = CanisterIdsLedgerTypes.CanisterInfo;
 
 	let ACTOR_NAME : Text = "ProjectMain";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
@@ -421,7 +421,7 @@ actor ProjectMain {
 
 		project_canister_id := Principal.toText(principal);
 
-		let canister_child : CanisterChild = {
+		let canister_child : CanisterInfo = {
 			created = Time.now();
 			id = project_canister_id;
 			name = "project";
@@ -429,7 +429,7 @@ actor ProjectMain {
 			isProd = is_prod;
 		};
 
-		ignore CanisterChildLedger.save_canister(canister_child);
+		ignore CanisterIdsLedger.save_canister(canister_child);
 	};
 
 	public shared (msg) func initialize_canisters() : async Text {

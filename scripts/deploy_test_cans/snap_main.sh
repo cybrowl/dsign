@@ -8,6 +8,12 @@ dfx deploy test_image_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", 
 dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principal "'${PROJECT_MAIN_PRINCIPAL}'", principal "'${FAVORITE_MAIN_PRINCIPAL}'")'
 dfx deploy snap_main
 
+dfx canister call snap_main initialize_canisters \
+'(record {
+    favorite_main_canister_id = "'${FAVORITE_MAIN_PRINCIPAL}'";
+    project_main_canister_id = "'${PROJECT_MAIN_PRINCIPAL}'";
+    })'
+
 # check version
 dfx canister call test_assets version
 dfx canister call test_image_assets version

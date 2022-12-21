@@ -1,5 +1,6 @@
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
+import ExperimentalCycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Option "mo:base/Option";
@@ -15,8 +16,11 @@ import Explore "canister:explore";
 import Logger "canister:logger";
 import Profile "canister:profile";
 
-import Types "./types";
+import HealthMetricsTypes "../types/health_metrics.types";
 import ProjectTypes "../service_projects/types";
+import Types "./types";
+
+import UtilsShared "../utils/utils";
 
 actor class Snap(snap_main : Principal, project_main : Principal, favorite_main : Principal) = this {
 	type AssetRef = Types.AssetRef;
@@ -24,9 +28,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	type ErrCreateSnap = Types.ErrCreateSnap;
 	type ErrUpdateSnap = Types.ErrUpdateSnap;
 	type ImageRef = Types.ImageRef;
-	type Project = ProjectTypes.Project;
 	type ProjectPublic = Types.ProjectPublic;
-	type ProjectRef = ProjectTypes.ProjectRef;
 	type Snap = Types.Snap;
 	type SnapID = Types.SnapID;
 	type SnapPublic = Types.SnapPublic;
@@ -34,6 +36,11 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	type SnapUpdateArgs = Types.SnapUpdateArgs;
 	type UserPrincipal = Types.UserPrincipal;
 
+	type Project = ProjectTypes.Project;
+	type ProjectRef = ProjectTypes.ProjectRef;
+	type Payload = HealthMetricsTypes.Payload;
+
+	type HealthMetricsActor = HealthMetricsTypes.HealthMetricsActor;
 	type ProjectActor = ProjectTypes.ProjectActor;
 
 	let ACTOR_NAME : Text = "Snap";
@@ -44,6 +51,8 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 
 	var snaps : HashMap.HashMap<SnapID, Snap> = HashMap.HashMap(0, Text.equal, Text.hash);
 	stable var snaps_stable_storage : [(SnapID, Snap)] = [];
+
+	stable var health_metrics_canister_id : Text = "";
 
 	public shared ({ caller }) func create_snap(
 		args : CreateSnapArgs,
@@ -296,6 +305,30 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	public shared func health() : async Payload {
+		let memory_in_mb = UtilsShared.get_memory_in_mb();
+		let heap_in_mb = UtilsShared.get_heap_in_mb();
+
+		let snap_principal = Principal.fromActor(this);
+
+		let log_payload : Payload = {
+			metrics = [
+				("snaps_num", snaps.size()),
+				("cycles_balance", ExperimentalCycles.balance()),
+				("memory_in_mb", memory_in_mb),
+				("heap_in_mb", heap_in_mb)
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(snap_principal);
+			parent_canister_id = "";
+		};
+
+		let health_metrics_actor = actor (health_metrics_canister_id) : HealthMetricsActor;
+		ignore health_metrics_actor.log_event(log_payload);
+
+		return log_payload;
 	};
 
 	// ------------------------- System Methods -------------------------

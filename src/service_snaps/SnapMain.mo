@@ -2,6 +2,7 @@ import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
+import ExperimentalCycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Option "mo:base/Option";
@@ -11,7 +12,7 @@ import Time "mo:base/Time";
 import Result "mo:base/Result";
 
 import Assets "../service_assets/Assets";
-import CanisterChildLedger "canister:canister_child_ledger";
+import CanisterIdsLedger "canister:canister_ids_ledger";
 import FileAssetChunks "canister:assets_file_chunks";
 import ImageAssets "../service_assets_img/ImageAssets";
 import ImageAssetStaging "canister:assets_img_staging";
@@ -19,8 +20,11 @@ import Logger "canister:logger";
 import Snap "Snap";
 
 import Types "./types";
-import CanisterLedgerTypes "../types/canister_child_ledger.types";
+import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
+import HealthMetricsTypes "../types/health_metrics.types";
+
 import Utils "../utils/utils";
+import UtilsShared "../utils/utils";
 
 actor SnapMain {
 	type CreateAssetArgs = Types.CreateAssetArgs;
@@ -31,7 +35,6 @@ actor SnapMain {
 	type ICInterface = Types.ICInterface;
 	type ICInterfaceStatusResponse = Types.ICInterfaceStatusResponse;
 	type ImageRef = Types.ImageRef;
-	type InitArgs = Types.InitArgs;
 	type Snap = Types.Snap;
 	type SnapPublic = Types.SnapPublic;
 	type SnapCanisterID = Types.SnapCanisterID;
@@ -43,11 +46,13 @@ actor SnapMain {
 	type ImageAssetsActor = Types.ImageAssetsActor;
 	type SnapActor = Types.SnapActor;
 
-	type CanisterChild = CanisterLedgerTypes.CanisterChild;
+	type CanisterInfo = CanisterIdsLedgerTypes.CanisterInfo;
+	type HealthMetricsActor = HealthMetricsTypes.HealthMetricsActor;
+	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "SnapMain";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
-	let VERSION : Nat = 2;
+	let VERSION : Nat = 3;
 
 	var user_canisters_ref : HashMap.HashMap<UserPrincipal, SnapIDStorage> = HashMap.HashMap(
 		0,
@@ -65,6 +70,7 @@ actor SnapMain {
 	// this doesn't change after init
 	stable var project_main_canister_id : Text = "";
 	stable var favorite_main_canister_id : Text = "";
+	stable var health_metrics_canister_id : Text = "";
 
 	private let ic : ICInterface = actor "aaaaa-aa";
 
@@ -367,7 +373,7 @@ actor SnapMain {
 
 		assets_canister_id := Principal.toText(principal);
 
-		let canister_child : CanisterChild = {
+		let canister_child : CanisterInfo = {
 			created = Time.now();
 			id = assets_canister_id;
 			name = "assets";
@@ -375,7 +381,7 @@ actor SnapMain {
 			isProd = is_prod;
 		};
 
-		ignore CanisterChildLedger.save_canister(canister_child);
+		ignore CanisterIdsLedger.save_canister(canister_child);
 	};
 
 	private func create_image_assets_canister(snap_main_principal : Principal, is_prod : Bool) : async () {
@@ -385,7 +391,7 @@ actor SnapMain {
 
 		image_assets_canister_id := Principal.toText(principal);
 
-		let canister_child : CanisterChild = {
+		let canister_child : CanisterInfo = {
 			created = Time.now();
 			id = image_assets_canister_id;
 			name = "image_assets";
@@ -393,7 +399,7 @@ actor SnapMain {
 			isProd = is_prod;
 		};
 
-		ignore CanisterChildLedger.save_canister(canister_child);
+		ignore CanisterIdsLedger.save_canister(canister_child);
 	};
 
 	private func create_snap_canister(
@@ -412,7 +418,7 @@ actor SnapMain {
 		let principal = Principal.fromActor(snap_actor);
 		snap_canister_id := Principal.toText(principal);
 
-		let canister_child : CanisterChild = {
+		let canister_child : CanisterInfo = {
 			created = Time.now();
 			id = snap_canister_id;
 			name = "snap";
@@ -420,11 +426,11 @@ actor SnapMain {
 			isProd = is_prod;
 		};
 
-		ignore CanisterChildLedger.save_canister(canister_child);
+		ignore CanisterIdsLedger.save_canister(canister_child);
 	};
 
 	// INIT CANISTERS
-	public shared (msg) func initialize_canisters(args : InitArgs) : async () {
+	public shared (msg) func initialize_canisters() : async () {
 		let tags = [ACTOR_NAME, "initialize_canisters"];
 		let snap_main_principal = Principal.fromActor(SnapMain);
 
@@ -436,15 +442,19 @@ actor SnapMain {
 		let has_assets_canister_id : Bool = assets_canister_id.size() > 0;
 		let has_image_assets_canister_id : Bool = image_assets_canister_id.size() > 0;
 		let has_snap_canister_id : Bool = snap_canister_id.size() > 0;
-		let has_project_main_canister_id : Bool = project_main_canister_id.size() > 0;
-		let has_favorite_main_canister_id : Bool = favorite_main_canister_id.size() > 0;
 
-		if (has_project_main_canister_id == false) {
-			project_main_canister_id := args.project_main_canister_id;
+		if (has_assets_canister_id == true and has_image_assets_canister_id == true and has_snap_canister_id == true) {
+			return;
 		};
 
-		if (has_favorite_main_canister_id == false) {
-			favorite_main_canister_id := args.favorite_main_canister_id;
+		let canister_ids = await CanisterIdsLedger.get_canister_ids();
+
+		if (project_main_canister_id.size() == 0) {
+			project_main_canister_id := canister_ids.project_main;
+		};
+
+		if (favorite_main_canister_id.size() == 0) {
+			favorite_main_canister_id := canister_ids.favorite_main;
 		};
 
 		let project_main_principal = Principal.fromText(project_main_canister_id);
@@ -490,21 +500,31 @@ actor SnapMain {
 		);
 	};
 
+	public shared func health() : async Payload {
+		let memory_in_mb = UtilsShared.get_memory_in_mb();
+		let heap_in_mb = UtilsShared.get_heap_in_mb();
+
+		let snap_main_principal = Principal.fromActor(SnapMain);
+
+		let log_payload : Payload = {
+			metrics = [
+				("profiles_num", user_canisters_ref.size()),
+				("cycles_balance", ExperimentalCycles.balance()),
+				("memory_in_mb", memory_in_mb),
+				("heap_in_mb", heap_in_mb)
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(snap_main_principal);
+			parent_canister_id = "";
+		};
+
+		let health_metrics_actor = actor (health_metrics_canister_id) : HealthMetricsActor;
+		ignore health_metrics_actor.log_event(log_payload);
+
+		return log_payload;
+	};
+
 	// UPDATE CHILD CANISTERS
-	public shared func get_child_status(canister_id : Text) : async ICInterfaceStatusResponse {
-		let principal : Principal = Principal.fromText(canister_id);
-
-		await ic.canister_status({ canister_id = principal });
-	};
-
-	public shared ({ caller }) func get_child_controllers(canister_id : Text) : async Text {
-		let principal : Principal = Principal.fromText(canister_id);
-
-		let response = await ic.canister_status({ canister_id = principal });
-
-		return debug_show (response.settings.controllers, caller);
-	};
-
 	public shared ({ caller }) func install_code(
 		canister_id : Principal,
 		arg : Blob,
