@@ -7,16 +7,22 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import CanisterLedgerTypes "../types/canidster_ids_ledger.types";
+import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
 
 import Logger "canister:logger";
+
+import UtilsShared "../utils/utils";
 
 actor CanisterIdsLedger = {
 	type CanisterActor = Types.CanisterActor;
 	type CanisterIds = Types.CanisterIds;
 	type CanisterInfo = CanisterLedgerTypes.CanisterInfo;
 
+	type Payload = HealthMetricsTypes.Payload;
+
 	let ACTOR_NAME : Text = "CanisterIdsLedger";
+	let VERSION : Nat = 1;
 
 	var canisters = List.nil<CanisterInfo>();
 	stable var canisters_stable_storage : [(CanisterInfo)] = [];
@@ -34,10 +40,7 @@ actor CanisterIdsLedger = {
 		snap_main = "lyswl-7iaaa-aaaag-aatya-cai";
 	};
 
-	public query func ping() : async Text {
-		return "meow";
-	};
-
+	// ------------------------- CanisterIdsLedger Methods -------------------------
 	public shared ({ caller }) func save_canister(canister_child : CanisterInfo) : async Text {
 		if (is_prod == false) {
 			canisters := List.push<CanisterInfo>(canister_child, canisters);
@@ -96,7 +99,7 @@ actor CanisterIdsLedger = {
 		};
 	};
 
-	public shared ({ caller }) func call_health() : async Text {
+	public shared ({ caller }) func log_canisters_health() : async Text {
 		let all_canister_children = List.toArray<CanisterInfo>(canisters);
 
 		// note: not sure how Iter over records
@@ -152,7 +155,27 @@ actor CanisterIdsLedger = {
 
 	};
 
-	// ------------------------- SYSTEM METHODS -------------------------
+	// ------------------------- Canister Management Methods -------------------------
+	public query func version() : async Nat {
+		return VERSION;
+	};
+
+	public shared func health() : async Payload {
+		let log_payload : Payload = {
+			metrics = [
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(Principal.fromActor(CanisterIdsLedger));
+			parent_canister_id = "";
+		};
+
+		return log_payload;
+	};
+
+	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		authorized_stable_storage := Iter.toArray(authorized.entries());
 
