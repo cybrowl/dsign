@@ -11,15 +11,18 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import CanisterIdsLedger "canister:canister_ids_ledger";
+import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 import Profile "canister:profile";
 import Project "Project";
 
 import Types "./types";
 import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
+import HealthMetricsTypes "../types/health_metrics.types";
 import SnapTypes "../service_snaps/types";
 
 import Utils "../utils/utils";
+import UtilsShared "../utils/utils";
 
 actor ProjectMain {
 	type ErrAddSnapsToProject = Types.ErrAddSnapsToProject;
@@ -43,6 +46,7 @@ actor ProjectMain {
 	type SnapActor = SnapTypes.SnapActor;
 
 	type CanisterInfo = CanisterIdsLedgerTypes.CanisterInfo;
+	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "ProjectMain";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
@@ -412,6 +416,24 @@ actor ProjectMain {
 	// ------------------------- CANISTER MANAGEMENT -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	public shared func health() : async Payload {
+		let log_payload : Payload = {
+			metrics = [
+				("user_can_refs", user_canisters_ref.size()),
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(Principal.fromActor(ProjectMain));
+			parent_canister_id = "";
+		};
+
+		ignore HealthMetrics.log_event(log_payload);
+
+		return log_payload;
 	};
 
 	private func create_project_canister(project_main_principal : Principal, is_prod : Bool) : async () {

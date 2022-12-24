@@ -6,7 +6,12 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
+import HealthMetrics "canister:health_metrics";
+
+import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
+
+import UtilsShared "../utils/utils";
 
 actor class Favorite(favorite_main : Principal) = this {
 	type ErrDeleteFavorite = Types.ErrDeleteFavorite;
@@ -15,6 +20,8 @@ actor class Favorite(favorite_main : Principal) = this {
 	type SnapCanisterId = Types.SnapCanisterId;
 	type SnapID = Types.SnapID;
 	type SnapPublic = Types.SnapPublic;
+
+	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "Favorite";
 	let VERSION : Nat = 1;
@@ -76,6 +83,24 @@ actor class Favorite(favorite_main : Principal) = this {
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	public shared func health() : async Payload {
+		let log_payload : Payload = {
+			metrics = [
+				("favorites_num", snaps.size()),
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(Principal.fromActor(this));
+			parent_canister_id = Principal.toText(favorite_main);
+		};
+
+		ignore HealthMetrics.log_event(log_payload);
+
+		return log_payload;
 	};
 
 	// ------------------------- System Methods -------------------------

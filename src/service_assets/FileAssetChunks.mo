@@ -8,16 +8,25 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Time "mo:base/Time";
 
+import HealthMetrics "canister:health_metrics";
+
+import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
 
+import UtilsShared "../utils/utils";
+
 actor FileAssetChunks = {
+	type Payload = HealthMetricsTypes.Payload;
+
 	private var chunk_id_count : Nat = 0;
 	private let chunks : HashMap.HashMap<Nat, Types.AssetChunk> = HashMap.HashMap<Nat, Types.AssetChunk>(
 		0,
 		Nat.equal,
 		Hash.hash
 	);
+
 	let VERSION : Nat = 3;
+	let ACTOR_NAME : Text = "FileAssetChunksStaging";
 
 	public shared ({ caller }) func create_chunk(chunk : Types.Chunk) : async Nat {
 		//TODO: check username to stop spam
@@ -70,11 +79,21 @@ actor FileAssetChunks = {
 		return VERSION;
 	};
 
-	public query func health() : async Types.Health {
-		return {
-			chunks_size = chunks.size();
-			memory = Prim.rts_memory_size();
-			heap = Prim.rts_heap_size();
+	public shared func health() : async Payload {
+		let log_payload : Payload = {
+			metrics = [
+				("images_num", chunks.size()),
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(Principal.fromActor(FileAssetChunks));
+			parent_canister_id = "";
 		};
+
+		ignore HealthMetrics.log_event(log_payload);
+
+		return log_payload;
 	};
 };

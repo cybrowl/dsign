@@ -5,17 +5,26 @@ import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
+import HealthMetrics "canister:health_metrics";
+
+import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
+
+import UtilsShared "../utils/utils";
 
 actor Explore = {
 	type SnapCanisterId = Types.SnapCanisterId;
 	type SnapID = Types.SnapID;
 	type SnapPublic = Types.SnapPublic;
 
+	type Payload = HealthMetricsTypes.Payload;
+
 	var snaps : HashMap.HashMap<SnapID, SnapPublic> = HashMap.HashMap(0, Text.equal, Text.hash);
 	stable var snaps_stable_storage : [(SnapID, SnapPublic)] = [];
 
 	var snaps_authorized_can_ids : HashMap.HashMap<SnapCanisterId, SnapCanisterId> = HashMap.HashMap(0, Text.equal, Text.hash);
+
+	let ACTOR_NAME : Text = "Explore";
 
 	public query func ping() : async Text {
 		return "pong";
@@ -46,6 +55,25 @@ actor Explore = {
 
 	public query func length() : async Nat {
 		return snaps.size();
+	};
+
+	// ------------------------- CANISTER MANAGEMENT -------------------------
+	public shared func health() : async Payload {
+		let log_payload : Payload = {
+			metrics = [
+				("snaps_num", snaps.size()),
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(Principal.fromActor(Explore));
+			parent_canister_id = "";
+		};
+
+		ignore HealthMetrics.log_event(log_payload);
+
+		return log_payload;
 	};
 
 	// ------------------------- System Methods -------------------------

@@ -1,13 +1,9 @@
 import { Buffer; toArray } "mo:base/Buffer";
 import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
-import ExperimentalCycles "mo:base/ExperimentalCycles";
-import ExperimentalStableMemory "mo:base/ExperimentalStableMemory";
-import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
-import Prim "mo:⛔";
 import Principal "mo:base/Principal";
 import Rand "mo:base/Random";
 import Result "mo:base/Result";
@@ -22,7 +18,9 @@ import ImageAssetStaging "canister:assets_img_staging";
 
 import Types "./types";
 import HealthMetricsTypes "../types/health_metrics.types";
+
 import Utils "./utils";
+import UtilsShared "../utils/utils";
 
 actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	type AssetImg = Types.AssetImg;
@@ -30,7 +28,8 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	type HttpResponse = Types.HttpResponse;
 	type ImageID = Types.ImageID;
 	type ImageRef = Types.ImageRef;
-	type Payload = Types.Payload;
+
+	type Payload = HealthMetricsTypes.Payload;
 
 	type AssetImgErr = {
 		#NotAuthorized;
@@ -192,27 +191,16 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	};
 
 	public shared func health() : async Payload {
-
-		let rts_memory_size : Nat = Prim.rts_memory_size();
-		let mem_size : Float = Float.fromInt(rts_memory_size);
-		let memory_in_megabytes = Float.toInt(Float.abs(mem_size / 1_048_576));
-
-		let rts_heap_size : Nat = Prim.rts_heap_size();
-		let heap_size : Float = Float.fromInt(rts_heap_size);
-		let heap_in_megabytes = Float.toInt(Float.abs(heap_size / 1_048_576));
-		let child_canister_id = Principal.toText(Principal.fromActor(this));
-		let parent_canister_id = Principal.toText(controller);
-
 		let log_payload : Payload = {
 			metrics = [
 				("images_num", image_assets.size()),
-				("cycles_balance", ExperimentalCycles.balance()),
-				("memory_in_mb", memory_in_megabytes),
-				("heap_in_mb", heap_in_megabytes)
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
 			];
 			name = ACTOR_NAME;
-			child_canister_id = child_canister_id;
-			parent_canister_id = parent_canister_id;
+			child_canister_id = Principal.toText(Principal.fromActor(this));
+			parent_canister_id = Principal.toText(controller);
 		};
 
 		ignore HealthMetrics.log_event(log_payload);

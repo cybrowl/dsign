@@ -8,11 +8,11 @@ const fs = require('fs');
 const Path = require('path');
 
 const {
-	canister_child_ledger_interface,
+	canister_ids_ledger_interface,
 	favorite_main_interface
 } = require('../../test-utils/actor_interface.cjs');
 const {
-	canister_child_ledger_canister_id,
+	canister_ids_ledger_canister_id,
 	favorite_main_canister_id
 } = require('../../test-utils/actor_canister_ids.cjs');
 const canister_ids = require('../../canister_ids.json');
@@ -84,8 +84,8 @@ const installCode = async () => {
 		console.log('======== Installing Local Favorite Main Child Canisters =========');
 
 		const canister_child_ledger_actor = await get_actor(
-			canister_child_ledger_canister_id,
-			canister_child_ledger_interface,
+			canister_ids_ledger_canister_id,
+			canister_ids_ledger_interface,
 			false
 		);
 
@@ -127,7 +127,7 @@ const installCode = async () => {
 
 		const canister_child_ledger_actor = await get_actor(
 			canister_ids['canister_child_ledger'].ic,
-			canister_child_ledger_interface,
+			canister_ids_ledger_interface,
 			true
 		);
 

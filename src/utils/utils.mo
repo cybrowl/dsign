@@ -2,10 +2,11 @@ import Arr "mo:array/Array";
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import Debug "mo:base/Debug";
+import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
-import Text "mo:base/Text";
 import Prim "mo:⛔";
+import Text "mo:base/Text";
 
 module {
 	public type IDStorage = HashMap.HashMap<Text, [Text]>;
@@ -117,5 +118,9 @@ module {
 		let heap_in_megabytes = Float.toInt(Float.abs(heap_size / 1_048_576));
 
 		return heap_in_megabytes;
+	};
+
+	public func get_cycles_balance() : Int {
+		return ExperimentalCycles.balance();
 	};
 };

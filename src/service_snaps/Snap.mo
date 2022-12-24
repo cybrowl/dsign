@@ -1,6 +1,5 @@
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
-import ExperimentalCycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Option "mo:base/Option";
@@ -308,21 +307,16 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	};
 
 	public shared func health() : async Payload {
-		let memory_in_mb = UtilsShared.get_memory_in_mb();
-		let heap_in_mb = UtilsShared.get_heap_in_mb();
-
-		let snap_principal = Principal.fromActor(this);
-
 		let log_payload : Payload = {
 			metrics = [
 				("snaps_num", snaps.size()),
-				("cycles_balance", ExperimentalCycles.balance()),
-				("memory_in_mb", memory_in_mb),
-				("heap_in_mb", heap_in_mb)
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
 			];
 			name = ACTOR_NAME;
-			child_canister_id = Principal.toText(snap_principal);
-			parent_canister_id = "";
+			child_canister_id = Principal.toText(Principal.fromActor(this));
+			parent_canister_id = Principal.toText(snap_main);
 		};
 
 		ignore HealthMetrics.log_event(log_payload);

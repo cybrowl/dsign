@@ -15,15 +15,20 @@ import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
 import FileAssetChunks "canister:assets_file_chunks";
+import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 
+import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
 
 import Utils "./utils";
+import UtilsShared "../utils/utils";
 
 actor class Assets(controller : Principal, is_prod : Bool) = this {
 	let ACTOR_NAME : Text = "Assets";
 	let VERSION : Nat = 3;
+
+	type Payload = HealthMetricsTypes.Payload;
 
 	private let rr = XorShift.toReader(XorShift.XorShift64(null));
 	private let se = Source.Source(rr, 0);
@@ -210,6 +215,24 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	public shared func health() : async Payload {
+		let log_payload : Payload = {
+			metrics = [
+				("assets_num", assets.size()),
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(Principal.fromActor(this));
+			parent_canister_id = Principal.toText(controller);
+		};
+
+		ignore HealthMetrics.log_event(log_payload);
+
+		return log_payload;
 	};
 
 	// ------------------------- System Methods -------------------------

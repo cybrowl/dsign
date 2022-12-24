@@ -1,6 +1,9 @@
 import { Buffer; toArray; fromArray; subBuffer } "mo:base/Buffer";
 import Iter "mo:base/Iter";
+import Principal "mo:base/Principal";
 import Time "mo:base/Time";
+
+import UtilsShared "../utils/utils";
 
 actor HealthMetrics = {
 	public type Payload = {
@@ -57,6 +60,24 @@ actor HealthMetrics = {
 	// ------------------------- CANISTER MANAGEMENT -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	public shared func health() : async Payload {
+		let log_payload : Payload = {
+			metrics = [
+				("logs_num", logs.size()),
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(Principal.fromActor(HealthMetrics));
+			parent_canister_id = "";
+		};
+
+		ignore HealthMetrics.log_event(log_payload);
+
+		return log_payload;
 	};
 
 	// ------------------------- System Methods -------------------------

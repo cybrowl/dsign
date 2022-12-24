@@ -10,13 +10,16 @@ import Time "mo:base/Time";
 import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
+import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 import Profile "canister:profile";
 
-import Types "./types";
+import HealthMetricsTypes "../types/health_metrics.types";
 import SnapTypes "../service_snaps/types";
+import Types "./types";
 
 import Utils "../utils/utils";
+import UtilsShared "../utils/utils";
 
 actor class Project(project_main : Principal, is_prod : Bool) = this {
 	type ErrAddSnapsToProject = Types.ErrAddSnapsToProject;
@@ -34,7 +37,9 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	type UserPrincipal = Types.UserPrincipal;
 
 	type SnapActor = SnapTypes.SnapActor;
+
 	type SnapPublic = SnapTypes.SnapPublic;
+	type Payload = HealthMetricsTypes.Payload;
 
 	public type ProjectPublic = {
 		id : Text;
@@ -303,6 +308,24 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	// ------------------------- CANISTER MANAGEMENT -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	public shared func health() : async Payload {
+		let log_payload : Payload = {
+			metrics = [
+				("projects_num", projects.size()),
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(Principal.fromActor(this));
+			parent_canister_id = Principal.toText(project_main);
+		};
+
+		ignore HealthMetrics.log_event(log_payload);
+
+		return log_payload;
 	};
 
 	// ------------------------- SYSTEM METHODS -------------------------

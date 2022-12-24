@@ -10,13 +10,16 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
+import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
 
 import CanisterIdsLedger "canister:canister_ids_ledger";
 import Favorite "Favorite";
+import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 
 import Utils "../utils/utils";
+import UtilsShared "../utils/utils";
 
 actor FavoriteMain {
 	type ErrDeleteFavorite = Types.ErrDeleteFavorite;
@@ -34,6 +37,7 @@ actor FavoriteMain {
 	type SnapActor = Types.SnapActor;
 
 	type CanisterInfo = CanisterIdsLedgerTypes.CanisterInfo;
+	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "FavoriteMain";
 	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
@@ -252,6 +256,24 @@ actor FavoriteMain {
 			return favorite_canister_id;
 		}
 
+	};
+
+	public shared func health() : async Payload {
+		let log_payload : Payload = {
+			metrics = [
+				("user_can_refs", user_canisters_ref.size()),
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(Principal.fromActor(FavoriteMain));
+			parent_canister_id = "";
+		};
+
+		ignore HealthMetrics.log_event(log_payload);
+
+		return log_payload;
 	};
 
 	public shared ({ caller }) func install_code(

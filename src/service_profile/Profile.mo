@@ -1,6 +1,5 @@
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
-import ExperimentalCycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
@@ -370,20 +369,15 @@ actor Profile = {
 	};
 
 	public shared func health() : async Payload {
-		let memory_in_mb = UtilsShared.get_memory_in_mb();
-		let heap_in_mb = UtilsShared.get_heap_in_mb();
-
-		let profile_principal = Principal.fromActor(Profile);
-
 		let log_payload : Payload = {
 			metrics = [
 				("profiles_num", profiles.size()),
-				("cycles_balance", ExperimentalCycles.balance()),
-				("memory_in_mb", memory_in_mb),
-				("heap_in_mb", heap_in_mb)
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
 			];
 			name = ACTOR_NAME;
-			child_canister_id = Principal.toText(profile_principal);
+			child_canister_id = Principal.toText(Principal.fromActor(Profile));
 			parent_canister_id = "";
 		};
 

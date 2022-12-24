@@ -1,7 +1,5 @@
 import Array "mo:base/Array";
 import Debug "mo:base/Debug";
-import ExperimentalCycles "mo:base/ExperimentalCycles";
-import ExperimentalStableMemory "mo:base/ExperimentalStableMemory";
 import Float "mo:base/Float";
 import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
@@ -11,8 +9,13 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Time "mo:base/Time";
 
+import HealthMetrics "canister:health_metrics";
+
+import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
+
 import Utils "./utils";
+import UtilsShared "../utils/utils";
 
 actor ImageAssetStaging = {
 	type AssetImg = Types.AssetImg;
@@ -21,6 +24,8 @@ actor ImageAssetStaging = {
 		#AssetNotFound;
 		#NotOwnerOfAsset;
 	};
+
+	type Payload = HealthMetricsTypes.Payload;
 
 	private var asset_id_count : Nat = 0;
 	private let assets : HashMap.HashMap<Nat, Types.AssetImg> = HashMap.HashMap<Nat, Types.AssetImg>(
@@ -90,24 +95,22 @@ actor ImageAssetStaging = {
 		return VERSION;
 	};
 
-	public query func health() : async [(Text, Int)] {
+	public shared func health() : async Payload {
+		let log_payload : Payload = {
+			metrics = [
+				("images_num", assets.size()),
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(Principal.fromActor(ImageAssetStaging));
+			parent_canister_id = "";
+		};
 
-		let rts_memory_size : Nat = Prim.rts_memory_size();
-		let mem_size : Float = Float.fromInt(rts_memory_size);
-		let memory_in_megabytes = Float.toInt(Float.abs(mem_size / 1_048_576));
+		ignore HealthMetrics.log_event(log_payload);
 
-		let rts_heap_size : Nat = Prim.rts_heap_size();
-		let heap_size : Float = Float.fromInt(rts_heap_size);
-		let heap_in_megabytes = Float.toInt(Float.abs(heap_size / 1_048_576));
-
-		let health_info = [
-			("assets_num", assets.size()),
-			("cycles_balance", ExperimentalCycles.balance()),
-			("memory_in_mb", memory_in_megabytes),
-			("heap_in_mb", heap_in_megabytes)
-		];
-
-		return health_info;
+		return log_payload;
 	};
 
 	public query func is_full() : async Bool {

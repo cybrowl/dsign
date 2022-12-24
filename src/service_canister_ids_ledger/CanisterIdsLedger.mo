@@ -11,12 +11,12 @@ import Types "./types";
 
 import Logger "canister:logger";
 
-actor CanisterChildLedger = {
+actor CanisterIdsLedger = {
 	type CanisterActor = Types.CanisterActor;
 	type CanisterIds = Types.CanisterIds;
 	type CanisterInfo = CanisterLedgerTypes.CanisterInfo;
 
-	let ACTOR_NAME : Text = "CanisterChildLedger";
+	let ACTOR_NAME : Text = "CanisterIdsLedger";
 
 	var canisters = List.nil<CanisterInfo>();
 	stable var canisters_stable_storage : [(CanisterInfo)] = [];
@@ -62,9 +62,9 @@ actor CanisterChildLedger = {
 	};
 
 	public query func get_health_metrics_id() : async Text {
-		let canister_child_ledger = Principal.fromActor(CanisterChildLedger);
+		let canister_ids_ledger = Principal.fromActor(CanisterIdsLedger);
 		let is_production = Text.equal(
-			Principal.toText(canister_child_ledger),
+			Principal.toText(canister_ids_ledger),
 			"7t2d4-jiaaa-aaaag-aa36q-cai"
 		);
 
@@ -80,9 +80,9 @@ actor CanisterChildLedger = {
 	};
 
 	public shared ({ caller }) func set_canister_ids(canisterIds : CanisterIds) : async Text {
-		let canister_child_ledger = Principal.fromActor(CanisterChildLedger);
+		let canister_ids_ledger = Principal.fromActor(CanisterIdsLedger);
 		let is_production = Text.equal(
-			Principal.toText(canister_child_ledger),
+			Principal.toText(canister_ids_ledger),
 			"7t2d4-jiaaa-aaaag-aa36q-cai"
 		);
 
@@ -124,9 +124,9 @@ actor CanisterChildLedger = {
 	};
 
 	public shared func initialize_authorized_principals() : async Text {
-		let canister_child_ledger = Principal.fromActor(CanisterChildLedger);
+		let canister_ids_ledger = Principal.fromActor(CanisterIdsLedger);
 		let is_production = Text.equal(
-			Principal.toText(canister_child_ledger),
+			Principal.toText(canister_ids_ledger),
 			"7t2d4-jiaaa-aaaag-aa36q-cai"
 		);
 

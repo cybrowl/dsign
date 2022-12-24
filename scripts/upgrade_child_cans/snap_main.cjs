@@ -8,11 +8,11 @@ const fs = require('fs');
 const Path = require('path');
 
 const {
-	canister_child_ledger_interface,
+	canister_ids_ledger_interface,
 	snap_main_interface
 } = require('../../test-utils/actor_interface.cjs');
 const {
-	canister_child_ledger_canister_id,
+	canister_ids_ledger_canister_id,
 	favorite_main_canister_id,
 	snap_main_canister_id,
 	project_main_canister_id
@@ -84,8 +84,8 @@ const installCode = async () => {
 		console.log('======== Installing Local Snap Main Child Canisters =========');
 
 		const canister_child_ledger_actor = await get_actor(
-			canister_child_ledger_canister_id,
-			canister_child_ledger_interface,
+			canister_ids_ledger_canister_id,
+			canister_ids_ledger_interface,
 			false
 		);
 
@@ -142,7 +142,7 @@ const installCode = async () => {
 
 		const canister_child_ledger_actor = await get_actor(
 			canister_ids['canister_child_ledger'].ic,
-			canister_child_ledger_interface,
+			canister_ids_ledger_interface,
 			true
 		);
 
