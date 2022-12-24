@@ -97,27 +97,27 @@ actor CanisterChildLedger = {
 	};
 
 	public shared ({ caller }) func call_health() : async Text {
-		let tags = [ACTOR_NAME, "call_health"];
-
 		let all_canister_children = List.toArray<CanisterInfo>(canisters);
 
+		// note: not sure how Iter over records
+		let canister_ids_arr = [
+			canister_ids.explore,
+			canister_ids.favorite_main,
+			canister_ids.profile,
+			canister_ids.project_main,
+			canister_ids.snap_main
+		];
+
 		for (canister in all_canister_children.vals()) {
-			switch (canister.name) {
-				case ("snap") {
+			let canister_child_actor = actor (canister.id) : CanisterActor;
 
-					ignore Logger.log_event(
-						tags,
-						"snap"
-					);
+			ignore canister_child_actor.health();
+		};
 
-					let canister_child_actor = actor (canister.id) : CanisterActor;
+		for (canister_id in canister_ids_arr.vals()) {
+			let canister_child_actor = actor (canister_id) : CanisterActor;
 
-					ignore canister_child_actor.health();
-				};
-				case (_) {
-					// ignore
-				};
-			};
+			ignore canister_child_actor.health();
 		};
 
 		return "ok";
