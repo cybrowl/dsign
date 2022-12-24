@@ -25,10 +25,8 @@ actor HealthMetrics = {
 	stable var logs_stable_storage : [(Log)] = [];
 
 	let ACTOR_NAME : Text = "HealthMetrics";
-	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
-	let VERSION : Nat = 1;
+	let VERSION : Nat = 2;
 
-	// note: only called from app canisters
 	public shared (msg) func log_event(log_payload : Payload) : async () {
 		// TODO: some auth check here
 
@@ -65,7 +63,7 @@ actor HealthMetrics = {
 	public shared func health() : async Payload {
 		let log_payload : Payload = {
 			metrics = [
-				("logs_num", logs.size()),
+				("logs_size", logs.size()),
 				("cycles_balance", UtilsShared.get_cycles_balance()),
 				("memory_in_mb", UtilsShared.get_memory_in_mb()),
 				("heap_in_mb", UtilsShared.get_heap_in_mb())
@@ -75,12 +73,10 @@ actor HealthMetrics = {
 			parent_canister_id = "";
 		};
 
-		ignore HealthMetrics.log_event(log_payload);
-
 		return log_payload;
 	};
 
-	// ------------------------- System Methods -------------------------
+	// ------------------------- SYSTEM METHODS -------------------------
 	system func preupgrade() {
 		logs_stable_storage := toArray(logs);
 	};
