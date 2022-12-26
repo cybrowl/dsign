@@ -8,6 +8,9 @@
 	"canister_child_ledger": {
 		"ic": "7t2d4-jiaaa-aaaag-aa36q-cai"
 	},
+	"canister_ids_ledger": {
+		"ic": "k25dy-3yaaa-aaaag-abcpa-cai"
+	},
 	"dsign_assets": {
 		"ic": "kqlfj-siaaa-aaaag-aaawq-cai"
 	},
