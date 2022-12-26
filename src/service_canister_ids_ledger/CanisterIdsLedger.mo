@@ -22,6 +22,7 @@ actor CanisterIdsLedger = {
 	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "CanisterIdsLedger";
+	let CANISTER_ID_PROD : Text = "k25dy-3yaaa-aaaag-abcpa-cai";
 	let VERSION : Nat = 1;
 
 	var canisters = List.nil<CanisterInfo>();
@@ -68,7 +69,7 @@ actor CanisterIdsLedger = {
 		let canister_ids_ledger = Principal.fromActor(CanisterIdsLedger);
 		let is_production = Text.equal(
 			Principal.toText(canister_ids_ledger),
-			"7t2d4-jiaaa-aaaag-aa36q-cai"
+			CANISTER_ID_PROD
 		);
 
 		if (is_production == true) {
@@ -82,11 +83,17 @@ actor CanisterIdsLedger = {
 		return canister_ids;
 	};
 
+	// public shared ({ caller }) func drop_canister(n : Nat) : async () {
+	// 	canisters := List.drop<CanisterInfo>(canisters, n);
+
+	// 	return ();
+	// };
+
 	public shared ({ caller }) func set_canister_ids(canisterIds : CanisterIds) : async Text {
 		let canister_ids_ledger = Principal.fromActor(CanisterIdsLedger);
 		let is_production = Text.equal(
 			Principal.toText(canister_ids_ledger),
-			"7t2d4-jiaaa-aaaag-aa36q-cai"
+			CANISTER_ID_PROD
 		);
 
 		if (is_production == false) {
@@ -130,7 +137,7 @@ actor CanisterIdsLedger = {
 		let canister_ids_ledger = Principal.fromActor(CanisterIdsLedger);
 		let is_production = Text.equal(
 			Principal.toText(canister_ids_ledger),
-			"7t2d4-jiaaa-aaaag-aa36q-cai"
+			CANISTER_ID_PROD
 		);
 
 		is_prod := is_production;
