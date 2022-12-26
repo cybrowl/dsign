@@ -1,6 +1,8 @@
 import { Buffer; toArray; fromArray; subBuffer } "mo:base/Buffer";
+import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
+import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import UtilsShared "../utils/utils";
@@ -24,8 +26,15 @@ actor HealthMetrics = {
 	var logs = Buffer<Log>(0);
 	stable var logs_stable_storage : [(Log)] = [];
 
+	var logs_unique = HashMap.HashMap<Text, Log>(
+		0,
+		Text.equal,
+		Text.hash
+	);
+	stable var logs_unique_stable_storage : [(Text, Log)] = [];
+
 	let ACTOR_NAME : Text = "HealthMetrics";
-	let VERSION : Nat = 2;
+	let VERSION : Nat = 3;
 
 	public shared (msg) func log_event(log_payload : Payload) : async () {
 		// TODO: some auth check here
@@ -39,11 +48,17 @@ actor HealthMetrics = {
 		};
 
 		logs.add(log);
+
+		logs_unique.put(log_payload.child_canister_id, log);
 	};
 
 	public query func get_logs() : async [Log] {
 		//NOTE: to be deprecated once we have a better way to get logs
 		return toArray(logs);
+	};
+
+	public query func get_unique_logs() : async [Log] {
+		return Iter.toArray(logs_unique.vals());
 	};
 
 	public query func get_latest_logs(length : Nat) : async [Log] {
@@ -79,10 +94,20 @@ actor HealthMetrics = {
 	// ------------------------- SYSTEM METHODS -------------------------
 	system func preupgrade() {
 		logs_stable_storage := toArray(logs);
+
+		logs_unique_stable_storage := Iter.toArray(logs_unique.entries());
 	};
 
 	system func postupgrade() {
 		logs := fromArray(logs_stable_storage);
 		logs_stable_storage := [];
+
+		logs_unique := HashMap.fromIter<Text, Log>(
+			logs_unique_stable_storage.vals(),
+			0,
+			Text.equal,
+			Text.hash
+		);
+		logs_unique_stable_storage := [];
 	};
 };
