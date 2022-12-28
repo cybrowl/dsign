@@ -9,7 +9,7 @@
 			"type": "assets"
 		},
 		"assets_file_chunks": {
-			"main": "src/service_assets/FileAssetChunks.mo",
+			"main": "src/service_assets/FileAssetChunksStaging.mo",
 			"type": "motoko",
 			"dependencies": ["health_metrics", "logger"]
 		},

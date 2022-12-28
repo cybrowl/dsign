@@ -15,7 +15,7 @@ import Types "./types";
 
 import UtilsShared "../utils/utils";
 
-actor FileAssetChunks = {
+actor FileAssetChunksStaging = {
 	type Payload = HealthMetricsTypes.Payload;
 
 	private var chunk_id_count : Nat = 0;
@@ -25,7 +25,7 @@ actor FileAssetChunks = {
 		Hash.hash
 	);
 
-	let VERSION : Nat = 3;
+	let VERSION : Nat = 4;
 	let ACTOR_NAME : Text = "FileAssetChunksStaging";
 
 	public shared ({ caller }) func create_chunk(chunk : Types.Chunk) : async Nat {
@@ -82,13 +82,13 @@ actor FileAssetChunks = {
 	public shared func health() : async Payload {
 		let log_payload : Payload = {
 			metrics = [
-				("images_num", chunks.size()),
+				("assets_num", chunks.size()),
 				("cycles_balance", UtilsShared.get_cycles_balance()),
 				("memory_in_mb", UtilsShared.get_memory_in_mb()),
 				("heap_in_mb", UtilsShared.get_heap_in_mb())
 			];
 			name = ACTOR_NAME;
-			child_canister_id = Principal.toText(Principal.fromActor(FileAssetChunks));
+			child_canister_id = Principal.toText(Principal.fromActor(FileAssetChunksStaging));
 			parent_canister_id = "";
 		};
 

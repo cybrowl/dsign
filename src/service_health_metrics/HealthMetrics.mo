@@ -23,15 +23,24 @@ actor HealthMetrics = {
 		time : Int;
 	};
 
+	public type LogMin = {
+		id : Text;
+		time : Int;
+		name : Text;
+		heap_in_mb : Int;
+		memory_in_mb : Int;
+		cycles_balance : Int;
+	};
+
 	var logs = Buffer<Log>(0);
 	stable var logs_stable_storage : [(Log)] = [];
 
-	var logs_unique = HashMap.HashMap<Text, Log>(
+	var logs_unique = HashMap.HashMap<Text, LogMin>(
 		0,
 		Text.equal,
 		Text.hash
 	);
-	stable var logs_unique_stable_storage : [(Text, Log)] = [];
+	stable var logs_unique_stable_storage : [(Text, LogMin)] = [];
 
 	let ACTOR_NAME : Text = "HealthMetrics";
 	let VERSION : Nat = 3;
@@ -49,7 +58,16 @@ actor HealthMetrics = {
 
 		logs.add(log);
 
-		logs_unique.put(log_payload.child_canister_id, log);
+		let log_min = {
+			id = log_payload.child_canister_id;
+			time = log.time;
+			name = log.name;
+			cycles_balance = log_payload.metrics[1].1;
+			memory_in_mb = log_payload.metrics[2].1;
+			heap_in_mb = log_payload.metrics[3].1;
+		};
+
+		logs_unique.put(log_payload.child_canister_id, log_min);
 	};
 
 	public query func get_logs() : async [Log] {
@@ -57,7 +75,7 @@ actor HealthMetrics = {
 		return toArray(logs);
 	};
 
-	public query func get_unique_logs() : async [Log] {
+	public query func get_unique_logs() : async [LogMin] {
 		return Iter.toArray(logs_unique.vals());
 	};
 
@@ -102,7 +120,7 @@ actor HealthMetrics = {
 		logs := fromArray(logs_stable_storage);
 		logs_stable_storage := [];
 
-		logs_unique := HashMap.fromIter<Text, Log>(
+		logs_unique := HashMap.fromIter<Text, LogMin>(
 			logs_unique_stable_storage.vals(),
 			0,
 			Text.equal,

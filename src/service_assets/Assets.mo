@@ -113,6 +113,8 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 			is_public = args.is_public;
 		};
 
+		asset_data.clear();
+
 		#ok(asset_ref);
 	};
 

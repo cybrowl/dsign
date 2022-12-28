@@ -48,6 +48,8 @@ dfx canister call canister_ids_ledger set_canister_ids \
     snap_main = "'${SNAP_MAIN_PRINCIPAL}'";
     })'
 
+dfx canister call canister_ids_ledger initialize_authorized_principals
+
 dfx canister call profile initialize_canisters 
 
 dfx canister call snap_main initialize_canisters
