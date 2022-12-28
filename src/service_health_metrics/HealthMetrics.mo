@@ -1,4 +1,5 @@
 import { Buffer; toArray; fromArray; subBuffer } "mo:base/Buffer";
+import Buff "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
@@ -32,15 +33,19 @@ actor HealthMetrics = {
 		cycles_balance : Int;
 	};
 
-	var logs = Buffer<Log>(0);
-	stable var logs_stable_storage : [(Log)] = [];
-
 	var logs_unique = HashMap.HashMap<Text, LogMin>(
 		0,
 		Text.equal,
 		Text.hash
 	);
 	stable var logs_unique_stable_storage : [(Text, LogMin)] = [];
+
+	var logs_ordered = HashMap.HashMap<Text, [Log]>(
+		0,
+		Text.equal,
+		Text.hash
+	);
+	stable var logs_ordered_stable_storage : [(Text, [Log])] = [];
 
 	let ACTOR_NAME : Text = "HealthMetrics";
 	let VERSION : Nat = 3;
@@ -56,8 +61,6 @@ actor HealthMetrics = {
 			metrics = log_payload.metrics;
 		};
 
-		logs.add(log);
-
 		let log_min = {
 			id = log_payload.child_canister_id;
 			time = log.time;
@@ -68,24 +71,34 @@ actor HealthMetrics = {
 		};
 
 		logs_unique.put(log_payload.child_canister_id, log_min);
-	};
 
-	public query func get_logs() : async [Log] {
-		//NOTE: to be deprecated once we have a better way to get logs
-		return toArray(logs);
+		switch (logs_ordered.get(log_payload.child_canister_id)) {
+			case null {
+				var logs_buffer = Buffer<Log>(0);
+				logs_buffer.add(log);
+				logs_ordered.put(log_payload.child_canister_id, toArray(logs_buffer));
+			};
+			case (?logs) {
+				var logs_buffer : Buff.Buffer<Log> = fromArray(logs);
+				logs_buffer.add(log);
+				logs_ordered.put(log_payload.child_canister_id, toArray(logs_buffer));
+			};
+		};
 	};
 
 	public query func get_unique_logs() : async [LogMin] {
 		return Iter.toArray(logs_unique.vals());
 	};
 
-	public query func get_latest_logs(length : Nat) : async [Log] {
-		let logs_length = logs.size();
-		let start_index : Nat = logs_length - length;
-
-		let latest_logs = subBuffer(logs, start_index, length);
-
-		return toArray(latest_logs);
+	public query func get_canister_logs(id : Text) : async ?[Log] {
+		switch (logs_ordered.get(id)) {
+			case null {
+				return null;
+			};
+			case (?logs) {
+				return ?logs;
+			};
+		};
 	};
 
 	// ------------------------- CANISTER MANAGEMENT -------------------------
@@ -96,7 +109,7 @@ actor HealthMetrics = {
 	public shared func health() : async Payload {
 		let log_payload : Payload = {
 			metrics = [
-				("logs_size", logs.size()),
+				("logs_ordered_size", logs_ordered.size()),
 				("cycles_balance", UtilsShared.get_cycles_balance()),
 				("memory_in_mb", UtilsShared.get_memory_in_mb()),
 				("heap_in_mb", UtilsShared.get_heap_in_mb())
@@ -111,21 +124,27 @@ actor HealthMetrics = {
 
 	// ------------------------- SYSTEM METHODS -------------------------
 	system func preupgrade() {
-		logs_stable_storage := toArray(logs);
-
 		logs_unique_stable_storage := Iter.toArray(logs_unique.entries());
+
+		logs_ordered_stable_storage := Iter.toArray(logs_ordered.entries());
 	};
 
 	system func postupgrade() {
-		logs := fromArray(logs_stable_storage);
-		logs_stable_storage := [];
-
 		logs_unique := HashMap.fromIter<Text, LogMin>(
 			logs_unique_stable_storage.vals(),
 			0,
 			Text.equal,
 			Text.hash
 		);
+
 		logs_unique_stable_storage := [];
+
+		logs_ordered := HashMap.fromIter<Text, [Log]>(
+			logs_ordered_stable_storage.vals(),
+			0,
+			Text.equal,
+			Text.hash
+		);
+		logs_ordered_stable_storage := [];
 	};
 };
