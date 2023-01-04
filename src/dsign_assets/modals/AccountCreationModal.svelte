@@ -25,18 +25,6 @@
 
 	onMount(async () => {
 		await Promise.all([auth_project_main(), auth_snap_main(), auth_favorite_main()]);
-
-		if ($actor_favorite_main.loggedIn) {
-			await $actor_favorite_main.actor.create_user_favorite_storage();
-		}
-
-		if ($actor_project_main.loggedIn) {
-			await $actor_project_main.actor.create_user_project_storage();
-		}
-
-		if ($actor_snap_main.loggedIn) {
-			await $actor_snap_main.actor.create_user_snap_storage();
-		}
 	});
 
 	async function handleAccountCreation(e) {
@@ -61,6 +49,18 @@
 
 				if (username) {
 					createdAccount = true;
+
+					if (
+						$actor_favorite_main.loggedIn &&
+						$actor_project_main.loggedIn &&
+						$actor_snap_main.loggedIn
+					) {
+						await Promise.all([
+							$actor_favorite_main.actor.create_user_favorite_storage(),
+							$actor_project_main.actor.create_user_project_storage(),
+							$actor_snap_main.actor.create_user_snap_storage()
+						]);
+					}
 
 					setTimeout(function () {
 						location.replace('/projects');

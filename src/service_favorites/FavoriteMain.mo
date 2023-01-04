@@ -40,7 +40,7 @@ actor FavoriteMain {
 	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "FavoriteMain";
-	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
+	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
 	let VERSION : Nat = 1;
 
 	var user_canisters_ref : HashMap.HashMap<Principal, FavoriteIDStorage> = HashMap.HashMap(

@@ -49,7 +49,7 @@ actor ProjectMain {
 	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "ProjectMain";
-	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
+	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
 	let VERSION : Nat = 2;
 
 	private let ic : ICInterface = actor "aaaaa-aa";

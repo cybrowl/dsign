@@ -17,6 +17,7 @@ import HealthMetrics "canister:health_metrics";
 import ImageAssets "../service_assets_img/ImageAssets";
 import ImageAssetStaging "canister:assets_img_staging";
 import Logger "canister:logger";
+import Profile "canister:profile";
 import Snap "Snap";
 
 import Types "./types";
@@ -50,8 +51,8 @@ actor SnapMain {
 	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "SnapMain";
-	let CYCLE_AMOUNT : Nat = 100_000_0000_000;
-	let VERSION : Nat = 3;
+	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
+	let VERSION : Nat = 4;
 
 	var user_canisters_ref : HashMap.HashMap<UserPrincipal, SnapIDStorage> = HashMap.HashMap(
 		0,
@@ -84,17 +85,25 @@ actor SnapMain {
 				return false;
 			};
 			case (_) {
-				var snap_ids_storage : SnapIDStorage = HashMap.HashMap(
-					0,
-					Text.equal,
-					Text.hash
-				);
+				switch (await Profile.get_username_public(caller)) {
+					case (#ok(username)) {
+						var snap_ids_storage : SnapIDStorage = HashMap.HashMap(
+							0,
+							Text.equal,
+							Text.hash
+						);
 
-				user_canisters_ref.put(caller, snap_ids_storage);
+						user_canisters_ref.put(caller, snap_ids_storage);
 
-				ignore Logger.log_event(tags, "created, user_snap_storage");
+						ignore Logger.log_event(tags, "created, user_snap_storage");
 
-				return true;
+						return true;
+					};
+					case (#err(_)) {
+						ignore Logger.log_event(tags, "no username");
+						return false;
+					};
+				};
 			};
 		};
 	};
