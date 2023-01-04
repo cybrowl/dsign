@@ -36,7 +36,6 @@ actor Profile = {
 	let VERSION : Nat = 2;
 
 	private let ic : ICInterface = actor "aaaaa-aa";
-	stable var health_metrics_canister_id : Text = "";
 
 	// ------------------------- Variables -------------------------
 	// usernames
@@ -449,8 +448,6 @@ actor Profile = {
 				debug_show (("image_assets_canister_id: ", image_assets_canister_id))
 			);
 		};
-
-		health_metrics_canister_id := await CanisterIdsLedger.get_health_metrics_id();
 	};
 
 	// ------------------------- System Methods -------------------------

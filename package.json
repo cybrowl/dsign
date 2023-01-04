@@ -1,7 +1,7 @@
 {
 	"private": true,
 	"name": "dsign",
-	"version": "0.6.0",
+	"version": "0.6.1",
 	"type": "module",
 	"scripts": {
 		"build": "vite build",
@@ -30,7 +30,7 @@
 		"@dfinity/candid": "^0.14.1",
 		"@dfinity/identity": "^0.14.1",
 		"@dfinity/principal": "^0.14.1",
-		"dsign-components": "^0.20.13",
+		"dsign-components": "^0.20.14",
 		"lodash": "^4.17.21",
 		"svelte-local-storage-store": "^0.2.6"
 	},

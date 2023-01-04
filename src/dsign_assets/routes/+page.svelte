@@ -1,5 +1,6 @@
 <script>
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 
 	import Login from '../components/Login.svelte';
 	import Notification from 'dsign-components/components/Notification.svelte';
@@ -8,21 +9,19 @@
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
-	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
 	import { actor_explore, actor_favorite_main } from '$stores_ref/actors.js';
 	import { auth_favorite_main } from '$stores_ref/auth_client';
 	import { explore_store } from '$stores_ref/fetch_store.js';
-	import modal_update, { modal_visible } from '$stores_ref/modal';
+	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
 	import page_navigation_update, {
+		navigate_to_home_with_notification,
 		page_navigation,
-		navigate_to_home_with_notification
+		snap_preview
 	} from '$stores_ref/page_navigation';
 
 	page_navigation_update.select_item(0);
-
-	let snap_preview = null;
 
 	onMount(async () => {
 		if ($notification.message.length === 0) {
@@ -42,15 +41,12 @@
 		}
 	});
 
-	onDestroy(() => {
-		modal_update.set_visibility_false('snap_preview');
-	});
-
 	function handleSnapPreviewModalOpen(e) {
 		const snap = e.detail;
-		snap_preview = snap;
 
-		modal_update.change_visibility('snap_preview');
+		snap_preview.set(snap);
+
+		goto('/snap/' + snap.id);
 	}
 
 	async function handleClickLike(e) {
@@ -96,11 +92,6 @@
 	<!-- SnapCreationModal -->
 	{#if $modal_visible.snap_creation}
 		<SnapCreationModal />
-	{/if}
-
-	<!-- SnapPreviewModal -->
-	{#if $modal_visible.snap_preview && snap_preview}
-		<SnapPreviewModal snap={snap_preview} />
 	{/if}
 
 	<!-- Notification -->

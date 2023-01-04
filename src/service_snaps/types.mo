@@ -103,11 +103,6 @@ module {
 		};
 	};
 
-	public type SnapInitArgs = {
-		project_main_canister_id : Text;
-		favorite_main_canister_id : Text;
-	};
-
 	// Errors
 	public type ErrCreateSnap = {
 		#UserAnonymous;
