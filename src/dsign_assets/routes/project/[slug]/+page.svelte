@@ -1,9 +1,10 @@
 <script>
 	import { page } from '$app/stores';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import get from 'lodash/get';
 	import last from 'lodash/last';
 	import isEmpty from 'lodash/isEmpty';
+	import { goto } from '$app/navigation';
 
 	import Login from '$components_ref/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
@@ -14,16 +15,16 @@
 	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
 	import { actor_project_main } from '$stores_ref/actors';
-	import { profile_tabs } from '$stores_ref/page_state';
 	import {
 		project_store_public,
 		project_store_public_fetching,
 		projects_update
 	} from '$stores_ref/fetch_store';
-	import modal_update, { modal_visible } from '$stores_ref/modal';
-	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
-
-	let snap_preview = null;
+	import { modal_visible } from '$stores_ref/modal';
+	import page_navigation_update, {
+		snap_preview,
+		page_navigation
+	} from '$stores_ref/page_navigation';
 
 	page_navigation_update.deselect_all();
 
@@ -36,27 +37,18 @@
 		try {
 			const { ok: project } = await $actor_project_main.actor.get_project(project_id, canister_id);
 
-			console.log('project: ', project);
-
 			projects_update.update_project_public(project);
 		} catch (error) {
 			console.log('error projects: ', error);
 		}
 	});
 
-	onDestroy(() => {
-		projects_update.update_project_public([]);
-		profile_tabs.set({
-			isProjectsSelected: true,
-			isProjectSelected: false
-		});
-	});
-
 	function handleSnapPreviewModalOpen(e) {
 		const snap = e.detail;
-		snap_preview = snap;
 
-		modal_update.change_visibility('snap_preview');
+		snap_preview.set(snap);
+
+		goto('/snap/' + snap.id);
 	}
 </script>
 
