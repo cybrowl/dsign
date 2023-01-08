@@ -61,15 +61,10 @@
 			try {
 				const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps();
 
-				console.log('all_snaps_: ', all_snaps);
-
 				Promise.all([
 					$actor_snap_main.actor.get_all_snaps_without_project(),
 					$actor_project_main.actor.get_all_projects([])
 				]).then(async ([snaps, projects]) => {
-					console.log('snaps: ', snaps);
-					console.log('projects: ', projects);
-
 					const { ok: all_projects, err: err_all_projects } = projects;
 					const { ok: all_snaps, err: err_all_snaps } = snaps;
 

@@ -46,9 +46,6 @@
 						await $actor_favorite_main.actor.create_user_favorite_storage();
 					}
 				}
-
-				console.log('all_favs: ', all_favs);
-				console.log('err_get_all_favs: ', err_get_all_favs);
 			} catch (error) {
 				console.log(error);
 			}
@@ -61,11 +58,12 @@
 		const snap_liked = e.detail;
 
 		try {
+			const filtered_fav_snaps = $favorite_store.snaps.filter((snap) => snap.id !== snap_liked.id);
+			favorite_store.set({ isFetching: false, snaps: filtered_fav_snaps });
+			local_storage_favorites.set({ all_favorites_count: filtered_fav_snaps.length || 1 });
+
 			const { ok: delete_snap, err: err_delete_snap } =
 				await $actor_favorite_main.actor.delete_snap(snap_liked.id);
-
-			console.log('delete_snap: ', delete_snap);
-			console.log('err_delete_snap: ', err_delete_snap);
 		} catch (error) {
 			console.log('error: call', error);
 		}
@@ -105,7 +103,7 @@
 		row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 			>
 				{#each { length: $local_storage_favorites.all_favorites_count } as _, i}
-					<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />
+					<SnapCard isLoadingSnap={true} showMetricLikesNumber={false} />
 				{/each}
 			</div>
 		{/if}
@@ -130,7 +128,7 @@
 					<SnapCard
 						{snap}
 						showUsername={true}
-						showMetrics={false}
+						showMetricLikesNumber={false}
 						on:clickCard={handleSnapPreviewModalOpen}
 						on:clickLike={handleClickLike}
 					/>

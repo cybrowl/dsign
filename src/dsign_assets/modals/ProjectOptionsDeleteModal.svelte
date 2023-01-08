@@ -33,13 +33,9 @@
 					project.id
 				]);
 
-				console.log('err_delete_projects: ', err_delete_projects);
-
 				const { err: err_delete_snaps } = await $actor_snap_main.actor.delete_snaps(
 					project_snaps_ids
 				);
-
-				console.log('err_delete_snaps: ', err_delete_snaps);
 
 				//TODO: handle errors
 			} catch (error) {
