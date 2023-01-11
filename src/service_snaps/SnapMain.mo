@@ -52,7 +52,7 @@ actor SnapMain {
 
 	let ACTOR_NAME : Text = "SnapMain";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 4;
+	let VERSION : Nat = 5;
 
 	var user_canisters_ref : HashMap.HashMap<UserPrincipal, SnapIDStorage> = HashMap.HashMap(
 		0,
@@ -305,6 +305,23 @@ actor SnapMain {
 				#err(#UserNotFound(true));
 			};
 		};
+	};
+
+	public shared ({ caller }) func get_snap(id : SnapID, canister_id : SnapCanisterID) : async Result.Result<SnapPublic, Text> {
+		let tags = [ACTOR_NAME, "get_snap"];
+
+		if (id.size() == 0 or id.size() > 40) {
+			return #err("Snap ID is invalid");
+		};
+
+		if (canister_id.size() == 0 or canister_id.size() > 40) {
+			return #err("Snap Canister ID is invalid");
+		};
+
+		let snap_actor = actor (canister_id) : SnapActor;
+		let snap = await snap_actor.get_all_snaps([id]);
+
+		return #ok(snap[0]);
 	};
 
 	public shared ({ caller }) func get_all_snaps_without_project() : async Result.Result<[SnapPublic], ErrGetAllSnaps> {

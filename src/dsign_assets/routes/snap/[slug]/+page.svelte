@@ -1,6 +1,8 @@
 <script>
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
+	import get from 'lodash/get';
+	import last from 'lodash/last';
 
 	import Login from '$components_ref/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
@@ -9,6 +11,7 @@
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
+	import { actor_snap_main } from '$stores_ref/actors';
 	import modal_update, { modal_visible } from '$stores_ref/modal';
 	import page_navigation_update, {
 		page_navigation,
@@ -20,7 +23,16 @@
 	// isEmpty($project_store_public.project) === true && project_store_public_fetching();
 
 	onMount(async () => {
-		//TODO: support calling to get snap based on snap id and canister id from url
+		const canister_id = $page.url.searchParams.get('canister_id');
+		const snap_id = last(get($page, 'url.pathname', '').split('/'));
+
+		try {
+			const { ok: snap } = await $actor_snap_main.actor.get_snap(snap_id, canister_id);
+
+			snap_preview.set(snap);
+		} catch (error) {
+			console.log('error projects: ', error);
+		}
 	});
 </script>
 
@@ -46,7 +58,9 @@
 		<div class="close" on:click={() => history.back()} on:keypress={console.log('todo')}>
 			<Icon class="closeRounded" name="close_rounded" width="48" height="48" />
 		</div>
-		<SnapPreview snap={$snap_preview} />
+		{#if $snap_preview.id !== undefined}
+			<SnapPreview snap={$snap_preview} />
+		{/if}
 	</div>
 </main>
 

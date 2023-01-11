@@ -46,7 +46,7 @@
 
 		snap_preview.set(snap);
 
-		goto('/snap/' + snap.id);
+		goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
 	}
 
 	async function handleClickLike(e) {
