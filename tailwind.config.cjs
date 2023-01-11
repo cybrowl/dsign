@@ -20,6 +20,7 @@ module.exports = {
 				'light-grey': '#E2E1E6',
 				'tulip-purple': '#6259C8',
 				'primary-purple': '#7A71DE',
+				'foggy-purple': '#A099F4',
 				'light-purple': '#6259C8',
 				'bubble-purple': '#B6AFFC',
 				'lilalic-purple': '#968CFF',

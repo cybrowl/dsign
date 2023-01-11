@@ -30,7 +30,7 @@
 		"@dfinity/candid": "^0.14.1",
 		"@dfinity/identity": "^0.14.1",
 		"@dfinity/principal": "^0.14.1",
-		"dsign-components": "^0.21.4",
+		"dsign-components": "^0.21.5",
 		"lodash": "^4.17.21",
 		"luxon": "^3.2.1",
 		"svelte-local-storage-store": "^0.2.6"
