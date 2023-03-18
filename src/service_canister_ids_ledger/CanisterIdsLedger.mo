@@ -5,6 +5,7 @@ import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
+import Timer "mo:base/Timer";
 
 import CanisterLedgerTypes "../types/canidster_ids_ledger.types";
 import HealthMetricsTypes "../types/health_metrics.types";
@@ -84,9 +85,9 @@ actor CanisterIdsLedger = {
 	};
 
 	// public shared ({ caller }) func drop_canister(n : Nat) : async () {
-	// 	canisters := List.drop<CanisterInfo>(canisters, n);
+	//     canisters := List.drop<CanisterInfo>(canisters, n);
 
-	// 	return ();
+	//     return ();
 	// };
 
 	public shared ({ caller }) func set_canister_ids(canisterIds : CanisterIds) : async Text {
@@ -106,7 +107,7 @@ actor CanisterIdsLedger = {
 		};
 	};
 
-	public shared ({ caller }) func log_canisters_health() : async Text {
+	func log_canisters_health() : async () {
 		let all_canister_children = List.toArray<CanisterInfo>(canisters);
 
 		// note: not sure how Iter over records
@@ -130,7 +131,7 @@ actor CanisterIdsLedger = {
 			ignore canister_child_actor.health();
 		};
 
-		return "ok";
+		return ();
 	};
 
 	public shared func initialize_authorized_principals() : async Text {
@@ -158,7 +159,7 @@ actor CanisterIdsLedger = {
 			return "added";
 		} else {
 			return "exists";
-		}
+		};
 
 	};
 
@@ -180,6 +181,11 @@ actor CanisterIdsLedger = {
 		};
 
 		return log_payload;
+	};
+
+	public func start_log_timer() : async Timer.TimerId {
+
+		return Timer.recurringTimer(#seconds(3600), log_canisters_health);
 	};
 
 	// ------------------------- System Methods -------------------------

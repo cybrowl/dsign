@@ -1,10 +1,19 @@
 import { Buffer; toArray; fromArray; subBuffer } "mo:base/Buffer";
 import Buff "mo:base/Buffer";
+import Cycles "mo:base/ExperimentalCycles";
+import Blob "mo:base/Blob";
 import HashMap "mo:base/HashMap";
+import Int "mo:base/Int";
 import Iter "mo:base/Iter";
+import Nat "mo:base/Nat";
+import Nat64 "mo:base/Nat64";
+import Prim "mo:prim";
 import Principal "mo:base/Principal";
+import StableMemory "mo:base/ExperimentalStableMemory";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
+import Option "mo:base/Option";
+import JSON "mo:json/JSON";
 
 import UtilsShared "../utils/utils";
 
@@ -33,6 +42,34 @@ actor HealthMetrics = {
 		cycles_balance : Int;
 	};
 
+	type HeaderField = (Text, Text);
+
+	type HttpResponse = {
+		status_code : Nat16;
+		headers : [HeaderField];
+		body : Blob;
+	};
+
+	type HttpRequest = {
+		method : Text;
+		url : Text;
+		headers : [HeaderField];
+		body : Blob;
+	};
+
+	type Metrics = {
+		balance : {
+			help : Text;
+			value : Text;
+			timestamp : Text;
+		};
+		heap_size : {
+			help : Text;
+			value : Text;
+			timestamp : Text;
+		};
+	};
+
 	var logs_unique = HashMap.HashMap<Text, LogMin>(
 		0,
 		Text.equal,
@@ -48,7 +85,7 @@ actor HealthMetrics = {
 	stable var logs_ordered_stable_storage : [(Text, [Log])] = [];
 
 	let ACTOR_NAME : Text = "HealthMetrics";
-	let VERSION : Nat = 3;
+	let VERSION : Nat = 4;
 
 	public shared (msg) func log_event(log_payload : Payload) : async () {
 		// TODO: some auth check here
@@ -101,6 +138,55 @@ actor HealthMetrics = {
 		};
 	};
 
+	// ------------------------- HTTP -------------------------
+	public query func http_request(req : HttpRequest) : async HttpResponse {
+		let path = Text.split(req.url, #char '?').next();
+
+		switch (path) {
+			case (null) {
+				{
+					status_code = 400;
+					headers = [];
+					body = "Path Invalid";
+				};
+			};
+			case (?path) {
+				switch (req.method, path) {
+					// Endpoint that serves metrics to be consumed with Prometheseus
+					case ("GET", "/metrics") {
+
+						let m = JSON.show(metrics());
+
+						{
+							status_code = 200;
+							headers = [("content-type", "application/json")];
+							body = Text.encodeUtf8(m);
+						};
+					};
+					case _ {
+						{
+							status_code = 400;
+							headers = [];
+							body = "Invalid request";
+						};
+					};
+				};
+			};
+		};
+
+	};
+
+	func metrics() : JSON.JSON {
+		// Prometheus expects timestamps in ms. Time.now() returns ns.
+		let timestamp = Int.toText(Time.now() / 1000000);
+
+		let metrics : JSON.JSON = #Object([
+			("balance", #Object([("help", #String("The current balance in cycles")), ("timestamp", #String(timestamp)), ("value", #String(Nat.toText(Cycles.balance())))])),
+			("heap_size", #Object([("help", #String("The current size of the wasm heap in pages of 64KiB")), ("timestamp", #String(timestamp)), ("value", #String(Nat.toText(Prim.rts_heap_size())))]))
+		]);
+
+		return metrics;
+	};
 	// ------------------------- CANISTER MANAGEMENT -------------------------
 	public query func version() : async Nat {
 		return VERSION;

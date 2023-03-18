@@ -1,4 +1,4 @@
-let upstream = https://github.com/dfinity/vessel-package-set/releases/download/mo-0.6.7-20210818/package-set.dhall sha256:c4bd3b9ffaf6b48d21841545306d9f69b57e79ce3b1ac5e1f63b068ca4f89957
+let upstream = https://github.com/internet-computer/base-package-set/releases/download/moc-0.7.4/package-set.dhall sha256:3a20693fc597b96a8c7cf8645fda7a3534d13e5fbda28c00d01f0b7641efe494
 let Package = { name : Text, version : Text, repo : Text, dependencies : List Text }
 
 let additions = [
@@ -6,31 +6,43 @@ let additions = [
     name = "array",
     repo = "https://github.com/aviate-labs/array.mo",
     version = "main", 
-    dependencies = [] : List Text
+    dependencies = ["base-0.7.3" ] : List Text
+  },
+  {
+    name = "parser-combinators",
+    repo = "https://github.com/aviate-labs/parser-combinators.mo",
+    version = "v0.1.2",
+    dependencies = [ "base-0.7.3" ] : List Text
+  },
+  {
+    name = "json",
+    repo = "https://github.com/aviate-labs/json.mo",
+    version = "v0.2.1",
+    dependencies = [ "base-0.7.3", "parser-combinators" ] : List Text
   },
   { 
     name = "ulid",
     repo = "https://github.com/aviate-labs/ulid.mo",
     version = "main", 
-    dependencies = [ "base" ] : List Text
+    dependencies = [ "base-0.7.3" ] : List Text
   },
   {
     name = "io",
     repo = "https://github.com/cybrowl/io.mo",
     version = "main",
-    dependencies = [ "base" ]
+    dependencies = [ "base-0.7.3" ]
   },
   {
     name = "rand",
     repo = "https://github.com/cybrowl/rand.mo.git",
     version = "main",
-    dependencies = [ "base" ]
+    dependencies = [ "base-0.7.3" ]
   },
   {
     name = "encoding",
     repo = "https://github.com/aviate-labs/encoding.mo",
-    version = "8e0fe1d8f5c2d284e77d719703c42e0e271839b1",
-    dependencies = [ "base" ]
+    version = "v0.4.1",
+    dependencies = [ "base-0.7.3", "array" ]
   },
 ] : List Package
 
