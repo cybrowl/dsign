@@ -11,7 +11,7 @@
 		"assets_file_chunks": {
 			"main": "src/service_assets/FileAssetChunksStaging.mo",
 			"type": "motoko",
-			"dependencies": ["health_metrics", "logger"]
+			"dependencies": ["health_metrics", "logger", "canister_ids_ledger"]
 		},
 		"assets_img_staging": {
 			"main": "src/service_assets_img/ImageAssetStaging.mo",

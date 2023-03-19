@@ -24,7 +24,7 @@ actor CanisterIdsLedger = {
 
 	let ACTOR_NAME : Text = "CanisterIdsLedger";
 	let CANISTER_ID_PROD : Text = "k25dy-3yaaa-aaaag-abcpa-cai";
-	let VERSION : Nat = 1;
+	let VERSION : Nat = 2;
 
 	var canisters = List.nil<CanisterInfo>();
 	stable var canisters_stable_storage : [(CanisterInfo)] = [];
@@ -62,6 +62,24 @@ actor CanisterIdsLedger = {
 		};
 	};
 
+	// NOTE: only for dev
+	public shared ({ caller }) func set_canister_ids(canisterIds : CanisterIds) : async Text {
+		let canister_ids_ledger = Principal.fromActor(CanisterIdsLedger);
+		let is_production = Text.equal(
+			Principal.toText(canister_ids_ledger),
+			CANISTER_ID_PROD
+		);
+
+		if (is_production == false) {
+			canister_ids := canisterIds;
+
+			return debug_show ("set", canister_ids);
+
+		} else {
+			return "is production";
+		};
+	};
+
 	public query func get_canisters() : async [CanisterInfo] {
 		return List.toArray<CanisterInfo>(canisters);
 	};
@@ -84,29 +102,27 @@ actor CanisterIdsLedger = {
 		return canister_ids;
 	};
 
+	public query func canister_exists(canisterPrincipal : Principal) : async Bool {
+		let canisterId : Text = Principal.toText(canisterPrincipal);
+
+		let exists = List.some<CanisterInfo>(
+			canisters,
+			func(info : CanisterInfo) : Bool {
+				return Text.equal(info.id, canisterId);
+			}
+		);
+
+		return exists;
+	};
+
 	// public shared ({ caller }) func drop_canister(n : Nat) : async () {
 	//     canisters := List.drop<CanisterInfo>(canisters, n);
 
 	//     return ();
 	// };
 
-	public shared ({ caller }) func set_canister_ids(canisterIds : CanisterIds) : async Text {
-		let canister_ids_ledger = Principal.fromActor(CanisterIdsLedger);
-		let is_production = Text.equal(
-			Principal.toText(canister_ids_ledger),
-			CANISTER_ID_PROD
-		);
-
-		if (is_production == false) {
-			canister_ids := canisterIds;
-
-			return debug_show ("set", canister_ids);
-
-		} else {
-			return "is production";
-		};
-	};
-
+	// This function logs the health status of multiple canisters by iterating over a list of canister IDs
+	// and calling the health() method on the corresponding actor object.
 	func log_canisters_health() : async () {
 		let all_canister_children = List.toArray<CanisterInfo>(canisters);
 
@@ -132,6 +148,31 @@ actor CanisterIdsLedger = {
 		};
 
 		return ();
+	};
+
+	// ------------------------- Canister Management Methods -------------------------
+	public query func version() : async Nat {
+		return VERSION;
+	};
+
+	public shared func health() : async Payload {
+		let log_payload : Payload = {
+			metrics = [
+				("cycles_balance", UtilsShared.get_cycles_balance()),
+				("memory_in_mb", UtilsShared.get_memory_in_mb()),
+				("heap_in_mb", UtilsShared.get_heap_in_mb())
+			];
+			name = ACTOR_NAME;
+			child_canister_id = Principal.toText(Principal.fromActor(CanisterIdsLedger));
+			parent_canister_id = "";
+		};
+
+		return log_payload;
+	};
+
+	public func start_log_timer() : async Timer.TimerId {
+
+		return Timer.recurringTimer(#seconds(3600), log_canisters_health);
 	};
 
 	public shared func initialize_authorized_principals() : async Text {
@@ -161,31 +202,6 @@ actor CanisterIdsLedger = {
 			return "exists";
 		};
 
-	};
-
-	// ------------------------- Canister Management Methods -------------------------
-	public query func version() : async Nat {
-		return VERSION;
-	};
-
-	public shared func health() : async Payload {
-		let log_payload : Payload = {
-			metrics = [
-				("cycles_balance", UtilsShared.get_cycles_balance()),
-				("memory_in_mb", UtilsShared.get_memory_in_mb()),
-				("heap_in_mb", UtilsShared.get_heap_in_mb())
-			];
-			name = ACTOR_NAME;
-			child_canister_id = Principal.toText(Principal.fromActor(CanisterIdsLedger));
-			parent_canister_id = "";
-		};
-
-		return log_payload;
-	};
-
-	public func start_log_timer() : async Timer.TimerId {
-
-		return Timer.recurringTimer(#seconds(3600), log_canisters_health);
 	};
 
 	// ------------------------- System Methods -------------------------

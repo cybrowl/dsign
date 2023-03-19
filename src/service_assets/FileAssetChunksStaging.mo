@@ -6,10 +6,13 @@ import Nat "mo:base/Nat";
 import Prim "mo:⛔";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
+import Text "mo:base/Text";
 import Time "mo:base/Time";
 
+import CanisterIdsLedger "canister:canister_ids_ledger";
 import HealthMetrics "canister:health_metrics";
 
+import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
 import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
 
@@ -25,7 +28,7 @@ actor FileAssetChunksStaging = {
 		Hash.hash
 	);
 
-	let VERSION : Nat = 4;
+	let VERSION : Nat = 5;
 	let ACTOR_NAME : Text = "FileAssetChunksStaging";
 
 	public shared ({ caller }) func create_chunk(chunk : Types.Chunk) : async Nat {
@@ -95,5 +98,37 @@ actor FileAssetChunksStaging = {
 		ignore HealthMetrics.log_event(log_payload);
 
 		return log_payload;
+	};
+
+	public shared (message) func whoami() : async Principal {
+		return message.caller;
+	};
+
+	public shared func init() : async Text {
+		let principal_canister = await whoami();
+		let canister_id = Principal.toText(principal_canister);
+		let is_prod = Text.equal(
+			Principal.toText(principal_canister),
+			"jfpyd-maaaa-aaaag-aatxq-cai"
+		);
+
+		switch (await CanisterIdsLedger.canister_exists(principal_canister)) {
+			case (true) {
+				return "Canister Already Exists";
+			};
+			case (false) {
+				let canister_child : CanisterIdsLedgerTypes.CanisterInfo = {
+					created = Time.now();
+					id = canister_id;
+					name = "root";
+					parent_name = ACTOR_NAME;
+					isProd = is_prod;
+				};
+
+				ignore CanisterIdsLedger.save_canister(canister_child);
+
+				return "Canister Created";
+			};
+		};
 	};
 };
