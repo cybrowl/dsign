@@ -65,7 +65,7 @@ actor ProjectMain {
 
 	// ------------------------- PROJECTS MANAGEMENT -------------------------
 	public shared ({ caller }) func create_user_project_storage() : async Bool {
-		let tags = [ACTOR_NAME, "create_user_project_storage"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "create_user_project_storage")];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?project_canister_ids) {
@@ -90,7 +90,7 @@ actor ProjectMain {
 	};
 
 	public shared ({ caller }) func create_project(name : Text, snaps : ?[SnapRef]) : async Result.Result<Text, ErrCreateProject> {
-		let tags = [ACTOR_NAME, "create_project"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "create_project")];
 
 		//todo: args security checks
 
@@ -455,7 +455,8 @@ actor ProjectMain {
 	};
 
 	public shared (msg) func initialize_canisters() : async Text {
-		let tags = [ACTOR_NAME, "initialize_canisters"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
+
 		let project_main_principal = Principal.fromActor(ProjectMain);
 		let is_prod = Text.equal(
 			Principal.toText(project_main_principal),

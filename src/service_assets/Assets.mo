@@ -119,7 +119,7 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 	};
 
 	public shared ({ caller }) func delete_asset(asset_id : Text) : async () {
-		let tags = [ACTOR_NAME, "delete_asset"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "delete_asset")];
 
 		if (controller != caller) {
 			return ();

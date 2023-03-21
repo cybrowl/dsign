@@ -56,7 +56,7 @@ actor FavoriteMain {
 
 	// ------------------------- FAVORITES MANAGEMENT -------------------------
 	public shared ({ caller }) func create_user_favorite_storage() : async Bool {
-		let tags = [ACTOR_NAME, "create_user_favorite_storage"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "create_user_favorite_storage")];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?favorite_canister_ids) {
@@ -81,7 +81,7 @@ actor FavoriteMain {
 	};
 
 	public shared ({ caller }) func save_snap(snap : SnapPublic) : async Result.Result<Text, ErrSaveFavorite> {
-		let tags = [ACTOR_NAME, "save_snap"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "save_snap")];
 
 		//todo: args security checks
 
@@ -144,7 +144,7 @@ actor FavoriteMain {
 	};
 
 	public shared ({ caller }) func delete_snap(snap_id_delete : SnapID) : async Result.Result<Text, ErrDeleteFavorite> {
-		let tags = [ACTOR_NAME, "delete_snap"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "delete_snap")];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_favorites_ids_storage) {
@@ -177,7 +177,7 @@ actor FavoriteMain {
 	};
 
 	public shared ({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], ErrGetFavorite> {
-		let tags = [ACTOR_NAME, "get_all_snaps"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "get_all_snaps")];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?favorite_canister_ids) {
@@ -234,7 +234,8 @@ actor FavoriteMain {
 	};
 
 	public shared (msg) func initialize_canisters() : async Text {
-		let tags = [ACTOR_NAME, "initialize_canisters"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
+
 		let favorite_main_principal = Principal.fromActor(FavoriteMain);
 		let is_prod = Text.equal(
 			Principal.toText(favorite_main_principal),
@@ -254,7 +255,7 @@ actor FavoriteMain {
 			await create_favorite_canister(favorite_main_principal, is_prod);
 
 			return favorite_canister_id;
-		}
+		};
 
 	};
 

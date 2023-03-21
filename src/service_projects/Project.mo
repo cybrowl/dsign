@@ -170,8 +170,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 		project_id : ProjectID,
 		owner : UserPrincipal
 	) : async Result.Result<Project, ErrAddSnapsToProject> {
-
-		let tags = [ACTOR_NAME, "add_snaps_to_project"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "add_snaps_to_project")];
 
 		if (project_main != caller) {
 			return #err(#NotAuthorized);
@@ -215,8 +214,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 		update_project_args : UpdateProject,
 		project_ref : ProjectRef
 	) : async Result.Result<Project, ErrUpdateProject> {
-
-		let tags = [ACTOR_NAME, "update_project_details"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "update_project_details")];
 
 		if (project_main != caller) {
 			return #err(#NotAuthorized);

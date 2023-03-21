@@ -213,7 +213,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	public shared ({ caller }) func add_project_to_snaps(
 		project_ref : ProjectRef
 	) : async () {
-		let tags = [ACTOR_NAME, "add_project_to_snaps"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "add_project_to_snaps")];
 
 		if (project_main != caller) {
 			ignore Logger.log_event(

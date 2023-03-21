@@ -98,7 +98,7 @@ actor Profile = {
 	};
 
 	public shared ({ caller }) func create_username(username : Username) : async Result.Result<Username, ErrUsername> {
-		let tags = [ACTOR_NAME, "create_username"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "create_username")];
 		let is_anonymous = Principal.isAnonymous(caller);
 
 		let valid_username : Bool = Utils.is_valid_username(username);
@@ -150,39 +150,39 @@ actor Profile = {
 	};
 
 	// public shared ({ caller }) func update_username(username : Username) : async Result.Result<UsernameOk, UsernameErr> {
-	// 	let tags = [ACTOR_NAME, "update_username"];
-	// 	let is_anonymous = Principal.isAnonymous(caller);
+	//     let tags = [ACTOR_NAME, "update_username"];
+	//     let is_anonymous = Principal.isAnonymous(caller);
 
-	// 	let valid_username : Bool = Utils.is_valid_username(username);
-	// 	let username_available : Bool = check_username_is_available(username);
-	// 	let user_has_username : Bool = check_user_has_a_username(caller);
+	//     let valid_username : Bool = Utils.is_valid_username(username);
+	//     let username_available : Bool = check_username_is_available(username);
+	//     let user_has_username : Bool = check_user_has_a_username(caller);
 
-	// 	if (is_anonymous == true) {
-	// 		return #err(#UserAnonymous);
-	// 	};
+	//     if (is_anonymous == true) {
+	//         return #err(#UserAnonymous);
+	//     };
 
-	// 	if (valid_username == false) {
-	// 		return #err(#UsernameInvalid);
-	// 	};
+	//     if (valid_username == false) {
+	//         return #err(#UsernameInvalid);
+	//     };
 
-	// 	if (user_has_username == false) {
-	// 		return #err(#UsernameNotFound);
-	// 	};
+	//     if (user_has_username == false) {
+	//         return #err(#UsernameNotFound);
+	//     };
 
-	// 	if (username_available == false) {
-	// 		return #err(#UsernameTaken);
-	// 	} else {
-	// 		let current_username : Username = get_current_username(caller);
-	// 		username_owners.delete(current_username);
-	// 		username_owners.put(username, caller);
-	// 		usernames.put(caller, username);
+	//     if (username_available == false) {
+	//         return #err(#UsernameTaken);
+	//     } else {
+	//         let current_username : Username = get_current_username(caller);
+	//         username_owners.delete(current_username);
+	//         username_owners.put(username, caller);
+	//         usernames.put(caller, username);
 
-	// 		await Logger.log_event(tags, "updated");
+	//         await Logger.log_event(tags, "updated");
 
-	// 		//TODO: update username in snaps, profile, avatar_url
+	//         //TODO: update username in snaps, profile, avatar_url
 
-	// 		return #ok(username);
-	// 	};
+	//         return #ok(username);
+	//     };
 	// };
 
 	public query func get_number_of_users() : async Nat {
@@ -324,7 +324,7 @@ actor Profile = {
 						case (#ok images) {
 							return #ok("updated banner");
 						};
-					}
+					};
 
 				};
 			};
@@ -386,7 +386,7 @@ actor Profile = {
 	};
 
 	private func create_image_assets_canister(profile_principal : Principal, is_prod : Bool) : async () {
-		let tags = [ACTOR_NAME, "create_image_assets_canister"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "create_image_assets_canister")];
 
 		Cycles.add(CYCLE_AMOUNT);
 		let image_assets_actor = await ImageAssets.ImageAssets(profile_principal, is_prod);
@@ -432,7 +432,8 @@ actor Profile = {
 	};
 
 	public shared (msg) func initialize_canisters() : async () {
-		let tags = [ACTOR_NAME, "initialize_canisters"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
+
 		let profile_principal = Principal.fromActor(Profile);
 		let is_prod = Text.equal(
 			Principal.toText(profile_principal),

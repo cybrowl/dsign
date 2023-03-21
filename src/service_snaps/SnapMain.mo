@@ -76,7 +76,7 @@ actor SnapMain {
 
 	// ------------------------- SNAPS MANAGEMENT -------------------------
 	public shared ({ caller }) func create_user_snap_storage() : async Bool {
-		let tags = [ACTOR_NAME, "create_user_snap_storage"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "create_user_snap_storage")];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?snap_canister_ids) {
@@ -109,7 +109,8 @@ actor SnapMain {
 	};
 
 	public shared ({ caller }) func create_snap(args : CreateSnapArgs) : async Result.Result<Text, ErrCreateSnap> {
-		let tags = [ACTOR_NAME, "create_snap"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "create_snap")];
+
 		let is_anonymous = Principal.isAnonymous(caller);
 		let has_image = args.img_asset_ids.size() > 0;
 		let too_many_images = args.img_asset_ids.size() > 4;
@@ -251,10 +252,10 @@ actor SnapMain {
 						// TODO: add images to a queue to be deleted later
 
 						// for (image in snap.images.vals()) {
-						// 	if (Text.size(image.canister_id) > 1) {
-						// 		let image_assets_actor = actor (image.canister_id) : ImageAssetsActor;
-						// 		ignore image_assets_actor.delete_image(image.id);
-						// 	};
+						//     if (Text.size(image.canister_id) > 1) {
+						//         let image_assets_actor = actor (image.canister_id) : ImageAssetsActor;
+						//         ignore image_assets_actor.delete_image(image.id);
+						//     };
 						// };
 					};
 
@@ -279,7 +280,7 @@ actor SnapMain {
 	//TODO: update_snap_likes
 
 	public shared ({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], ErrGetAllSnaps> {
-		let log_tags = [ACTOR_NAME, "get_all_snaps"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "get_all_snaps")];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_snap_ids_storage) {
@@ -290,7 +291,7 @@ actor SnapMain {
 					let snaps = await snap_actor.get_all_snaps(snap_ids);
 
 					ignore Logger.log_event(
-						log_tags,
+						tags,
 						debug_show ("snap_ids: ", snap_ids)
 					);
 
@@ -325,7 +326,7 @@ actor SnapMain {
 	};
 
 	public shared ({ caller }) func get_all_snaps_without_project() : async Result.Result<[SnapPublic], ErrGetAllSnaps> {
-		let tags = [ACTOR_NAME, "get_all_snaps_without_project"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "get_all_snaps_without_project")];
 
 		//TODO: add username as optional arg
 		//TODO: if username is provided it should replace caller
@@ -456,7 +457,8 @@ actor SnapMain {
 
 	// INIT CANISTERS
 	public shared (msg) func initialize_canisters() : async () {
-		let tags = [ACTOR_NAME, "initialize_canisters"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
+
 		let snap_main_principal = Principal.fromActor(SnapMain);
 
 		let is_prod = Text.equal(

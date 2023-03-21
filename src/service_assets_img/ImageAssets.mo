@@ -57,7 +57,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 		asset_type : Text,
 		owner : Principal
 	) : async Result.Result<[Types.ImageRef], AssetImgErr> {
-		let tags = [ACTOR_NAME, "save_images"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "save_images")];
 
 		if (controller != caller) {
 			return #err(#NotAuthorized);
@@ -107,7 +107,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 		asset_type : Text,
 		owner : Principal
 	) : async Result.Result<Types.ImageRef, AssetImgErr> {
-		let tags = [ACTOR_NAME, "update_image"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "update_image")];
 
 		if (controller != caller) {
 			return #err(#NotAuthorized);
@@ -150,7 +150,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	};
 
 	public shared ({ caller }) func delete_image(image_id : Text) : async () {
-		let tags = [ACTOR_NAME, "delete_image"];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "delete_image")];
 
 		if (controller != caller) {
 			return ();
