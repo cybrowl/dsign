@@ -50,7 +50,7 @@ actor Logger {
 	let VERSION : Nat = 1;
 
 	public shared (msg) func log_event(tags : Tags, message : Message) : async () {
-		let log : LogEvent = { time = Time.now(); tags = tags; message = "" };
+		let log : LogEvent = { time = Time.now(); tags = tags; message = message };
 
 		logs_pending.add(log);
 	};
@@ -88,13 +88,13 @@ actor Logger {
 								),
 								[
 									("logtype", #String("accesslogs")),
-									("service", #String("login-service")),
 									("hostname", #String("dsign.ooo"))
 								]
 							)
 						)
 					),
-					("message", #String(log.message))
+					("message", #String(log.message)),
+					("time", #Number(log.time))
 				]);
 			}
 		);

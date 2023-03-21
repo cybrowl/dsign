@@ -123,7 +123,7 @@ actor Profile = {
 			usernames.put(caller, username);
 			username_owners.put(username, caller);
 
-			await Logger.log_event(tags, "created");
+			// ignore Logger.log_event(tags, "created");
 
 			// create profile
 			let profile : Profile = {
@@ -404,10 +404,10 @@ actor Profile = {
 
 		ignore CanisterIdsLedger.save_canister(canister_child);
 
-		await Logger.log_event(
-			tags,
-			debug_show (("image_assets_canister_id: ", image_assets_canister_id))
-		);
+		// ignore Logger.log_event(
+		//     tags,
+		//     debug_show (("image_assets_canister_id: ", image_assets_canister_id))
+		// );
 	};
 
 	public shared ({ caller }) func install_code(
@@ -444,9 +444,9 @@ actor Profile = {
 		if (image_assets_canister_id.size() < 1) {
 			await create_image_assets_canister(profile_principal, is_prod);
 		} else {
-			await Logger.log_event(
+			ignore Logger.log_event(
 				tags,
-				debug_show (("image_assets_canister_id: ", image_assets_canister_id))
+				"image_assets_canister_id exists: " # image_assets_canister_id
 			);
 		};
 	};
