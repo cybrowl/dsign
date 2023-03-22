@@ -1,9 +1,15 @@
 import Array "mo:base/Array";
+import Blob "mo:base/Blob";
 import Buffer "mo:base/Buffer";
+import Cycles "mo:base/ExperimentalCycles";
 import Int "mo:base/Int";
 import JSON "mo:json/JSON";
+import List "mo:base/List";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
+import Timer "mo:base/Timer";
+
+import ICTypes "../types/ic.types";
 
 actor Logger {
 	type HeaderField = (Text, Text);
@@ -49,6 +55,9 @@ actor Logger {
 
 	let VERSION : Nat = 1;
 
+	// NOTE: this will be with a key recived from another canister for security
+	let API_KEY_RELIC : Text = "425061228b048ff3b8aa2b406ef538acFFFFNRAL";
+
 	public shared (msg) func log_event(tags : Tags, message : Message) : async () {
 		let log : LogEvent = { time = Time.now(); tags = tags; message = message };
 
@@ -70,6 +79,56 @@ actor Logger {
 	public query func get_logs() : async [LogEvent] {
 		return Buffer.toArray(logs_pending);
 	};
+
+	public shared (msg) func send_logs_relic() : async () {
+
+		let NEW_RELIC_LOG_API_URL = "https://log-api.newrelic.com/log/v1";
+
+		let request_headers = [{ name = "Content-Type"; value = "application/json" }, { name = "X-Insert-Key"; value = API_KEY_RELIC }];
+		let body = JSON.show(convert_to_json());
+
+		let request : ICTypes.CanisterHttpRequestArgs = {
+			url = NEW_RELIC_LOG_API_URL;
+			headers = request_headers;
+			body = ?Blob.toArray(Text.encodeUtf8(body));
+			method = #post;
+			transform = null;
+			max_response_bytes = ?2000000;
+		};
+
+		let log : LogEvent = {
+			time = Time.now();
+			tags = [];
+			message = "Before sending logs to New Relic: ";
+		};
+
+		logs_pending.add(log);
+
+		Cycles.add(200_500_000_000);
+		let ic : ICTypes.Self = actor ("aaaaa-aa");
+		logs_pending.add(log);
+		let response : ICTypes.CanisterHttpResponsePayload = await ic.http_request(request);
+
+		switch (response.status) {
+			case (200) {
+				logs_storage.append(logs_pending);
+				logs_pending.clear();
+			};
+			case (status) {
+				let log : LogEvent = {
+					time = Time.now();
+					tags = [];
+					message = "Error sending logs to New Relic: " # Int.toText(status) # " " # debug_show (response.body);
+				};
+				logs_pending.add(log);
+			};
+		};
+	};
+
+	// public func start_log_timer() : async Timer.TimerId {
+
+	//     return Timer.recurringTimer(#seconds(60), send_logs_relic);
+	// };
 
 	func convert_to_json() : JSON.JSON {
 		let logs = Array.map<LogEvent, JSON.JSON>(
@@ -99,7 +158,7 @@ actor Logger {
 			}
 		);
 
-		let result = #Object([("logs", #Array(logs))]);
+		let result = #Array(logs);
 
 		return result;
 	};
@@ -108,41 +167,39 @@ actor Logger {
 	public query func http_request(req : HttpRequest) : async HttpResponse {
 		let path = Text.split(req.url, #char '?').next();
 
+		func invalidResponse(reason : Text) : HttpResponse {
+			{
+				status_code = 400;
+				headers = [];
+				body = Text.encodeUtf8(reason);
+			};
+		};
+
+		func validResponse(content : Text, mimeType : Text) : HttpResponse {
+			let headers = [("content-type", mimeType)];
+			{
+				status_code = 200;
+				headers = headers;
+				body = Text.encodeUtf8(content);
+			};
+		};
+
 		switch (path) {
 			case (null) {
-				{
-					status_code = 400;
-					headers = [];
-					body = "Path Invalid";
-				};
+				return invalidResponse("Path Invalid");
 			};
 			case (?path) {
 				switch (req.method, path) {
 					case ("GET", "/logs") {
-
 						let body = JSON.show(convert_to_json());
-
-						let headers = [("content-type", "application/json")];
-
-						let response : HttpResponse = {
-							status_code = 200;
-							headers = headers;
-							body = Text.encodeUtf8(body);
-						};
-
-						return response;
+						return validResponse(body, "application/json");
 					};
 					case _ {
-						{
-							status_code = 400;
-							headers = [];
-							body = "Invalid request";
-						};
+						return invalidResponse("Invalid request");
 					};
 				};
 			};
 		};
-
 	};
 
 	// ------------------------- CANISTER MANAGEMENT -------------------------
