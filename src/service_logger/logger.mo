@@ -160,32 +160,16 @@ actor Logger {
 		return result;
 	};
 
+	public shared (msg) func clear_logs() : async () {
+		logs_storage.append(logs_pending);
+		logs_pending.clear();
+	};
+
 	// ------------------------- HTTP -------------------------
 	public query func http_request(req : HttpRequest) : async HttpResponse {
 		if ((req.method, req.url) == ("GET", "/logs")) {
-			return {
-				status_code = 200;
-				headers = [("content-type", "application/json")];
-				body = Text.encodeUtf8("{\"message\": \"final\"}");
-				upgrade = true;
-			};
-		} else {
-			return {
-				status_code = 404;
-				headers = [("content-type", "application/json")];
-				body = Text.encodeUtf8("{\"message\": \"failed\"}");
-				upgrade = false;
-			};
-		};
-	};
-
-	public func http_request_update(req : HttpRequest) : async HttpResponse {
-		if ((req.method, req.url) == ("GET", "/logs")) {
 			let body = JSON.show(convert_to_json());
 			let headers = [("content-type", "application/json")];
-
-			logs_storage.append(logs_pending);
-			logs_pending.clear();
 
 			{
 				body = Text.encodeUtf8(body);
@@ -201,8 +185,8 @@ actor Logger {
 				upgrade = false;
 			};
 		};
-
 	};
+
 	// ------------------------- CANISTER MANAGEMENT -------------------------
 	public query func version() : async Nat {
 		return VERSION;
