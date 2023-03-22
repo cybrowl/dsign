@@ -1,9 +1,9 @@
+// import JSON "mo:json/JSON";
 import Array "mo:base/Array";
 import Blob "mo:base/Blob";
 import Buffer "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
 import Int "mo:base/Int";
-import JSON "mo:json/JSON";
 import List "mo:base/List";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
@@ -31,29 +31,15 @@ actor Logger {
 
 	public type Tags = [(Text, Text)];
 	public type Message = Text;
-	public type PayloadHealthMetric = {
-		metrics : [(Text, Int)];
-		name : Text;
-		child_canister_id : Text;
-		parent_canister_id : Text;
-	};
 
 	public type LogEvent = {
 		time : Int;
 		tags : Tags;
 		message : Text;
 	};
-	public type LogHealthMetric = {
-		child_canister_id : Text;
-		metrics : [(Text, Int)];
-		name : Text;
-		parent_canister_id : Text;
-		time : Int;
-	};
 
 	var logs_storage = Buffer.Buffer<LogEvent>(0);
 	var logs_pending = Buffer.Buffer<LogEvent>(0);
-	var logs_health_metric_pending = Buffer.Buffer<LogHealthMetric>(0);
 
 	let VERSION : Nat = 1;
 	stable var authorized : ?Principal = null;
@@ -74,6 +60,7 @@ actor Logger {
 	};
 
 	public shared (msg) func log_event(tags : Tags, message : Message) : async () {
+		//TODO: lock it for only authorized canisters
 		let log : LogEvent = { time = Time.now(); tags = tags; message = message };
 
 		logs_pending.add(log);
@@ -88,24 +75,10 @@ actor Logger {
 		return "Logs cleared";
 	};
 
-	public shared (msg) func log_health_metric(tags : Tags, payload : PayloadHealthMetric) : async () {
-		let log : LogHealthMetric = {
-			child_canister_id = payload.child_canister_id;
-			metrics = payload.metrics;
-			name = payload.name;
-			parent_canister_id = payload.parent_canister_id;
-			time = Time.now();
-		};
+	public query ({ caller }) func get_logs() : async [LogEvent] {
+		assert (authorized == ?caller);
 
-		logs_health_metric_pending.add(log);
-	};
-
-	public query func get_logs() : async [LogEvent] {
 		return Buffer.toArray(logs_pending);
-	};
-
-	public shared ({ caller }) func whoami() : async Text {
-		return Principal.toText(caller);
 	};
 
 	// public shared (msg) func send_logs_relic() : async () {
@@ -157,63 +130,67 @@ actor Logger {
 	//     return Timer.recurringTimer(#seconds(60), send_logs_relic);
 	// };
 
-	func convert_to_json() : JSON.JSON {
-		let logs = Array.map<LogEvent, JSON.JSON>(
-			Buffer.toArray(logs_pending),
-			func(log : LogEvent) : JSON.JSON {
-				return #Object([
-					(
-						"attributes",
-						#Object(
-							Array.append(
-								Array.map<(Text, Text), (Text, JSON.JSON)>(
-									log.tags,
-									func(tag : (Text, Text)) : (Text, JSON.JSON) {
-										return (tag.0, #String(tag.1));
-									}
-								),
-								[
-									("logtype", #String("accesslogs")),
-									("hostname", #String("dsign.ooo"))
-								]
-							)
-						)
-					),
-					("message", #String(log.message)),
-					("time", #Number(log.time))
-				]);
-			}
-		);
+	// func convert_to_json() : JSON.JSON {
+	//     let logs = Array.map<LogEvent, JSON.JSON>(
+	//         Buffer.toArray(logs_pending),
+	//         func(log : LogEvent) : JSON.JSON {
+	//             return #Object([
+	//                 (
+	//                     "attributes",
+	//                     #Object(
+	//                         Array.append(
+	//                             Array.map<(Text, Text), (Text, JSON.JSON)>(
+	//                                 log.tags,
+	//                                 func(tag : (Text, Text)) : (Text, JSON.JSON) {
+	//                                     return (tag.0, #String(tag.1));
+	//                                 }
+	//                             ),
+	//                             [
+	//                                 ("logtype", #String("accesslogs")),
+	//                                 ("hostname", #String("dsign.ooo"))
+	//                             ]
+	//                         )
+	//                     )
+	//                 ),
+	//                 ("message", #String(log.message)),
+	//                 ("time", #Number(log.time))
+	//             ]);
+	//         }
+	//     );
 
-		let result = #Array(logs);
+	//     let result = #Array(logs);
 
-		return result;
-	};
+	//     return result;
+	// };
 
 	// ------------------------- HTTP -------------------------
-	public query func http_request(req : HttpRequest) : async HttpResponse {
-		if ((req.method, req.url) == ("GET", "/logs")) {
-			let body = JSON.show(convert_to_json());
-			let headers = [("content-type", "application/json")];
+	// public query func http_request(req : HttpRequest) : async HttpResponse {
+	//     if ((req.method, req.url) == ("GET", "/logs")) {
+	//         let body = JSON.show(convert_to_json());
+	//         let headers = [("content-type", "application/json")];
 
-			{
-				body = Text.encodeUtf8(body);
-				headers = headers;
-				status_code = 200;
-				upgrade = false;
-			};
-		} else {
-			{
-				body = Text.encodeUtf8("Invalid request");
-				headers = [];
-				status_code = 400;
-				upgrade = false;
-			};
-		};
-	};
+	//         {
+	//             body = Text.encodeUtf8(body);
+	//             headers = headers;
+	//             status_code = 200;
+	//             upgrade = false;
+	//         };
+	//     } else {
+	//         {
+	//             body = Text.encodeUtf8("Invalid request");
+	//             headers = [];
+	//             status_code = 400;
+	//             upgrade = false;
+	//         };
+	//     };
+	// };
 
 	// ------------------------- CANISTER MANAGEMENT -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	public shared ({ caller }) func whoami() : async Text {
+		return Principal.toText(caller);
 	};
 };
