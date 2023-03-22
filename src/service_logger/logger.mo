@@ -5,6 +5,7 @@ import Cycles "mo:base/ExperimentalCycles";
 import Int "mo:base/Int";
 import JSON "mo:json/JSON";
 import List "mo:base/List";
+import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Timer "mo:base/Timer";
@@ -55,11 +56,36 @@ actor Logger {
 	var logs_health_metric_pending = Buffer.Buffer<LogHealthMetric>(0);
 
 	let VERSION : Nat = 1;
+	stable var authorized : ?Principal = null;
+
+	public shared ({ caller }) func authorize() : async Bool {
+		switch (authorized) {
+			case (?authorized) {
+				assert (authorized == caller);
+
+				return true;
+			};
+			case (null) {
+				authorized := ?caller;
+
+				return false;
+			};
+		};
+	};
 
 	public shared (msg) func log_event(tags : Tags, message : Message) : async () {
 		let log : LogEvent = { time = Time.now(); tags = tags; message = message };
 
 		logs_pending.add(log);
+	};
+
+	public shared ({ caller }) func clear_logs() : async Text {
+		assert (authorized == ?caller);
+
+		logs_storage.append(logs_pending);
+		logs_pending.clear();
+
+		return "Logs cleared";
 	};
 
 	public shared (msg) func log_health_metric(tags : Tags, payload : PayloadHealthMetric) : async () {
@@ -76,6 +102,10 @@ actor Logger {
 
 	public query func get_logs() : async [LogEvent] {
 		return Buffer.toArray(logs_pending);
+	};
+
+	public shared ({ caller }) func whoami() : async Text {
+		return Principal.toText(caller);
 	};
 
 	// public shared (msg) func send_logs_relic() : async () {
@@ -158,11 +188,6 @@ actor Logger {
 		let result = #Array(logs);
 
 		return result;
-	};
-
-	public shared (msg) func clear_logs() : async () {
-		logs_storage.append(logs_pending);
-		logs_pending.clear();
 	};
 
 	// ------------------------- HTTP -------------------------
