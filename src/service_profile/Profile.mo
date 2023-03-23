@@ -6,6 +6,7 @@ import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
+import Int "mo:base/Int";
 import Time "mo:base/Time";
 
 import CanisterIdsLedger "canister:canister_ids_ledger";
@@ -63,7 +64,6 @@ actor Profile = {
 	stable var profiles_stable_storage : [(UserPrincipal, Profile)] = [];
 
 	stable var image_assets_canister_id : Text = "";
-	stable var is_prod : Bool = false;
 
 	// ------------------------- Username Methods -------------------------
 	private func check_username_is_available(username : Username) : Bool {
@@ -370,6 +370,21 @@ actor Profile = {
 	};
 
 	public shared func health() : async Payload {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("profiles_num", Int.toText(profiles.size())),
+			("usernames_size", Int.toText(usernames.size())),
+			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
+			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
+
 		let log_payload : Payload = {
 			metrics = [
 				("profiles_num", profiles.size()),
@@ -408,7 +423,7 @@ actor Profile = {
 
 		ignore Logger.log_event(
 			tags,
-			debug_show (("image_assets_canister_id: ", image_assets_canister_id))
+			"image_assets_canister_id: " # image_assets_canister_id
 		);
 	};
 
@@ -423,7 +438,6 @@ actor Profile = {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "install_code"),
-			("is_prod", Bool.toText(is_prod)),
 			("authorized", Bool.toText(authorized))
 		];
 
@@ -452,12 +466,12 @@ actor Profile = {
 
 	public shared (msg) func initialize_canisters() : async () {
 		let profile_principal = Principal.fromActor(Profile);
-		is_prod := Text.equal(
+		let is_prod = Text.equal(
 			Principal.toText(profile_principal),
 			"kxkd5-7qaaa-aaaag-aaawa-cai"
 		);
 
-		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters"), ("is_prod", Bool.toText(is_prod))];
+		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
 
 		// create image assets canister
 		if (image_assets_canister_id.size() < 1) {
