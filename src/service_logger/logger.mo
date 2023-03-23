@@ -49,10 +49,9 @@ actor Logger {
 		//TODO: lock it for only authorized canisters
 		let profile_principal = Principal.fromActor(Logger);
 
-		// Note: change me to your canister id
-
 		var env = "dev";
 
+		// Note: change me to your canister id
 		switch (Principal.toText(profile_principal)) {
 			case ("jaypp-oiaaa-aaaag-aaa6q-cai") {
 				env := "prod";

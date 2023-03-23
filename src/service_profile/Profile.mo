@@ -228,6 +228,11 @@ actor Profile = {
 
 	// ------------------------- Profile Methods -------------------------
 	public shared ({ caller }) func update_profile_avatar(img_asset_ids : [Nat]) : async Result.Result<Text, ErrProfile> {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "update_profile_avatar")
+		];
+
 		switch (profiles.get(caller)) {
 			case (null) {
 				return #err(#ProfileNotFound(true));
@@ -254,6 +259,11 @@ actor Profile = {
 
 							profiles.put(caller, profile_modified);
 
+							ignore Logger.log_event(
+								tags,
+								"added avatar first time"
+							);
+
 							return #ok(profile_modified.avatar.url);
 						};
 					};
@@ -277,6 +287,11 @@ actor Profile = {
 
 							profiles.put(caller, profile_modified);
 
+							ignore Logger.log_event(
+								tags,
+								"updated avatar"
+							);
+
 							return #ok(profile_modified.avatar.url);
 						};
 					};
@@ -287,6 +302,11 @@ actor Profile = {
 	};
 
 	public shared ({ caller }) func update_profile_banner(img_asset_ids : [Nat]) : async Result.Result<Text, ErrProfile> {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "update_profile_banner")
+		];
+
 		switch (profiles.get(caller)) {
 			case (null) {
 				return #err(#ProfileNotFound(true));
@@ -313,6 +333,11 @@ actor Profile = {
 
 							profiles.put(caller, profile_modified);
 
+							ignore Logger.log_event(
+								tags,
+								"added banner first time"
+							);
+
 							return #ok(profile_modified.banner.url);
 						};
 					};
@@ -324,6 +349,11 @@ actor Profile = {
 							return #err(#ErrorCall(debug_show (err)));
 						};
 						case (#ok images) {
+
+							ignore Logger.log_event(
+								tags,
+								"updated banner"
+							);
 							return #ok("updated banner");
 						};
 					};
@@ -333,6 +363,7 @@ actor Profile = {
 		};
 
 	};
+
 	//TODO: update_profile
 
 	public query ({ caller }) func get_profile() : async Result.Result<Profile, ErrProfile> {
