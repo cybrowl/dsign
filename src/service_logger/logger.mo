@@ -13,21 +13,21 @@ import Timer "mo:base/Timer";
 import ICTypes "../types/ic.types";
 
 actor Logger {
-	type HeaderField = (Text, Text);
+	// type HeaderField = (Text, Text);
 
-	type HttpRequest = {
-		method : Text;
-		url : Text;
-		headers : [HeaderField];
-		body : Blob;
-	};
+	// type HttpRequest = {
+	//     method : Text;
+	//     url : Text;
+	//     headers : [HeaderField];
+	//     body : Blob;
+	// };
 
-	type HttpResponse = {
-		body : Blob;
-		headers : [HeaderField];
-		status_code : Nat16;
-		upgrade : Bool;
-	};
+	// type HttpResponse = {
+	//     body : Blob;
+	//     headers : [HeaderField];
+	//     status_code : Nat16;
+	//     upgrade : Bool;
+	// };
 
 	public type Tags = [(Text, Text)];
 	public type Message = Text;

@@ -1,3 +1,4 @@
+import Bool "mo:base/Bool";
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
@@ -432,13 +433,13 @@ actor Profile = {
 	};
 
 	public shared (msg) func initialize_canisters() : async () {
-		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
-
 		let profile_principal = Principal.fromActor(Profile);
 		let is_prod = Text.equal(
 			Principal.toText(profile_principal),
 			"kxkd5-7qaaa-aaaag-aaawa-cai"
 		);
+
+		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters"), ("is_prod", Bool.toText(is_prod))];
 
 		// create image assets canister
 		if (image_assets_canister_id.size() < 1) {
