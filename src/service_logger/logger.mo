@@ -1,4 +1,3 @@
-// import JSON "mo:json/JSON";
 import Array "mo:base/Array";
 import Blob "mo:base/Blob";
 import Buffer "mo:base/Buffer";
@@ -17,15 +16,17 @@ actor Logger {
 	public type Message = Text;
 
 	public type LogEvent = {
-		time : Int;
-		tags : Tags;
+		hostname : Text;
+		logtype : Text;
 		message : Text;
+		tags : Tags;
+		time : Int;
 	};
 
 	var logs_storage = Buffer.Buffer<LogEvent>(0);
 	var logs_pending = Buffer.Buffer<LogEvent>(0);
 
-	let VERSION : Nat = 1;
+	let VERSION : Nat = 2;
 	stable var authorized : ?Principal = null;
 
 	public shared ({ caller }) func authorize() : async Bool {
@@ -45,7 +46,14 @@ actor Logger {
 
 	public shared (msg) func log_event(tags : Tags, message : Message) : async () {
 		//TODO: lock it for only authorized canisters
-		let log : LogEvent = { time = Time.now(); tags = tags; message = message };
+
+		let log : LogEvent = {
+			hostname = "dsign.ooo";
+			logtype = "accesslogs";
+			message = message;
+			tags = tags;
+			time = Time.now();
+		};
 
 		logs_pending.add(log);
 	};
