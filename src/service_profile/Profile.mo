@@ -63,6 +63,7 @@ actor Profile = {
 	stable var profiles_stable_storage : [(UserPrincipal, Profile)] = [];
 
 	stable var image_assets_canister_id : Text = "";
+	stable var is_prod : Bool = false;
 
 	// ------------------------- Username Methods -------------------------
 	private func check_username_is_available(username : Username) : Bool {
@@ -405,10 +406,10 @@ actor Profile = {
 
 		ignore CanisterIdsLedger.save_canister(canister_child);
 
-		// ignore Logger.log_event(
-		//     tags,
-		//     debug_show (("image_assets_canister_id: ", image_assets_canister_id))
-		// );
+		ignore Logger.log_event(
+			tags,
+			debug_show (("image_assets_canister_id: ", image_assets_canister_id))
+		);
 	};
 
 	public shared ({ caller }) func install_code(
@@ -417,24 +418,41 @@ actor Profile = {
 		wasm_module : Blob
 	) : async Text {
 		let principal = Principal.toText(caller);
+		let authorized : Bool = Text.equal(principal, "be7if-4i5lo-xnuq5-6ilpw-aedq2-epko6-gdmew-kzcse-7qpey-wztpj-qqe");
 
-		if (Text.equal(principal, "be7if-4i5lo-xnuq5-6ilpw-aedq2-epko6-gdmew-kzcse-7qpey-wztpj-qqe")) {
-			await ic.install_code({
-				arg = arg;
-				wasm_module = wasm_module;
-				mode = #upgrade;
-				canister_id = canister_id;
-			});
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "install_code"),
+			("is_prod", Bool.toText(is_prod)),
+			("authorized", Bool.toText(authorized))
+		];
 
-			return "success";
+		ignore Logger.log_event(
+			tags,
+			"check authorized"
+		);
+
+		switch (authorized) {
+			case (true) {
+				await ic.install_code({
+					arg = arg;
+					wasm_module = wasm_module;
+					mode = #upgrade;
+					canister_id = canister_id;
+				});
+
+				return "success";
+
+			};
+			case (false) {
+				return "not_authorized";
+			};
 		};
-
-		return "not_authorized";
 	};
 
 	public shared (msg) func initialize_canisters() : async () {
 		let profile_principal = Principal.fromActor(Profile);
-		let is_prod = Text.equal(
+		is_prod := Text.equal(
 			Principal.toText(profile_principal),
 			"kxkd5-7qaaa-aaaag-aaawa-cai"
 		);
