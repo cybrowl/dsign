@@ -18,6 +18,7 @@ actor Logger {
 	public type LogEvent = {
 		hostname : Text;
 		logtype : Text;
+		env : Text;
 		message : Text;
 		tags : Tags;
 		time : Int;
@@ -46,10 +47,25 @@ actor Logger {
 
 	public shared (msg) func log_event(tags : Tags, message : Message) : async () {
 		//TODO: lock it for only authorized canisters
+		let profile_principal = Principal.fromActor(Logger);
+
+		// Note: change me to your canister id
+
+		var env = "dev";
+
+		switch (Principal.toText(profile_principal)) {
+			case ("jaypp-oiaaa-aaaag-aaa6q-cai") {
+				env := "prod";
+			};
+			case _ {
+				env := "dev";
+			};
+		};
 
 		let log : LogEvent = {
 			hostname = "dsign.ooo";
 			logtype = "accesslogs";
+			env = env;
 			message = message;
 			tags = tags;
 			time = Time.now();
