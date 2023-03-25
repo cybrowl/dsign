@@ -2,6 +2,8 @@ import Array "mo:base/Array";
 import Debug "mo:base/Debug";
 import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
+import Int "mo:base/Int";
+import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
 import Prim "mo:⛔";
 import Principal "mo:base/Principal";
@@ -9,10 +11,9 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
-import CanisterIdsLedger "canister:canister_ids_ledger";
+import Logger "canister:logger";
 import HealthMetrics "canister:health_metrics";
 
-import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
 import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
 
@@ -21,14 +22,15 @@ import UtilsShared "../utils/utils";
 actor FileAssetChunksStaging = {
 	type Payload = HealthMetricsTypes.Payload;
 
-	private var chunk_id_count : Nat = 0;
-	private let chunks : HashMap.HashMap<Nat, Types.AssetChunk> = HashMap.HashMap<Nat, Types.AssetChunk>(
+	private stable var chunk_id_count : Nat = 0;
+	private var chunks : HashMap.HashMap<Nat, Types.AssetChunk> = HashMap.HashMap<Nat, Types.AssetChunk>(
 		0,
 		Nat.equal,
 		Hash.hash
 	);
+	stable var chunks_stable_storage : [(Nat, Types.AssetChunk)] = [];
 
-	let VERSION : Nat = 5;
+	let VERSION : Nat = 6;
 	let ACTOR_NAME : Text = "FileAssetChunksStaging";
 
 	public shared ({ caller }) func create_chunk(chunk : Types.Chunk) : async Nat {
@@ -77,12 +79,27 @@ actor FileAssetChunksStaging = {
 		};
 	};
 
-	// ------------------------- Canister Management -------------------------
+	// ------------------------- CANISTER MANAGEMENT -------------------------
 	public query func version() : async Nat {
 		return VERSION;
 	};
 
 	public shared func health() : async Payload {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("chunks_size", Int.toText(chunks.size())),
+			("chunk_id_count", Int.toText(chunk_id_count)),
+			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
+			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
+
 		let log_payload : Payload = {
 			metrics = [
 				("assets_num", chunks.size()),
@@ -104,31 +121,18 @@ actor FileAssetChunksStaging = {
 		return message.caller;
 	};
 
-	public shared func init() : async Text {
-		let principal_canister = await whoami();
-		let canister_id = Principal.toText(principal_canister);
-		let is_prod = Text.equal(
-			Principal.toText(principal_canister),
-			"jfpyd-maaaa-aaaag-aatxq-cai"
+	// ------------------------- SYSTEM METHODS -------------------------
+	system func preupgrade() {
+		chunks_stable_storage := Iter.toArray(chunks.entries());
+	};
+
+	system func postupgrade() {
+		chunks := HashMap.fromIter<Nat, Types.AssetChunk>(
+			chunks_stable_storage.vals(),
+			0,
+			Nat.equal,
+			Hash.hash
 		);
-
-		switch (await CanisterIdsLedger.canister_exists(principal_canister)) {
-			case (true) {
-				return "Canister Already Exists";
-			};
-			case (false) {
-				let canister_child : CanisterIdsLedgerTypes.CanisterInfo = {
-					created = Time.now();
-					id = canister_id;
-					name = "root";
-					parent_name = ACTOR_NAME;
-					isProd = is_prod;
-				};
-
-				ignore CanisterIdsLedger.save_canister(canister_child);
-
-				return "Canister Created";
-			};
-		};
+		chunks_stable_storage := [];
 	};
 };
