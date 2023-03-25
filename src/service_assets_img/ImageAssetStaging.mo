@@ -3,12 +3,14 @@ import Debug "mo:base/Debug";
 import Float "mo:base/Float";
 import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
+import Int "mo:base/Int";
 import Nat "mo:base/Nat";
 import Prim "mo:⛔";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Time "mo:base/Time";
 
+import Logger "canister:logger";
 import HealthMetrics "canister:health_metrics";
 
 import HealthMetricsTypes "../types/health_metrics.types";
@@ -35,7 +37,7 @@ actor ImageAssetStaging = {
 	);
 
 	let ACTOR_NAME : Text = "ImageAssetsStaging";
-	let VERSION : Nat = 4;
+	let VERSION : Nat = 5;
 
 	public shared ({ caller }) func create_asset(img : Types.Img) : async Nat {
 		//TODO: check username to stop spam
@@ -45,7 +47,7 @@ actor ImageAssetStaging = {
 		// let is_valid_image = Utils.is_valid_image(img.data);
 
 		// if (is_valid_image == false) {
-		// 	return 0;
+		//     return 0;
 		// };
 
 		asset_id_count := asset_id_count + 1;
@@ -96,6 +98,21 @@ actor ImageAssetStaging = {
 	};
 
 	public shared func health() : async Payload {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("assets_size", Int.toText(assets.size())),
+			("asset_id_count", Int.toText(asset_id_count)),
+			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
+			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
+
 		let log_payload : Payload = {
 			metrics = [
 				("images_num", assets.size()),
@@ -111,19 +128,5 @@ actor ImageAssetStaging = {
 		ignore HealthMetrics.log_event(log_payload);
 
 		return log_payload;
-	};
-
-	public query func is_full() : async Bool {
-		let MAX_SIZE_THRESHOLD_MB : Float = 3500;
-
-		let rts_memory_size : Nat = Prim.rts_memory_size();
-		let mem_size : Float = Float.fromInt(rts_memory_size);
-		let memory_in_megabytes = Float.abs(mem_size * 0.000001);
-
-		if (memory_in_megabytes > MAX_SIZE_THRESHOLD_MB) {
-			return true;
-		} else {
-			return false;
-		};
 	};
 };

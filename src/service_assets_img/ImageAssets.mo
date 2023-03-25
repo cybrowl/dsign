@@ -50,8 +50,6 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	);
 	stable var image_assets_stable_storage : [(ImageID, AssetImg)] = [];
 
-	stable var health_metrics_canister_id : Text = "tqtu6-byaaa-aaaaa-aaana-cai";
-
 	public shared ({ caller }) func save_images(
 		img_asset_ids : [Nat],
 		asset_type : Text,
@@ -206,6 +204,10 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 		ignore HealthMetrics.log_event(log_payload);
 
 		return log_payload;
+	};
+
+	public query func is_full() : async Bool {
+		return UtilsShared.is_full();
 	};
 
 	// ------------------------- System Methods -------------------------
