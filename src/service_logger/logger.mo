@@ -1,8 +1,9 @@
 import Array "mo:base/Array";
 import Blob "mo:base/Blob";
-import Buffer "mo:base/Buffer";
+import { Buffer; toArray; fromArray } "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
 import Int "mo:base/Int";
+import Iter "mo:base/Iter";
 import List "mo:base/List";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
@@ -10,6 +11,7 @@ import Time "mo:base/Time";
 import Timer "mo:base/Timer";
 
 import ICTypes "../types/ic.types";
+import UtilsShared "../utils/utils";
 
 actor Logger {
 	public type Tags = [(Text, Text)];
@@ -24,10 +26,15 @@ actor Logger {
 		time : Int;
 	};
 
-	var logs_storage = Buffer.Buffer<LogEvent>(0);
-	var logs_pending = Buffer.Buffer<LogEvent>(0);
+	var logs_storage = Buffer<LogEvent>(0);
+	stable var logs_storage_stable_storage : [LogEvent] = [];
 
-	let VERSION : Nat = 2;
+	var logs_pending = Buffer<LogEvent>(0);
+	stable var logs_pending_stable_storage : [LogEvent] = [];
+
+	let VERSION : Nat = 3;
+	let ACTOR_NAME : Text = "Logger";
+
 	stable var authorized : ?Principal = null;
 
 	public shared ({ caller }) func authorize() : async Bool {
@@ -85,7 +92,7 @@ actor Logger {
 	public query ({ caller }) func get_logs() : async [LogEvent] {
 		assert (authorized == ?caller);
 
-		return Buffer.toArray(logs_pending);
+		return toArray(logs_pending);
 	};
 
 	// ------------------------- CANISTER MANAGEMENT -------------------------
@@ -95,5 +102,34 @@ actor Logger {
 
 	public shared ({ caller }) func whoami() : async Text {
 		return Principal.toText(caller);
+	};
+
+	public shared func health() : async () {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("logs_pending_size", Int.toText(logs_pending.size())),
+			("logs_storage_size", Int.toText(logs_storage.size())),
+			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
+			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+		];
+
+		ignore log_event(
+			tags,
+			"health"
+		);
+
+		return ();
+	};
+
+	system func preupgrade() {
+		logs_storage_stable_storage := toArray(logs_storage);
+		logs_pending_stable_storage := toArray(logs_pending);
+	};
+
+	system func postupgrade() {
+		logs_storage := fromArray(logs_storage_stable_storage);
+		logs_pending := fromArray(logs_pending_stable_storage);
 	};
 };

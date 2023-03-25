@@ -66,12 +66,12 @@ dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principa
 
 # killall dfx replica nodemanager
 
-# dfx canister --network ic call canister_child_ledger save_canister \
+# dfx canister --network ic call canister_ids_ledger save_canister \
 # '(record {
 #     created = 1_670_321_001_063_287_000; 
-#     id = "lrr5x-jaaaa-aaaag-aatzq-cai"; 
-#     name = "snap"; 
-#     parent_name = "SnapMain"; 
+#     id = "jaypp-oiaaa-aaaag-aaa6q-cai"; 
+#     name = "Logger"; 
+#     parent_name = "root"; 
 #     isProd = true;
 #     })'
 

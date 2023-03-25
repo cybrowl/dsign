@@ -172,7 +172,7 @@ actor CanisterIdsLedger = {
 
 	public func start_log_timer() : async Timer.TimerId {
 
-		return Timer.recurringTimer(#seconds(3600), log_canisters_health);
+		return Timer.recurringTimer(#seconds(60), log_canisters_health);
 	};
 
 	public shared func initialize_authorized_principals() : async Text {
