@@ -1,7 +1,8 @@
 import { Buffer; toArray } "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
-import List "mo:base/List";
+import Int "mo:base/Int";
 import Iter "mo:base/Iter";
+import List "mo:base/List";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
@@ -24,7 +25,7 @@ actor CanisterIdsLedger = {
 
 	let ACTOR_NAME : Text = "CanisterIdsLedger";
 	let CANISTER_ID_PROD : Text = "k25dy-3yaaa-aaaag-abcpa-cai";
-	let VERSION : Nat = 2;
+	let VERSION : Nat = 3;
 
 	var canisters = List.nil<CanisterInfo>();
 	stable var canisters_stable_storage : [(CanisterInfo)] = [];
@@ -155,19 +156,20 @@ actor CanisterIdsLedger = {
 		return VERSION;
 	};
 
-	public shared func health() : async Payload {
-		let log_payload : Payload = {
-			metrics = [
-				("cycles_balance", UtilsShared.get_cycles_balance()),
-				("memory_in_mb", UtilsShared.get_memory_in_mb()),
-				("heap_in_mb", UtilsShared.get_heap_in_mb())
-			];
-			name = ACTOR_NAME;
-			child_canister_id = Principal.toText(Principal.fromActor(CanisterIdsLedger));
-			parent_canister_id = "";
-		};
+	public shared func health() : async () {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("canisters_size", Int.toText(List.size(canisters))),
+			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
+			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+		];
 
-		return log_payload;
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
 	};
 
 	public func start_log_timer() : async Timer.TimerId {
