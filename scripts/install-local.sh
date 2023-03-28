@@ -69,8 +69,8 @@ dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principa
 # dfx canister --network ic call canister_ids_ledger save_canister \
 # '(record {
 #     created = 1_670_321_001_063_287_000; 
-#     id = "k25dy-3yaaa-aaaag-abcpa-cai"; 
-#     name = "CanisterIdsLedger"; 
+#     id = "72zia-7aaaa-aaaag-aa37a-cai"; 
+#     name = "Explore"; 
 #     parent_name = "root"; 
 #     isProd = true;
 #     })'

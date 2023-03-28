@@ -33,6 +33,8 @@ actor Explore = {
 	};
 
 	public shared func save_snap(snap : SnapPublic) : async Text {
+		//TODO: add authorization
+
 		snaps.put(snap.id, snap);
 
 		return "Saved Snap";
@@ -41,6 +43,8 @@ actor Explore = {
 	//TODO: given a list of snaps (id and canister id) it should call that canister to get latest snap
 
 	public shared func delete_snaps(snap_ids : [SnapID]) : async () {
+		//TODO: add authorization
+
 		for (snap_id in snap_ids.vals()) {
 			switch (snaps.get(snap_id)) {
 				case null {};
