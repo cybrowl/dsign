@@ -17,40 +17,46 @@ dfx deploy health_metrics
 
 # profile
 dfx deploy profile
-export PROFILE_PRINCIPAL=$(dfx canister id profile)
 
 # projects
 dfx deploy project_main
-export PROJECT_MAIN_PRINCIPAL=$(dfx canister id project_main)
 
 # snaps
 dfx deploy snap_main
-export SNAP_MAIN_PRINCIPAL=$(dfx canister id snap_main)
 
 # snaps
 dfx deploy favorite_main
-export FAVORITE_MAIN_PRINCIPAL=$(dfx canister id favorite_main)
 
 # explore
 dfx deploy explore
+
 export EXPLORE_PRINCIPAL=$(dfx canister id explore)
+export FAVORITE_MAIN_PRINCIPAL=$(dfx canister id favorite_main)
+export PROFILE_PRINCIPAL=$(dfx canister id profile)
+export PROJECT_MAIN_PRINCIPAL=$(dfx canister id project_main)
+export SNAP_MAIN_PRINCIPAL=$(dfx canister id snap_main)
 
-# front end
-dfx deploy dsign_assets
+# # front end
+# dfx deploy dsign_assets
 
-# init
-dfx canister call canister_ids_ledger set_canister_ids \
-'(record {
-    explore = "'${EXPLORE_PRINCIPAL}'";
-    favorite_main = "'${FAVORITE_MAIN_PRINCIPAL}'";
-    profile = "'${PROFILE_PRINCIPAL}'";
-    project_main = "'${PROJECT_MAIN_PRINCIPAL}'";
-    snap_main = "'${SNAP_MAIN_PRINCIPAL}'";
-    })'
-
-dfx canister call canister_ids_ledger initialize_authorized_principals
+# initialize canisters
+dfx canister call canister_ids_ledger authorize_ids "(
+    vec {
+        \"${EXPLORE_PRINCIPAL}\";
+        \"${FAVORITE_MAIN_PRINCIPAL}\";
+        \"${PROFILE_PRINCIPAL}\";
+        \"${PROJECT_MAIN_PRINCIPAL}\";
+        \"${SNAP_MAIN_PRINCIPAL}\";
+    }
+)"
 
 dfx canister call profile initialize_canisters 
+
+dfx canister call snap_main set_canister_ids \
+'(record {
+    project_main = "'${PROJECT_MAIN_PRINCIPAL}'";
+    favorite_main = "'${FAVORITE_MAIN_PRINCIPAL}'";
+    })'
 
 dfx canister call snap_main initialize_canisters
 

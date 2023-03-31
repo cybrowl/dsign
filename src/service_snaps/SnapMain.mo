@@ -456,6 +456,34 @@ actor SnapMain {
 	};
 
 	// INIT CANISTERS
+
+	//NOTE: dev only
+	public shared (msg) func set_canister_ids({
+		project_main : Text;
+		favorite_main : Text;
+	}) : async Text {
+		let tags = [("actor_name", ACTOR_NAME), ("method", "set_canister_ids")];
+
+		let snap_main_principal = Principal.fromActor(SnapMain);
+
+		let is_prod = Text.equal(
+			Principal.toText(snap_main_principal),
+			"lyswl-7iaaa-aaaag-aatya-cai"
+		);
+
+		if (is_prod == false) {
+			project_main_canister_id := project_main;
+			favorite_main_canister_id := favorite_main;
+		};
+
+		ignore Logger.log_event(
+			tags,
+			"set_canister_ids"
+		);
+
+		return "set_canister_ids";
+	};
+
 	public shared (msg) func initialize_canisters() : async () {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
 
@@ -474,15 +502,15 @@ actor SnapMain {
 			return;
 		};
 
-		let canister_ids = await CanisterIdsLedger.get_canister_ids();
+		// let canister_ids = await CanisterIdsLedger.get_canister_ids();
 
-		if (project_main_canister_id.size() == 0) {
-			project_main_canister_id := canister_ids.project_main;
-		};
+		// if (project_main_canister_id.size() == 0) {
+		//     project_main_canister_id := canister_ids.project_main;
+		// };
 
-		if (favorite_main_canister_id.size() == 0) {
-			favorite_main_canister_id := canister_ids.favorite_main;
-		};
+		// if (favorite_main_canister_id.size() == 0) {
+		//     favorite_main_canister_id := canister_ids.favorite_main;
+		// };
 
 		let project_main_principal = Principal.fromText(project_main_canister_id);
 		let favorite_main_principal = Principal.fromText(favorite_main_canister_id);

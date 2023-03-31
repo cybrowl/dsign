@@ -35,14 +35,6 @@ actor CanisterIdsLedger = {
 
 	stable var is_prod : Bool = false;
 
-	stable var canister_ids : CanisterIds = {
-		explore = "72zia-7aaaa-aaaag-aa37a-cai";
-		favorite_main = "a7b5k-xiaaa-aaaag-aa6ja-cai";
-		profile = "kxkd5-7qaaa-aaaag-aaawa-cai";
-		project_main = "nhlnj-vyaaa-aaaag-aay5q-cai";
-		snap_main = "lyswl-7iaaa-aaaag-aatya-cai";
-	};
-
 	// ------------------------- CanisterIdsLedger Methods -------------------------
 	public shared ({ caller }) func save_canister(canister_child : CanisterInfo) : async Text {
 		if (is_prod == false) {
@@ -64,18 +56,33 @@ actor CanisterIdsLedger = {
 	};
 
 	// NOTE: only for dev
-	public shared ({ caller }) func set_canister_ids(canisterIds : CanisterIds) : async Text {
+	public shared ({ caller }) func authorize_ids(ids : [Text]) : async Text {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "authorize_ids")
+		];
+
 		let canister_ids_ledger = Principal.fromActor(CanisterIdsLedger);
 		let is_production = Text.equal(
 			Principal.toText(canister_ids_ledger),
 			CANISTER_ID_PROD
 		);
 
+		if (authorized.size() > 0) {
+			return "already authorized";
+		};
+
 		if (is_production == false) {
-			canister_ids := canisterIds;
+			for (id in ids.vals()) {
+				authorized.put(id, id);
+			};
 
-			return debug_show ("set", canister_ids);
+			ignore Logger.log_event(
+				tags,
+				"authorize_ids"
+			);
 
+			return "authorized";
 		} else {
 			return "is production";
 		};
@@ -83,6 +90,10 @@ actor CanisterIdsLedger = {
 
 	public query func get_canisters() : async [CanisterInfo] {
 		return List.toArray<CanisterInfo>(canisters);
+	};
+
+	public query func get_authorized() : async [Text] {
+		return Iter.toArray(authorized.vals());
 	};
 
 	public query func get_health_metrics_id() : async Text {
@@ -97,10 +108,6 @@ actor CanisterIdsLedger = {
 		} else {
 			return "txssk-maaaa-aaaaa-aaanq-cai";
 		};
-	};
-
-	public query func get_canister_ids() : async CanisterIds {
-		return canister_ids;
 	};
 
 	public query func canister_exists(canisterPrincipal : Principal) : async Bool {
@@ -128,13 +135,6 @@ actor CanisterIdsLedger = {
 		let all_canister_children = List.toArray<CanisterInfo>(canisters);
 
 		// note: not sure how Iter over records
-		let canister_ids_arr = [
-			canister_ids.explore,
-			canister_ids.favorite_main,
-			canister_ids.profile,
-			canister_ids.project_main,
-			canister_ids.snap_main
-		];
 
 		for (canister in all_canister_children.vals()) {
 			let canister_child_actor = actor (canister.id) : CanisterActor;
@@ -142,7 +142,7 @@ actor CanisterIdsLedger = {
 			ignore canister_child_actor.health();
 		};
 
-		for (canister_id in canister_ids_arr.vals()) {
+		for (canister_id in authorized.vals()) {
 			let canister_child_actor = actor (canister_id) : CanisterActor;
 
 			ignore canister_child_actor.health();
@@ -175,35 +175,6 @@ actor CanisterIdsLedger = {
 	public func start_log_timer() : async Timer.TimerId {
 
 		return Timer.recurringTimer(#seconds(60), log_canisters_health);
-	};
-
-	public shared func initialize_authorized_principals() : async Text {
-		let canister_ids_ledger = Principal.fromActor(CanisterIdsLedger);
-		let is_production = Text.equal(
-			Principal.toText(canister_ids_ledger),
-			CANISTER_ID_PROD
-		);
-
-		is_prod := is_production;
-
-		let author : Text = "ru737-xk264-4nswf-o6lzb-3juxx-ixp63-objgb-l4io2-yievs-5ezxe-kqe";
-		let favorite_main : Text = "a7b5k-xiaaa-aaaag-aa6ja-cai";
-		let profile : Text = "kxkd5-7qaaa-aaaag-aaawa-cai";
-		let project_main : Text = "nhlnj-vyaaa-aaaag-aay5q-cai";
-		let snap_main : Text = "lyswl-7iaaa-aaaag-aatya-cai";
-
-		if (authorized.size() < 5) {
-			authorized.put(author, author);
-			authorized.put(favorite_main, favorite_main);
-			authorized.put(profile, profile);
-			authorized.put(project_main, project_main);
-			authorized.put(snap_main, snap_main);
-
-			return "added";
-		} else {
-			return "exists";
-		};
-
 	};
 
 	// ------------------------- System Methods -------------------------
