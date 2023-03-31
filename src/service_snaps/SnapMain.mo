@@ -478,7 +478,7 @@ actor SnapMain {
 
 		ignore Logger.log_event(
 			tags,
-			"set_canister_ids"
+			"set_canister_ids: " # project_main # favorite_main
 		);
 
 		return "set_canister_ids";
@@ -501,16 +501,6 @@ actor SnapMain {
 		if (has_assets_canister_id == true and has_image_assets_canister_id == true and has_snap_canister_id == true) {
 			return;
 		};
-
-		// let canister_ids = await CanisterIdsLedger.get_canister_ids();
-
-		// if (project_main_canister_id.size() == 0) {
-		//     project_main_canister_id := canister_ids.project_main;
-		// };
-
-		// if (favorite_main_canister_id.size() == 0) {
-		//     favorite_main_canister_id := canister_ids.favorite_main;
-		// };
 
 		let project_main_principal = Principal.fromText(project_main_canister_id);
 		let favorite_main_principal = Principal.fromText(favorite_main_canister_id);

@@ -30,14 +30,14 @@ dfx deploy favorite_main
 # explore
 dfx deploy explore
 
+# front end
+dfx deploy dsign_assets
+
 export EXPLORE_PRINCIPAL=$(dfx canister id explore)
 export FAVORITE_MAIN_PRINCIPAL=$(dfx canister id favorite_main)
 export PROFILE_PRINCIPAL=$(dfx canister id profile)
 export PROJECT_MAIN_PRINCIPAL=$(dfx canister id project_main)
 export SNAP_MAIN_PRINCIPAL=$(dfx canister id snap_main)
-
-# # front end
-# dfx deploy dsign_assets
 
 # initialize canisters
 dfx canister call canister_ids_ledger authorize_ids "(
