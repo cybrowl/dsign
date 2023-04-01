@@ -52,7 +52,7 @@ dfx canister call canister_ids_ledger authorize_ids "(
     }
 )"
 
-source ./set_canister_ids_ledger.sh
+source ./scripts/set_canister_ids_ledger.sh
 
 dfx canister call profile initialize_canisters 
 
