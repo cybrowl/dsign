@@ -40,6 +40,8 @@ export PROJECT_MAIN_PRINCIPAL=$(dfx canister id project_main)
 export SNAP_MAIN_PRINCIPAL=$(dfx canister id snap_main)
 
 # initialize canisters
+dfx canister call canister_ids_ledger start_log_timer
+
 dfx canister call canister_ids_ledger authorize_ids "(
     vec {
         \"${EXPLORE_PRINCIPAL}\";

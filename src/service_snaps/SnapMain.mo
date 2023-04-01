@@ -498,10 +498,6 @@ actor SnapMain {
 		let has_image_assets_canister_id : Bool = image_assets_canister_id.size() > 0;
 		let has_snap_canister_id : Bool = snap_canister_id.size() > 0;
 
-		if (has_assets_canister_id == true and has_image_assets_canister_id == true and has_snap_canister_id == true) {
-			return;
-		};
-
 		let project_main_principal = Principal.fromText(project_main_canister_id);
 		let favorite_main_principal = Principal.fromText(favorite_main_canister_id);
 

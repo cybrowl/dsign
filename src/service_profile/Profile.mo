@@ -125,7 +125,7 @@ actor Profile = {
 			usernames.put(caller, username);
 			username_owners.put(username, caller);
 
-			// ignore Logger.log_event(tags, "created");
+			ignore Logger.log_event(tags, "created");
 
 			// create profile
 			let profile : Profile = {
