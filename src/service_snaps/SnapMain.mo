@@ -523,6 +523,10 @@ actor SnapMain {
 
 			ignore Logger.log_event(tags, "created snap_canister_id: " # snap_canister_id);
 		};
+
+		let child_canister_ids = assets_canister_id # "," # image_assets_canister_id # "," # snap_canister_id;
+
+		ignore Logger.log_event(tags, "exists child_canister_ids: " # child_canister_ids);
 	};
 
 	public shared func health() : async Payload {
