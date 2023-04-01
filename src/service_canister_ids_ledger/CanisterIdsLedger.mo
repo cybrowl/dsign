@@ -37,7 +37,20 @@ actor CanisterIdsLedger = {
 
 	// ------------------------- CanisterIdsLedger Methods -------------------------
 	public shared ({ caller }) func save_canister(canister_child : CanisterInfo) : async Text {
+		// check if canister exists before adding
+		let canister_exists = List.some<CanisterInfo>(
+			canisters,
+			func(info : CanisterInfo) : Bool {
+				return Text.equal(info.id, canister_child.id);
+			}
+		);
+
+		if (canister_exists == true) {
+			return "Canister already exists";
+		};
+
 		if (is_prod == false) {
+
 			canisters := List.push<CanisterInfo>(canister_child, canisters);
 
 			return "Added for Dev";
@@ -123,8 +136,14 @@ actor CanisterIdsLedger = {
 		return exists;
 	};
 
-	// public shared ({ caller }) func drop_canister(n : Nat) : async () {
-	//     canisters := List.drop<CanisterInfo>(canisters, n);
+	// public shared ({ caller }) func drop_canister() : async () {
+	//     // Filter the list of canisters to only include those with isProd = true
+	//     canisters := List.filter<CanisterInfo>(
+	//         canisters,
+	//         func(canister : CanisterInfo) : Bool {
+	//             return canister.isProd; // Keep only canisters where isProd is true
+	//         }
+	//     );
 
 	//     return ();
 	// };
@@ -132,20 +151,12 @@ actor CanisterIdsLedger = {
 	// This function logs the health status of multiple canisters by iterating over a list of canister IDs
 	// and calling the health() method on the corresponding actor object.
 	func log_canisters_health() : async () {
-		let all_canister_children = List.toArray<CanisterInfo>(canisters);
+		let all_canisters = List.toArray<CanisterInfo>(canisters);
 
-		// note: not sure how Iter over records
+		for (canister in all_canisters.vals()) {
+			let canister_actor = actor (canister.id) : CanisterActor;
 
-		for (canister in all_canister_children.vals()) {
-			let canister_child_actor = actor (canister.id) : CanisterActor;
-
-			ignore canister_child_actor.health();
-		};
-
-		for (canister_id in authorized.vals()) {
-			let canister_child_actor = actor (canister_id) : CanisterActor;
-
-			ignore canister_child_actor.health();
+			ignore canister_actor.health();
 		};
 
 		return ();

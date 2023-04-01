@@ -52,6 +52,8 @@ dfx canister call canister_ids_ledger authorize_ids "(
     }
 )"
 
+source ./set_canister_ids_ledger.sh
+
 dfx canister call profile initialize_canisters 
 
 dfx canister call snap_main set_canister_ids \
