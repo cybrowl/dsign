@@ -509,28 +509,19 @@ actor SnapMain {
 		if (has_assets_canister_id == false) {
 			await create_assets_canister(snap_main_principal, is_prod);
 
-			ignore Logger.log_event(
-				tags,
-				debug_show (("created, assets_canister_id: ", assets_canister_id))
-			);
+			ignore Logger.log_event(tags, "created assets_canister_id: " # assets_canister_id);
 		};
 
 		if (has_image_assets_canister_id == false) {
 			await create_image_assets_canister(snap_main_principal, is_prod);
 
-			ignore Logger.log_event(
-				tags,
-				debug_show (("created, image_assets_canister_id: ", image_assets_canister_id))
-			);
+			ignore Logger.log_event(tags, "created image_assets_canister_id: " # image_assets_canister_id);
 		};
 
 		if (has_snap_canister_id == false) {
 			await create_snap_canister(snap_main_principal, project_main_principal, favorite_main_principal, is_prod);
 
-			ignore Logger.log_event(
-				tags,
-				debug_show (("created, snap_canister_id: ", snap_canister_id))
-			);
+			ignore Logger.log_event(tags, "created snap_canister_id: " # snap_canister_id);
 		};
 	};
 
