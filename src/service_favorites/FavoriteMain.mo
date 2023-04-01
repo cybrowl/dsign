@@ -243,20 +243,16 @@ actor FavoriteMain {
 		);
 
 		if (favorite_canister_id.size() > 1) {
-			ignore Logger.log_event(
-				tags,
-				debug_show (("favorite_canister_id already set: ", favorite_canister_id))
-			);
+			ignore Logger.log_event(tags, "exists favorite_canister_id: " # favorite_canister_id);
 
 			return favorite_canister_id;
 		} else {
-			ignore Logger.log_event(tags, debug_show ("no arg, creating favorite_canister_id"));
-
 			await create_favorite_canister(favorite_main_principal, is_prod);
+
+			ignore Logger.log_event(tags, "created favorite_canister_id: " # favorite_canister_id);
 
 			return favorite_canister_id;
 		};
-
 	};
 
 	public shared func health() : async Payload {

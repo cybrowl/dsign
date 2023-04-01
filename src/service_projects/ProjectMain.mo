@@ -464,16 +464,14 @@ actor ProjectMain {
 		);
 
 		if (project_canister_id.size() > 1) {
-			ignore Logger.log_event(
-				tags,
-				debug_show (("project_canister_id already set: ", project_canister_id))
-			);
+			ignore Logger.log_event(tags, "exists project_canister_id: " # project_canister_id);
 
 			return project_canister_id;
 		} else {
-			ignore Logger.log_event(tags, debug_show ("no arg, creating project_canister_id"));
-
 			await create_project_canister(project_main_principal, is_prod);
+
+			ignore Logger.log_event(tags, "created project_canister_id: " # project_canister_id);
+
 			return project_canister_id;
 		};
 	};

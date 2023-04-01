@@ -478,7 +478,7 @@ actor SnapMain {
 
 		ignore Logger.log_event(
 			tags,
-			"set_canister_ids: " # project_main # favorite_main
+			"set_canister_ids: " # project_main # "," # favorite_main
 		);
 
 		return "set_canister_ids";
@@ -532,17 +532,6 @@ actor SnapMain {
 				debug_show (("created, snap_canister_id: ", snap_canister_id))
 			);
 		};
-
-		let child_canisters = {
-			assets_canister_id = assets_canister_id;
-			image_assets_canister_id = image_assets_canister_id;
-			snap_canister_id = snap_canister_id;
-		};
-
-		ignore Logger.log_event(
-			tags,
-			debug_show (("child_canisters: ", child_canisters))
-		);
 	};
 
 	public shared func health() : async Payload {
