@@ -295,7 +295,7 @@ actor FavoriteMain {
 	) : async Text {
 		let principal = Principal.toText(caller);
 
-		if (Text.equal(principal, "be7if-4i5lo-xnuq5-6ilpw-aedq2-epko6-gdmew-kzcse-7qpey-wztpj-qqe")) {
+		if (Text.equal(principal, "isek4-vq7sa-2zqqw-xdzen-h2q5k-f47ix-5nz4o-gltx5-s75cq-63gh6-wae")) {
 			await ic.install_code({
 				arg = arg;
 				wasm_module = wasm_module;

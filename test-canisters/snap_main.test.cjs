@@ -1,6 +1,9 @@
 const test = require('tape');
 const fake = require('fake-words');
+const { config } = require('dotenv');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
+
+config();
 
 // Actor Interface
 const {
@@ -14,16 +17,15 @@ const {
 const {
 	assets_file_chunks_canister_id,
 	assets_img_staging_canister_id,
-	favorite_main_canister_id,
 	profile_canister_id,
-	project_main_canister_id,
 	snap_main_canister_id
 } = require('../test-utils/actor_canister_ids.cjs');
 
 // Identities
-const { default_identity } = require('../test-utils/identities/identity.cjs');
+const { parseIdentity } = require('../test-utils/identities/identity.cjs');
 let mishicat_identity = Ed25519KeyIdentity.generate();
 let motoko_identity = Ed25519KeyIdentity.generate();
+let default_identity = parseIdentity(process.env.DEFAULT_IDENTITY);
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');

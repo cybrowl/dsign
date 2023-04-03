@@ -8,8 +8,8 @@ test('DFX Config: generateCanisterAliases()', async function (t) {
 		'local-canister-ids': '/Users/cyberowl/Projects/dsign/.dfx/local/canister_ids.json',
 		$IDLdsign_assets:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/dsign_assets.did.js',
-		$IDLassets_file_chunks:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/assets_file_chunks/assets_file_chunks.did.js',
+		$IDLassets_file_staging:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/assets_file_staging/assets_file_staging.did.js',
 		$IDLassets_img_staging:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/assets_img_staging/assets_img_staging.did.js',
 		$IDLcanister_ids_ledger:

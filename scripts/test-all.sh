@@ -9,5 +9,5 @@ npm run test-p
 # snaps
 npm run test-sm
 
-# snaps
+# projects
 npm run test-pm

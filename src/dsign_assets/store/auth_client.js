@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 import { AuthClient } from '@dfinity/auth-client';
 
 import {
-	actor_assets_file_chunks,
+	actor_assets_file_staging,
 	actor_assets_img_staging,
 	actor_explore,
 	actor_favorite_main,
@@ -14,15 +14,15 @@ import {
 
 export const auth_client = writable({});
 
-export const auth_assets_file_chunks = async () => {
+export const auth_assets_file_staging = async () => {
 	const authClient = await AuthClient.create();
 	const isAuthenticated = await authClient.isAuthenticated();
 
 	if (isAuthenticated) {
-		actor_assets_file_chunks.update(() => ({
+		actor_assets_file_staging.update(() => ({
 			loggedIn: true,
 			actor: createActor({
-				actor_name: 'assets_file_chunks',
+				actor_name: 'assets_file_staging',
 				identity: authClient.getIdentity()
 			})
 		}));
@@ -124,10 +124,10 @@ export const auth_logout_all = async () => {
 	const isAuthenticated = await authClient.isAuthenticated();
 
 	if (isAuthenticated === false) {
-		actor_assets_file_chunks.update(() => ({
+		actor_assets_file_staging.update(() => ({
 			loggedIn: false,
 			actor: createActor({
-				actor_name: 'assets_file_chunks',
+				actor_name: 'assets_file_staging',
 				identity: authClient.getIdentity()
 			})
 		}));

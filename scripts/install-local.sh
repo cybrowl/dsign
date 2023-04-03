@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# asset chunks
-dfx deploy assets_file_chunks
+# asset staging
+dfx deploy assets_file_staging
 
 # image asset staging
 dfx deploy assets_img_staging
@@ -79,8 +79,8 @@ dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principa
 # dfx canister --network ic call canister_ids_ledger save_canister \
 # '(record {
 #     created = 1_670_321_001_063_287_000; 
-#     id = "72zia-7aaaa-aaaag-aa37a-cai"; 
-#     name = "Explore"; 
+#     id = "a7b5k-xiaaa-aaaag-aa6ja-cai"; 
+#     name = "FavoriteMain"; 
 #     parent_name = "root"; 
 #     isProd = true;
 #     })'

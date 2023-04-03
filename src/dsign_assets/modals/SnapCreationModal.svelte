@@ -7,12 +7,12 @@
 	import Modal from 'dsign-components/components/Modal.svelte';
 
 	import {
-		actor_assets_file_chunks,
+		actor_assets_file_staging,
 		actor_assets_img_staging,
 		actor_snap_main
 	} from '$stores_ref/actors';
 	import {
-		auth_assets_file_chunks,
+		auth_assets_file_staging,
 		auth_assets_img_staging,
 		auth_snap_main
 	} from '$stores_ref/auth_client';
@@ -23,7 +23,7 @@
 	let is_publishing = false;
 
 	onMount(async () => {
-		await Promise.all([auth_assets_file_chunks(), auth_assets_img_staging(), auth_snap_main()]);
+		await Promise.all([auth_assets_file_staging(), auth_assets_img_staging(), auth_snap_main()]);
 	});
 
 	onDestroy(() => (is_publishing = false));
@@ -55,7 +55,7 @@
 
 	async function commitFileAssetChunks(snap) {
 		const uploadChunk = async ({ chunk, file_name }) => {
-			return $actor_assets_file_chunks.actor.create_chunk({
+			return $actor_assets_file_staging.actor.create_chunk({
 				data: [...chunk],
 				file_name: file_name
 			});
@@ -97,7 +97,7 @@
 		is_publishing = true;
 
 		if (
-			$actor_assets_file_chunks.loggedIn &&
+			$actor_assets_file_staging.loggedIn &&
 			$actor_assets_img_staging.loggedIn &&
 			$actor_snap_main.loggedIn
 		) {

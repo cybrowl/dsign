@@ -464,7 +464,7 @@ actor Profile = {
 		wasm_module : Blob
 	) : async Text {
 		let principal = Principal.toText(caller);
-		let authorized : Bool = Text.equal(principal, "be7if-4i5lo-xnuq5-6ilpw-aedq2-epko6-gdmew-kzcse-7qpey-wztpj-qqe");
+		let authorized : Bool = Text.equal(principal, "isek4-vq7sa-2zqqw-xdzen-h2q5k-f47ix-5nz4o-gltx5-s75cq-63gh6-wae");
 
 		let tags = [
 			("actor_name", ACTOR_NAME),

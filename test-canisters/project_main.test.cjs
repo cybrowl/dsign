@@ -1,7 +1,10 @@
 const test = require('tape');
 const fake = require('fake-words');
+const { config } = require('dotenv');
 
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
+
+config();
 
 // Actor Interface
 const {
@@ -22,8 +25,9 @@ const {
 } = require('../test-utils/actor_canister_ids.cjs');
 
 // Identities
+// const { parseIdentity } = require('../test-utils/identities/identity.cjs');
 let mishicat_identity = Ed25519KeyIdentity.generate();
-const { default_identity } = require('../test-utils/identities/identity.cjs');
+// let default_identity = parseIdentity(process.env.DEFAULT_IDENTITY);
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
@@ -68,12 +72,6 @@ test('Setup Actors', async function () {
 		mishicat_identity
 	);
 
-	project_main_actor.defualt = await get_actor(
-		project_main_canister_id,
-		project_main_interface,
-		default_identity
-	);
-
 	project_actor.mishicat = await get_actor(
 		test_project_canister_id,
 		test_project_interface,
@@ -115,6 +113,14 @@ test('Project[mishicat].delete_snaps_from_project(): with wrong caller => #err -
 });
 
 // CREATE SNAP
+test('Profile[mishicat].create_username(): with valid username => #ok - username', async function (t) {
+	const username = fake.word();
+
+	const { ok: username_ } = await profile_actors.mishicat.create_username(username.toLowerCase());
+
+	t.equal(username_, username.toLowerCase());
+});
+
 test('SnapMain[mishicat].create_user_snap_storage(): should create initial storage for snaps => #ok - true', async function (t) {
 	const response = await snap_main_actor.mishicat.create_user_snap_storage();
 
@@ -139,14 +145,6 @@ test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - 
 	} catch (error) {
 		console.log('error: ', error);
 	}
-});
-
-test('Profile[mishicat].create_username(): with valid username => #ok - username', async function (t) {
-	const username = fake.word();
-
-	const { ok: username_ } = await profile_actors.mishicat.create_username(username.toLowerCase());
-
-	t.equal(username_, username.toLowerCase());
 });
 
 test('SnapMain[mishicat].create_snap(): should create snap without file asset => #ok - snap', async function (t) {
@@ -249,8 +247,6 @@ test('ProjectMain[mishicat].create_project(): with snap => #ok - project', async
 	const snaps = [{ id: snap.id, canister_id: snap.canister_id }];
 	const response = await project_main_actor.mishicat.create_project('Project One', [snaps]);
 
-	console.log('response: ', response);
-
 	t.deepEqual(response.ok, 'Created Project');
 });
 
@@ -262,10 +258,7 @@ test('ProjectMain[mishicat].create_project(): with no snaps => #ok - project', a
 });
 
 test('ProjectMain[mishicat].get_all_projects(): should have both projects => #ok - projects', async function (t) {
-	let { ok: projects, err: error } = await project_main_actor.mishicat.get_all_projects([]);
-
-	console.log('projects: ', projects);
-	console.log('error: ', error);
+	let { ok: projects } = await project_main_actor.mishicat.get_all_projects([]);
 
 	let first_project = projects[0];
 	let second_project = projects[1];
@@ -297,7 +290,7 @@ test('SnapMain[mishicat].get_all_snaps(): should have project as part of snap', 
 
 	const project = snaps[0].project[0];
 
-	t.equal(project.name, 'Project One');
+	t.equal(project.name, 'Updated Project One');
 	t.equal(project.id.length > 0, true);
 });
 

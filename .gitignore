@@ -12,6 +12,9 @@
 # vessel
 .vessel
 
+# env
+.env
+
 #locks
 package-lock.json
 

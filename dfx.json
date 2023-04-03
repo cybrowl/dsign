@@ -8,7 +8,7 @@
 			"source": ["build"],
 			"type": "assets"
 		},
-		"assets_file_chunks": {
+		"assets_file_staging": {
 			"main": "src/service_assets/FileAssetChunksStaging.mo",
 			"type": "motoko",
 			"dependencies": ["health_metrics", "logger", "canister_ids_ledger"]
@@ -52,7 +52,7 @@
 			"main": "src/service_snaps/SnapMain.mo",
 			"type": "motoko",
 			"dependencies": [
-				"assets_file_chunks",
+				"assets_file_staging",
 				"assets_img_staging",
 				"canister_ids_ledger",
 				"health_metrics",
@@ -68,7 +68,7 @@
 		"test_assets": {
 			"main": "src/service_assets/Assets.mo",
 			"type": "motoko",
-			"dependencies": ["health_metrics", "logger", "assets_file_chunks"]
+			"dependencies": ["health_metrics", "logger", "assets_file_staging"]
 		},
 		"test_favorite": {
 			"main": "src/service_favorites/Favorite.mo",

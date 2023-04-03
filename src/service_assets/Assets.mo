@@ -14,7 +14,7 @@ import Time "mo:base/Time";
 import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
-import FileAssetChunks "canister:assets_file_chunks";
+import FileAssetStaging "canister:assets_file_staging";
 import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 
@@ -57,7 +57,7 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 
 		// get all chunks and check if owners match
 		for (chunk_id in args.chunk_ids.vals()) {
-			switch (await FileAssetChunks.get_chunk(chunk_id, args.principal)) {
+			switch (await FileAssetStaging.get_chunk(chunk_id, args.principal)) {
 				case (#ok chunk) {
 
 					asset_data.add(chunk.data);
@@ -103,7 +103,7 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 
 		assets.put(asset_id, asset);
 
-		ignore FileAssetChunks.delete_chunks(args.chunk_ids, owner);
+		ignore FileAssetStaging.delete_chunks(args.chunk_ids, owner);
 
 		let asset_ref : Types.AssetRef = {
 			url = asset_url;

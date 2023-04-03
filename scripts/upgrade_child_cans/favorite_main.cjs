@@ -2,10 +2,10 @@ const { Principal } = require('@dfinity/principal');
 const { IDL } = require('@dfinity/candid');
 const { readFileSync } = require('fs');
 const { HttpAgent, Actor } = require('@dfinity/agent');
-const { Secp256k1KeyIdentity } = require('@dfinity/identity');
-const sha256 = require('sha256');
-const fs = require('fs');
-const Path = require('path');
+const { config } = require('dotenv');
+const { Ed25519KeyIdentity } = require('@dfinity/identity');
+
+config();
 
 const {
 	canister_ids_ledger_interface,
@@ -19,36 +19,14 @@ const canister_ids = require('../../canister_ids.json');
 
 global.fetch = fetch;
 
-const parseIdentity = (keyPath) => {
-	const rawKey = fs
-		.readFileSync(keyPath)
-		.toString()
-		.replace('-----BEGIN PRIVATE KEY-----', '')
-		.replace('-----END PRIVATE KEY-----', '')
-		.trim();
-
-	const rawBuffer = Uint8Array.from(rawKey).buffer;
-
-	const privKey = Uint8Array.from(sha256(rawBuffer, { asBytes: true }));
+const parseIdentity = (privateKeyHex) => {
+	const privateKey = Uint8Array.from(Buffer.from(privateKeyHex, 'hex'));
 
 	// Initialize an identity from the secret key
-	return Secp256k1KeyIdentity.fromSecretKey(Uint8Array.from(privKey).buffer);
+	return Ed25519KeyIdentity.fromSecretKey(privateKey);
 };
 
-let identity_path = Path.join(
-	__dirname,
-	'..',
-	'..',
-	'..',
-	'..',
-	'.config',
-	'dfx',
-	'identity',
-	'cyberowl',
-	'identity.pem'
-);
-
-const dev_identity = parseIdentity(identity_path);
+const dev_identity = parseIdentity(process.env.ADMIN_IDENTITY);
 
 const get_wasm = (name) => {
 	const buffer = readFileSync(`${process.cwd()}/.dfx/local/canisters/${name}/${name}.wasm`);
@@ -78,7 +56,7 @@ const get_actor = async (canisterId, can_interface, is_prod) => {
 const installCode = async () => {
 	console.log('Installing canisters...');
 
-	let run_in_prod = false;
+	let run_in_prod = process.env.DEPLOY_ENV === 'prod' ? true : false;
 
 	if (run_in_prod === false) {
 		console.log('======== Installing Local Favorite Main Child Canisters =========');

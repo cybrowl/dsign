@@ -1,12 +1,9 @@
 {
-	"assets_file_chunks": {
+	"assets_file_staging": {
 		"ic": "jfpyd-maaaa-aaaag-aatxq-cai"
 	},
 	"assets_img_staging": {
 		"ic": "jlnvl-xqaaa-aaaag-aatwq-cai"
-	},
-	"canister_child_ledger": {
-		"ic": "7t2d4-jiaaa-aaaag-aa36q-cai"
 	},
 	"canister_ids_ledger": {
 		"ic": "k25dy-3yaaa-aaaag-abcpa-cai"

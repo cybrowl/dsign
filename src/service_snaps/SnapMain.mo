@@ -12,7 +12,7 @@ import Result "mo:base/Result";
 
 import Assets "../service_assets/Assets";
 import CanisterIdsLedger "canister:canister_ids_ledger";
-import FileAssetChunks "canister:assets_file_chunks";
+import FileAssetStaging "canister:assets_file_staging";
 import HealthMetrics "canister:health_metrics";
 import ImageAssets "../service_assets_img/ImageAssets";
 import ImageAssetStaging "canister:assets_img_staging";
@@ -202,7 +202,7 @@ actor SnapMain {
 					case (#ok file_asset_) {
 						file_asset := file_asset_;
 
-						ignore FileAssetChunks.delete_chunks(fileAsset.chunk_ids, caller);
+						ignore FileAssetStaging.delete_chunks(fileAsset.chunk_ids, caller);
 					};
 				};
 			};
@@ -551,7 +551,7 @@ actor SnapMain {
 	) : async Text {
 		let principal = Principal.toText(caller);
 
-		if (Text.equal(principal, "be7if-4i5lo-xnuq5-6ilpw-aedq2-epko6-gdmew-kzcse-7qpey-wztpj-qqe")) {
+		if (Text.equal(principal, "isek4-vq7sa-2zqqw-xdzen-h2q5k-f47ix-5nz4o-gltx5-s75cq-63gh6-wae")) {
 			await ic.install_code({
 				arg = arg;
 				wasm_module = wasm_module;
@@ -562,7 +562,7 @@ actor SnapMain {
 			return "success";
 		};
 
-		return "not_authorized";
+		return "not authorized";
 	};
 
 	// ------------------------- SYSTEM METHODS -------------------------

@@ -1,5 +1,5 @@
 import { Actor, HttpAgent } from '@dfinity/agent';
-import { idlFactory as idl_assets_file_chunks } from '$IDLassets_file_chunks';
+import { idlFactory as idl_assets_file_staging } from '$IDLassets_file_staging';
 import { idlFactory as idl_assets_img_staging } from '$IDLassets_img_staging';
 import { idlFactory as idl_explore } from '$IDLexplore';
 import { idlFactory as idl_favorite_main } from '$IDLfavorite_main';
@@ -23,7 +23,7 @@ export function createActor(options) {
 	const agentOptions = { host };
 
 	const idl_reference = {
-		assets_file_chunks: idl_assets_file_chunks,
+		assets_file_staging: idl_assets_file_staging,
 		assets_img_staging: idl_assets_img_staging,
 		explore: idl_explore,
 		favorite_main: idl_favorite_main,
@@ -53,9 +53,9 @@ export function createActor(options) {
 	});
 }
 
-export const actor_assets_file_chunks = writable({
+export const actor_assets_file_staging = writable({
 	loggedIn: false,
-	actor: createActor({ actor_name: 'assets_file_chunks' })
+	actor: createActor({ actor_name: 'assets_file_staging' })
 });
 
 export const actor_assets_img_staging = writable({
