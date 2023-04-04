@@ -225,6 +225,7 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
 			("parent", Principal.toText(controller)),
+			("canister_id", Principal.toText(Principal.fromActor(this))),
 			("assets_size", Int.toText(assets.size())),
 			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
 			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
