@@ -3,6 +3,7 @@ import Buffer "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
+import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
@@ -419,6 +420,20 @@ actor ProjectMain {
 	};
 
 	public shared func health() : async Payload {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("user_canisters_ref_num", Int.toText(user_canisters_ref.size())),
+			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
+			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
+
 		let log_payload : Payload = {
 			metrics = [
 				("user_can_refs", user_canisters_ref.size()),
