@@ -27,7 +27,7 @@ dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} test_image_assets --argument='(pri
 dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principal "'${PROJECT_MAIN_PRINCIPAL}'", principal "'${FAVORITE_MAIN_PRINCIPAL}'")'
 dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} snap_main
 
-dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call snap_main initialize_canisters
+# dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call snap_main initialize_canisters
 
 # Check version
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call test_assets version

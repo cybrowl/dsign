@@ -61,13 +61,13 @@ const installCode = async () => {
 	if (run_in_prod === false) {
 		console.log('======== Installing Local Project Main Child Canisters =========');
 
-		const canister_child_ledger_actor = await get_actor(
+		const canister_ids_ledger_actor = await get_actor(
 			canister_ids_ledger_canister_id,
 			canister_ids_ledger_interface,
 			false
 		);
 
-		const canister_children = await canister_child_ledger_actor.get_canisters();
+		const canister_children = await canister_ids_ledger_actor.get_canisters();
 
 		const project_main_canisters = canister_children.filter((canister) => {
 			return canister.parent_name == 'ProjectMain';
@@ -106,13 +106,13 @@ const installCode = async () => {
 	} else {
 		console.log('======== Installing Prod Project Main Child Canisters =========');
 
-		const canister_child_ledger_actor = await get_actor(
-			canister_ids['canister_child_ledger'].ic,
+		const canister_ids_ledger_actor = await get_actor(
+			canister_ids['canister_ids_ledger'].ic,
 			canister_ids_ledger_interface,
 			true
 		);
 
-		const canister_children = await canister_child_ledger_actor.get_canisters();
+		const canister_children = await canister_ids_ledger_actor.get_canisters();
 
 		const project_main_canisters = canister_children.filter((canister) => {
 			return canister.parent_name == 'ProjectMain';

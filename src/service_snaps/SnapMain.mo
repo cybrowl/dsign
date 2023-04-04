@@ -70,7 +70,6 @@ actor SnapMain {
 	// this doesn't change after init
 	stable var project_main_canister_id : Text = "";
 	stable var favorite_main_canister_id : Text = "";
-	stable var health_metrics_canister_id : Text = "";
 
 	private let ic : ICInterface = actor "aaaaa-aa";
 
@@ -493,6 +492,11 @@ actor SnapMain {
 			Principal.toText(snap_main_principal),
 			"lyswl-7iaaa-aaaag-aatya-cai"
 		);
+
+		if (is_prod == true) {
+			project_main_canister_id := "nhlnj-vyaaa-aaaag-aay5q-cai";
+			favorite_main_canister_id := "a7b5k-xiaaa-aaaag-aa6ja-cai";
+		};
 
 		let has_assets_canister_id : Bool = assets_canister_id.size() > 0;
 		let has_image_assets_canister_id : Bool = image_assets_canister_id.size() > 0;
