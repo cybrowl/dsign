@@ -1,6 +1,7 @@
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
+import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
@@ -307,6 +308,21 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	};
 
 	public shared func health() : async Payload {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("canister_id", Principal.toText(Principal.fromActor(this))),
+			("snaps_size", Int.toText(snaps.size())),
+			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
+			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
+
 		let log_payload : Payload = {
 			metrics = [
 				("snaps_num", snaps.size()),

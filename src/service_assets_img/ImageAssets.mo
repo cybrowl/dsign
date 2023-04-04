@@ -2,6 +2,7 @@ import { Buffer; toArray } "mo:base/Buffer";
 import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
+import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
 import Principal "mo:base/Principal";
@@ -189,6 +190,21 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	};
 
 	public shared func health() : async Payload {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("parent", Principal.toText(controller)),
+			("image_assets_size", Int.toText(image_assets.size())),
+			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
+			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
+
 		let log_payload : Payload = {
 			metrics = [
 				("images_num", image_assets.size()),

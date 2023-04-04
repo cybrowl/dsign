@@ -1,5 +1,6 @@
 import { Buffer; toArray } "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
+import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
@@ -7,6 +8,7 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import HealthMetrics "canister:health_metrics";
+import Logger "canister:logger";
 
 import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
@@ -86,6 +88,21 @@ actor class Favorite(favorite_main : Principal) = this {
 	};
 
 	public shared func health() : async Payload {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("canister_id", Principal.toText(Principal.fromActor(this))),
+			("snaps_size", Int.toText(snaps.size())),
+			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
+			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
+
 		let log_payload : Payload = {
 			metrics = [
 				("favorites_num", snaps.size()),
