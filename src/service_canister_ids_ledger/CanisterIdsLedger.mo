@@ -34,6 +34,7 @@ actor CanisterIdsLedger = {
 	stable var authorized_stable_storage : [(Text, Text)] = [];
 
 	stable var is_prod : Bool = false;
+	stable var timer_id : Nat = 0;
 
 	// ------------------------- CanisterIdsLedger Methods -------------------------
 	public shared ({ caller }) func save_canister(canister_child : CanisterInfo) : async Text {
@@ -183,9 +184,22 @@ actor CanisterIdsLedger = {
 		);
 	};
 
-	public func start_log_timer() : async Timer.TimerId {
+	public func start_log_canisters_health() : async Timer.TimerId {
+		if (timer_id == 0) {
+			timer_id := 1;
 
-		return Timer.recurringTimer(#seconds(60), log_canisters_health);
+			return Timer.recurringTimer(#seconds(60), log_canisters_health);
+		} else {
+			return timer_id;
+		};
+	};
+
+	public func stop_log_canisters_health() : async Timer.TimerId {
+		timer_id := 0;
+
+		Timer.cancelTimer(1);
+
+		return 0;
 	};
 
 	// ------------------------- System Methods -------------------------

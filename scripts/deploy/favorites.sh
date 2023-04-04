@@ -20,8 +20,11 @@ fi
 export FAVORITE_MAIN_PRINCIPAL=$(dfx canister ${DEPLOY_NETWORK} id favorite_main)
 
 # Deploy
-dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} test_favorite --argument='(principal "'${FAVORITE_MAIN_PRINCIPAL}'")'
 dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} favorite_main
+
+# Build Child Canister
+dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} test_favorite --argument='(principal "'${FAVORITE_MAIN_PRINCIPAL}'")'
+
 
 # Check version
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call test_favorite version
