@@ -505,6 +505,8 @@ actor SnapMain {
 		let project_main_principal = Principal.fromText(project_main_canister_id);
 		let favorite_main_principal = Principal.fromText(favorite_main_canister_id);
 
+		ignore Logger.log_event(tags, "main_ids: " # project_main_canister_id # "," # favorite_main_canister_id);
+
 		// create canisters
 		if (has_assets_canister_id == false) {
 			await create_assets_canister(snap_main_principal, is_prod);
