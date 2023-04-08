@@ -20,8 +20,7 @@
 		},
 		"canister_ids_ledger": {
 			"main": "src/service_canister_ids_ledger/CanisterIdsLedger.mo",
-			"type": "motoko",
-			"dependencies": ["logger"]
+			"type": "motoko"
 		},
 		"explore": {
 			"main": "src/service_explore/Explore.mo",
@@ -63,7 +62,8 @@
 		},
 		"logger": {
 			"main": "src/service_logger/logger.mo",
-			"type": "motoko"
+			"type": "motoko",
+			"dependencies": ["canister_ids_ledger"]
 		},
 		"test_assets": {
 			"main": "src/service_assets/Assets.mo",

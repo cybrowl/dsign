@@ -12,12 +12,12 @@ import CanisterLedgerTypes "../types/canidster_ids_ledger.types";
 import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
 
-import Logger "canister:logger";
-
 import UtilsShared "../utils/utils";
 
 actor CanisterIdsLedger = {
 	type CanisterActor = Types.CanisterActor;
+	type LoggerActor = Types.LoggerActor;
+
 	type CanisterIds = Types.CanisterIds;
 	type CanisterInfo = CanisterLedgerTypes.CanisterInfo;
 
@@ -35,6 +35,7 @@ actor CanisterIdsLedger = {
 
 	stable var is_prod : Bool = false;
 	stable var timer_id : Nat = 0;
+	stable var logger_canister_id : Text = "qoctq-giaaa-aaaaa-aaaea-cai";
 
 	// ------------------------- CanisterIdsLedger Methods -------------------------
 	public shared ({ caller }) func save_canister(canister_child : CanisterInfo) : async Text {
@@ -55,8 +56,6 @@ actor CanisterIdsLedger = {
 			return "Canister already exists";
 		};
 
-		ignore Logger.log_event(tags, "caller: " # Principal.toText(caller));
-
 		switch (authorized.get(Principal.toText(caller))) {
 			case (null) {
 				return "Not Authorized";
@@ -64,7 +63,7 @@ actor CanisterIdsLedger = {
 			case (?principal) {
 				canisters := List.push<CanisterInfo>(canister_child, canisters);
 
-				return "Added for Prod";
+				return "Added Canister";
 			};
 		};
 	};
@@ -89,11 +88,6 @@ actor CanisterIdsLedger = {
 			authorized.put(id, id);
 		};
 
-		ignore Logger.log_event(
-			tags,
-			"authorize_ids"
-		);
-
 		return "authorized";
 	};
 
@@ -103,6 +97,17 @@ actor CanisterIdsLedger = {
 
 	public query func get_authorized() : async [Text] {
 		return Iter.toArray(authorized.vals());
+	};
+
+	public query func canister_exists(id : Text) : async Bool {
+		let exists = List.some<CanisterInfo>(
+			canisters,
+			func(info : CanisterInfo) : Bool {
+				return Text.equal(info.id, id);
+			}
+		);
+
+		return exists;
 	};
 
 	// This function logs the health status of multiple canisters by iterating over a list of canister IDs
@@ -134,10 +139,9 @@ actor CanisterIdsLedger = {
 			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
 		];
 
-		ignore Logger.log_event(
-			tags,
-			"health"
-		);
+		let logger_actor = actor (logger_canister_id) : LoggerActor;
+
+		ignore logger_actor.log_event(tags, "health");
 	};
 
 	public func start_log_canisters_health() : async Timer.TimerId {

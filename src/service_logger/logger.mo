@@ -11,12 +11,18 @@ import Time "mo:base/Time";
 import Timer "mo:base/Timer";
 import Result "mo:base/Result";
 
+import CanisterIdsLedger "canister:canister_ids_ledger";
+
 import ICTypes "../types/ic.types";
+import CanisterLedgerTypes "../types/canidster_ids_ledger.types";
+
 import UtilsShared "../utils/utils";
 
 actor Logger {
 	public type Tags = [(Text, Text)];
 	public type Message = Text;
+	type CanisterInfo = CanisterLedgerTypes.CanisterInfo;
+
 	type AuthorizationError = { #NotAuthorized : Bool };
 
 	public type LogEvent = {
@@ -53,8 +59,13 @@ actor Logger {
 		};
 	};
 
-	public shared (msg) func log_event(tags : Tags, message : Message) : async () {
-		//TODO: lock it for only authorized canisters
+	public shared ({ caller }) func log_event(tags : Tags, message : Message) : async () {
+		let authorized = await CanisterIdsLedger.canister_exists(Principal.toText(caller));
+
+		if (authorized == false) {
+			return ();
+		};
+
 		let profile_principal = Principal.fromActor(Logger);
 
 		var env = "dev";

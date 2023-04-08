@@ -3,7 +3,16 @@ export EXPLORE_PRINCIPAL=$(dfx canister id explore)
 export FAVORITE_MAIN_PRINCIPAL=$(dfx canister id favorite_main)
 export PROFILE_PRINCIPAL=$(dfx canister id profile)
 export PROJECT_MAIN_PRINCIPAL=$(dfx canister id project_main)
-export SNAP_MAIN_PRINCIPAL=$(dfx canister id snap_main)
+export CANISTER_IDS_LEDGER_PRINCIPAL=$(dfx canister id canister_ids_ledger)
+
+dfx canister call canister_ids_ledger save_canister \
+'(record {
+    created = 1_670_321_001_063_287_000; 
+    id = "'${CANISTER_IDS_LEDGER_PRINCIPAL}'"; 
+    name = "CANISTER_IDS_LEDGER"; 
+    parent_name = "root"; 
+    isProd = false;
+    })'
 
 dfx canister call canister_ids_ledger save_canister \
 '(record {

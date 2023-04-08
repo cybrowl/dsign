@@ -16,4 +16,10 @@ module {
 		health : shared () -> async Payload;
 	};
 
+	public type Tags = [(Text, Text)];
+	public type Message = Text;
+
+	public type LoggerActor = actor {
+		log_event : shared (Tags, Message) -> async ();
+	};
 };

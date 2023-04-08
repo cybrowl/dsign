@@ -14,25 +14,25 @@ test('Setup Actors', async function () {
 	logger = await getActor(canisterId, idlFactory, motoko_identity);
 });
 
-test('Logger: version()', async function (t) {
+test('Logger: [motoko].version()', async function (t) {
 	const response = await logger.version();
 
 	t.equal(typeof response, 'bigint', 'The response should be of type number');
 });
 
-test('Logger: get authorize() - should return false meaning authorized person choosen', async function (t) {
+test('Logger: [motoko].authorize() - should return false meaning authorized person choosen', async function (t) {
 	const response = await logger.authorize();
 
 	t.equal(response, true);
 });
 
-test('Logger: get logs() - should not be authorized', async function (t) {
+test('Logger: [motoko].get_logs() - should not be authorized', async function (t) {
 	const { err: error } = await logger.get_logs();
 
 	t.deepEqual(error, { NotAuthorized: true });
 });
 
-test('Logger: get clear_logs() - should not be authorized', async function (t) {
+test('Logger: [motoko].get clear_logs() - should not be authorized', async function (t) {
 	const { err: error } = await logger.clear_logs();
 
 	t.deepEqual(error, { NotAuthorized: true });
