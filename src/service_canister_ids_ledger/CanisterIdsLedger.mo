@@ -105,19 +105,6 @@ actor CanisterIdsLedger = {
 		return Iter.toArray(authorized.vals());
 	};
 
-	public query func canister_exists(canisterPrincipal : Principal) : async Bool {
-		let canisterId : Text = Principal.toText(canisterPrincipal);
-
-		let exists = List.some<CanisterInfo>(
-			canisters,
-			func(info : CanisterInfo) : Bool {
-				return Text.equal(info.id, canisterId);
-			}
-		);
-
-		return exists;
-	};
-
 	// This function logs the health status of multiple canisters by iterating over a list of canister IDs
 	// and calling the health() method on the corresponding actor object.
 	func log_canisters_health() : async () {

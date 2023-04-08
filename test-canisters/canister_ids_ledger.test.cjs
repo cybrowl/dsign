@@ -87,3 +87,16 @@ test('CanisterIdsLedger: [authorized].save_canister(): Canister already exists',
 
 	t.assert(response === 'Canister already exists');
 });
+
+test('CanisterIdsLedger: [authorized].get_canisters(): Canisters', async function (t) {
+	const response = await canister_ids_ledger_actors.authorized.get_canisters();
+
+	t.assert(response.length > 0);
+});
+
+test('CanisterIdsLedger: [authorized].get_authorized(): include TEST_IDENTITY', async function (t) {
+	const response = await canister_ids_ledger_actors.authorized.get_authorized();
+	let exists = response.includes('geyca-lz2jy-mf7bx-a4tt5-o72km-wiz7y-2f57v-pwg7p-5jwzo-ol5nz-rae');
+
+	t.equal(exists, true, 'The specified canister ID should exist in the response');
+});
