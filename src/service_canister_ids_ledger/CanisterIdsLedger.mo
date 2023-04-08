@@ -35,7 +35,8 @@ actor CanisterIdsLedger = {
 
 	stable var is_prod : Bool = false;
 	stable var timer_id : Nat = 0;
-	stable var logger_canister_id : Text = "qoctq-giaaa-aaaaa-aaaea-cai";
+
+	stable var logger_canister_id : Text = "jaypp-oiaaa-aaaag-aaa6q-cai";
 
 	// ------------------------- CanisterIdsLedger Methods -------------------------
 	public shared ({ caller }) func save_canister(canister_child : CanisterInfo) : async Text {
@@ -89,6 +90,22 @@ actor CanisterIdsLedger = {
 		};
 
 		return "authorized";
+	};
+
+	// NOTE: only for dev
+	public shared ({ caller }) func set_logger_id(id : Text) : async Text {
+		let is_production = Text.equal(
+			Principal.toText(Principal.fromActor(CanisterIdsLedger)),
+			CANISTER_ID_PROD
+		);
+
+		if (is_production == true) {
+			return "Try Dev";
+		};
+
+		logger_canister_id := id;
+
+		return logger_canister_id;
 	};
 
 	public query func get_canisters() : async [CanisterInfo] {
