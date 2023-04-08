@@ -18,6 +18,7 @@
 		"test-config": "tape test-env/dfx.config.test.cjs",
 		"test-cl": "npm run generate_test_interface && tape test-canisters/canister_ids_ledger.test.cjs",
 		"test-ex": "npm run generate_test_interface && tape test-canisters/explore.test.cjs",
+		"test-lg": "npm run generate_test_interface && tape test-canisters/logger.test.cjs",
 		"test-ta": "npm run generate_test_interface && tape test-canisters/test_assets.test.cjs",
 		"test-sm": "npm run generate_test_interface && tape test-canisters/snap_main.test.cjs",
 		"test-p": "npm run generate_test_interface && tape test-canisters/profile.test.cjs",

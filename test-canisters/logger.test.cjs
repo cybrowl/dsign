@@ -20,10 +20,20 @@ test('Logger: version()', async function (t) {
 	t.equal(typeof response, 'bigint', 'The response should be of type number');
 });
 
-test('Logger: add log and get logs()', async function () {
-	await logger.log_event(['mishi', 'cat'], 'Hello World!');
+test('Logger: get authorize() - should return false meaning authorized person choosen', async function (t) {
+	const response = await logger.authorize();
 
-	const response = await logger.get_logs();
+	t.equal(response, true);
+});
 
-	console.log('response: ', response);
+test('Logger: get logs() - should not be authorized', async function (t) {
+	const { err: error } = await logger.get_logs();
+
+	t.deepEqual(error, { NotAuthorized: true });
+});
+
+test('Logger: get clear_logs() - should not be authorized', async function (t) {
+	const { err: error } = await logger.clear_logs();
+
+	t.deepEqual(error, { NotAuthorized: true });
 });

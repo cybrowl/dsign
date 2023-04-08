@@ -9,6 +9,7 @@ import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Timer "mo:base/Timer";
+import Result "mo:base/Result";
 
 import ICTypes "../types/ic.types";
 import UtilsShared "../utils/utils";
@@ -16,6 +17,7 @@ import UtilsShared "../utils/utils";
 actor Logger {
 	public type Tags = [(Text, Text)];
 	public type Message = Text;
+	type AuthorizationError = { #NotAuthorized : Bool };
 
 	public type LogEvent = {
 		hostname : Text;
@@ -32,7 +34,7 @@ actor Logger {
 	var logs_pending = Buffer<LogEvent>(0);
 	stable var logs_pending_stable_storage : [LogEvent] = [];
 
-	let VERSION : Nat = 3;
+	let VERSION : Nat = 4;
 	let ACTOR_NAME : Text = "Logger";
 
 	stable var authorized : ?Principal = null;
@@ -40,7 +42,6 @@ actor Logger {
 	public shared ({ caller }) func authorize() : async Bool {
 		switch (authorized) {
 			case (?authorized) {
-				assert (authorized == caller);
 
 				return true;
 			};
@@ -80,22 +81,29 @@ actor Logger {
 		logs_pending.add(log);
 	};
 
-	public shared ({ caller }) func clear_logs() : async Text {
-		assert (authorized == ?caller);
+	public shared ({ caller }) func clear_logs() : async Result.Result<Text, AuthorizationError> {
+		switch (authorized == ?caller) {
+			case (true) {
+				logs_storage.append(logs_pending);
+				logs_pending.clear();
 
-		logs_storage.append(logs_pending);
-		logs_pending.clear();
-
-		return "Logs cleared";
+				return #ok("Logs cleared");
+			};
+			case (false) {
+				return #err(#NotAuthorized(true));
+			};
+		};
 	};
 
-	public query ({ caller }) func get_logs() : async [LogEvent] {
-		assert (authorized == ?caller);
-
-		return toArray(logs_pending);
+	public query ({ caller }) func get_logs() : async Result.Result<[LogEvent], AuthorizationError> {
+		if (authorized == ?caller) {
+			return #ok(toArray(logs_pending));
+		} else {
+			return #err(#NotAuthorized(true));
+		};
 	};
 
-	// ------------------------- CANISTER MANAGEMENT -------------------------
+	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
 	};
@@ -123,6 +131,7 @@ actor Logger {
 		return ();
 	};
 
+	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		logs_storage_stable_storage := toArray(logs_storage);
 		logs_pending_stable_storage := toArray(logs_pending);
