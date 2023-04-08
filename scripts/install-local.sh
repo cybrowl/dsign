@@ -38,6 +38,7 @@ export FAVORITE_MAIN_PRINCIPAL=$(dfx canister id favorite_main)
 export PROFILE_PRINCIPAL=$(dfx canister id profile)
 export PROJECT_MAIN_PRINCIPAL=$(dfx canister id project_main)
 export SNAP_MAIN_PRINCIPAL=$(dfx canister id snap_main)
+export TEST_AUTH="geyca-lz2jy-mf7bx-a4tt5-o72km-wiz7y-2f57v-pwg7p-5jwzo-ol5nz-rae"
 
 # initialize canisters
 dfx canister call canister_ids_ledger start_log_timer
@@ -49,6 +50,7 @@ dfx canister call canister_ids_ledger authorize_ids "(
         \"${PROFILE_PRINCIPAL}\";
         \"${PROJECT_MAIN_PRINCIPAL}\";
         \"${SNAP_MAIN_PRINCIPAL}\";
+        \"${TEST_AUTH}\";
     }
 )"
 

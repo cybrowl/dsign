@@ -16,6 +16,7 @@
 		"deploy_all": "npm run deploy_favorites && npm run deploy_profile && npm run deploy_projects && npm run deploy_snaps",
 		"test-all": "bash ./scripts/test-all.sh",
 		"test-config": "tape test-env/dfx.config.test.cjs",
+		"test-cl": "npm run generate_test_interface && tape test-canisters/canister_ids_ledger.test.cjs",
 		"test-ex": "npm run generate_test_interface && tape test-canisters/explore.test.cjs",
 		"test-ta": "npm run generate_test_interface && tape test-canisters/test_assets.test.cjs",
 		"test-sm": "npm run generate_test_interface && tape test-canisters/snap_main.test.cjs",
@@ -55,6 +56,7 @@
 		"tailwindcss": "^3.2.4",
 		"tap-nyan": "^1.1.0",
 		"tape": "^5.6.1",
+		"uuid": "^9.0.0",
 		"vite": "^4.2.1"
 	}
 }

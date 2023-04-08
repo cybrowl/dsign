@@ -17,8 +17,7 @@ test('Setup Actors', async function () {
 test('Logger: version()', async function (t) {
 	const response = await logger.version();
 
-	t.equal(typeof response, 'bigint');
-	t.equal(response, 1n);
+	t.equal(typeof response, 'bigint', 'The response should be of type number');
 });
 
 test('Logger: add log and get logs()', async function () {

@@ -2,8 +2,8 @@ const {
 	idlFactory: assets_img_staging_interface
 } = require('../.dfx/local/canisters/assets_img_staging/assets_img_staging.did.test.cjs');
 const {
-	idlFactory: assets_file_chunks_interface
-} = require('../.dfx/local/canisters/assets_file_chunks/assets_file_chunks.did.test.cjs');
+	idlFactory: assets_file_staging_interface
+} = require('../.dfx/local/canisters/assets_file_staging/assets_file_staging.did.test.cjs');
 const {
 	idlFactory: canister_ids_ledger_interface
 } = require('../.dfx/local/canisters/canister_ids_ledger/canister_ids_ledger.did.test.cjs');
@@ -33,7 +33,7 @@ const {
 } = require('../.dfx/local/canisters/test_project/test_project.did.test.cjs');
 
 module.exports = {
-	assets_file_chunks_interface,
+	assets_file_staging_interface,
 	assets_img_staging_interface,
 	canister_ids_ledger_interface,
 	explore_interface,

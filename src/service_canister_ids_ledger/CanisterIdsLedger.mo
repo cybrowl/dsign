@@ -38,6 +38,11 @@ actor CanisterIdsLedger = {
 
 	// ------------------------- CanisterIdsLedger Methods -------------------------
 	public shared ({ caller }) func save_canister(canister_child : CanisterInfo) : async Text {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "save_canister")
+		];
+
 		// check if canister exists before adding
 		let canister_exists = List.some<CanisterInfo>(
 			canisters,
@@ -50,56 +55,46 @@ actor CanisterIdsLedger = {
 			return "Canister already exists";
 		};
 
-		if (is_prod == false) {
+		ignore Logger.log_event(tags, "caller: " # Principal.toText(caller));
 
-			canisters := List.push<CanisterInfo>(canister_child, canisters);
+		switch (authorized.get(Principal.toText(caller))) {
+			case (null) {
+				return "Not Authorized";
+			};
+			case (?principal) {
+				canisters := List.push<CanisterInfo>(canister_child, canisters);
 
-			return "Added for Dev";
-		} else {
-			switch (authorized.get(Principal.toText(caller))) {
-				case (null) {
-					return "Not Authorized";
-				};
-				case (?principal) {
-					canisters := List.push<CanisterInfo>(canister_child, canisters);
-
-					return "Added for Prod";
-				};
+				return "Added for Prod";
 			};
 		};
 	};
 
 	// NOTE: only for dev
 	public shared ({ caller }) func authorize_ids(ids : [Text]) : async Text {
+		let is_production = Text.equal(
+			Principal.toText(Principal.fromActor(CanisterIdsLedger)),
+			CANISTER_ID_PROD
+		);
+
+		if (is_production == true) {
+			return "Try Dev";
+		};
+
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "authorize_ids")
 		];
 
-		let canister_ids_ledger = Principal.fromActor(CanisterIdsLedger);
-		let is_production = Text.equal(
-			Principal.toText(canister_ids_ledger),
-			CANISTER_ID_PROD
+		for (id in ids.vals()) {
+			authorized.put(id, id);
+		};
+
+		ignore Logger.log_event(
+			tags,
+			"authorize_ids"
 		);
 
-		if (authorized.size() > 0) {
-			return "already authorized";
-		};
-
-		if (is_production == false) {
-			for (id in ids.vals()) {
-				authorized.put(id, id);
-			};
-
-			ignore Logger.log_event(
-				tags,
-				"authorize_ids"
-			);
-
-			return "authorized";
-		} else {
-			return "is production";
-		};
+		return "authorized";
 	};
 
 	public query func get_canisters() : async [CanisterInfo] {
@@ -108,20 +103,6 @@ actor CanisterIdsLedger = {
 
 	public query func get_authorized() : async [Text] {
 		return Iter.toArray(authorized.vals());
-	};
-
-	public query func get_health_metrics_id() : async Text {
-		let canister_ids_ledger = Principal.fromActor(CanisterIdsLedger);
-		let is_production = Text.equal(
-			Principal.toText(canister_ids_ledger),
-			CANISTER_ID_PROD
-		);
-
-		if (is_production == true) {
-			return "ree2h-zaaaa-aaaag-aba5q-cai";
-		} else {
-			return "txssk-maaaa-aaaaa-aaanq-cai";
-		};
 	};
 
 	public query func canister_exists(canisterPrincipal : Principal) : async Bool {
@@ -136,18 +117,6 @@ actor CanisterIdsLedger = {
 
 		return exists;
 	};
-
-	// public shared ({ caller }) func drop_canister() : async () {
-	//     // Filter the list of canisters to only include those with isProd = true
-	//     canisters := List.filter<CanisterInfo>(
-	//         canisters,
-	//         func(canister : CanisterInfo) : Bool {
-	//             return canister.isProd; // Keep only canisters where isProd is true
-	//         }
-	//     );
-
-	//     return ();
-	// };
 
 	// This function logs the health status of multiple canisters by iterating over a list of canister IDs
 	// and calling the health() method on the corresponding actor object.

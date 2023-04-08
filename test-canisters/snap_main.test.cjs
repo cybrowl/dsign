@@ -7,7 +7,7 @@ config();
 
 // Actor Interface
 const {
-	assets_file_chunks_interface,
+	assets_file_staging_interface,
 	assets_img_staging_interface,
 	profile_interface,
 	snap_main_interface
@@ -46,7 +46,7 @@ test('Setup Actors', async function () {
 
 	assets_file_chunks_actors.mishicat = await get_actor(
 		assets_file_chunks_canister_id,
-		assets_file_chunks_interface,
+		assets_file_staging_interface,
 		mishicat_identity
 	);
 
