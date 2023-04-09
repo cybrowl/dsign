@@ -60,9 +60,14 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		file_asset : AssetRef,
 		owner : UserPrincipal
 	) : async Result.Result<Snap, ErrCreateSnap> {
-		let log_tags = [ACTOR_NAME, "create_snap"];
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "create_snap")];
 
 		if (snap_main != caller) {
+			ignore Logger.log_event(
+				log_tags,
+				"Unauthorized: " # Principal.toText(caller)
+			);
+
 			return #err(#Unauthorized);
 		};
 
@@ -114,9 +119,14 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	public shared ({ caller }) func update_snap_metrics(
 		snap_id : SnapID
 	) : async Result.Result<SnapPublic, ErrUpdateSnap> {
-		let tags = [ACTOR_NAME, "update_snap"];
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "update_snap_metrics")];
 
 		if (favorite_main != caller) {
+			ignore Logger.log_event(
+				log_tags,
+				"Unauthorized: " # Principal.toText(caller)
+			);
+
 			return #err(#NotAuthorized(true));
 		};
 
@@ -161,7 +171,14 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	};
 
 	public shared ({ caller }) func delete_snaps(snap_ids : [SnapID]) : async () {
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "delete_snaps")];
+
 		if (snap_main != caller) {
+			ignore Logger.log_event(
+				log_tags,
+				"Unauthorized: " # Principal.toText(caller)
+			);
+
 			return ();
 		};
 
@@ -181,7 +198,14 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	public shared ({ caller }) func delete_project_from_snaps(
 		snaps_ref : [SnapRef]
 	) : async () {
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "delete_project_from_snaps")];
+
 		if (project_main != caller) {
+			ignore Logger.log_event(
+				log_tags,
+				"Unauthorized: " # Principal.toText(caller)
+			);
+
 			return ();
 		};
 
@@ -214,12 +238,12 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	public shared ({ caller }) func add_project_to_snaps(
 		project_ref : ProjectRef
 	) : async () {
-		let tags = [("actor_name", ACTOR_NAME), ("method", "add_project_to_snaps")];
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "add_project_to_snaps")];
 
 		if (project_main != caller) {
 			ignore Logger.log_event(
-				tags,
-				"Unauthorized"
+				log_tags,
+				"Unauthorized: " # Principal.toText(caller)
 			);
 
 			return ();
