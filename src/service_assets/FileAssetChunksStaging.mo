@@ -4,6 +4,7 @@ import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
+import Map "mo:hashmap/Map";
 import Nat "mo:base/Nat";
 import Prim "mo:⛔";
 import Principal "mo:base/Principal";
@@ -22,12 +23,11 @@ import UtilsShared "../utils/utils";
 actor FileAssetChunksStaging = {
 	type Payload = HealthMetricsTypes.Payload;
 
+	let { nhash } = Map;
+
 	private stable var chunk_id_count : Nat = 0;
-	private var chunks : HashMap.HashMap<Nat, Types.AssetChunk> = HashMap.HashMap<Nat, Types.AssetChunk>(
-		0,
-		Nat.equal,
-		Hash.hash
-	);
+
+	private var chunks = Map.new<Nat, Types.AssetChunk>(nhash);
 	stable var chunks_stable_storage : [(Nat, Types.AssetChunk)] = [];
 
 	let VERSION : Nat = 6;
@@ -46,17 +46,17 @@ actor FileAssetChunksStaging = {
 			owner = caller;
 		};
 
-		chunks.put(chunk_id_count, asset_chunk);
+		ignore Map.put(chunks, nhash, chunk_id_count, asset_chunk);
 
 		return chunk_id_count;
 	};
 
 	public shared ({ caller }) func delete_chunks(chunk_ids : [Nat], owner : Principal) : async () {
 		for (chunk_id in chunk_ids.vals()) {
-			switch (chunks.get(chunk_id)) {
+			switch (Map.get(chunks, nhash, chunk_id)) {
 				case (?chunk) {
 					if (chunk.owner == owner) {
-						chunks.delete(chunk_id);
+						Map.delete(chunks, nhash, chunk_id);
 					};
 				};
 				case (_) {};
@@ -65,7 +65,7 @@ actor FileAssetChunksStaging = {
 	};
 
 	public query func get_chunk(chunk_id : Nat, principal : Principal) : async Result.Result<Types.AssetChunk, Text> {
-		switch (chunks.get(chunk_id)) {
+		switch (Map.get(chunks, nhash, chunk_id)) {
 			case (?chunk) {
 				if (chunk.owner != principal) {
 					return #err("Chunk Not Owned By Caller");
@@ -88,7 +88,7 @@ actor FileAssetChunksStaging = {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
-			("chunks_size", Int.toText(chunks.size())),
+			("chunks_size", Int.toText(Map.size(chunks))),
 			("chunk_id_count", Int.toText(chunk_id_count)),
 			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
 			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
@@ -102,7 +102,7 @@ actor FileAssetChunksStaging = {
 
 		let log_payload : Payload = {
 			metrics = [
-				("assets_num", chunks.size()),
+				("assets_num", Map.size(chunks)),
 				("cycles_balance", UtilsShared.get_cycles_balance()),
 				("memory_in_mb", UtilsShared.get_memory_in_mb()),
 				("heap_in_mb", UtilsShared.get_heap_in_mb())
@@ -123,16 +123,12 @@ actor FileAssetChunksStaging = {
 
 	// ------------------------- SYSTEM METHODS -------------------------
 	system func preupgrade() {
-		chunks_stable_storage := Iter.toArray(chunks.entries());
+		chunks_stable_storage := Iter.toArray(Map.entries(chunks));
 	};
 
 	system func postupgrade() {
-		chunks := HashMap.fromIter<Nat, Types.AssetChunk>(
-			chunks_stable_storage.vals(),
-			0,
-			Nat.equal,
-			Hash.hash
-		);
+		chunks := Map.fromIter<Nat, Types.AssetChunk>(chunks_stable_storage.vals(), nhash);
+
 		chunks_stable_storage := [];
 	};
 };
