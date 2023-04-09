@@ -43,6 +43,11 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 
 	// ------------------------- Create Asset -------------------------
 	public shared ({ caller }) func create_asset_from_chunks(args : Types.CreateAssetArgs) : async Result.Result<Types.AssetRef, Text> {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "create_asset_from_chunks")
+		];
+
 		var asset_data = Buffer<Blob>(0);
 		var all_chunks_match_owner : Bool = true;
 
@@ -53,6 +58,11 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 		let asset_id : Text = ULID.toText(se.new());
 
 		if (controller != caller) {
+			ignore Logger.log_event(
+				tags,
+				"Not Authorized"
+			);
+
 			return #err("Not Authorized");
 		};
 
@@ -123,10 +133,16 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "delete_asset")];
 
 		if (controller != caller) {
+			ignore Logger.log_event(
+				tags,
+				"Not Authorized"
+			);
+
 			return ();
 		};
 
-		ignore Logger.log_event(tags, debug_show ("asset", asset_id));
+		ignore Logger.log_event(tags, "asset: " # asset_id);
+
 		assets.delete(asset_id);
 	};
 
@@ -167,6 +183,25 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 		};
 	};
 
+	public shared query ({ caller }) func http_request_streaming_callback(
+		st : Types.StreamingCallbackToken
+	) : async Types.StreamingCallbackHttpResponse {
+
+		switch (assets.get(st.asset_id)) {
+			case (null) throw Error.reject("asset_id not found: " # st.asset_id);
+			case (?asset) {
+				return {
+					token = create_token({
+						asset_id = st.asset_id;
+						chunk_index = st.chunk_index;
+						data_chunks_size = asset.data_chunks_size;
+					});
+					body = asset.data_chunks[st.chunk_index];
+				};
+			};
+		};
+	};
+
 	private func create_strategy(args : Types.CreateStrategyArgs) : ?Types.StreamingStrategy {
 		switch (create_token(args)) {
 			case (null) { null };
@@ -195,26 +230,6 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 			return ?token;
 		};
 	};
-
-	public shared query ({ caller }) func http_request_streaming_callback(
-		st : Types.StreamingCallbackToken
-	) : async Types.StreamingCallbackHttpResponse {
-
-		switch (assets.get(st.asset_id)) {
-			case (null) throw Error.reject("asset_id not found: " # st.asset_id);
-			case (?asset) {
-				return {
-					token = create_token({
-						asset_id = st.asset_id;
-						chunk_index = st.chunk_index;
-						data_chunks_size = asset.data_chunks_size;
-					});
-					body = asset.data_chunks[st.chunk_index];
-				};
-			};
-		};
-	};
-
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
@@ -224,6 +239,7 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
+			("version", Int.toText(VERSION)),
 			("parent", Principal.toText(controller)),
 			("canister_id", Principal.toText(Principal.fromActor(this))),
 			("assets_size", Int.toText(assets.size())),
