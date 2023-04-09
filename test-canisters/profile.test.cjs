@@ -29,7 +29,7 @@ let profile_actors = {};
 
 let img_asset_ids = [];
 
-test('Setup Actors', async function (t) {
+test('Setup Actors', async function () {
 	console.log('=========== Profile ===========');
 
 	assets_img_staging_actors.mishicat = await get_actor(
@@ -49,7 +49,6 @@ test('Setup Actors', async function (t) {
 
 test('Profile[mishicat].get_profile(): before user creates profile => #err - ProfileNotFound', async function (t) {
 	const response = await profile_actors.mishicat.get_profile();
-	console.log('response: ', response);
 
 	t.deepEqual(response.err, { ProfileNotFound: true });
 });

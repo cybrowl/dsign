@@ -15,7 +15,7 @@ const {
 
 // Canister Ids
 const {
-	assets_file_chunks_canister_id,
+	assets_file_staging_canister_id,
 	assets_img_staging_canister_id,
 	profile_canister_id,
 	snap_main_canister_id
@@ -45,7 +45,7 @@ test('Setup Actors', async function () {
 	console.log('=========== Snap Main ===========');
 
 	assets_file_chunks_actors.mishicat = await get_actor(
-		assets_file_chunks_canister_id,
+		assets_file_staging_canister_id,
 		assets_file_staging_interface,
 		mishicat_identity
 	);

@@ -25,7 +25,7 @@ actor CanisterIdsLedger = {
 
 	let ACTOR_NAME : Text = "CanisterIdsLedger";
 	let CANISTER_ID_PROD : Text = "k25dy-3yaaa-aaaag-abcpa-cai";
-	let VERSION : Nat = 3;
+	let VERSION : Nat = 4;
 
 	var canisters = List.nil<CanisterInfo>();
 	stable var canisters_stable_storage : [(CanisterInfo)] = [];

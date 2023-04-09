@@ -1,6 +1,6 @@
 const canister_ids = require('../.dfx/local/canister_ids.json');
 
-const assets_file_chunks_canister_id = canister_ids.assets_file_chunks.local;
+const assets_file_staging_canister_id = canister_ids.assets_file_staging.local;
 const assets_img_staging_canister_id = canister_ids.assets_img_staging.local;
 const canister_ids_ledger_canister_id = canister_ids.canister_ids_ledger.local;
 const explore_canister_id = canister_ids.explore.local;
@@ -14,7 +14,7 @@ const test_project_canister_id = canister_ids.test_project.local;
 const test_snap_canister_id = canister_ids.test_snap.local;
 
 module.exports = {
-	assets_file_chunks_canister_id,
+	assets_file_staging_canister_id,
 	assets_img_staging_canister_id,
 	canister_ids_ledger_canister_id,
 	explore_canister_id,

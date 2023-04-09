@@ -4,17 +4,17 @@ const HOST = 'http://127.0.0.1:8080/';
 
 const getActor = async (canisterId, idlFactory, identity) => {
 	if (canisterId === undefined) {
-		console.log('canisterId: ', canisterId);
+		console.log('ERROR: CanisterId: ', canisterId);
 		return null;
 	}
 
 	if (idlFactory === undefined) {
-		console.log('idlFactory: ', idlFactory);
+		console.log('ERROR: idlFactory: ', idlFactory);
 		return null;
 	}
 
 	if (identity === undefined) {
-		console.log('identity:', identity);
+		console.log('ERROR: identity:', identity);
 	}
 
 	const agent = new HttpAgent({

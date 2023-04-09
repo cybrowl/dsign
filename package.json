@@ -5,6 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"build": "vite build",
+		"boot": "sh ./scripts/install-local.sh",
 		"format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
 		"generate_test_interface": "bash ./scripts/generate_can_test_interface.sh",
 		"lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
@@ -19,11 +20,10 @@
 		"test-cl": "npm run generate_test_interface && tape test-canisters/canister_ids_ledger.test.cjs",
 		"test-ex": "npm run generate_test_interface && tape test-canisters/explore.test.cjs",
 		"test-lg": "npm run generate_test_interface && tape test-canisters/logger.test.cjs",
-		"test-ta": "npm run generate_test_interface && tape test-canisters/test_assets.test.cjs",
 		"test-sm": "npm run generate_test_interface && tape test-canisters/snap_main.test.cjs",
 		"test-p": "npm run generate_test_interface && tape test-canisters/profile.test.cjs",
 		"test-pm": "npm run generate_test_interface && tape test-canisters/project_main.test.cjs",
-		"test-u": "npm run generate_test_interface && tape test-canisters/username.test.cjs"
+		"test-ta": "npm run generate_test_interface && tape test-canisters/test_assets.test.cjs"
 	},
 	"dependencies": {
 		"@dfinity/agent": "^0.15.4",

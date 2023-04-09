@@ -9,7 +9,7 @@ const {
 
 // Canister Ids
 const {
-	assets_file_chunks_canister_id,
+	assets_file_staging_canister_id,
 	test_assets_canister_id
 } = require('../test-utils/actor_canister_ids.cjs');
 
@@ -33,7 +33,7 @@ test('Setup Actors', async function (t) {
 	);
 
 	assets_file_chunks_actors.mishicat = await get_actor(
-		assets_file_chunks_canister_id,
+		assets_file_staging_canister_id,
 		assets_file_staging_interface,
 		mishicat_identity
 	);

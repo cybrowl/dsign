@@ -71,7 +71,7 @@ test('CanisterIdsLedger: [authorized].save_canister(): Added for Prod', async fu
 
 	const response = await canister_ids_ledger_actors.authorized.save_canister(canister);
 
-	t.assert(response === 'Added for Prod');
+	t.assert(response === 'Added Canister');
 });
 
 test('CanisterIdsLedger: [authorized].save_canister(): Canister already exists', async function (t) {
@@ -88,7 +88,7 @@ test('CanisterIdsLedger: [authorized].save_canister(): Canister already exists',
 	t.assert(response === 'Canister already exists');
 });
 
-test('CanisterIdsLedger: [authorized].get_canisters(): Canisters', async function (t) {
+test('CanisterIdsLedger: [authorized].get_canisters(): Has Canisters', async function (t) {
 	const response = await canister_ids_ledger_actors.authorized.get_canisters();
 
 	t.assert(response.length > 0);
