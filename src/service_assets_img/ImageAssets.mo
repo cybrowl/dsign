@@ -59,6 +59,11 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "save_images")];
 
 		if (controller != caller) {
+			ignore Logger.log_event(
+				tags,
+				"Not Authorized"
+			);
+
 			return #err(#NotAuthorized);
 		};
 
@@ -109,6 +114,11 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "update_image")];
 
 		if (controller != caller) {
+			ignore Logger.log_event(
+				tags,
+				"Not Authorized"
+			);
+
 			return #err(#NotAuthorized);
 		};
 
@@ -152,6 +162,11 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "delete_image")];
 
 		if (controller != caller) {
+			ignore Logger.log_event(
+				tags,
+				"Not Authorized"
+			);
+
 			return ();
 		};
 
