@@ -108,15 +108,28 @@ actor SnapMain {
 		};
 	};
 
-	public shared ({ caller }) func create_snap(args : CreateSnapArgs) : async Result.Result<Text, ErrCreateSnap> {
+	public shared ({ caller }) func create_snap(snap_info : CreateSnapArgs) : async Result.Result<Text, ErrCreateSnap> {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "create_snap")];
 
 		let is_anonymous = Principal.isAnonymous(caller);
-		let has_image = args.img_asset_ids.size() > 0;
-		let too_many_images = args.img_asset_ids.size() > 4;
+		let has_image = snap_info.img_asset_ids.size() > 0;
+		let too_many_images = snap_info.img_asset_ids.size() > 4;
 
 		if (is_anonymous == true) {
 			return #err(#UserAnonymous);
+		};
+
+		if (snap_info.title.size() > 100) {
+			return #err(#TitleTooLarge);
+		};
+
+		switch (snap_info.file_asset) {
+			case (null) {};
+			case (?file) {
+				if (file.content_type.size() > 50) {
+					return #err(#FileTypeTooLarge);
+				};
+			};
 		};
 
 		if (has_image == false) {
@@ -162,7 +175,7 @@ actor SnapMain {
 		// save images from img_asset_ids
 		let image_ref : ImageRef = { canister_id = ""; id = ""; url = "" };
 		var images_ref = [image_ref];
-		switch (await image_assets_actor.save_images(args.img_asset_ids, "snap", caller)) {
+		switch (await image_assets_actor.save_images(snap_info.img_asset_ids, "snap", caller)) {
 			case (#err err) {
 				ignore Logger.log_event(
 					tags,
@@ -174,23 +187,23 @@ actor SnapMain {
 			case (#ok images_ref_) {
 				images_ref := images_ref_;
 
-				ignore ImageAssetStaging.delete_assets(args.img_asset_ids, caller);
+				ignore ImageAssetStaging.delete_assets(snap_info.img_asset_ids, caller);
 			};
 		};
 
 		// create asset from chunks
 		var file_asset = { canister_id = ""; id = ""; file_name = ""; url = ""; is_public = false };
-		switch (args.file_asset) {
+		switch (snap_info.file_asset) {
 			case null {};
 			case (?fileAsset) {
-				let file_asset_args : CreateAssetArgs = {
+				let file_asset_snap_info : CreateAssetArgs = {
 					chunk_ids = fileAsset.chunk_ids;
 					content_type = fileAsset.content_type;
 					is_public = fileAsset.is_public;
 					principal = caller;
 				};
 
-				switch (await assets_actor.create_asset_from_chunks(file_asset_args)) {
+				switch (await assets_actor.create_asset_from_chunks(file_asset_snap_info)) {
 					case (#err err) {
 						ignore Logger.log_event(
 							tags,
@@ -209,7 +222,7 @@ actor SnapMain {
 		};
 
 		// save snap
-		switch (await snap_actor.create_snap(args, images_ref, file_asset, caller)) {
+		switch (await snap_actor.create_snap(snap_info, images_ref, file_asset, caller)) {
 			case (#err err) {
 				ignore Logger.log_event(
 					tags,

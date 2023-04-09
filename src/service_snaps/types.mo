@@ -105,6 +105,8 @@ module {
 
 	// Errors
 	public type ErrCreateSnap = {
+		#TitleTooLarge;
+		#FileTypeTooLarge;
 		#UserAnonymous;
 		#NoImageToSave;
 		#FourImagesMax;
