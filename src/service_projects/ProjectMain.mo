@@ -51,6 +51,7 @@ actor ProjectMain {
 
 	let ACTOR_NAME : Text = "ProjectMain";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
+	let SNAP_ARG_SIZE_LIMIT : Nat = 50;
 	let VERSION : Nat = 2;
 
 	private let ic : ICInterface = actor "aaaaa-aa";
@@ -93,7 +94,13 @@ actor ProjectMain {
 	public shared ({ caller }) func create_project(name : Text, snaps : ?[SnapRef]) : async Result.Result<Text, ErrCreateProject> {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "create_project")];
 
-		//todo: args security checks
+		if (name.size() > 100) {
+			return #err(#NameTooLarge);
+		};
+
+		if (Option.get(snaps, []).size() > SNAP_ARG_SIZE_LIMIT) {
+			return #err(#NumberSnapsTooLarge);
+		};
 
 		var user_project_ids_storage : ProjectIDStorage = HashMap.HashMap(0, Text.equal, Text.hash);
 		switch (user_canisters_ref.get(caller)) {
@@ -174,6 +181,10 @@ actor ProjectMain {
 	) : async Result.Result<Text, ErrDeleteSnapsFromProject> {
 		let tags = [ACTOR_NAME, "delete_snaps_from_project"];
 
+		if (snaps.size() > SNAP_ARG_SIZE_LIMIT) {
+			return #err(#NumberSnapsTooLarge);
+		};
+
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_project_ids_storage) {
 				let my_ids = Utils.get_all_ids(user_project_ids_storage);
@@ -210,6 +221,10 @@ actor ProjectMain {
 		project_ref : ProjectRef
 	) : async Result.Result<Text, ErrAddSnapsToProject> {
 		let tags = [ACTOR_NAME, "add_snaps_to_project"];
+
+		if (snaps.size() > SNAP_ARG_SIZE_LIMIT) {
+			return #err(#NumberSnapsTooLarge);
+		};
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_project_ids_storage) {
@@ -250,6 +265,10 @@ actor ProjectMain {
 		project_to_ref : ProjectRef
 	) : async Result.Result<Text, ErrAddSnapsToProject> {
 		let tags = [ACTOR_NAME, "move_snaps_from_project"];
+
+		if (snaps.size() > SNAP_ARG_SIZE_LIMIT) {
+			return #err(#NumberSnapsTooLarge);
+		};
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_project_ids_storage) {
@@ -298,6 +317,8 @@ actor ProjectMain {
 		project_ref : ProjectRef
 	) : async Result.Result<Text, ErrUpdateProject> {
 		let tags = [ACTOR_NAME, "update_project_details"];
+
+		//TODO: check update_project_args
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_project_ids_storage) {

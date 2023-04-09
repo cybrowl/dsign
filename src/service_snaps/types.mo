@@ -126,6 +126,7 @@ module {
 	};
 
 	public type ErrGetAllSnaps = {
+		#NotAuthorized : Bool;
 		#UserNotFound : Bool;
 	};
 

@@ -67,8 +67,14 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 		snap_refs : ?[SnapRef],
 		owner : UserPrincipal
 	) : async Result.Result<Project, ErrCreateProject> {
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "create_project")];
 
 		if (project_main != caller) {
+			ignore Logger.log_event(
+				log_tags,
+				"Unauthorized: " # Principal.toText(caller)
+			);
+
 			return #err(#NotAuthorized);
 		};
 
@@ -109,6 +115,8 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	};
 
 	public shared ({ caller }) func delete_projects(project_ids : [ProjectID]) : async Result.Result<(), ErrDeleteProjects> {
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "delete_projects")];
+
 		if (project_main != caller) {
 			return #err(#NotAuthorized);
 		};
@@ -130,8 +138,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 		project_id : ProjectID,
 		owner : UserPrincipal
 	) : async Result.Result<Text, ErrDeleteSnapsFromProject> {
-
-		let tags = [ACTOR_NAME, "delete_snaps_from_project"];
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "delete_snaps_from_project")];
 
 		if (project_main != caller) {
 			return #err(#NotAuthorized);
@@ -171,7 +178,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 		project_id : ProjectID,
 		owner : UserPrincipal
 	) : async Result.Result<Project, ErrAddSnapsToProject> {
-		let tags = [("actor_name", ACTOR_NAME), ("method", "add_snaps_to_project")];
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "add_snaps_to_project")];
 
 		if (project_main != caller) {
 			return #err(#NotAuthorized);
@@ -204,7 +211,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 
 				projects.put(project_id, project_updated);
 
-				ignore Logger.log_event(tags, "Snaps Added To Project");
+				ignore Logger.log_event(log_tags, "Snaps Added To Project");
 
 				return #ok(project);
 			};
@@ -215,7 +222,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 		update_project_args : UpdateProject,
 		project_ref : ProjectRef
 	) : async Result.Result<Project, ErrUpdateProject> {
-		let tags = [("actor_name", ACTOR_NAME), ("method", "update_project_details")];
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "update_project_details")];
 
 		if (project_main != caller) {
 			return #err(#NotAuthorized);
@@ -238,7 +245,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 
 				projects.put(project_ref.id, project_updated);
 
-				ignore Logger.log_event(tags, "Project Details Updated");
+				ignore Logger.log_event(log_tags, "Project Details Updated");
 
 				return #ok(project_updated);
 			};
@@ -247,6 +254,8 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 
 	public shared func get_projects(project_ids : [ProjectID]) : async [ProjectPublic] {
 		let log_tags = [ACTOR_NAME, "get_projects"];
+
+		//TODO: CanisterIdsLedger.canister_exists to stop DDOS
 
 		var projects_list = Buffer.Buffer<ProjectPublic>(0);
 
@@ -288,7 +297,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	};
 
 	public query func get_projects_actor(project_ids : [ProjectID]) : async [Project] {
-		//TODO: only allow authorized canisters to call this method
+		//TODO: CanisterIdsLedger.canister_exists to stop DDOS
 
 		var projects_list = Buffer.Buffer<Project>(0);
 

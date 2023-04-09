@@ -285,6 +285,8 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	};
 
 	public query func get_all_snaps(snap_ids : [SnapID]) : async [SnapPublic] {
+		//TODO: CanisterIdsLedger.canister_exists to stop DDOS
+
 		var snaps_list = Buffer.Buffer<SnapPublic>(0);
 
 		for (snap_id in snap_ids.vals()) {

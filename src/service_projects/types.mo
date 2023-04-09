@@ -95,6 +95,8 @@ module {
 	// Errors
 	public type ErrCreateProject = {
 		#NotAuthorized;
+		#NameTooLarge;
+		#NumberSnapsTooLarge;
 		#UserAnonymous;
 		#UserNotFound;
 		#UsernameNotFound;
@@ -103,12 +105,14 @@ module {
 	};
 
 	public type ErrDeleteProjects = {
+		#NumberSnapsTooLarge;
 		#NotAuthorized;
 		#UserNotFound;
 		#ProjectIdsDoNotMatch;
 	};
 
 	public type ErrDeleteSnapsFromProject = {
+		#NumberSnapsTooLarge;
 		#NotAuthorized;
 		#NotOwner;
 		#ProjectNotFound;
@@ -118,6 +122,7 @@ module {
 	};
 
 	public type ErrAddSnapsToProject = {
+		#NumberSnapsTooLarge;
 		#NotAuthorized;
 		#NotOwner;
 		#ProjectNotFound;
