@@ -45,6 +45,8 @@ actor CanisterIdsLedger = {
 			("method", "save_canister")
 		];
 
+		let caller_ : Text = Principal.toText(caller);
+
 		// check if canister exists before adding
 		let canister_exists = List.some<CanisterInfo>(
 			canisters,
@@ -57,9 +59,9 @@ actor CanisterIdsLedger = {
 			return "Canister already exists";
 		};
 
-		switch (authorized.get(Principal.toText(caller))) {
+		switch (authorized.get(caller_)) {
 			case (null) {
-				return "Not Authorized";
+				return "Not Authorized: " # caller_;
 			};
 			case (?principal) {
 				canisters := List.push<CanisterInfo>(canister_child, canisters);

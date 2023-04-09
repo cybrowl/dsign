@@ -233,6 +233,10 @@ actor Profile = {
 			("method", "update_profile_avatar")
 		];
 
+		if (img_asset_ids.size() > 5) {
+			return #err(#ProfileInvalidArgs(true));
+		};
+
 		switch (profiles.get(caller)) {
 			case (null) {
 				return #err(#ProfileNotFound(true));
@@ -306,6 +310,10 @@ actor Profile = {
 			("actor_name", ACTOR_NAME),
 			("method", "update_profile_banner")
 		];
+
+		if (img_asset_ids.size() > 5) {
+			return #err(#ProfileInvalidArgs(true));
+		};
 
 		switch (profiles.get(caller)) {
 			case (null) {

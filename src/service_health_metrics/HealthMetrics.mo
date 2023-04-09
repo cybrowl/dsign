@@ -91,9 +91,18 @@ actor HealthMetrics = {
 	let VERSION : Nat = 5;
 
 	public shared ({ caller }) func log_event(log_payload : Payload) : async () {
-		let authorized = await CanisterIdsLedger.canister_exists(Principal.toText(caller));
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "log_event")
+		];
+
+		let caller_ = Principal.toText(caller);
+
+		let authorized = await CanisterIdsLedger.canister_exists(caller_);
 
 		if (authorized == false) {
+			ignore Logger.log_event(tags, "Not Authorized: " # caller_);
+
 			return ();
 		};
 

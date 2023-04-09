@@ -60,7 +60,7 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 		if (controller != caller) {
 			ignore Logger.log_event(
 				tags,
-				"Not Authorized"
+				"Not Authorized: " # Principal.toText(caller)
 			);
 
 			return #err("Not Authorized");
@@ -135,7 +135,7 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 		if (controller != caller) {
 			ignore Logger.log_event(
 				tags,
-				"Not Authorized"
+				"Not Authorized: " # Principal.toText(caller)
 			);
 
 			return ();
