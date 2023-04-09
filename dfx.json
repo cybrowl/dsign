@@ -35,7 +35,7 @@
 		"health_metrics": {
 			"main": "src/service_health_metrics/HealthMetrics.mo",
 			"type": "motoko",
-			"dependencies": []
+			"dependencies": ["canister_ids_ledger", "logger"]
 		},
 		"profile": {
 			"main": "src/service_profile/Profile.mo",

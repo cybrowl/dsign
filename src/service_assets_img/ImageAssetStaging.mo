@@ -36,11 +36,11 @@ actor ImageAssetStaging = {
 	private let assets = Map.new<Nat, Types.AssetImg>(nhash);
 
 	let ACTOR_NAME : Text = "ImageAssetsStaging";
-	let VERSION : Nat = 5;
+	let VERSION : Nat = 6;
 
 	public shared ({ caller }) func create_asset(img : Types.Img) : async Nat {
 		//TODO: check username to stop spam
-		//TODO: add limit to number of file space per user
+		//TODO: check user storage usage
 
 		// TODO: check if img is valid
 		// let is_valid_image = Utils.is_valid_image(img.data);

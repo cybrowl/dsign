@@ -39,7 +39,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	};
 
 	let ACTOR_NAME : Text = "ImageAssets";
-	let VERSION : Nat = 4;
+	let VERSION : Nat = 5;
 
 	private let rr = XorShift.toReader(XorShift.XorShift64(null));
 	private let se = Source.Source(rr, 0);

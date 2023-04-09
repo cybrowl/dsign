@@ -27,7 +27,7 @@ import UtilsShared "../utils/utils";
 
 actor class Assets(controller : Principal, is_prod : Bool) = this {
 	let ACTOR_NAME : Text = "Assets";
-	let VERSION : Nat = 3;
+	let VERSION : Nat = 4;
 
 	type Payload = HealthMetricsTypes.Payload;
 

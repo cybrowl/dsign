@@ -15,6 +15,9 @@ import StableMemory "mo:base/ExperimentalStableMemory";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
+import CanisterIdsLedger "canister:canister_ids_ledger";
+import Logger "canister:logger";
+
 import UtilsShared "../utils/utils";
 
 actor HealthMetrics = {
@@ -85,10 +88,14 @@ actor HealthMetrics = {
 	stable var logs_ordered_stable_storage : [(Text, [Log])] = [];
 
 	let ACTOR_NAME : Text = "HealthMetrics";
-	let VERSION : Nat = 4;
+	let VERSION : Nat = 5;
 
-	public shared (msg) func log_event(log_payload : Payload) : async () {
-		// TODO: some auth check here
+	public shared ({ caller }) func log_event(log_payload : Payload) : async () {
+		let authorized = await CanisterIdsLedger.canister_exists(Principal.toText(caller));
+
+		if (authorized == false) {
+			return ();
+		};
 
 		let log = {
 			time = Time.now();
@@ -193,6 +200,15 @@ actor HealthMetrics = {
 	};
 
 	public shared func health() : async Payload {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("logs_unique_size", Int.toText(logs_unique.size())),
+			("logs_ordered_size", Int.toText(logs_ordered.size()))
+		];
+
+		ignore Logger.log_event(tags, "health");
+
 		let log_payload : Payload = {
 			metrics = [
 				("logs_ordered_size", logs_ordered.size()),

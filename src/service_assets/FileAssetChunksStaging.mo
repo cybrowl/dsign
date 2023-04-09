@@ -30,7 +30,7 @@ actor FileAssetChunksStaging = {
 	private var chunks = Map.new<Nat, Types.AssetChunk>(nhash);
 	stable var chunks_stable_storage : [(Nat, Types.AssetChunk)] = [];
 
-	let VERSION : Nat = 6;
+	let VERSION : Nat = 7;
 	let ACTOR_NAME : Text = "FileAssetChunksStaging";
 
 	public shared ({ caller }) func create_chunk(chunk : Types.Chunk) : async Nat {
