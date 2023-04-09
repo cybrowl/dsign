@@ -44,6 +44,12 @@ let additions = [
     version = "v0.4.1",
     dependencies = [ "base-0.7.3", "array" ]
   },
+  {
+    name = "hashmap",
+    repo = "https://github.com/ZhenyaUsenko/motoko-hash-map",
+    version = "v8.1.0",
+    dependencies = [] : List Text
+  },
 ] : List Package
 
 let overrides = [

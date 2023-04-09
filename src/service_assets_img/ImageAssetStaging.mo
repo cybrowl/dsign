@@ -4,6 +4,7 @@ import Float "mo:base/Float";
 import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
 import Int "mo:base/Int";
+import Map "mo:hashmap/Map";
 import Nat "mo:base/Nat";
 import Prim "mo:⛔";
 import Principal "mo:base/Principal";
@@ -29,12 +30,10 @@ actor ImageAssetStaging = {
 
 	type Payload = HealthMetricsTypes.Payload;
 
+	let { nhash } = Map;
+
 	private var asset_id_count : Nat = 0;
-	private let assets : HashMap.HashMap<Nat, Types.AssetImg> = HashMap.HashMap<Nat, Types.AssetImg>(
-		0,
-		Nat.equal,
-		Hash.hash
-	);
+	private let assets = Map.new<Nat, Types.AssetImg>(nhash);
 
 	let ACTOR_NAME : Text = "ImageAssetsStaging";
 	let VERSION : Nat = 5;
@@ -59,17 +58,17 @@ actor ImageAssetStaging = {
 			owner = caller;
 		};
 
-		assets.put(asset_id_count, asset_chunk);
+		ignore Map.put(assets, nhash, asset_id_count, asset_chunk);
 
 		return asset_id_count;
 	};
 
 	public shared ({ caller }) func delete_assets(asset_ids : [Nat], owner : Principal) : async () {
 		for (asset_id in asset_ids.vals()) {
-			switch (assets.get(asset_id)) {
+			switch (Map.get(assets, nhash, asset_id)) {
 				case (?asset) {
 					if (asset.owner == owner) {
-						assets.delete(asset_id);
+						Map.delete(assets, nhash, asset_id);
 					};
 				};
 				case (_) {};
@@ -78,7 +77,7 @@ actor ImageAssetStaging = {
 	};
 
 	public query func get_asset(asset_id : Nat, owner : Principal) : async Result.Result<AssetImg, AssetImgErr> {
-		switch (assets.get(asset_id)) {
+		switch (Map.get(assets, nhash, asset_id)) {
 			case (?asset) {
 				if (asset.owner != owner) {
 					return #err(#NotOwnerOfAsset);
@@ -101,7 +100,7 @@ actor ImageAssetStaging = {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
-			("assets_size", Int.toText(assets.size())),
+			("assets_size", Int.toText(Map.size(assets))),
 			("asset_id_count", Int.toText(asset_id_count)),
 			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
 			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
@@ -115,7 +114,7 @@ actor ImageAssetStaging = {
 
 		let log_payload : Payload = {
 			metrics = [
-				("images_num", assets.size()),
+				("images_num", Map.size(assets)),
 				("cycles_balance", UtilsShared.get_cycles_balance()),
 				("memory_in_mb", UtilsShared.get_memory_in_mb()),
 				("heap_in_mb", UtilsShared.get_heap_in_mb())
