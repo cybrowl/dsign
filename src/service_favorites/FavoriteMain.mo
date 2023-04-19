@@ -17,6 +17,7 @@ import Types "./types";
 import CanisterIdsLedger "canister:canister_ids_ledger";
 import Favorite "Favorite";
 import HealthMetrics "canister:health_metrics";
+import Profile "canister:profile";
 import Logger "canister:logger";
 
 import Utils "../utils/utils";
@@ -177,10 +178,26 @@ actor FavoriteMain {
 		};
 	};
 
-	public shared ({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], ErrGetFavorite> {
+	public shared ({ caller }) func get_all_snaps(username : ?Text) : async Result.Result<[SnapPublic], ErrGetFavorite> {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "get_all_snaps")];
 
-		switch (user_canisters_ref.get(caller)) {
+		var user_principal = caller;
+
+		switch (username) {
+			case (?username) {
+				switch (await Profile.get_user_principal_public(username)) {
+					case (#err err) {
+						//TODO: log error
+					};
+					case (#ok principal) {
+						user_principal := principal;
+					};
+				};
+			};
+			case (_) {};
+		};
+
+		switch (user_canisters_ref.get(user_principal)) {
 			case (?favorite_canister_ids) {
 				let all_snaps = Buffer<SnapPublic>(0);
 

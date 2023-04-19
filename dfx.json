@@ -30,7 +30,7 @@
 		"favorite_main": {
 			"main": "src/service_favorites/FavoriteMain.mo",
 			"type": "motoko",
-			"dependencies": ["canister_ids_ledger", "health_metrics", "logger"]
+			"dependencies": ["canister_ids_ledger", "health_metrics", "logger", "profile"]
 		},
 		"health_metrics": {
 			"main": "src/service_health_metrics/HealthMetrics.mo",

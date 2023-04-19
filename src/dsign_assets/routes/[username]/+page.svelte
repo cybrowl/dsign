@@ -12,6 +12,7 @@
 	import ProjectCardCreate from 'dsign-components/components/ProjectCardCreate.svelte';
 	import ProjectPublicEmpty from 'dsign-components/components/ProjectPublicEmpty.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
+	import SnapCardFavoriteEmpty from 'dsign-components/components/SnapCardFavoriteEmpty.svelte';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import ProjectCreationModal from '$modals_ref/ProjectCreationModal.svelte';
@@ -20,16 +21,26 @@
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
-	import { actor_assets_img_staging, actor_profile, actor_project_main } from '$stores_ref/actors';
+	import {
+		actor_assets_img_staging,
+		actor_favorite_main,
+		actor_profile,
+		actor_project_main
+	} from '$stores_ref/actors';
 	import {
 		auth_assets_img_staging,
 		auth_profile,
 		auth_project_main
 	} from '$stores_ref/auth_client';
 	import { profile_tabs } from '$stores_ref/page_state';
-	import { project_store, project_store_fetching, projects_update } from '$stores_ref/fetch_store';
+	import {
+		favorite_store,
+		project_store,
+		project_store_fetching,
+		projects_update
+	} from '$stores_ref/fetch_store';
 	import modal_update, { modal_visible } from '$stores_ref/modal';
-	import { local_storage_projects } from '$stores_ref/local_storage';
+	import { local_storage_projects, local_storage_favorites } from '$stores_ref/local_storage';
 	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
 
 	let project = {
@@ -65,23 +76,39 @@
 				}
 			});
 
-			Promise.all([$actor_project_main.actor.get_all_projects([$page.params.username])]).then(
-				async ([projects]) => {
-					const { ok: all_projects, err: err_all_projects } = projects;
+			Promise.all([
+				$actor_favorite_main.actor.get_all_snaps([$page.params.username]),
+				$actor_project_main.actor.get_all_projects([$page.params.username])
+			]).then(async ([favorites, projects]) => {
+				const { ok: all_favs, err: err_get_all_favs } = favorites;
+				const { ok: all_projects, err: err_all_projects } = projects;
 
-					if (all_projects) {
-						project_store.set({ isFetching: false, projects: [...all_projects] });
+				if (all_favs) {
+					favorite_store.set({ isFetching: false, snaps: [...all_favs] });
+					local_storage_favorites.set({ all_favorites_count: all_favs.length || 1 });
+				}
 
-						local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
-					} else {
-						project_store.set({ isFetching: false, projects: [] });
+				if (err_get_all_favs) {
+					favorite_store.set({ isFetching: false, snaps: [] });
+					local_storage_favorites.set({ all_favorites_count: 1 });
 
-						if (err_all_projects['UserNotFound'] === true) {
-							await $actor_project_main.actor.create_user_project_storage();
-						}
+					if (err_get_all_favs['UserNotFound'] === true) {
+						await $actor_favorite_main.actor.create_user_favorite_storage();
 					}
 				}
-			);
+
+				if (all_projects) {
+					project_store.set({ isFetching: false, projects: [...all_projects] });
+
+					local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
+				} else {
+					project_store.set({ isFetching: false, projects: [] });
+
+					if (err_all_projects['UserNotFound'] === true) {
+						await $actor_project_main.actor.create_user_project_storage();
+					}
+				}
+			});
 		} catch (error) {
 			console.log('error projects: ', error);
 			goto('/');
@@ -230,6 +257,7 @@
 			project_name={project.name}
 			profileTabs={$profile_tabs}
 			on:toggleProjects={(e) => profile_tabs.set(e.detail)}
+			on:toggleFavorites={(e) => profile_tabs.set(e.detail)}
 		/>
 	</div>
 
@@ -281,16 +309,43 @@
 		{/if}
 	{/if}
 
-	<!-- Project -->
-	{#if $profile_tabs.isProjectSelected}
-		<!-- Snaps -->
-		{#if project.snaps && project.snaps.length > 0}
+	<!-- Favorites -->
+	{#if $profile_tabs.isFavoritesSelected}
+		<!-- Fetching Snaps -->
+		{#if $favorite_store.isFetching === true}
 			<div
-				class="col-start-4 col-end-12 grid grid-cols-4 
-						row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
+				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
-				{#each project.snaps as snap}
-					<SnapCard {snap} on:clickCard={handleSnapPreviewModalOpen} />
+				{#each { length: $local_storage_favorites.all_favorites_count } as _, i}
+					<SnapCard isLoadingSnap={true} showMetricLikesNumber={false} />
+				{/each}
+			</div>
+		{/if}
+
+		<!-- No Snaps Found -->
+		{#if $favorite_store.snaps.length === 0 && $favorite_store.isFetching === false}
+			<div
+				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
+			>
+				<SnapCardFavoriteEmpty />
+			</div>
+		{/if}
+
+		<!-- Snaps -->
+		{#if $favorite_store.snaps.length > 0}
+			<div
+				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
+			>
+				{#each $favorite_store.snaps as snap}
+					<SnapCard
+						{snap}
+						showUsername={true}
+						showMetricLikesNumber={false}
+						on:clickCard={handleSnapPreviewModalOpen}
+					/>
 				{/each}
 			</div>
 		{/if}
