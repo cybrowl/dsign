@@ -1,5 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import environment from 'environment';
 	import get from 'lodash/get.js';
@@ -48,7 +49,13 @@
 				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
 
 				if (profile) {
-					goto(get(profile, 'username', ''));
+					const username = get(profile, 'username', '');
+
+					if ($page.params.username) {
+						window.location.reload();
+					} else {
+						goto(username);
+					}
 				}
 
 				if (err_profile) {

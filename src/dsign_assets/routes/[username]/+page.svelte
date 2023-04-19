@@ -13,60 +13,73 @@
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
+	import ProjectDeleteModal from '$modals_ref/ProjectDeleteModal.svelte';
+	import ProjectRenameModal from '$modals_ref/ProjectRenameModal.svelte';
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
 	import { actor_assets_img_staging, actor_profile, actor_project_main } from '$stores_ref/actors';
-	import { auth_assets_img_staging, auth_profile } from '$stores_ref/auth_client';
-	import { profile_tabs } from '$stores_ref/page_state';
 	import {
-		project_store_public,
-		project_store_public_fetching,
-		projects_update
-	} from '$stores_ref/fetch_store';
+		auth_assets_img_staging,
+		auth_profile,
+		auth_project_main
+	} from '$stores_ref/auth_client';
+	import { profile_tabs } from '$stores_ref/page_state';
+	import { project_store, project_store_fetching, projects_update } from '$stores_ref/fetch_store';
 	import modal_update, { modal_visible } from '$stores_ref/modal';
+	import { local_storage_projects } from '$stores_ref/local_storage';
 	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
 
 	let project = {
-		name: ''
+		name: '',
+		snaps: []
 	};
+
 	let isProfileOwner = false;
 	let profile = {};
 	let snap_preview = null;
 
 	page_navigation_update.delete_all();
 
-	if ($project_store_public.projects.length === 0) {
-		project_store_public_fetching();
-	}
+	project_store_fetching();
 
 	onMount(async () => {
-		await Promise.all([auth_assets_img_staging(), auth_profile()]);
+		await Promise.all([auth_assets_img_staging(), auth_profile(), auth_project_main()]);
 
 		try {
-			const { ok: profile_, err: err_profile } = await $actor_profile.actor.get_profile_public(
-				$page.params.slug
-			);
-			profile = profile_;
+			Promise.all([
+				$actor_profile.actor.get_profile(),
+				$actor_profile.actor.get_profile_public($page.params.username),
+				$actor_project_main.actor.get_all_projects([$page.params.username])
+			]).then(async ([auth_profile, public_profile, projects]) => {
+				const { ok: auth_profile_, err: err_auth_profile } = auth_profile;
+				const { ok: public_profile_, err: err_public_profile } = public_profile;
+				const { ok: all_projects, err: err_all_projects } = projects;
 
-			if ($actor_profile.loggedIn) {
-				const { ok: profile_, err: err_profile } = await $actor_profile.actor.get_profile();
-				const username = get(profile_, 'username', 'x');
+				profile = public_profile_;
 
-				isProfileOwner = username === $page.params.slug;
-			}
+				if ($actor_profile.loggedIn) {
+					const username = get(auth_profile_, 'username', 'x');
 
-			const { ok: all_projects, err: err_all_projects } =
-				await $actor_project_main.actor.get_all_projects([$page.params.slug]);
+					isProfileOwner = username === $page.params.username;
+				}
 
-			if (all_projects) {
-				projects_update.update_projects_public(all_projects);
-			} else {
-				projects_update.update_projects_public([]);
-			}
+				if (all_projects) {
+					project_store.set({ isFetching: false, projects: [...all_projects] });
+
+					local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
+				} else {
+					project_store.set({ isFetching: false, projects: [] });
+
+					if (err_all_projects['UserNotFound'] === true) {
+						await $actor_project_main.actor.create_user_project_storage();
+					}
+				}
+			});
 		} catch (error) {
-			// Show error notification
-			// TODO: log error
+			console.log('error projects: ', error);
+			goto('/');
+			console.log('error: call', error);
 		}
 	});
 
@@ -131,6 +144,18 @@
 
 		modal_update.change_visibility('snap_preview');
 	}
+
+	function handleProjectRenameModalOpen(e) {
+		modal_update.change_visibility('project_rename');
+
+		project = get(e, 'detail');
+	}
+
+	async function handleProjectDeleteModalOpen(e) {
+		modal_update.change_visibility('project_options');
+
+		project = get(e, 'detail');
+	}
 </script>
 
 <svelte:head>
@@ -152,6 +177,15 @@
 	{/if}
 	{#if $modal_visible.snap_preview && snap_preview}
 		<SnapPreviewModal snap={snap_preview} />
+	{/if}
+
+	<!-- ProjectDeleteModal -->
+	{#if $modal_visible.project_options}
+		<ProjectDeleteModal {project} />
+	{/if}
+	<!-- ProjectRenameModal -->
+	{#if $modal_visible.project_rename}
+		<ProjectRenameModal {project} />
 	{/if}
 
 	<!-- ProfileInfo -->
@@ -188,7 +222,7 @@
 	<!-- Projects -->
 	{#if $profile_tabs.isProjectsSelected}
 		<!-- Fetching Projects -->
-		{#if $project_store_public.isFetching === true}
+		{#if $project_store.isFetching === true}
 			<div
 				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
@@ -198,7 +232,7 @@
 		{/if}
 
 		<!-- No Projects Found -->
-		{#if $project_store_public.projects.length === 0 && $project_store_public.isFetching === false}
+		{#if $project_store.projects.length === 0 && $project_store.isFetching === false}
 			<div
 				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
@@ -212,8 +246,14 @@
 			class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
 			row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 		>
-			{#each $project_store_public.projects as project}
-				<ProjectCard {project} on:clickProject={handleProjectClick} />
+			{#each $project_store.projects as project}
+				<ProjectCard
+					{project}
+					showOptionsPopover={isProfileOwner ? true : false}
+					on:clickProject={handleProjectClick}
+					on:clickRenameProject={handleProjectRenameModalOpen}
+					on:clickDeleteProject={handleProjectDeleteModalOpen}
+				/>
 			{/each}
 		</div>
 	{/if}

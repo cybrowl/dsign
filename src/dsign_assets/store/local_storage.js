@@ -10,11 +10,6 @@ export const local_storage_profile = writable('profile', {
 	banner_url: '',
 	username: ''
 });
-export const local_storage_profile_public = writable('profile_public', {
-	avatar_url: '',
-	banner_url: '',
-	username: ''
-});
 
 export function local_storage_remove(key) {
 	if (!browser) return;
@@ -28,6 +23,6 @@ export function local_storage_remove_all() {
 	localStorage.removeItem('snaps');
 	localStorage.removeItem('favorites');
 	localStorage.removeItem('projects');
-	localStorage.removeItem('profile');
+	// localStorage.removeItem('profile');
 	localStorage.removeItem('profile_public');
 }

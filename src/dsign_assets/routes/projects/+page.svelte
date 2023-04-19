@@ -15,7 +15,7 @@
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import ProjectCreationModal from '$modals_ref/ProjectCreationModal.svelte';
-	import ProjectOptionsDeleteModal from '$modals_ref/ProjectOptionsDeleteModal.svelte';
+	import ProjectDeleteModal from '$modals_ref/ProjectDeleteModal.svelte';
 	import ProjectRenameModal from '$modals_ref/ProjectRenameModal.svelte';
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 	import SnapsMoveModal from '$modals_ref/SnapsMoveModal.svelte';
@@ -276,9 +276,9 @@
 	{#if $modal_visible.project_creation}
 		<ProjectCreationModal />
 	{/if}
-	<!-- ProjectOptionsDeleteModal -->
+	<!-- ProjectDeleteModal -->
 	{#if $modal_visible.project_options}
-		<ProjectOptionsDeleteModal {project} />
+		<ProjectDeleteModal {project} />
 	{/if}
 	<!-- ProjectRenameModal -->
 	{#if $modal_visible.project_rename}

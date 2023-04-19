@@ -32,10 +32,10 @@ export const snap_store_fetching = function () {
 
 export const project_store = writable({ isFetching: false, projects: [] });
 export const project_store_fetching = function () {
-	project_store.update(({ projects }) => {
+	project_store.update(() => {
 		return {
 			isFetching: true,
-			projects: projects
+			projects: []
 		};
 	});
 };
