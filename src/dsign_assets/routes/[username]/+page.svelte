@@ -9,10 +9,12 @@
 	import ProfileInfo from 'dsign-components/components/ProfileInfo.svelte';
 	import ProfileTabs from 'dsign-components/components/ProfileTabs.svelte';
 	import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
+	import ProjectCardCreate from 'dsign-components/components/ProjectCardCreate.svelte';
 	import ProjectPublicEmpty from 'dsign-components/components/ProjectPublicEmpty.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
+	import ProjectCreationModal from '$modals_ref/ProjectCreationModal.svelte';
 	import ProjectDeleteModal from '$modals_ref/ProjectDeleteModal.svelte';
 	import ProjectRenameModal from '$modals_ref/ProjectRenameModal.svelte';
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
@@ -149,6 +151,10 @@
 		modal_update.change_visibility('snap_preview');
 	}
 
+	function handleProjectCreateModalOpen() {
+		modal_update.change_visibility('project_creation');
+	}
+
 	function handleProjectRenameModalOpen(e) {
 		modal_update.change_visibility('project_rename');
 
@@ -183,6 +189,10 @@
 		<SnapPreviewModal snap={snap_preview} />
 	{/if}
 
+	<!-- ProjectCreationModal -->
+	{#if $modal_visible.project_creation}
+		<ProjectCreationModal />
+	{/if}
 	<!-- ProjectDeleteModal -->
 	{#if $modal_visible.project_options}
 		<ProjectDeleteModal {project} />
@@ -241,25 +251,34 @@
 				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
-				<ProjectPublicEmpty />
+				{#if isProfileOwner}
+					<ProjectCardCreate on:clickProjectCardCreate={handleProjectCreateModalOpen} />
+				{:else}
+					<ProjectPublicEmpty />
+				{/if}
 			</div>
 		{/if}
 
 		<!-- Project -->
-		<div
-			class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+		{#if $project_store.isFetching === false && $project_store.projects.length > 0}
+			<div
+				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
 			row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
-		>
-			{#each $project_store.projects as project}
-				<ProjectCard
-					{project}
-					showOptionsPopover={isProfileOwner ? true : false}
-					on:clickProject={handleProjectClick}
-					on:clickRenameProject={handleProjectRenameModalOpen}
-					on:clickDeleteProject={handleProjectDeleteModalOpen}
-				/>
-			{/each}
-		</div>
+			>
+				{#each $project_store.projects as project}
+					<ProjectCard
+						{project}
+						showOptionsPopover={isProfileOwner ? true : false}
+						on:clickProject={handleProjectClick}
+						on:clickRenameProject={handleProjectRenameModalOpen}
+						on:clickDeleteProject={handleProjectDeleteModalOpen}
+					/>
+				{/each}
+				{#if isProfileOwner}
+					<ProjectCardCreate on:clickProjectCardCreate={handleProjectCreateModalOpen} />
+				{/if}
+			</div>
+		{/if}
 	{/if}
 
 	<!-- Project -->

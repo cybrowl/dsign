@@ -7,7 +7,7 @@
 	import Notification from 'dsign-components/components/Notification.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
-	import ProjectCardEmpty from 'dsign-components/components/ProjectCardEmpty.svelte';
+	import ProjectCardCreate from 'dsign-components/components/ProjectCardCreate.svelte';
 	import ProjectEditActionsBar from 'dsign-components/components/ProjectEditActionsBar.svelte';
 	import ProjectsTabs from 'dsign-components/components/ProjectsTabs.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
@@ -383,7 +383,7 @@
 					class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
 				row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 				>
-					<ProjectCardEmpty on:clickProjectCardEmpty={handleProjectCreateModalOpen} />
+					<ProjectCardCreate on:clickProjectCardCreate={handleProjectCreateModalOpen} />
 				</div>
 			{/if}
 
