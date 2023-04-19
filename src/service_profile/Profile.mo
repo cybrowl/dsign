@@ -213,8 +213,12 @@ actor Profile = {
 		};
 	};
 
-	public query func get_user_principal_public(username : Username) : async Result.Result<UserPrincipal, ErrUsername> {
-		//TODO: lock for authorized canisters only
+	public shared ({ caller }) func get_user_principal_public(username : Username) : async Result.Result<UserPrincipal, ErrUsername> {
+		let authorized = await CanisterIdsLedger.canister_exists(Principal.toText(caller));
+
+		if (authorized == false) {
+			return #err(#UserNotAuthorized);
+		};
 
 		switch (username_owners.get(username)) {
 			case (?principal) {

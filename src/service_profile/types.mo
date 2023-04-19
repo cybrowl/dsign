@@ -37,6 +37,7 @@ module {
 	public type ErrUsername = {
 		#UserAnonymous;
 		#UserHasUsername;
+		#UserNotAuthorized;
 		#UsernameInvalid;
 		#UsernameTaken;
 		#UsernameNotFound;
