@@ -53,7 +53,7 @@
 		}
 	}
 
-	async function commitFileAssetChunks(snap) {
+	async function commitFileAssetChunksToStaging(snap) {
 		const uploadChunk = async ({ chunk, file_name }) => {
 			return $actor_assets_file_staging.actor.create_chunk({
 				data: [...chunk],
@@ -92,8 +92,6 @@
 	async function handleSnapCreation(e) {
 		const snap = get(e, 'detail');
 
-		let img_asset_ids = [];
-		let file_asset = [];
 		is_publishing = true;
 
 		if (
@@ -101,45 +99,46 @@
 			$actor_assets_img_staging.loggedIn &&
 			$actor_snap_main.loggedIn
 		) {
-			img_asset_ids = await commitImgAssetsToStaging(snap.images);
+			try {
+				const imgAssetPromise = commitImgAssetsToStaging(snap.images);
+				const fileAssetPromise = snap.file
+					? commitFileAssetChunksToStaging(snap)
+					: Promise.resolve(null);
 
-			let has_invalid_img = false;
+				const [img_asset_ids, file_asset] = await Promise.all([imgAssetPromise, fileAssetPromise]);
 
-			img_asset_ids.forEach(function (val) {
-				if (val == 0) {
-					has_invalid_img = true;
+				const has_invalid_img = img_asset_ids.some((val) => val === 0);
+
+				if (!has_invalid_img) {
+					const create_snap_args = {
+						title: snap.title,
+						image_cover_location: snap.cover_image_location,
+						img_asset_ids: img_asset_ids,
+						file_asset
+					};
+
+					const { ok: created_snap } = await $actor_snap_main.actor.create_snap(create_snap_args);
+
+					const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
+
+					if (all_snaps) {
+						snap_store.set({ isFetching: false, snaps: [...all_snaps] });
+
+						projects_tabs.set({
+							isSnapsSelected: true,
+							isProjectsSelected: false,
+							isProjectSelected: false
+						});
+					}
 				}
-			});
 
-			if (snap.file !== null) {
-				file_asset = await commitFileAssetChunks(snap);
+				modal_update.change_visibility('snap_creation');
+			} catch (error) {
+				console.error('Error during snap creation:', error);
+				// You can display an error message to the user or handle the error as needed
+			} finally {
+				is_publishing = false;
 			}
-
-			const create_snap_args = {
-				title: snap.title,
-				image_cover_location: snap.cover_image_location,
-				img_asset_ids: img_asset_ids,
-				file_asset
-			};
-
-			const { ok: created_snap, err_create_snap } = await $actor_snap_main.actor.create_snap(
-				create_snap_args
-			);
-
-			const { ok: all_snaps, err: err_get_all_snaps_without_project } =
-				await $actor_snap_main.actor.get_all_snaps_without_project();
-
-			if (all_snaps) {
-				snap_store.set({ isFetching: false, snaps: [...all_snaps] });
-
-				projects_tabs.set({
-					isSnapsSelected: true,
-					isProjectsSelected: false,
-					isProjectSelected: false
-				});
-			}
-
-			modal_update.change_visibility('snap_creation');
 		}
 	}
 </script>
