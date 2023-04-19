@@ -48,7 +48,7 @@
 				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
 
 				if (profile) {
-					goto('/projects');
+					goto(get(profile, 'username', ''));
 				}
 
 				if (err_profile) {
@@ -69,10 +69,6 @@
 		});
 	}
 
-	async function openSnapCreationModal() {
-		modal_update.change_visibility('snap_creation');
-	}
-
 	async function openSettingsModal() {
 		modal_update.change_visibility('account_settings');
 	}
@@ -81,7 +77,6 @@
 <span>
 	{#if $actor_profile.loggedIn}
 		<div class="flex items-center">
-			<Button label="Upload" primary={true} class="mr-4" on:click={openSnapCreationModal} />
 			<Avatar
 				avatar={$local_storage_profile.avatar_url}
 				username={$local_storage_profile.username}

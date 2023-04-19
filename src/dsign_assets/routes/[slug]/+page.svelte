@@ -34,7 +34,7 @@
 	let profile = {};
 	let snap_preview = null;
 
-	// page_navigation_update.select_item(0);
+	page_navigation_update.delete_all();
 
 	if ($project_store_public.projects.length === 0) {
 		project_store_public_fetching();

@@ -19,7 +19,7 @@
 		goto(`/profile/${username}`);
 	}
 
-	page_navigation_update.select_item(3);
+	// page_navigation_update.select_item(0);
 
 	onMount(async () => {
 		if ($actor_profile.loggedIn) {
@@ -37,7 +37,7 @@
 
 <main class="grid grid-cols-12 gap-y-2">
 	<div class="col-start-2 col-end-12 mb-24">
-		<PageNavigation navItems={$page_navigation.navItems}>
+		<PageNavigation navigationItems={$page_navigation.navigationItems}>
 			<Login />
 		</PageNavigation>
 	</div>

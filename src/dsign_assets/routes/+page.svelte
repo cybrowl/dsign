@@ -20,8 +20,13 @@
 		page_navigation,
 		snap_preview
 	} from '$stores_ref/page_navigation';
+	import { local_storage_profile } from '$stores_ref/local_storage';
 
-	page_navigation_update.select_item(0);
+	page_navigation_update.add_item({
+		name: 'Profile',
+		href: `${$local_storage_profile.username}`,
+		isSelected: false
+	});
 
 	onMount(async () => {
 		if ($notification.message.length === 0) {
@@ -75,7 +80,7 @@
 
 <main class="hidden lg:grid grid-cols-12 gap-y-2 relative">
 	<div class="col-start-2 col-end-12 mb-8">
-		<PageNavigation navItems={$page_navigation.navItems}>
+		<PageNavigation navigationItems={$page_navigation.navigationItems}>
 			<Login />
 		</PageNavigation>
 	</div>

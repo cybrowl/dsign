@@ -3,14 +3,11 @@ import { writable } from 'svelte/store';
 import { notification_visible, notification } from '$stores_ref/notification';
 
 export const nav_items = [
-	{ name: 'Explore', href: '', isSelected: false },
-	{ name: 'Projects', href: 'projects', isSelected: false },
-	{ name: 'Favorites', href: 'favorites', isSelected: false },
-	{ name: 'Profile', href: 'profile', isSelected: false }
+	// { name: 'Profile', href: '', isSelected: false }
 ];
 
 export const page_navigation = writable({
-	navItems: nav_items
+	navigationItems: nav_items
 });
 
 export const snap_preview = writable({});
@@ -39,32 +36,62 @@ export const show_notification_with_msg = (message) => {
 	}, 3000);
 };
 
+function add_item(item) {
+	page_navigation.update(({ navigationItems }) => {
+		const itemExists = navigationItems.some(
+			(navItem) => navItem.name === item.name && navItem.href === item.href
+		);
+
+		if (!itemExists) {
+			navigationItems.push(item);
+		}
+
+		return {
+			navigationItems: navigationItems
+		};
+	});
+}
+
+function delete_all() {
+	page_navigation.update(() => {
+		return {
+			navigationItems: []
+		};
+	});
+}
+
 function deselect_all() {
-	page_navigation.update(({ navItems }) => {
-		navItems.forEach((navItem) => {
+	page_navigation.update(({ navigationItems }) => {
+		navigationItems.forEach((navItem) => {
 			navItem.isSelected = false;
 		});
 
 		return {
-			navItems: navItems
+			navigationItems: navigationItems
 		};
 	});
 }
 
 function select_item(num) {
-	page_navigation.update(({ navItems }) => {
-		navItems.forEach((navItem) => {
+	if (num > nav_items.length) {
+		console.warn('num out of range');
+	}
+
+	page_navigation.update(({ navigationItems }) => {
+		navigationItems.forEach((navItem) => {
 			navItem.isSelected = false;
 		});
-		navItems[num].isSelected = true;
+		navigationItems[num].isSelected = true;
 
 		return {
-			navItems: navItems
+			navigationItems: navigationItems
 		};
 	});
 }
 
 export default {
+	add_item,
 	deselect_all,
+	delete_all,
 	select_item
 };

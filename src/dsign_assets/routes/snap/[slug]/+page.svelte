@@ -42,7 +42,7 @@
 
 <main class="grid grid-cols-12 gap-y-2">
 	<div class="col-start-2 col-end-12 mb-8">
-		<PageNavigation navItems={$page_navigation.navItems}>
+		<PageNavigation navigationItems={$page_navigation.navigationItems}>
 			<Login />
 		</PageNavigation>
 	</div>

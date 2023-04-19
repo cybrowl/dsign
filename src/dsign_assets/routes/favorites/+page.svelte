@@ -21,7 +21,7 @@
 		snap_preview
 	} from '$stores_ref/page_navigation';
 
-	page_navigation_update.select_item(2);
+	// page_navigation_update.select_item(0);
 
 	$favorite_store.snaps.length === 0 && favorite_store_fetching();
 
@@ -83,7 +83,7 @@
 
 <main class="grid grid-cols-12 gap-y-2">
 	<div class="col-start-2 col-end-12 mb-8">
-		<PageNavigation navItems={$page_navigation.navItems}>
+		<PageNavigation navigationItems={$page_navigation.navigationItems}>
 			<Login />
 		</PageNavigation>
 	</div>

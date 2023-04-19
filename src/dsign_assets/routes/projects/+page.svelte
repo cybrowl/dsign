@@ -41,7 +41,7 @@
 	let project = { snaps: [] };
 	let snap_preview = null;
 
-	page_navigation_update.select_item(1);
+	// page_navigation_update.select_item(0);
 
 	$snap_store.snaps.length === 0 && snap_store_fetching();
 	$project_store.projects.length === 0 && project_store_fetching();
@@ -249,7 +249,7 @@
 <main class="hidden lg:grid grid-cols-12 gap-y-2 relative">
 	<!-- Header Nav -->
 	<div class="col-start-2 col-end-12 row-start-1 row-end-2 mb-8">
-		<PageNavigation navItems={$page_navigation.navItems}>
+		<PageNavigation navigationItems={$page_navigation.navigationItems}>
 			<Login />
 		</PageNavigation>
 	</div>
