@@ -49,12 +49,10 @@
 		try {
 			Promise.all([
 				$actor_profile.actor.get_profile(),
-				$actor_profile.actor.get_profile_public($page.params.username),
-				$actor_project_main.actor.get_all_projects([$page.params.username])
-			]).then(async ([auth_profile, public_profile, projects]) => {
+				$actor_profile.actor.get_profile_public($page.params.username)
+			]).then(async ([auth_profile, public_profile]) => {
 				const { ok: auth_profile_, err: err_auth_profile } = auth_profile;
 				const { ok: public_profile_, err: err_public_profile } = public_profile;
-				const { ok: all_projects, err: err_all_projects } = projects;
 
 				profile = public_profile_;
 
@@ -63,19 +61,25 @@
 
 					isProfileOwner = username === $page.params.username;
 				}
+			});
 
-				if (all_projects) {
-					project_store.set({ isFetching: false, projects: [...all_projects] });
+			Promise.all([$actor_project_main.actor.get_all_projects([$page.params.username])]).then(
+				async ([projects]) => {
+					const { ok: all_projects, err: err_all_projects } = projects;
 
-					local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
-				} else {
-					project_store.set({ isFetching: false, projects: [] });
+					if (all_projects) {
+						project_store.set({ isFetching: false, projects: [...all_projects] });
 
-					if (err_all_projects['UserNotFound'] === true) {
-						await $actor_project_main.actor.create_user_project_storage();
+						local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
+					} else {
+						project_store.set({ isFetching: false, projects: [] });
+
+						if (err_all_projects['UserNotFound'] === true) {
+							await $actor_project_main.actor.create_user_project_storage();
+						}
 					}
 				}
-			});
+			);
 		} catch (error) {
 			console.log('error projects: ', error);
 			goto('/');
