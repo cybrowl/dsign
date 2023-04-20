@@ -91,6 +91,7 @@
 
 	async function handleSnapCreation(e) {
 		const snap = get(e, 'detail');
+		//TODO: project the snap is being created in
 
 		is_publishing = true;
 
@@ -118,6 +119,12 @@
 					};
 
 					const { ok: created_snap } = await $actor_snap_main.actor.create_snap(create_snap_args);
+
+					//TODO:
+					// save snap id to localstorage to later send to actor_snap_main in root/[username]
+					// {snap_id: xxx, tags: ["xx", "yy"]}
+					// you can only save snap_id here so it has to be two arrays that are created
+					// make sure all the tags are sent in lowercase
 
 					const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
 

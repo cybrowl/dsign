@@ -1,6 +1,7 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import get from 'lodash/get';
 
 	import Login from '$components_ref/Login.svelte';
@@ -135,12 +136,7 @@
 	function handleProjectClick(e) {
 		project = get(e, 'detail');
 
-		project.name = project.name.charAt(0).toUpperCase() + project.name.slice(1);
-
-		profile_tabs.set({
-			isProjectsSelected: false,
-			isProjectSelected: true
-		});
+		goto(`/project/${project.id}?canister_id=${project.canister_id}`);
 	}
 
 	async function handleProfileBannerChange(event) {
