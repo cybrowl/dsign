@@ -22,7 +22,7 @@ import Types "./types";
 import Utils "../utils/utils";
 import UtilsShared "../utils/utils";
 
-actor class Project(project_main : Principal, is_prod : Bool) = this {
+actor class Project(project_main : Principal, snap_main : Principal, is_prod : Bool) = this {
 	type ErrAddSnapsToProject = Types.ErrAddSnapsToProject;
 	type ErrCreateProject = Types.ErrCreateProject;
 	type ErrDeleteProjects = Types.ErrDeleteProjects;
@@ -180,7 +180,7 @@ actor class Project(project_main : Principal, is_prod : Bool) = this {
 	) : async Result.Result<Project, ErrAddSnapsToProject> {
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "add_snaps_to_project")];
 
-		if (project_main != caller) {
+		if (project_main != caller or snap_main != caller) {
 			return #err(#NotAuthorized);
 		};
 

@@ -1,43 +1,68 @@
 <script>
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import get from 'lodash/get';
 	import last from 'lodash/last';
 	import isEmpty from 'lodash/isEmpty';
-	import { goto } from '$app/navigation';
 
 	import Login from '$components_ref/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import ProjectInfoHeader from 'dsign-components/components/ProjectInfoHeader.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
+	import SnapCardCreate from 'dsign-components/components/SnapCardCreate.svelte';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
+	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
-	import { actor_project_main } from '$stores_ref/actors';
+	import { actor_project_main, actor_profile } from '$stores_ref/actors';
 	import {
 		project_store_public,
 		project_store_public_fetching,
 		projects_update
 	} from '$stores_ref/fetch_store';
-	import { modal_visible } from '$stores_ref/modal';
+	import { auth_profile } from '$stores_ref/auth_client';
+	import modal_update, { modal_visible } from '$stores_ref/modal';
 	import page_navigation_update, {
 		snap_preview,
 		page_navigation
 	} from '$stores_ref/page_navigation';
+	import { disable_project_store_reset } from '$stores_ref/page_state';
 
 	page_navigation_update.deselect_all();
 
-	isEmpty($project_store_public.project) === true && project_store_public_fetching();
+	let isProjectOwner = false;
+
+	if ($disable_project_store_reset === false) {
+		project_store_public_fetching();
+	} else {
+		disable_project_store_reset.set(false);
+	}
 
 	onMount(async () => {
+		await Promise.all([auth_profile()]);
+
 		const canister_id = $page.url.searchParams.get('canister_id');
 		const project_id = last(get($page, 'url.pathname', '').split('/'));
 
 		try {
-			const { ok: project } = await $actor_project_main.actor.get_project(project_id, canister_id);
+			Promise.all([
+				$actor_profile.actor.get_profile(),
+				$actor_project_main.actor.get_project(project_id, canister_id)
+			]).then(async ([auth_profile_, project_]) => {
+				const { ok: auth_profile, err: err_auth_profile } = auth_profile_;
+				const { ok: project, err: err_project } = project_;
 
-			projects_update.update_project_public(project);
+				projects_update.update_project_public(project);
+
+				if ($actor_profile.loggedIn) {
+					const username = get(auth_profile, 'username', 'x');
+
+					console.log('isProjectOwner: ', isProjectOwner);
+					isProjectOwner = username === project.username;
+				}
+			});
 		} catch (error) {
 			console.log('error projects: ', error);
 		}
@@ -49,6 +74,10 @@
 		snap_preview.set(snap);
 
 		goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
+	}
+
+	function handleSnapCreateModalOpen() {
+		modal_update.change_visibility('snap_creation');
 	}
 </script>
 
@@ -64,12 +93,15 @@
 	</div>
 
 	<!-- Modals -->
-
-	<!-- AccountSettingsModal -->
+	{#if $modal_visible.snap_creation}
+		<SnapCreationModal />
+	{/if}
+	{#if $modal_visible.snap_preview && snap_preview}
+		<SnapPreviewModal snap={snap_preview} />
+	{/if}
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}
-	<!-- SnapPreviewModal -->
 	{#if $modal_visible.snap_preview && snap_preview}
 		<SnapPreviewModal snap={snap_preview} />
 	{/if}
@@ -97,6 +129,18 @@
 			<ProjectInfoHeader project={$project_store_public.project} />
 		</div>
 
+		<!-- No Snaps Found -->
+		{#if $project_store_public.project.snaps && $project_store_public.project.snaps.length === 0 && $project_store_public.isFetching === false}
+			<div
+				class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
+				row-start-3 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
+			>
+				{#if isProjectOwner}
+					<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
+				{/if}
+			</div>
+		{/if}
+
 		<!-- Snaps -->
 		{#if $project_store_public.project.snaps && $project_store_public.project.snaps.length > 0}
 			<div
@@ -106,6 +150,9 @@
 				{#each $project_store_public.project.snaps as snap}
 					<SnapCard {snap} on:clickCard={handleSnapPreviewModalOpen} />
 				{/each}
+				{#if isProjectOwner}
+					<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
+				{/if}
 			</div>
 		{/if}
 	{/if}

@@ -64,6 +64,7 @@ actor ProjectMain {
 	stable var user_canisters_ref_storage : [var (UserPrincipal, [(ProjectCanisterID, [ProjectID])])] = [var];
 
 	stable var project_canister_id : Text = "";
+	stable var snap_main_canister_id : Text = "";
 
 	// ------------------------- PROJECTS MANAGEMENT -------------------------
 	public shared ({ caller }) func create_user_project_storage() : async Bool {
@@ -472,9 +473,34 @@ actor ProjectMain {
 		return log_payload;
 	};
 
-	private func create_project_canister(project_main_principal : Principal, is_prod : Bool) : async () {
+	//NOTE: dev only
+	public shared (msg) func set_canister_ids({
+		snap_main : Text;
+	}) : async Text {
+		let tags = [("actor_name", ACTOR_NAME), ("method", "set_canister_ids")];
+
+		let project_main_principal = Principal.fromActor(ProjectMain);
+
+		let is_prod = Text.equal(
+			Principal.toText(project_main_principal),
+			"nhlnj-vyaaa-aaaag-aay5q-cai"
+		);
+
+		if (is_prod == false) {
+			snap_main_canister_id := snap_main;
+		};
+
+		ignore Logger.log_event(
+			tags,
+			"set_canister_ids: " # snap_main
+		);
+
+		return "set_canister_ids";
+	};
+
+	private func create_project_canister(project_main_principal : Principal, snap_main_principal : Principal, is_prod : Bool) : async () {
 		Cycles.add(CYCLE_AMOUNT);
-		let project_actor = await Project.Project(project_main_principal, is_prod);
+		let project_actor = await Project.Project(project_main_principal, snap_main_principal, is_prod);
 		let principal = Principal.fromActor(project_actor);
 
 		project_canister_id := Principal.toText(principal);
@@ -499,12 +525,18 @@ actor ProjectMain {
 			"lyswl-7iaaa-aaaag-aatya-cai"
 		);
 
+		if (is_prod == true) {
+			snap_main_canister_id := "lyswl-7iaaa-aaaag-aatya-cai";
+		};
+
+		let snap_main_principal = Principal.fromText(snap_main_canister_id);
+
 		if (project_canister_id.size() > 1) {
 			ignore Logger.log_event(tags, "exists project_canister_id: " # project_canister_id);
 
 			return project_canister_id;
 		} else {
-			await create_project_canister(project_main_principal, is_prod);
+			await create_project_canister(project_main_principal, snap_main_principal, is_prod);
 
 			ignore Logger.log_event(tags, "created project_canister_id: " # project_canister_id);
 

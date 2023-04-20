@@ -32,7 +32,7 @@
 		"@dfinity/identity": "^0.15.4",
 		"@dfinity/principal": "^0.15.4",
 		"dotenv": "^16.0.3",
-		"dsign-components": "^0.21.12",
+		"dsign-components": "^0.21.13",
 		"lodash": "^4.17.21",
 		"luxon": "^3.2.1",
 		"svelte-local-storage-store": "^0.2.6"
@@ -45,6 +45,7 @@
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-svelte3": "^4.0.0",
 		"fake-words": "^0.5.3",
+		"node-fetch": "^2.6.7",
 		"postcss": "^8.4.5",
 		"postcss-load-config": "^3.1.1",
 		"prettier": "^2.8.0",

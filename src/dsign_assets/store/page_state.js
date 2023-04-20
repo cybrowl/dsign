@@ -11,4 +11,6 @@ export const profile_tabs = writable({
 	isFavoritesSelected: false
 });
 
+export const disable_project_store_reset = writable(false);
+
 export const is_edit_active = writable(false);

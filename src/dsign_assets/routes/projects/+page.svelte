@@ -11,7 +11,7 @@
 	import ProjectEditActionsBar from 'dsign-components/components/ProjectEditActionsBar.svelte';
 	import ProjectsTabs from 'dsign-components/components/ProjectsTabs.svelte';
 	import SnapCard from 'dsign-components/components/SnapCard.svelte';
-	import SnapCardEmpty from 'dsign-components/components/SnapCardEmpty.svelte';
+	import SnapCardCreate from 'dsign-components/components/SnapCardCreate.svelte';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import ProjectCreationModal from '$modals_ref/ProjectCreationModal.svelte';
@@ -340,8 +340,8 @@
 					class="col-start-2 col-end-12 grid grid-cols-4 
 			row-start-3 row-end-auto mx-4 gap-x-10 gap-y-12 mt-2 mb-24"
 				>
-					<SnapCardEmpty
-						on:clickSnapCardEmpty={() => modal_update.change_visibility('snap_creation')}
+					<SnapCardCreate
+						on:clickSnapCardCreate={() => modal_update.change_visibility('snap_creation')}
 					/>
 				</div>
 			{/if}

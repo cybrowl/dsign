@@ -4,6 +4,7 @@ const { readFileSync } = require('fs');
 const { HttpAgent, Actor } = require('@dfinity/agent');
 const { config } = require('dotenv');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
+const fetch = require('node-fetch');
 
 config();
 
@@ -13,11 +14,13 @@ const {
 } = require('../../test-utils/actor_interface.cjs');
 const {
 	canister_ids_ledger_canister_id,
-	project_main_canister_id
+	project_main_canister_id,
+	snap_main_canister_id
 } = require('../../test-utils/actor_canister_ids.cjs');
 const canister_ids = require('../../canister_ids.json');
 
 global.fetch = fetch;
+global.Headers = fetch.Headers;
 
 const parseIdentity = (privateKeyHex) => {
 	const privateKey = Uint8Array.from(Buffer.from(privateKeyHex, 'hex'));
@@ -76,8 +79,12 @@ const installCode = async () => {
 		const local_canisters = project_main_canisters.map((canister) => {
 			const arg_map = {
 				project: IDL.encode(
-					[IDL.Principal, IDL.Bool],
-					[Principal.fromText(project_main_canister_id), false]
+					[IDL.Principal, IDL.Principal, IDL.Bool],
+					[
+						Principal.fromText(project_main_canister_id),
+						Principal.fromText(snap_main_canister_id),
+						false
+					]
 				)
 			};
 
@@ -94,13 +101,11 @@ const installCode = async () => {
 
 		local_canisters.forEach(async (canister) => {
 			const actor = await get_actor(canister.canister_id, canister.can_interface, canister.is_prod);
-
 			const res = await actor.install_code(
 				canister.child_canister_principal,
 				[...canister.arg],
 				canister.wasm
 			);
-
 			console.log('done => ', res);
 		});
 	} else {
@@ -121,8 +126,12 @@ const installCode = async () => {
 		const prod_canisters = project_main_canisters.map((canister) => {
 			const arg_map = {
 				project: IDL.encode(
-					[IDL.Principal, IDL.Bool],
-					[Principal.fromText(canister_ids['project_main'].ic), false]
+					[IDL.Principal, IDL.Principal, IDL.Bool],
+					[
+						Principal.fromText(canister_ids['project_main'].ic),
+						Principal.fromText(canister_ids['snap_main'].ic),
+						true
+					]
 				)
 			};
 
@@ -150,6 +159,7 @@ const installCode = async () => {
 		});
 	}
 };
+
 const init = async () => {
 	try {
 		await installCode();

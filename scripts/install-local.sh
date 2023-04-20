@@ -71,12 +71,17 @@ dfx canister call snap_main set_canister_ids \
 
 dfx canister call snap_main initialize_canisters
 
+dfx canister call project_main set_canister_ids \
+'(record {
+    snap_main = "'${SNAP_MAIN_PRINCIPAL}'";
+    })'
+
 dfx canister call project_main initialize_canisters
 
 dfx canister call favorite_main initialize_canisters
 
 # test canisters
-dfx deploy test_project --argument='(principal "'${PROJECT_MAIN_PRINCIPAL}'", false)'
+dfx deploy test_project --argument='(principal "'${PROJECT_MAIN_PRINCIPAL}'", principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
 dfx deploy test_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
 dfx deploy test_image_assets --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
 dfx deploy test_snap --argument='(principal "'${SNAP_MAIN_PRINCIPAL}'", principal "'${PROJECT_MAIN_PRINCIPAL}'", principal "'${FAVORITE_MAIN_PRINCIPAL}'")'

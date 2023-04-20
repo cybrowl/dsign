@@ -18,9 +18,10 @@ else
 fi
 
 export PROJECT_MAIN_PRINCIPAL=$(dfx canister ${DEPLOY_NETWORK} id project_main)
+export SNAP_MAIN_PRINCIPAL=$(dfx canister ${DEPLOY_NETWORK} id snap_main)
 
 # Deploy
-dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} test_project --argument='(principal "'${PROJECT_MAIN_PRINCIPAL}'", false)'
+dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} test_project --argument='(principal "'${PROJECT_MAIN_PRINCIPAL}'", principal "'${SNAP_MAIN_PRINCIPAL}'", false)'
 dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} project_main
 
 # Check version

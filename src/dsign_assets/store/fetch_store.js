@@ -42,11 +42,11 @@ export const project_store_fetching = function () {
 
 export const project_store_public = writable({ isFetching: false, projects: [], project: {} });
 export const project_store_public_fetching = function () {
-	project_store_public.update(({ projects, project }) => {
+	project_store_public.update(() => {
 		return {
 			isFetching: true,
-			projects: projects,
-			project: project
+			projects: [],
+			project: []
 		};
 	});
 };

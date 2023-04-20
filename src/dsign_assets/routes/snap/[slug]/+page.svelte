@@ -17,19 +17,20 @@
 		page_navigation,
 		snap_preview
 	} from '$stores_ref/page_navigation';
+	import { disable_project_store_reset } from '$stores_ref/page_state';
 
 	page_navigation_update.deselect_all();
-
-	// isEmpty($project_store_public.project) === true && project_store_public_fetching();
 
 	onMount(async () => {
 		const canister_id = $page.url.searchParams.get('canister_id');
 		const snap_id = last(get($page, 'url.pathname', '').split('/'));
 
 		try {
-			const { ok: snap } = await $actor_snap_main.actor.get_snap(snap_id, canister_id);
+			if ($snap_preview.id === undefined) {
+				const { ok: snap } = await $actor_snap_main.actor.get_snap(snap_id, canister_id);
 
-			snap_preview.set(snap);
+				snap_preview.set(snap);
+			}
 		} catch (error) {
 			console.log('error projects: ', error);
 		}
@@ -55,7 +56,14 @@
 	{/if}
 
 	<div class="col-start-2 col-end-12 row-start-2 row-end-auto mb-20">
-		<div class="close" on:click={() => history.back()} on:keypress={console.log('todo')}>
+		<div
+			class="close"
+			on:click={() => {
+				disable_project_store_reset.set(true);
+				history.back();
+			}}
+			on:keypress={console.log('todo')}
+		>
 			<Icon class="closeRounded" name="close_rounded" width="48" height="48" />
 		</div>
 		{#if $snap_preview.id !== undefined}

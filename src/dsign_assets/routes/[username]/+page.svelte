@@ -19,8 +19,6 @@
 	import ProjectCreationModal from '$modals_ref/ProjectCreationModal.svelte';
 	import ProjectDeleteModal from '$modals_ref/ProjectDeleteModal.svelte';
 	import ProjectRenameModal from '$modals_ref/ProjectRenameModal.svelte';
-	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
-	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
 	import {
 		actor_assets_img_staging,
@@ -202,25 +200,16 @@
 		</PageNavigation>
 	</div>
 
+	<!-- Modals -->
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}
-	{#if $modal_visible.snap_creation}
-		<SnapCreationModal />
-	{/if}
-	{#if $modal_visible.snap_preview && snap_preview}
-		<SnapPreviewModal snap={snap_preview} />
-	{/if}
-
-	<!-- ProjectCreationModal -->
 	{#if $modal_visible.project_creation}
 		<ProjectCreationModal />
 	{/if}
-	<!-- ProjectDeleteModal -->
 	{#if $modal_visible.project_options}
 		<ProjectDeleteModal {project} />
 	{/if}
-	<!-- ProjectRenameModal -->
 	{#if $modal_visible.project_rename}
 		<ProjectRenameModal {project} />
 	{/if}

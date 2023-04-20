@@ -233,6 +233,8 @@ actor SnapMain {
 			};
 			case (#ok snap) {
 				snap_ids.add(snap.id);
+
+				// add_snap_to_project
 				user_snap_ids_storage.put(snap_canister_id, Buffer.toArray(snap_ids));
 
 				#ok("Created Snap");
