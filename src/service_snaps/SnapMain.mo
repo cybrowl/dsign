@@ -46,6 +46,7 @@ actor SnapMain {
 
 	type AssetsActor = Types.AssetsActor;
 	type ImageAssetsActor = Types.ImageAssetsActor;
+	type ProjectActor = Types.ProjectActor;
 	type SnapActor = Types.SnapActor;
 
 	type CanisterInfo = CanisterIdsLedgerTypes.CanisterInfo;
@@ -171,6 +172,7 @@ actor SnapMain {
 		let assets_actor = actor (assets_canister_id) : AssetsActor;
 		let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
 		let snap_actor = actor (snap_canister_id) : SnapActor;
+		let project_actor = actor (snap_info.project.canister_id) : ProjectActor;
 
 		// save images from img_asset_ids
 		let image_ref : ImageRef = { canister_id = ""; id = ""; url = "" };
@@ -234,7 +236,27 @@ actor SnapMain {
 			case (#ok snap) {
 				snap_ids.add(snap.id);
 
-				// add_snap_to_project
+				let snap_ref = {
+					id = snap.id;
+					canister_id = snap.canister_id;
+				};
+
+				// add snap to project
+				switch (await project_actor.add_snaps_to_project([snap_ref], snap_info.project.id, caller)) {
+					case (#err err) {
+						ignore Logger.log_event(
+							tags,
+							debug_show ("project_actor.add_snaps_to_project", err)
+						);
+					};
+					case (#ok project) {
+						ignore Logger.log_event(
+							tags,
+							debug_show ("project_actor.add_snaps_to_project", debug_show (project))
+						);
+					};
+				};
+
 				user_snap_ids_storage.put(snap_canister_id, Buffer.toArray(snap_ids));
 
 				#ok("Created Snap");

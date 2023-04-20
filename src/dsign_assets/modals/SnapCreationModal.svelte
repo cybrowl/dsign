@@ -21,6 +21,7 @@
 	import modal_update from '$stores_ref/modal';
 
 	let is_publishing = false;
+	export let project_ref = {};
 
 	onMount(async () => {
 		await Promise.all([auth_assets_file_staging(), auth_assets_img_staging(), auth_snap_main()]);
@@ -104,7 +105,7 @@
 				const imgAssetPromise = commitImgAssetsToStaging(snap.images);
 				const fileAssetPromise = snap.file
 					? commitFileAssetChunksToStaging(snap)
-					: Promise.resolve(null);
+					: Promise.resolve([]);
 
 				const [img_asset_ids, file_asset] = await Promise.all([imgAssetPromise, fileAssetPromise]);
 
@@ -115,8 +116,14 @@
 						title: snap.title,
 						image_cover_location: snap.cover_image_location,
 						img_asset_ids: img_asset_ids,
+						project: {
+							id: project_ref.id,
+							canister_id: project_ref.canister_id
+						},
 						file_asset
 					};
+
+					console.log('create_snap_args: ', create_snap_args);
 
 					const { ok: created_snap } = await $actor_snap_main.actor.create_snap(create_snap_args);
 
@@ -126,17 +133,17 @@
 					// you can only save snap_id here so it has to be two arrays that are created
 					// make sure all the tags are sent in lowercase
 
-					const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
+					// const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
 
-					if (all_snaps) {
-						snap_store.set({ isFetching: false, snaps: [...all_snaps] });
+					// if (all_snaps) {
+					// 	snap_store.set({ isFetching: false, snaps: [...all_snaps] });
 
-						projects_tabs.set({
-							isSnapsSelected: true,
-							isProjectsSelected: false,
-							isProjectSelected: false
-						});
-					}
+					// 	projects_tabs.set({
+					// 		isSnapsSelected: true,
+					// 		isProjectsSelected: false,
+					// 		isProjectSelected: false
+					// 	});
+					// }
 				}
 
 				modal_update.change_visibility('snap_creation');
@@ -144,7 +151,7 @@
 				console.error('Error during snap creation:', error);
 				// You can display an error message to the user or handle the error as needed
 			} finally {
-				is_publishing = false;
+				// is_publishing = false;
 			}
 		}
 	}

@@ -522,7 +522,7 @@ actor ProjectMain {
 		let project_main_principal = Principal.fromActor(ProjectMain);
 		let is_prod = Text.equal(
 			Principal.toText(project_main_principal),
-			"lyswl-7iaaa-aaaag-aatya-cai"
+			"nhlnj-vyaaa-aaaag-aay5q-cai"
 		);
 
 		if (is_prod == true) {

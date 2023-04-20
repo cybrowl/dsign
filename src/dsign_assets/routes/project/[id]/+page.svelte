@@ -33,6 +33,7 @@
 	page_navigation_update.deselect_all();
 
 	let isProjectOwner = false;
+	let project_ref = {};
 
 	if ($disable_project_store_reset === false) {
 		project_store_public_fetching();
@@ -54,6 +55,9 @@
 				const { ok: auth_profile, err: err_auth_profile } = auth_profile_;
 				const { ok: project, err: err_project } = project_;
 
+				console.log('project: ', project);
+
+				project_ref = project;
 				projects_update.update_project_public(project);
 
 				if ($actor_profile.loggedIn) {
@@ -94,7 +98,7 @@
 
 	<!-- Modals -->
 	{#if $modal_visible.snap_creation}
-		<SnapCreationModal />
+		<SnapCreationModal {project_ref} />
 	{/if}
 	{#if $modal_visible.snap_preview && snap_preview}
 		<SnapPreviewModal snap={snap_preview} />

@@ -180,41 +180,42 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 	) : async Result.Result<Project, ErrAddSnapsToProject> {
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "add_snaps_to_project")];
 
-		if (project_main != caller or snap_main != caller) {
+		if (project_main == caller or snap_main == caller) {
+
+			switch (projects.get(project_id)) {
+				case null {
+					return #err(#ProjectNotFound);
+				};
+				case (?project) {
+					if (project.owner != owner) {
+						return #err(#NotOwner);
+					};
+
+					var updated_snaps : Buffer.Buffer<SnapRef> = Buffer.fromArray(project.snaps);
+
+					for (snap in snaps.vals()) {
+						updated_snaps.add(snap);
+					};
+
+					let project_updated : Project = {
+						id = project.id;
+						canister_id = project.canister_id;
+						created = project.created;
+						username = project.username;
+						owner = project.owner;
+						name = project.name;
+						snaps = Buffer.toArray(updated_snaps);
+					};
+
+					projects.put(project_id, project_updated);
+
+					ignore Logger.log_event(log_tags, "Snaps Added To Project");
+
+					return #ok(project);
+				};
+			};
+		} else {
 			return #err(#NotAuthorized);
-		};
-
-		switch (projects.get(project_id)) {
-			case null {
-				return #err(#ProjectNotFound);
-			};
-			case (?project) {
-				if (project.owner != owner) {
-					return #err(#NotOwner);
-				};
-
-				var updated_snaps : Buffer.Buffer<SnapRef> = Buffer.fromArray(project.snaps);
-
-				for (snap in snaps.vals()) {
-					updated_snaps.add(snap);
-				};
-
-				let project_updated : Project = {
-					id = project.id;
-					canister_id = project.canister_id;
-					created = project.created;
-					username = project.username;
-					owner = project.owner;
-					name = project.name;
-					snaps = Buffer.toArray(updated_snaps);
-				};
-
-				projects.put(project_id, project_updated);
-
-				ignore Logger.log_event(log_tags, "Snaps Added To Project");
-
-				return #ok(project);
-			};
 		};
 	};
 
