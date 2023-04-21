@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import get from 'lodash/get';
 
 export const explore_store = writable({ isFetching: false, projects: [] });
 export const explore_store_fetching = function () {
@@ -88,6 +89,35 @@ function update_project(project) {
 	});
 }
 
+function deselect_snaps_from_project() {
+	project_store.update(({ projects, project }) => {
+		const snaps = get(project, 'snaps', []);
+
+		const updated_snaps = snaps.map((snap) => {
+			return {
+				...snap,
+				isSelected: false
+			};
+		});
+
+		return {
+			isFetching: false,
+			projects: projects,
+			project: { ...project, snaps: updated_snaps }
+		};
+	});
+}
+
+function delete_snaps_from_project(snaps_kept) {
+	project_store.update(({ projects, project }) => {
+		return {
+			isFetching: false,
+			projects: projects,
+			project: { ...project, snaps: snaps_kept }
+		};
+	});
+}
+
 function update_projects(projects) {
 	project_store.update(({ project }) => {
 		return {
@@ -101,6 +131,8 @@ function update_projects(projects) {
 export const projects_update = {
 	delete_projects,
 	rename_project,
+	delete_snaps_from_project,
+	deselect_snaps_from_project,
 	update_project,
 	update_projects
 };

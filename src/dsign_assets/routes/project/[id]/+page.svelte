@@ -18,9 +18,9 @@
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
-	import { actor_project_main, actor_profile } from '$stores_ref/actors';
+	import { actor_project_main, actor_snap_main, actor_profile } from '$stores_ref/actors';
 	import { project_store, project_store_fetching, projects_update } from '$stores_ref/fetch_store';
-	import { auth_profile } from '$stores_ref/auth_client';
+	import { auth_profile, auth_snap_main } from '$stores_ref/auth_client';
 	import modal_update, { modal_visible } from '$stores_ref/modal';
 	import page_navigation_update, {
 		snap_preview,
@@ -29,7 +29,7 @@
 	import {
 		disable_project_store_reset,
 		is_edit_active,
-		projectsTabsState
+		projectTabsState
 	} from '$stores_ref/page_state';
 
 	page_navigation_update.deselect_all();
@@ -44,7 +44,7 @@
 	}
 
 	onMount(async () => {
-		await Promise.all([auth_profile()]);
+		await Promise.all([auth_profile(), auth_snap_main()]);
 
 		const canister_id = $page.url.searchParams.get('canister_id');
 		const project_id = last(get($page, 'url.pathname', '').split('/'));
@@ -65,14 +65,58 @@
 				if ($actor_profile.loggedIn) {
 					const username = get(auth_profile, 'username', 'x');
 
-					console.log('isProjectOwner: ', isProjectOwner);
 					isProjectOwner = username === project.username;
+
+					console.log('isProjectOwner: ', isProjectOwner);
 				}
 			});
 		} catch (error) {
 			console.log('error projects: ', error);
 		}
 	});
+
+	function handleToggleEditMode(e) {
+		is_edit_active.set(get(e, 'detail', false));
+
+		projects_update.deselect_snaps_from_project();
+	}
+
+	async function handleDeleteSnaps() {
+		const snaps = get($project_store.project, 'snaps', []);
+
+		const selected_snaps = snaps.filter((snap) => snap.isSelected === true);
+		const selected_snaps_ids = selected_snaps.map((snap) => snap.id);
+
+		if (selected_snaps_ids.length === 0) {
+			//TODO: Notification
+			return 'Nothing to Delete';
+		}
+
+		handleToggleEditMode({ detail: false });
+
+		const snaps_kept = snaps.filter((snap) => snap.isSelected === false);
+
+		projects_update.delete_snaps_from_project(snaps_kept);
+
+		if ($actor_snap_main.loggedIn) {
+			const { ok: res, err: error } = await $actor_snap_main.actor.delete_snaps(
+				selected_snaps_ids,
+				{
+					id: project_ref.id,
+					canister_id: project_ref.canister_id
+				}
+			);
+
+			const { ok: project } = await $actor_project_main.actor.get_project(
+				project_ref.id,
+				project_ref.canister_id
+			);
+
+			projects_update.update_project(project);
+		} else {
+			// navigate_to_home_with_notification();
+		}
+	}
 
 	function handleSnapPreviewModalOpen(e) {
 		const snap = e.detail;
@@ -138,17 +182,21 @@
 		<!-- ProjectsTabs & ProjectEditActionsBar -->
 		<div class="col-start-2 col-end-12 row-start-3 row-end-4 mb-5">
 			<ProjectTabs
-				selectedTabState={$projectsTabsState}
-				on:selectSnapsTab={(e) => projectsTabsState.set(e.detail)}
-				on:selectIssuesTab={(e) => projectsTabsState.set(e.detail)}
-				on:selectChangesTab={(e) => projectsTabsState.set(e.detail)}
+				selectedTabState={$projectTabsState}
+				on:selectSnapsTab={(e) => projectTabsState.set(e.detail)}
+				on:selectIssuesTab={(e) => projectTabsState.set(e.detail)}
+				on:selectChangesTab={(e) => projectTabsState.set(e.detail)}
 			/>
-			{#if $projectsTabsState.isSnapsSelected}
-				<ProjectEditActionsBar isEditActive={$is_edit_active} />
+			{#if $projectTabsState.isSnapsSelected && isProjectOwner}
+				<ProjectEditActionsBar
+					isEditActive={$is_edit_active}
+					on:toggleEditMode={handleToggleEditMode}
+					on:clickRemove={handleDeleteSnaps}
+				/>
 			{/if}
 		</div>
 
-		{#if $projectsTabsState.isSnapsSelected}
+		{#if $projectTabsState.isSnapsSelected}
 			<!-- No Snaps Found -->
 			{#if $project_store.project.snaps && $project_store.project.snaps.length === 0 && $project_store.isFetching === false}
 				<div
@@ -168,7 +216,11 @@
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 				>
 					{#each $project_store.project.snaps as snap}
-						<SnapCard {snap} on:clickCard={handleSnapPreviewModalOpen} />
+						<SnapCard
+							{snap}
+							isEditMode={$is_edit_active}
+							on:clickCard={handleSnapPreviewModalOpen}
+						/>
 					{/each}
 					{#if isProjectOwner}
 						<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
