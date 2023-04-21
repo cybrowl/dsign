@@ -63,7 +63,7 @@
 					}
 
 					setTimeout(function () {
-						location.replace('/projects');
+						location.replace(`/${username}`);
 					}, 2000);
 				}
 			} catch (error) {

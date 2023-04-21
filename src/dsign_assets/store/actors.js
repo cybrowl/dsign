@@ -18,7 +18,7 @@ export function createActor(options) {
 	const canisterIds = env.canisterIds[options.actor_name];
 	const canisterId = canisterIds[env['DFX_NETWORK']];
 
-	const host = isProd ? `https://${canisterId}.ic0.app/` : `http://127.0.0.1:8080`;
+	const host = isProd ? `https://${canisterId}.icp0.io/` : `http://127.0.0.1:8080`;
 
 	const agentOptions = { host };
 

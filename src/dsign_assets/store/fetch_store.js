@@ -1,11 +1,11 @@
 import { writable } from 'svelte/store';
 
-export const explore_store = writable({ isFetching: false, snaps: [] });
+export const explore_store = writable({ isFetching: false, projects: [] });
 export const explore_store_fetching = function () {
-	explore_store.update(({ snaps }) => {
+	explore_store.update(({ projects }) => {
 		return {
 			isFetching: true,
-			snaps: snaps
+			projects: projects
 		};
 	});
 };
@@ -30,23 +30,13 @@ export const snap_store_fetching = function () {
 	});
 };
 
-export const project_store = writable({ isFetching: false, projects: [] });
+export const project_store = writable({ isFetching: false, projects: [], project: {} });
 export const project_store_fetching = function () {
 	project_store.update(() => {
 		return {
 			isFetching: true,
-			projects: []
-		};
-	});
-};
-
-export const project_store_public = writable({ isFetching: false, projects: [], project: {} });
-export const project_store_public_fetching = function () {
-	project_store_public.update(() => {
-		return {
-			isFetching: true,
 			projects: [],
-			project: []
+			project: {}
 		};
 	});
 };
@@ -88,8 +78,8 @@ function rename_project(project, project_name) {
 	});
 }
 
-function update_project_public(project) {
-	project_store_public.update(({ projects }) => {
+function update_project(project) {
+	project_store.update(({ projects }) => {
 		return {
 			isFetching: false,
 			projects: projects,
@@ -98,8 +88,8 @@ function update_project_public(project) {
 	});
 }
 
-function update_projects_public(projects) {
-	project_store_public.update(({ project }) => {
+function update_projects(projects) {
+	project_store.update(({ project }) => {
 		return {
 			isFetching: false,
 			projects: projects,
@@ -111,6 +101,6 @@ function update_projects_public(projects) {
 export const projects_update = {
 	delete_projects,
 	rename_project,
-	update_project_public,
-	update_projects_public
+	update_project,
+	update_projects
 };

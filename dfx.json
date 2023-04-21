@@ -45,7 +45,7 @@
 		"project_main": {
 			"main": "src/service_projects/ProjectMain.mo",
 			"type": "motoko",
-			"dependencies": ["canister_ids_ledger", "health_metrics", "logger", "profile"]
+			"dependencies": ["explore", "canister_ids_ledger", "health_metrics", "logger", "profile"]
 		},
 		"snap_main": {
 			"main": "src/service_snaps/SnapMain.mo",
@@ -55,7 +55,6 @@
 				"assets_img_staging",
 				"canister_ids_ledger",
 				"health_metrics",
-				"explore",
 				"logger",
 				"profile"
 			]
@@ -83,12 +82,12 @@
 		"test_project": {
 			"main": "src/service_projects/Project.mo",
 			"type": "motoko",
-			"dependencies": ["health_metrics", "logger", "profile"]
+			"dependencies": ["explore", "health_metrics", "logger", "profile"]
 		},
 		"test_snap": {
 			"main": "src/service_snaps/Snap.mo",
 			"type": "motoko",
-			"dependencies": ["explore", "health_metrics", "logger", "profile"]
+			"dependencies": ["health_metrics", "logger", "profile"]
 		}
 	},
 	"defaults": {

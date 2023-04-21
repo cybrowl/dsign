@@ -12,7 +12,6 @@ import Time "mo:base/Time";
 import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
-import Explore "canister:explore";
 import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 import Profile "canister:profile";
@@ -104,14 +103,6 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 
 		snaps.put(snap_id, snap);
 
-		let project_public : ?ProjectPublic = null;
-		let snap_public : SnapPublic = {
-			snap and {} with owner = null;
-			project = project_public;
-		};
-
-		ignore Explore.save_snap(snap_public);
-
 		return #ok(snap);
 	};
 
@@ -163,8 +154,6 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 					owner = null;
 				};
 
-				ignore Explore.save_snap(snap_public_updated : SnapPublic);
-
 				return #ok(snap_public_updated);
 			};
 		};
@@ -190,8 +179,6 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 				};
 			};
 		};
-
-		ignore Explore.delete_snaps(snap_ids);
 	};
 
 	// NOTE: only called from Project Main
@@ -265,18 +252,6 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 								snap with project = Option.make(project);
 							};
 							snaps.put(snap.id, snap_updated);
-
-							// update snap for explore
-							let project_public : ProjectPublic = {
-								project with owner = null;
-							};
-
-							let snap_public : SnapPublic = {
-								snap_updated with project = Option.make(project_public);
-								owner = null;
-							};
-
-							ignore Explore.save_snap(snap_public);
 						};
 					};
 				};

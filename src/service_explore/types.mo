@@ -1,9 +1,10 @@
 import ProjectTypes "../service_projects/types";
-import SnapTypes "../service_snaps/types";
 
 module {
-	public type SnapPublic = SnapTypes.SnapPublic;
+	public type ProjectPublic = ProjectTypes.ProjectPublic;
+	public type SnapPublic = ProjectTypes.SnapPublic;
+	public type Project = ProjectTypes.Project;
 
-	public type SnapCanisterId = Text;
-	public type SnapID = Text;
+	public type ProjectCanisterId = Text;
+	public type ProjectID = Text;
 };

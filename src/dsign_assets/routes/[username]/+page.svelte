@@ -116,7 +116,7 @@
 	});
 
 	onDestroy(() => {
-		projects_update.update_projects_public([]);
+		projects_update.update_projects([]);
 		modal_update.set_visibility_false('snap_preview');
 
 		profile_tabs.set({

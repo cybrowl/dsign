@@ -23,6 +23,4 @@ export function local_storage_remove_all() {
 	localStorage.removeItem('snaps');
 	localStorage.removeItem('favorites');
 	localStorage.removeItem('projects');
-	// localStorage.removeItem('profile');
-	localStorage.removeItem('profile_public');
 }

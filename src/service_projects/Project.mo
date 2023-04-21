@@ -11,6 +11,7 @@ import Time "mo:base/Time";
 import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
+import Explore "canister:explore";
 import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 import Profile "canister:profile";
@@ -209,6 +210,8 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 
 					projects.put(project_id, project_updated);
 
+					ignore Explore.save_project(project_updated);
+
 					ignore Logger.log_event(log_tags, "Snaps Added To Project");
 
 					return #ok(project);
@@ -267,6 +270,7 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 
 					var snap_list = Buffer.Buffer<SnapPublic>(0);
 
+					//TODO: there is an optimization here
 					for (snap in project.snaps.vals()) {
 						let snap_actor = actor (snap.canister_id) : SnapActor;
 

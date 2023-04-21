@@ -1,25 +1,21 @@
 <script>
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import get from 'lodash/get';
 
 	import Login from '../components/Login.svelte';
 	import Notification from 'dsign-components/components/Notification.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
-	import SnapCard from 'dsign-components/components/SnapCard.svelte';
+	import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
-	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 
 	import { actor_explore, actor_favorite_main } from '$stores_ref/actors.js';
 	import { auth_favorite_main } from '$stores_ref/auth_client';
 	import { explore_store } from '$stores_ref/fetch_store.js';
 	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
-	import page_navigation_update, {
-		navigate_to_home_with_notification,
-		page_navigation,
-		snap_preview
-	} from '$stores_ref/page_navigation';
+	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
 	import { local_storage_profile } from '$stores_ref/local_storage';
 
 	page_navigation_update.add_item({
@@ -34,42 +30,40 @@
 		}
 
 		try {
-			const all_snaps = await $actor_explore.actor.get_all_snaps();
+			const all_projects = await $actor_explore.actor.get_all_projects();
 
-			if (all_snaps) {
-				explore_store.set({ isFetching: false, snaps: [...all_snaps] });
+			console.log('all_projects: ', all_projects);
+
+			if (all_projects) {
+				explore_store.set({ isFetching: false, projects: [...all_projects] });
 			}
 		} catch (error) {
 			console.error('error: call', error);
 		}
 	});
 
-	function handleSnapPreviewModalOpen(e) {
-		const snap = e.detail;
+	function handleProjectClick(e) {
+		let project = get(e, 'detail');
 
-		snap_preview.set(snap);
-
-		goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
+		goto(`/project/${project.id}?canister_id=${project.canister_id}`);
 	}
 
 	async function handleClickLike(e) {
-		const snap_liked = e.detail;
-
-		if ($actor_favorite_main.loggedIn) {
-			try {
-				const { ok: saved_snap, err: err_save_snap } = await $actor_favorite_main.actor.save_snap(
-					snap_liked
-				);
-
-				if (err_save_snap && err_save_snap['UserNotFound'] === true) {
-					await $actor_favorite_main.actor.create_user_favorite_storage();
-				}
-			} catch (error) {
-				//TODO: log error
-			}
-		} else {
-			navigate_to_home_with_notification();
-		}
+		// const snap_liked = e.detail;
+		// if ($actor_favorite_main.loggedIn) {
+		// 	try {
+		// 		const { ok: saved_snap, err: err_save_snap } = await $actor_favorite_main.actor.save_snap(
+		// 			snap_liked
+		// 		);
+		// 		if (err_save_snap && err_save_snap['UserNotFound'] === true) {
+		// 			await $actor_favorite_main.actor.create_user_favorite_storage();
+		// 		}
+		// 	} catch (error) {
+		// 		//TODO: log error
+		// 	}
+		// } else {
+		// 	navigate_to_home_with_notification();
+		// }
 	}
 </script>
 
@@ -90,11 +84,6 @@
 		<AccountSettingsModal />
 	{/if}
 
-	<!-- SnapCreationModal -->
-	{#if $modal_visible.snap_creation}
-		<SnapCreationModal />
-	{/if}
-
 	<!-- Notification -->
 	{#if $notification_visible.auth_error}
 		<div class="absolute col-start-9 col-end-12 row-start-1 row-end-2 bottom-0 right-0">
@@ -104,19 +93,14 @@
 		</div>
 	{/if}
 
-	<!-- Snaps -->
-	{#if $explore_store.snaps.length > 0}
+	<!-- Projects -->
+	{#if $explore_store.projects.length > 0}
 		<div
 			class="col-start-2 col-end-12 grid grid-cols-4 
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-20 mt-2 mb-24"
 		>
-			{#each $explore_store.snaps as snap}
-				<SnapCard
-					{snap}
-					showUsername={true}
-					on:clickCard={handleSnapPreviewModalOpen}
-					on:clickLike={handleClickLike}
-				/>
+			{#each $explore_store.projects as project}
+				<ProjectCard {project} showOptionsPopover={false} on:clickProject={handleProjectClick} />
 			{/each}
 		</div>
 	{/if}

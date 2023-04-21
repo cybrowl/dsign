@@ -9,7 +9,8 @@
 	import {
 		actor_assets_file_staging,
 		actor_assets_img_staging,
-		actor_snap_main
+		actor_snap_main,
+		actor_project_main
 	} from '$stores_ref/actors';
 	import {
 		auth_assets_file_staging,
@@ -126,6 +127,11 @@
 					console.log('create_snap_args: ', create_snap_args);
 
 					const { ok: created_snap } = await $actor_snap_main.actor.create_snap(create_snap_args);
+
+					const { ok: project } = await actor_project_main.actor.get_project(
+						project_ref.id,
+						project_ref.canister_id
+					);
 
 					//TODO:
 					// save snap id to localstorage to later send to actor_snap_main in root/[username]

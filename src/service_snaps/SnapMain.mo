@@ -250,6 +250,14 @@ actor SnapMain {
 						);
 					};
 					case (#ok project) {
+						//TODO: add project ref to snaps
+						// for (snap in snaps.vals()) {
+						//     let snap_actor = actor (snap.canister_id) : SnapActor;
+						//     ignore snap_actor.add_project_to_snaps(project_ref);
+						// };
+
+						// return #ok("Added Snaps To Project");
+
 						ignore Logger.log_event(
 							tags,
 							debug_show ("project_actor.add_snaps_to_project", debug_show (project))

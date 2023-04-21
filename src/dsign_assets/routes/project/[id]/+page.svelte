@@ -17,11 +17,7 @@
 	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
 	import { actor_project_main, actor_profile } from '$stores_ref/actors';
-	import {
-		project_store_public,
-		project_store_public_fetching,
-		projects_update
-	} from '$stores_ref/fetch_store';
+	import { project_store, project_store_fetching, projects_update } from '$stores_ref/fetch_store';
 	import { auth_profile } from '$stores_ref/auth_client';
 	import modal_update, { modal_visible } from '$stores_ref/modal';
 	import page_navigation_update, {
@@ -36,7 +32,7 @@
 	let project_ref = {};
 
 	if ($disable_project_store_reset === false) {
-		project_store_public_fetching();
+		project_store_fetching();
 	} else {
 		disable_project_store_reset.set(false);
 	}
@@ -58,7 +54,7 @@
 				console.log('project: ', project);
 
 				project_ref = project;
-				projects_update.update_project_public(project);
+				projects_update.update_project(project);
 
 				if ($actor_profile.loggedIn) {
 					const username = get(auth_profile, 'username', 'x');
@@ -111,7 +107,7 @@
 	{/if}
 
 	<!-- Fetching Project -->
-	{#if $project_store_public.isFetching === true}
+	{#if $project_store.isFetching === true}
 		<!-- Fetching Project Info Header -->
 		<div class="col-start-2 col-end-12 row-start-2 row-end-3 mt-2 mb-5">
 			<ProjectInfoHeader isFetching={true} />
@@ -127,14 +123,14 @@
 	{/if}
 
 	<!-- Project -->
-	{#if isEmpty($project_store_public.project) === false}
+	{#if isEmpty($project_store.project) === false}
 		<!-- Project Info Header -->
 		<div class="col-start-2 col-end-6 row-start-2 row-end-3 mb-5">
-			<ProjectInfoHeader project={$project_store_public.project} />
+			<ProjectInfoHeader project={$project_store.project} />
 		</div>
 
 		<!-- No Snaps Found -->
-		{#if $project_store_public.project.snaps && $project_store_public.project.snaps.length === 0 && $project_store_public.isFetching === false}
+		{#if $project_store.project.snaps && $project_store.project.snaps.length === 0 && $project_store.isFetching === false}
 			<div
 				class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
 				row-start-3 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
@@ -146,12 +142,12 @@
 		{/if}
 
 		<!-- Snaps -->
-		{#if $project_store_public.project.snaps && $project_store_public.project.snaps.length > 0}
+		{#if $project_store.project.snaps && $project_store.project.snaps.length > 0}
 			<div
 				class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
 				row-start-3 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
-				{#each $project_store_public.project.snaps as snap}
+				{#each $project_store.project.snaps as snap}
 					<SnapCard {snap} on:clickCard={handleSnapPreviewModalOpen} />
 				{/each}
 				{#if isProjectOwner}

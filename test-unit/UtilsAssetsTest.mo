@@ -32,7 +32,7 @@ let success = run([
 			it(
 				"should get asset id from prod env",
 				do {
-					let url = "https://qoctq-giaaa-aaaaa-aaaea-cai.raw.ic0.app/asset/asset_id";
+					let url = "https://qoctq-giaaa-aaaaa-aaaea-cai.raw.icp0.io/asset/asset_id";
 					let expected = "asset_id";
 					let asset_id = Utils.get_asset_id(url);
 					assertTrue(Text.equal(asset_id, expected));
@@ -54,7 +54,7 @@ let success = run([
 						canister_id = canister_id;
 						is_prod = is_prod;
 					});
-					let expected = "https://qoctq-giaaa-aaaaa-aaaea-cai.raw.ic0.app/asset/70KKS0195HX5MS56MQVGV02C1Z";
+					let expected = "https://qoctq-giaaa-aaaaa-aaaea-cai.raw.icp0.io/asset/70KKS0195HX5MS56MQVGV02C1Z";
 					assertTrue(Text.equal(asset_url, expected));
 				}
 			)

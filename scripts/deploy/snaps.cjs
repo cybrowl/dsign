@@ -4,8 +4,12 @@ const { readFileSync } = require('fs');
 const { HttpAgent, Actor } = require('@dfinity/agent');
 const { config } = require('dotenv');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
+const fetch = require('node-fetch');
 
 config();
+
+global.fetch = fetch;
+global.Headers = fetch.Headers;
 
 const {
 	canister_ids_ledger_interface,
@@ -39,7 +43,7 @@ const get_wasm_prod = (name) => {
 };
 
 const get_actor = async (canisterId, can_interface, is_prod) => {
-	const host = is_prod ? `https://${canisterId}.ic0.app/` : `http://127.0.0.1:8080`;
+	const host = is_prod ? `https://${canisterId}.icp0.io/` : `http://127.0.0.1:8080`;
 
 	const agent = new HttpAgent({ host, identity: dev_identity });
 

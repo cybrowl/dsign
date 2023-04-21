@@ -42,7 +42,7 @@ const get_wasm_prod = (name) => {
 };
 
 const get_actor = async (canisterId, can_interface, is_prod) => {
-	const host = is_prod ? `https://${canisterId}.ic0.app/` : `http://127.0.0.1:8080`;
+	const host = is_prod ? `https://${canisterId}.icp0.io/` : `http://127.0.0.1:8080`;
 
 	const agent = new HttpAgent({ host, identity: dev_identity });
 

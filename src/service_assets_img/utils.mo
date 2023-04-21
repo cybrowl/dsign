@@ -59,7 +59,7 @@ module {
 	) : Text {
 		var url = Text.join(
 			"",
-			(["https://", canister_id, ".raw.ic0.app", "/image/", asset_type, "/", image_id].vals())
+			(["https://", canister_id, ".raw.icp0.io", "/image/", asset_type, "/", image_id].vals())
 		);
 
 		if (isProduction == false) {
