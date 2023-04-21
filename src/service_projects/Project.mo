@@ -131,6 +131,8 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 			};
 		};
 
+		ignore Explore.delete_projects(project_ids);
+
 		return #ok(());
 	};
 

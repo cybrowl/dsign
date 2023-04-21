@@ -47,24 +47,6 @@
 
 		goto(`/project/${project.id}?canister_id=${project.canister_id}`);
 	}
-
-	async function handleClickLike(e) {
-		// const snap_liked = e.detail;
-		// if ($actor_favorite_main.loggedIn) {
-		// 	try {
-		// 		const { ok: saved_snap, err: err_save_snap } = await $actor_favorite_main.actor.save_snap(
-		// 			snap_liked
-		// 		);
-		// 		if (err_save_snap && err_save_snap['UserNotFound'] === true) {
-		// 			await $actor_favorite_main.actor.create_user_favorite_storage();
-		// 		}
-		// 	} catch (error) {
-		// 		//TODO: log error
-		// 	}
-		// } else {
-		// 	navigate_to_home_with_notification();
-		// }
-	}
 </script>
 
 <!-- Explore -->

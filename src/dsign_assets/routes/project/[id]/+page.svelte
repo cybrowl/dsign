@@ -16,7 +16,6 @@
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
-	import SnapPreviewModal from '$modals_ref/SnapPreviewModal.svelte';
 
 	import { actor_project_main, actor_snap_main, actor_profile } from '$stores_ref/actors';
 	import { project_store, project_store_fetching, projects_update } from '$stores_ref/fetch_store';
@@ -118,7 +117,7 @@
 		}
 	}
 
-	function handleSnapPreviewModalOpen(e) {
+	function handleSnapPreview(e) {
 		const snap = e.detail;
 
 		snap_preview.set(snap);
@@ -146,14 +145,8 @@
 	{#if $modal_visible.snap_creation}
 		<SnapCreationModal {project_ref} />
 	{/if}
-	{#if $modal_visible.snap_preview && snap_preview}
-		<SnapPreviewModal snap={snap_preview} />
-	{/if}
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
-	{/if}
-	{#if $modal_visible.snap_preview && snap_preview}
-		<SnapPreviewModal snap={snap_preview} />
 	{/if}
 
 	<!-- Fetching Project -->
@@ -216,11 +209,7 @@
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 				>
 					{#each $project_store.project.snaps as snap}
-						<SnapCard
-							{snap}
-							isEditMode={$is_edit_active}
-							on:clickCard={handleSnapPreviewModalOpen}
-						/>
+						<SnapCard {snap} isEditMode={$is_edit_active} on:clickCard={handleSnapPreview} />
 					{/each}
 					{#if isProjectOwner}
 						<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
