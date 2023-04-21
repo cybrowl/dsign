@@ -1,12 +1,12 @@
 import { writable } from 'svelte/store';
 
-export const projects_tabs = writable({
-	isSnapsSelected: true,
-	isProjectsSelected: false,
-	isProjectSelected: false
+export const projectsTabsState = writable({
+	isChangesSelected: false,
+	isIssuesSelected: false,
+	isSnapsSelected: true
 });
 
-export const profile_tabs = writable({
+export const profileTabsState = writable({
 	isProjectsSelected: true,
 	isFavoritesSelected: false
 });

@@ -141,36 +141,36 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 	) : async Result.Result<Text, ErrDeleteSnapsFromProject> {
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "delete_snaps_from_project")];
 
-		if (project_main != caller) {
+		if (project_main == caller or snap_main == caller) {
+			// remove snaps from project
+			switch (projects.get(project_id)) {
+				case null {
+					return #err(#ProjectNotFound);
+				};
+				case (?project) {
+					if (project.owner != owner) {
+						return #err(#NotOwner);
+					};
+
+					let updated_snaps = Utils.remove_snaps(project.snaps, snaps);
+
+					let project_updated : Project = {
+						id = project.id;
+						canister_id = project.canister_id;
+						created = project.created;
+						username = project.username;
+						owner = project.owner;
+						name = project.name;
+						snaps = updated_snaps;
+					};
+
+					projects.put(project_id, project_updated);
+
+					return #ok("Snaps Deleted");
+				};
+			};
+		} else {
 			return #err(#NotAuthorized);
-		};
-
-		// remove snaps from project
-		switch (projects.get(project_id)) {
-			case null {
-				return #err(#ProjectNotFound);
-			};
-			case (?project) {
-				if (project.owner != owner) {
-					return #err(#NotOwner);
-				};
-
-				let updated_snaps = Utils.remove_snaps(project.snaps, snaps);
-
-				let project_updated : Project = {
-					id = project.id;
-					canister_id = project.canister_id;
-					created = project.created;
-					username = project.username;
-					owner = project.owner;
-					name = project.name;
-					snaps = updated_snaps;
-				};
-
-				projects.put(project_id, project_updated);
-
-				return #ok("Snaps Deleted");
-			};
 		};
 	};
 
@@ -252,6 +252,21 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 				ignore Logger.log_event(log_tags, "Project Details Updated");
 
 				return #ok(project_updated);
+			};
+		};
+	};
+
+	public query func owner_check(id : ProjectID, owner : Principal) : async Bool {
+		switch (projects.get(id)) {
+			case (null) {
+				return false;
+			};
+			case (?project) {
+				if (project.owner == owner) {
+					return true;
+				} else {
+					return false;
+				};
 			};
 		};
 	};

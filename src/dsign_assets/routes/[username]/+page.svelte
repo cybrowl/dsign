@@ -31,7 +31,7 @@
 		auth_profile,
 		auth_project_main
 	} from '$stores_ref/auth_client';
-	import { profile_tabs } from '$stores_ref/page_state';
+	import { profileTabsState } from '$stores_ref/page_state';
 	import {
 		favorite_store,
 		project_store,
@@ -119,9 +119,9 @@
 		projects_update.update_projects([]);
 		modal_update.set_visibility_false('snap_preview');
 
-		profile_tabs.set({
+		profileTabsState.set({
 			isProjectsSelected: true,
-			isProjectSelected: false
+			isFavoritesSelected: false
 		});
 	});
 
@@ -239,15 +239,14 @@
 			self-end justify-between items-center h-10"
 	>
 		<ProfileTabs
-			project_name={project.name}
-			profileTabs={$profile_tabs}
-			on:toggleProjects={(e) => profile_tabs.set(e.detail)}
-			on:toggleFavorites={(e) => profile_tabs.set(e.detail)}
+			profileTabsState={$profileTabsState}
+			on:selectProjectsTab={(e) => profileTabsState.set(e.detail)}
+			on:selectFavoritesTab={(e) => profileTabsState.set(e.detail)}
 		/>
 	</div>
 
 	<!-- Projects -->
-	{#if $profile_tabs.isProjectsSelected}
+	{#if $profileTabsState.isProjectsSelected}
 		<!-- Fetching Projects -->
 		{#if $project_store.isFetching === true}
 			<div
@@ -295,7 +294,7 @@
 	{/if}
 
 	<!-- Favorites -->
-	{#if $profile_tabs.isFavoritesSelected}
+	{#if $profileTabsState.isFavoritesSelected}
 		<!-- Fetching Snaps -->
 		{#if $favorite_store.isFetching === true}
 			<div

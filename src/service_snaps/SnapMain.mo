@@ -37,7 +37,9 @@ actor SnapMain {
 	type ICInterface = Types.ICInterface;
 	type ICInterfaceStatusResponse = Types.ICInterfaceStatusResponse;
 	type ImageRef = Types.ImageRef;
+	type ProjectRef = Types.ProjectRef;
 	type Snap = Types.Snap;
+	type SnapRef = Types.SnapRef;
 	type SnapCanisterID = Types.SnapCanisterID;
 	type SnapID = Types.SnapID;
 	type SnapIDStorage = Types.SnapIDStorage;
@@ -250,14 +252,7 @@ actor SnapMain {
 						);
 					};
 					case (#ok project) {
-						//TODO: add project ref to snaps
-						// for (snap in snaps.vals()) {
-						//     let snap_actor = actor (snap.canister_id) : SnapActor;
-						//     ignore snap_actor.add_project_to_snaps(project_ref);
-						// };
-
-						// return #ok("Added Snaps To Project");
-
+						//TODO: call Snap.add_project_to_snaps
 						ignore Logger.log_event(
 							tags,
 							debug_show ("project_actor.add_snaps_to_project", debug_show (project))
@@ -272,23 +267,41 @@ actor SnapMain {
 		};
 	};
 
-	public shared ({ caller }) func delete_snaps(snap_ids_delete : [SnapID]) : async Result.Result<Text, ErrDeleteSnaps> {
+	public shared ({ caller }) func delete_snaps(snap_ids_delete : [SnapID], project : ProjectRef) : async Result.Result<Text, ErrDeleteSnaps> {
 		let tags = [ACTOR_NAME, "delete_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_snap_ids_storage) {
 				let my_ids = Utils.get_all_ids(user_snap_ids_storage);
 				let matches = Utils.all_ids_match(my_ids, snap_ids_delete);
+				let project_actor = actor (project.canister_id) : ProjectActor;
 
+				// Owner Check
 				if (matches.all_match == false) {
-					return #err(#SnapIdsDoNotMatch);
+					return #err(#NotOwnerOfSnaps);
 				};
+
+				switch (await project_actor.owner_check(project.id, caller)) {
+					case (true) {};
+					case (false) {
+						return #err(#NotOwnerOfProject);
+					};
+				};
+
+				var snap_refs = Buffer.Buffer<SnapRef>(0);
 
 				for ((canister_id, snap_ids) in user_snap_ids_storage.entries()) {
 					let snap_actor = actor (canister_id) : SnapActor;
 					let snaps = await snap_actor.get_all_snaps(snap_ids_delete);
 
 					for (snap in snaps.vals()) {
+						let snap_ref = {
+							id = snap.id;
+							canister_id = snap.canister_id;
+						};
+
+						snap_refs.add(snap_ref);
+
 						if (Text.size(snap.file_asset.canister_id) > 1) {
 							let assets_actor = actor (snap.file_asset.canister_id) : AssetsActor;
 							ignore assets_actor.delete_asset(snap.file_asset.id);
@@ -313,6 +326,8 @@ actor SnapMain {
 
 					user_snap_ids_storage.put(canister_id, snap_ids_not_deleted);
 				};
+
+				ignore project_actor.delete_snaps_from_project(Buffer.toArray(snap_refs), project.id, caller);
 
 				return #ok("Deleted Snaps");
 			};

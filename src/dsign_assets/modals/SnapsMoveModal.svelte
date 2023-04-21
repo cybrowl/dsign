@@ -11,12 +11,12 @@
 	import { local_storage_projects, local_storage_snaps } from '$stores_ref/local_storage';
 	import { notification_update, notification_visible } from '$stores_ref/notification';
 	import { project_store, snap_store } from '$stores_ref/fetch_store';
-	import { projects_tabs, is_edit_active } from '$stores_ref/page_state';
+	import { projectsTabsState, is_edit_active } from '$stores_ref/page_state';
 	import modal_update from '$stores_ref/modal';
 
 	export let project = { snaps: [] };
 
-	const snaps = $projects_tabs.isSnapsSelected
+	const snaps = $projectsTabsState.isSnapsSelected
 		? get($snap_store, 'snaps', [])
 		: get(project, 'snaps', []);
 
@@ -70,7 +70,7 @@
 					canister_id: selected_project.canister_id
 				};
 
-				if ($projects_tabs.isSnapsSelected) {
+				if ($projectsTabsState.isSnapsSelected) {
 					const { ok: added_snaps_to_project, err: err_add_snaps_to_project } =
 						await $actor_project_main.actor.add_snaps_to_project(
 							selected_snaps_list,
@@ -109,7 +109,7 @@
 				//TODO: handle error
 			}
 
-			projects_tabs.set({
+			projectsTabsState.set({
 				isSnapsSelected: false,
 				isProjectsSelected: true,
 				isProjectSelected: false

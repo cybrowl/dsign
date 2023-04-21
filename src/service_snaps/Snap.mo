@@ -159,6 +159,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		};
 	};
 
+	// NOTE: only called from Snap Main
 	public shared ({ caller }) func delete_snaps(snap_ids : [SnapID]) : async () {
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "delete_snaps")];
 
@@ -182,44 +183,44 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	};
 
 	// NOTE: only called from Project Main
-	public shared ({ caller }) func delete_project_from_snaps(
-		snaps_ref : [SnapRef]
-	) : async () {
-		let log_tags = [("actor_name", ACTOR_NAME), ("method", "delete_project_from_snaps")];
+	// public shared ({ caller }) func delete_project_from_snaps(
+	//     snaps_ref : [SnapRef]
+	// ) : async () {
+	//     let log_tags = [("actor_name", ACTOR_NAME), ("method", "delete_project_from_snaps")];
 
-		if (project_main != caller) {
-			ignore Logger.log_event(
-				log_tags,
-				"Unauthorized: " # Principal.toText(caller)
-			);
+	//     if (project_main != caller) {
+	//         ignore Logger.log_event(
+	//             log_tags,
+	//             "Unauthorized: " # Principal.toText(caller)
+	//         );
 
-			return ();
-		};
+	//         return ();
+	//     };
 
-		for (snap_ref in snaps_ref.vals()) {
-			switch (snaps.get(snap_ref.id)) {
-				case (null) {};
-				case (?snap) {
-					let update_snap : Snap = {
-						canister_id = snap.canister_id;
-						created = snap.created;
-						file_asset = snap.file_asset;
-						id = snap.id;
-						image_cover_location = snap.image_cover_location;
-						images = snap.images;
-						project = null;
-						tags = snap.tags;
-						title = snap.title;
-						username = snap.username;
-						owner = snap.owner;
-						metrics = snap.metrics;
-					};
+	//     for (snap_ref in snaps_ref.vals()) {
+	//         switch (snaps.get(snap_ref.id)) {
+	//             case (null) {};
+	//             case (?snap) {
+	//                 let update_snap : Snap = {
+	//                     canister_id = snap.canister_id;
+	//                     created = snap.created;
+	//                     file_asset = snap.file_asset;
+	//                     id = snap.id;
+	//                     image_cover_location = snap.image_cover_location;
+	//                     images = snap.images;
+	//                     project = null;
+	//                     tags = snap.tags;
+	//                     title = snap.title;
+	//                     username = snap.username;
+	//                     owner = snap.owner;
+	//                     metrics = snap.metrics;
+	//                 };
 
-					snaps.put(snap.id, update_snap);
-				};
-			};
-		};
-	};
+	//                 snaps.put(snap.id, update_snap);
+	//             };
+	//         };
+	//     };
+	// };
 
 	// NOTE: only called from Project Main
 	public shared ({ caller }) func add_project_to_snaps(
@@ -242,6 +243,8 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		switch (await project_actor.get_projects_actor([project_ref.id])) {
 			case (projects) {
 				let project = projects[0];
+
+				// if arg.owner == project.owner
 
 				for (snap_ref in project.snaps.vals()) {
 					switch (snaps.get(snap_ref.id)) {

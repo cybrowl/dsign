@@ -212,7 +212,7 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 					http_request_streaming_callback : shared () -> async ();
 				};
 
-				return ?#Callback({ token; callback = canister.http_request_streaming_callback });
+				return ? #Callback({ token; callback = canister.http_request_streaming_callback });
 			};
 		};
 	};

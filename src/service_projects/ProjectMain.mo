@@ -202,11 +202,7 @@ actor ProjectMain {
 						return #err(#ErrorCall(debug_show (err)));
 					};
 					case (#ok _) {
-						// delete project from snaps
-						for (snap in snaps.vals()) {
-							let snap_actor = actor (snap.canister_id) : SnapActor;
-							ignore snap_actor.delete_project_from_snaps(snaps);
-						};
+						//TODO: ignore Snap.delete_snaps
 						return #ok("Deleted Snaps From Project");
 					};
 				};
@@ -217,48 +213,48 @@ actor ProjectMain {
 		};
 	};
 
-	public shared ({ caller }) func add_snaps_to_project(
-		snaps : [SnapRef],
-		project_ref : ProjectRef
-	) : async Result.Result<Text, ErrAddSnapsToProject> {
-		let tags = [ACTOR_NAME, "add_snaps_to_project"];
+	// public shared ({ caller }) func add_snaps_to_project(
+	//     snaps : [SnapRef],
+	//     project_ref : ProjectRef
+	// ) : async Result.Result<Text, ErrAddSnapsToProject> {
+	//     let tags = [ACTOR_NAME, "add_snaps_to_project"];
 
-		if (snaps.size() > SNAP_ARG_SIZE_LIMIT) {
-			return #err(#NumberSnapsTooLarge);
-		};
+	//     if (snaps.size() > SNAP_ARG_SIZE_LIMIT) {
+	//         return #err(#NumberSnapsTooLarge);
+	//     };
 
-		switch (user_canisters_ref.get(caller)) {
-			case (?user_project_ids_storage) {
-				let my_ids = Utils.get_all_ids(user_project_ids_storage);
-				let matches = Utils.all_ids_match(my_ids, [project_ref.id]);
+	//     switch (user_canisters_ref.get(caller)) {
+	//         case (?user_project_ids_storage) {
+	//             let my_ids = Utils.get_all_ids(user_project_ids_storage);
+	//             let matches = Utils.all_ids_match(my_ids, [project_ref.id]);
 
-				if (matches.all_match == false) {
-					return #err(#ProjectIdsDoNotMatch);
-				};
+	//             if (matches.all_match == false) {
+	//                 return #err(#ProjectIdsDoNotMatch);
+	//             };
 
-				let project_actor = actor (project_ref.canister_id) : ProjectActor;
+	//             let project_actor = actor (project_ref.canister_id) : ProjectActor;
 
-				switch (await project_actor.add_snaps_to_project(snaps, project_ref.id, caller)) {
-					case (#err err) {
-						return #err(#ErrorCall(debug_show (err)));
-					};
-					case (#ok _) {
+	//             switch (await project_actor.add_snaps_to_project(snaps, project_ref.id, caller)) {
+	//                 case (#err err) {
+	//                     return #err(#ErrorCall(debug_show (err)));
+	//                 };
+	//                 case (#ok _) {
 
-						//TODO: make this faster by filtering out unique canister ids
-						for (snap in snaps.vals()) {
-							let snap_actor = actor (snap.canister_id) : SnapActor;
-							ignore snap_actor.add_project_to_snaps(project_ref);
-						};
+	//                     //TODO: make this faster by filtering out unique canister ids
+	//                     for (snap in snaps.vals()) {
+	//                         let snap_actor = actor (snap.canister_id) : SnapActor;
+	//                         ignore snap_actor.add_project_to_snaps(project_ref);
+	//                     };
 
-						return #ok("Added Snaps To Project");
-					};
-				};
-			};
-			case (_) {
-				#err(#UserNotFound);
-			};
-		};
-	};
+	//                     return #ok("Added Snaps To Project");
+	//                 };
+	//             };
+	//         };
+	//         case (_) {
+	//             #err(#UserNotFound);
+	//         };
+	//     };
+	// };
 
 	public shared ({ caller }) func move_snaps_from_project(
 		snaps : [SnapRef],

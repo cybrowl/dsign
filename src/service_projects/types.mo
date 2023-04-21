@@ -152,6 +152,7 @@ module {
 		delete_snaps_from_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Text, ErrDeleteSnapsFromProject>;
 		add_snaps_to_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Project, ErrAddSnapsToProject>;
 		update_project_details : shared (UpdateProject, ProjectRef) -> async Result.Result<Project, ErrUpdateProject>;
+		owner_check : query (ProjectID, Principal) -> async Bool;
 		get_projects : query ([ProjectID]) -> async [ProjectPublic];
 		get_projects_actor : query ([ProjectID]) -> async [Project];
 	};

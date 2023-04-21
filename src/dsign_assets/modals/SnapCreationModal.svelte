@@ -17,7 +17,7 @@
 		auth_assets_img_staging,
 		auth_snap_main
 	} from '$stores_ref/auth_client';
-	import { projects_tabs } from '$stores_ref/page_state';
+	import { projectsTabsState } from '$stores_ref/page_state';
 	import { snap_store } from '$stores_ref/fetch_store';
 	import modal_update from '$stores_ref/modal';
 
@@ -144,7 +144,7 @@
 					// if (all_snaps) {
 					// 	snap_store.set({ isFetching: false, snaps: [...all_snaps] });
 
-					// 	projects_tabs.set({
+					// 	projectsTabsState.set({
 					// 		isSnapsSelected: true,
 					// 		isProjectsSelected: false,
 					// 		isProjectSelected: false
