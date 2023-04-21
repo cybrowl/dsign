@@ -17,8 +17,7 @@
 		auth_assets_img_staging,
 		auth_snap_main
 	} from '$stores_ref/auth_client';
-	import { projectsTabsState } from '$stores_ref/page_state';
-	import { snap_store } from '$stores_ref/fetch_store';
+	import { projects_update } from '$stores_ref/fetch_store';
 	import modal_update from '$stores_ref/modal';
 
 	let is_publishing = false;
@@ -128,28 +127,18 @@
 
 					const { ok: created_snap } = await $actor_snap_main.actor.create_snap(create_snap_args);
 
-					const { ok: project } = await actor_project_main.actor.get_project(
+					const { ok: project } = await $actor_project_main.actor.get_project(
 						project_ref.id,
 						project_ref.canister_id
 					);
+
+					projects_update.update_project(project);
 
 					//TODO:
 					// save snap id to localstorage to later send to actor_snap_main in root/[username]
 					// {snap_id: xxx, tags: ["xx", "yy"]}
 					// you can only save snap_id here so it has to be two arrays that are created
 					// make sure all the tags are sent in lowercase
-
-					// const { ok: all_snaps } = await $actor_snap_main.actor.get_all_snaps_without_project();
-
-					// if (all_snaps) {
-					// 	snap_store.set({ isFetching: false, snaps: [...all_snaps] });
-
-					// 	projectsTabsState.set({
-					// 		isSnapsSelected: true,
-					// 		isProjectsSelected: false,
-					// 		isProjectSelected: false
-					// 	});
-					// }
 				}
 
 				modal_update.change_visibility('snap_creation');

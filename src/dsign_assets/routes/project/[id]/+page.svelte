@@ -92,7 +92,7 @@
 </svelte:head>
 
 <main class="grid grid-cols-12 gap-y-2">
-	<div class="col-start-2 col-end-12 mb-8">
+	<div class="col-start-2 col-end-12">
 		<PageNavigation navigationItems={$page_navigation.navigationItems}>
 			<Login />
 		</PageNavigation>
@@ -148,31 +148,33 @@
 			{/if}
 		</div>
 
-		<!-- No Snaps Found -->
-		{#if $project_store.project.snaps && $project_store.project.snaps.length === 0 && $project_store.isFetching === false}
-			<div
-				class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
+		{#if $projectsTabsState.isSnapsSelected}
+			<!-- No Snaps Found -->
+			{#if $project_store.project.snaps && $project_store.project.snaps.length === 0 && $project_store.isFetching === false}
+				<div
+					class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
 				row-start-4 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
-			>
-				{#if isProjectOwner}
-					<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
-				{/if}
-			</div>
-		{/if}
+				>
+					{#if isProjectOwner}
+						<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
+					{/if}
+				</div>
+			{/if}
 
-		<!-- Snaps -->
-		{#if $project_store.project.snaps && $project_store.project.snaps.length > 0}
-			<div
-				class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
+			<!-- Snaps -->
+			{#if $project_store.project.snaps && $project_store.project.snaps.length > 0}
+				<div
+					class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
-			>
-				{#each $project_store.project.snaps as snap}
-					<SnapCard {snap} on:clickCard={handleSnapPreviewModalOpen} />
-				{/each}
-				{#if isProjectOwner}
-					<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
-				{/if}
-			</div>
+				>
+					{#each $project_store.project.snaps as snap}
+						<SnapCard {snap} on:clickCard={handleSnapPreviewModalOpen} />
+					{/each}
+					{#if isProjectOwner}
+						<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
+					{/if}
+				</div>
+			{/if}
 		{/if}
 	{/if}
 </main>
