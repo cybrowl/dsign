@@ -20,7 +20,7 @@
 
 	import { actor_project_main, actor_snap_main, actor_profile } from '$stores_ref/actors';
 	import { project_store, project_store_fetching, projects_update } from '$stores_ref/fetch_store';
-	import { auth_profile, auth_snap_main } from '$stores_ref/auth_client';
+	import { auth_profile, auth_project_main, auth_snap_main } from '$stores_ref/auth_client';
 	import modal_update, { modal_visible } from '$stores_ref/modal';
 	import page_navigation_update, {
 		snap_preview,
@@ -44,7 +44,7 @@
 	}
 
 	onMount(async () => {
-		await Promise.all([auth_profile(), auth_snap_main()]);
+		await Promise.all([auth_profile(), auth_snap_main(), auth_project_main()]);
 
 		const canister_id = $page.url.searchParams.get('canister_id');
 		const project_id = last(get($page, 'url.pathname', '').split('/'));

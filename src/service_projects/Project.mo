@@ -166,6 +166,8 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 
 					projects.put(project_id, project_updated);
 
+					ignore Explore.save_project(project_updated);
+
 					return #ok("Snaps Deleted");
 				};
 			};

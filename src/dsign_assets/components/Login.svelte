@@ -49,13 +49,7 @@
 				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
 
 				if (profile) {
-					const username = get(profile, 'username', '');
-
-					if ($page.params.username) {
-						window.location.reload();
-					} else {
-						goto(username);
-					}
+					window.location.reload();
 				}
 
 				if (err_profile) {
