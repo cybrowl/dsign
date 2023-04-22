@@ -8,6 +8,9 @@ const fetch = require('node-fetch');
 
 config();
 
+global.fetch = fetch;
+global.Headers = fetch.Headers;
+
 const {
 	canister_ids_ledger_interface,
 	project_main_interface
@@ -19,9 +22,6 @@ const {
 	snap_main_canister_id
 } = require('../../test-utils/actor_canister_ids.cjs');
 const canister_ids = require('../../canister_ids.json');
-
-global.fetch = fetch;
-global.Headers = fetch.Headers;
 
 const parseIdentity = (privateKeyHex) => {
 	const privateKey = Uint8Array.from(Buffer.from(privateKeyHex, 'hex'));
