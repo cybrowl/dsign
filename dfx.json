@@ -25,7 +25,7 @@
 		"explore": {
 			"main": "src/service_explore/Explore.mo",
 			"type": "motoko",
-			"dependencies": ["health_metrics", "logger"]
+			"dependencies": ["health_metrics", "logger", "canister_ids_ledger"]
 		},
 		"favorite_main": {
 			"main": "src/service_favorites/FavoriteMain.mo",

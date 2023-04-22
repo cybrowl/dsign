@@ -6,6 +6,7 @@ import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
+import CanisterIdsLedger "canister:canister_ids_ledger";
 import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 
@@ -40,8 +41,8 @@ actor Explore = {
 	let ACTOR_NAME : Text = "Explore";
 	let VERSION : Nat = 1;
 
-	public shared func save_project(project : Project) : async Text {
-		//TODO: add authorization
+	public shared ({ caller }) func save_project(project : Project) : async Text {
+		let authorized = await CanisterIdsLedger.canister_exists(Principal.toText(caller));
 
 		// covert project to public project to save
 		var snap_list = Buffer<SnapPublic>(0);
@@ -69,10 +70,8 @@ actor Explore = {
 		return "Saved project";
 	};
 
-	//TODO: given a list of projects (id and canister id) it should call that canister to get latest project
-
-	public shared func delete_projects(project_ids : [ProjectID]) : async () {
-		//TODO: add authorization
+	public shared ({ caller }) func delete_projects(project_ids : [ProjectID]) : async () {
+		let authorized = await CanisterIdsLedger.canister_exists(Principal.toText(caller));
 
 		for (project_id in project_ids.vals()) {
 			switch (projects.get(project_id)) {
