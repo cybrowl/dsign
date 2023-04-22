@@ -95,6 +95,10 @@ module {
 		name : Text;
 		owner : Null;
 		snaps : [SnapPublic];
+		metrics : {
+			likes : Nat;
+			views : Nat;
+		};
 	};
 
 	public type UpdateProject = {

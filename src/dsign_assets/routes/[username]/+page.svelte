@@ -12,7 +12,6 @@
 	import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
 	import ProjectCardCreate from 'dsign-components/components/ProjectCardCreate.svelte';
 	import ProjectPublicEmpty from 'dsign-components/components/ProjectPublicEmpty.svelte';
-	import SnapCard from 'dsign-components/components/SnapCard.svelte';
 	import SnapCardFavoriteEmpty from 'dsign-components/components/SnapCardFavoriteEmpty.svelte';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
@@ -28,14 +27,15 @@
 	} from '$stores_ref/actors';
 	import {
 		auth_assets_img_staging,
+		auth_favorite_main,
 		auth_profile,
 		auth_project_main
 	} from '$stores_ref/auth_client';
 	import { profileTabsState } from '$stores_ref/page_state';
 	import {
 		favorite_store,
-		project_store,
 		project_store_fetching,
+		project_store,
 		projects_update
 	} from '$stores_ref/fetch_store';
 	import modal_update, { modal_visible } from '$stores_ref/modal';
@@ -49,14 +49,18 @@
 
 	let isProfileOwner = false;
 	let profile = {};
-	let snap_preview = null;
 
 	page_navigation_update.delete_all();
 
 	project_store_fetching();
 
 	onMount(async () => {
-		await Promise.all([auth_assets_img_staging(), auth_profile(), auth_project_main()]);
+		await Promise.all([
+			auth_assets_img_staging(),
+			auth_profile(),
+			auth_project_main(),
+			auth_favorite_main()
+		]);
 
 		try {
 			Promise.all([
@@ -76,19 +80,21 @@
 			});
 
 			Promise.all([
-				$actor_favorite_main.actor.get_all_snaps([$page.params.username]),
+				$actor_favorite_main.actor.get_all_projects([$page.params.username]),
 				$actor_project_main.actor.get_all_projects([$page.params.username])
 			]).then(async ([favorites, projects]) => {
 				const { ok: all_favs, err: err_get_all_favs } = favorites;
 				const { ok: all_projects, err: err_all_projects } = projects;
 
+				console.log('all_favs: ', all_favs);
+
 				if (all_favs) {
-					favorite_store.set({ isFetching: false, snaps: [...all_favs] });
+					favorite_store.set({ isFetching: false, projects: [...all_favs] });
 					local_storage_favorites.set({ all_favorites_count: all_favs.length || 1 });
 				}
 
 				if (err_get_all_favs) {
-					favorite_store.set({ isFetching: false, snaps: [] });
+					favorite_store.set({ isFetching: false, projects: [] });
 					local_storage_favorites.set({ all_favorites_count: 1 });
 
 					if (err_get_all_favs['UserNotFound'] === true) {
@@ -117,7 +123,6 @@
 
 	onDestroy(() => {
 		projects_update.update_projects([]);
-		modal_update.set_visibility_false('snap_preview');
 
 		profileTabsState.set({
 			isProjectsSelected: true,
@@ -163,13 +168,6 @@
 				console.log('error', error);
 			}
 		}
-	}
-
-	function handleSnapPreviewModalOpen(e) {
-		const snap = e.detail;
-		snap_preview = snap;
-
-		modal_update.change_visibility('snap_preview');
 	}
 
 	function handleProjectCreateModalOpen() {
@@ -295,20 +293,23 @@
 
 	<!-- Favorites -->
 	{#if $profileTabsState.isFavoritesSelected}
-		<!-- Fetching Snaps -->
+		<!-- Fetching Projects -->
 		{#if $favorite_store.isFetching === true}
 			<div
 				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
-				{#each { length: $local_storage_favorites.all_favorites_count } as _, i}
-					<SnapCard isLoadingSnap={true} showMetricLikesNumber={false} />
-				{/each}
+				<div
+					class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
+				>
+					<ProjectCard isLoadingProject={true} />
+				</div>
 			</div>
 		{/if}
 
-		<!-- No Snaps Found -->
-		{#if $favorite_store.snaps.length === 0 && $favorite_store.isFetching === false}
+		<!-- No Projects Found -->
+		{#if $favorite_store.projects.length === 0 && $favorite_store.isFetching === false}
 			<div
 				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
@@ -317,19 +318,14 @@
 			</div>
 		{/if}
 
-		<!-- Snaps -->
-		{#if $favorite_store.snaps.length > 0}
+		<!-- Projects -->
+		{#if $favorite_store.projects.length > 0}
 			<div
 				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
-				{#each $favorite_store.snaps as snap}
-					<SnapCard
-						{snap}
-						showUsername={true}
-						showMetricLikesNumber={false}
-						on:clickCard={handleSnapPreviewModalOpen}
-					/>
+				{#each $favorite_store.projects as project}
+					<ProjectCard {project} showOptionsPopover={false} on:clickProject={handleProjectClick} />
 				{/each}
 			</div>
 		{/if}

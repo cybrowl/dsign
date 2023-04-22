@@ -120,21 +120,24 @@ actor FavoriteMain {
 		};
 
 		let project_actor = actor (project.canister_id) : ProjectActor;
+		let favorite_actor = actor (favorite_canister_id) : FavoriteActor;
 
-		switch (await project_actor.update_snap_metrics(project.id, #LikeAdd)) {
+		switch (await favorite_actor.save_project(project)) {
 			case (#err err) {
-				ignore Logger.log_event(log_tags, debug_show ("project_actor: ", err));
+				ignore Logger.log_event(log_tags, debug_show ("favorite_actor: ", err));
 
-				return #err(#ErrorCall(debug_show ("project_actor: ", err)));
+				return #err(#ErrorCall(debug_show ("favorite_actor: ", err)));
 			};
-			case (#ok) {
+			case (#ok projec_ref) {
+				ignore project_actor.update_snap_metrics(project.id, #LikeAdd);
+
 				favorite_ids.add(project.id);
 
 				removeDuplicates<FavoriteID>(favorite_ids, Text.compare);
 
 				user_favorite_ids_storage.put(favorite_canister_id, toArray(favorite_ids));
 
-				return #ok("Saved Favorite");
+				return #ok("Project Added To Favotires");
 			};
 		};
 	};
@@ -188,6 +191,7 @@ actor FavoriteMain {
 			};
 		};
 	};
+
 	// ------------------------- CANISTER MANAGEMENT -------------------------
 	public query func version() : async Nat {
 		return VERSION;

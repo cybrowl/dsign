@@ -41,6 +41,7 @@ module {
 
 	// Actor Interface
 	public type FavoriteActor = actor {
+		save_project : shared (ProjectRef) -> async Result.Result<ProjectRef, ErrSaveFavorite>;
 		get_all_projects : shared ([ProjectID]) -> async Result.Result<[ProjectPublic], ErrGetFavorite>;
 	};
 };

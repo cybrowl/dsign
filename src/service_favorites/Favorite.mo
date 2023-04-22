@@ -84,7 +84,6 @@ actor class Favorite(favorite_main : Principal) = this {
 
 			switch (await project_actor.get_projects(project_ref.ids)) {
 				case (projects) {
-
 					for (project in projects.vals()) {
 						projects_public.add(project);
 					};

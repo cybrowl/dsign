@@ -17,9 +17,19 @@
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 
-	import { actor_project_main, actor_snap_main, actor_profile } from '$stores_ref/actors';
+	import {
+		actor_favorite_main,
+		actor_profile,
+		actor_project_main,
+		actor_snap_main
+	} from '$stores_ref/actors';
 	import { project_store, project_store_fetching, projects_update } from '$stores_ref/fetch_store';
-	import { auth_profile, auth_project_main, auth_snap_main } from '$stores_ref/auth_client';
+	import {
+		auth_favorite_main,
+		auth_profile,
+		auth_project_main,
+		auth_snap_main
+	} from '$stores_ref/auth_client';
 	import modal_update, { modal_visible } from '$stores_ref/modal';
 	import page_navigation_update, {
 		snap_preview,
@@ -43,7 +53,12 @@
 	}
 
 	onMount(async () => {
-		await Promise.all([auth_profile(), auth_snap_main(), auth_project_main()]);
+		await Promise.all([
+			auth_favorite_main(),
+			auth_profile(),
+			auth_project_main(),
+			auth_snap_main()
+		]);
 
 		const canister_id = $page.url.searchParams.get('canister_id');
 		const project_id = last(get($page, 'url.pathname', '').split('/'));
@@ -73,6 +88,26 @@
 			console.log('error projects: ', error);
 		}
 	});
+
+	async function handleAddToFavorites(e) {
+		const project_liked = e.detail;
+
+		const project_ref = {
+			canister_id: project_liked.canister_id,
+			id: project_liked.id
+		};
+
+		if ($actor_favorite_main.loggedIn) {
+			try {
+				const { ok: all_favs, err: err_get_all_favs } =
+					await $actor_favorite_main.actor.save_project(project_ref);
+
+				console.log('all_favs: ', all_favs);
+			} catch (error) {
+				console.log('error: call', error);
+			}
+		}
+	}
 
 	function handleToggleEditMode(e) {
 		is_edit_active.set(get(e, 'detail', false));
@@ -169,7 +204,10 @@
 	{#if isEmpty($project_store.project) === false}
 		<!-- Project Info Header -->
 		<div class="col-start-2 col-end-6 row-start-2 row-end-3 mb-5">
-			<ProjectInfoHeader project={$project_store.project} />
+			<ProjectInfoHeader
+				project={$project_store.project}
+				on:saveToFavorites={handleAddToFavorites}
+			/>
 		</div>
 
 		<!-- ProjectsTabs & ProjectEditActionsBar -->

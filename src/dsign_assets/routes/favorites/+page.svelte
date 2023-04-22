@@ -31,7 +31,7 @@
 		if ($actor_favorite_main.loggedIn) {
 			try {
 				const { ok: all_favs, err: err_get_all_favs } =
-					await $actor_favorite_main.actor.get_all_snaps();
+					await $actor_favorite_main.actor.get_all_projects();
 
 				if (all_favs) {
 					favorite_store.set({ isFetching: false, snaps: [...all_favs] });
@@ -63,7 +63,7 @@
 			local_storage_favorites.set({ all_favorites_count: filtered_fav_snaps.length || 1 });
 
 			const { ok: delete_snap, err: err_delete_snap } =
-				await $actor_favorite_main.actor.delete_snap(snap_liked.id);
+				await $actor_favorite_main.actor.delete_project(snap_liked.id);
 		} catch (error) {
 			console.log('error: call', error);
 		}
