@@ -10,13 +10,12 @@
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
-	import { actor_explore, actor_favorite_main } from '$stores_ref/actors.js';
-	import { auth_favorite_main } from '$stores_ref/auth_client';
+	import { actor_explore } from '$stores_ref/actors.js';
 	import { explore_store } from '$stores_ref/fetch_store.js';
+	import { local_storage_profile } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
 	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
-	import { local_storage_profile } from '$stores_ref/local_storage';
 
 	page_navigation_update.add_item({
 		name: 'Profile',
@@ -25,10 +24,6 @@
 	});
 
 	onMount(async () => {
-		if ($notification.message.length === 0) {
-			await auth_favorite_main();
-		}
-
 		try {
 			const all_projects = await $actor_explore.actor.get_all_projects();
 
@@ -82,7 +77,13 @@
 						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-20 mt-2 mb-24"
 		>
 			{#each $explore_store.projects as project}
-				<ProjectCard {project} showOptionsPopover={false} on:clickProject={handleProjectClick} />
+				<ProjectCard
+					{project}
+					hideSnapsCount={true}
+					showUsername={true}
+					showOptionsPopover={false}
+					on:clickProject={handleProjectClick}
+				/>
 			{/each}
 		</div>
 	{/if}
