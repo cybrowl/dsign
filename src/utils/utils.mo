@@ -96,7 +96,17 @@ module {
 					grouped_results.add(result);
 				};
 				case (?result) {
-					let result_ids = Array.append<Text>(result.ids, [project_ref.id]);
+					let result_ids : [Text] = Array.tabulate<Text>(
+						result.ids.size() + 1,
+						func(i : Nat) : Text {
+							if (i < result.ids.size()) {
+								result.ids[i];
+							} else {
+								project_ref.id;
+							};
+						}
+					);
+
 					let result_updated : MatchingIdsResult = {
 						canister_id = result.canister_id;
 						ids = result_ids;
