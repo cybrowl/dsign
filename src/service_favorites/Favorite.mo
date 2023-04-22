@@ -43,6 +43,23 @@ actor class Favorite(favorite_main : Principal) = this {
 		return #ok(project);
 	};
 
+	public shared ({ caller }) func delete_project(project_id : ProjectID) : async Result.Result<ProjectRef, ErrDeleteFavorite> {
+		if (favorite_main != caller) {
+			return #err(#NotAuthorized(true));
+		};
+
+		switch (projects.get(project_id)) {
+			case null {
+				return #err(#ProjectNotFound(true));
+			};
+			case (?project) {
+				projects.delete(project_id);
+
+				return #ok(project);
+			};
+		};
+	};
+
 	public shared ({ caller }) func get_all_projects(project_ids : [ProjectID]) : async Result.Result<[ProjectPublic], ErrGetFavorite> {
 		if (favorite_main != caller) {
 			return #err(#NotAuthorized(true));
@@ -115,7 +132,18 @@ actor class Favorite(favorite_main : Principal) = this {
 	};
 
 	// ------------------------- System Methods -------------------------
-	system func preupgrade() {};
+	system func preupgrade() {
+		projects_stable_storage := Iter.toArray(projects.entries());
 
-	system func postupgrade() {};
+	};
+
+	system func postupgrade() {
+		projects := HashMap.fromIter<ProjectID, ProjectRef>(
+			projects_stable_storage.vals(),
+			0,
+			Text.equal,
+			Text.hash
+		);
+		projects_stable_storage := [];
+	};
 };
