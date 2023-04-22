@@ -49,6 +49,11 @@
 				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
 
 				if (profile) {
+					local_storage_profile.set({
+						avatar_url: get(profile, 'avatar.url', ''),
+						username: get(profile, 'username', '')
+					});
+
 					window.location.reload();
 				}
 
