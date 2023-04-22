@@ -32,8 +32,11 @@ actor FavoriteMain {
 	type FavoriteIDStorage = Types.FavoriteIDStorage;
 	type ICInterface = Types.ICInterface;
 	type ICInterfaceStatusResponse = Types.ICInterfaceStatusResponse;
+	type ProjectRef = Types.ProjectRef;
+	type ProjectPublic = Types.ProjectPublic;
 
 	type FavoriteActor = Types.FavoriteActor;
+	type ProjectActor = Types.ProjectActor;
 
 	type CanisterInfo = CanisterIdsLedgerTypes.CanisterInfo;
 	type Payload = HealthMetricsTypes.Payload;
@@ -79,6 +82,112 @@ actor FavoriteMain {
 		};
 	};
 
+	public shared ({ caller }) func save_project(project : ProjectRef) : async Result.Result<Text, ErrSaveFavorite> {
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "save_project")];
+
+		if (project.id.size() > 50 or project.canister_id.size() > 50) {
+			return #err(#ArgsTooLong(true));
+		};
+
+		var user_favorite_ids_storage : FavoriteIDStorage = HashMap.HashMap(0, Text.equal, Text.hash);
+		switch (user_canisters_ref.get(caller)) {
+			case (?user_favorite_ids_storage_) {
+				user_favorite_ids_storage := user_favorite_ids_storage_;
+			};
+			case (_) {
+				return #err(#UserNotFound(true));
+			};
+		};
+
+		let my_ids = Utils.get_all_ids(user_favorite_ids_storage);
+		let favorite_id_exists = Utils.some(my_ids, [project.id]);
+		if (favorite_id_exists == true) {
+			return #err(#ProjectAlreadySaved(true));
+		};
+
+		var favorite_ids = Buffer<FavoriteID>(0);
+		var favorite_ids_found = false;
+		switch (user_favorite_ids_storage.get(favorite_canister_id)) {
+			case (?favorite_ids_) {
+				ignore Logger.log_event(log_tags, "favorite_ids found");
+
+				favorite_ids := fromArray(favorite_ids_);
+				favorite_ids_found := true;
+			};
+			case (_) {
+				ignore Logger.log_event(log_tags, "favorite_ids NOT found");
+			};
+		};
+
+		let project_actor = actor (project.canister_id) : ProjectActor;
+
+		switch (await project_actor.update_snap_metrics(project.id, #LikeAdd)) {
+			case (#err err) {
+				ignore Logger.log_event(log_tags, debug_show ("project_actor: ", err));
+
+				return #err(#ErrorCall(debug_show ("project_actor: ", err)));
+			};
+			case (#ok) {
+				favorite_ids.add(project.id);
+
+				removeDuplicates<FavoriteID>(favorite_ids, Text.compare);
+
+				user_favorite_ids_storage.put(favorite_canister_id, toArray(favorite_ids));
+
+				return #ok("Saved Favorite");
+			};
+		};
+	};
+
+	public shared ({ caller }) func get_all_projects(username : ?Text) : async Result.Result<[ProjectPublic], ErrGetFavorite> {
+		let tags = [("actor_name", ACTOR_NAME), ("method", "get_all_projects")];
+
+		var user_principal = caller;
+
+		switch (username) {
+			case (?username) {
+				switch (await Profile.get_user_principal_public(username)) {
+					case (#err err) {
+						//TODO: log error
+					};
+					case (#ok principal) {
+						user_principal := principal;
+					};
+				};
+			};
+			case (_) {};
+		};
+
+		switch (user_canisters_ref.get(user_principal)) {
+			case (?favorite_canister_ids) {
+				let all_projects = Buffer<ProjectPublic>(0);
+
+				for ((canister_id, favorite_ids) in favorite_canister_ids.entries()) {
+					let favorite_actor = actor (canister_id) : FavoriteActor;
+
+					switch (await favorite_actor.get_all_projects(favorite_ids)) {
+						case (#err err) {
+							return #err(#ErrorCall(debug_show (err)));
+						};
+						case (#ok projects) {
+							for (project in projects.vals()) {
+								all_projects.add(project);
+							};
+						};
+					};
+				};
+
+				if (all_projects.size() == 0) {
+					return #err(#ProjectsEmpty(true));
+				};
+
+				return #ok(toArray(all_projects));
+			};
+			case (_) {
+				return #err(#UserNotFound(true));
+			};
+		};
+	};
 	// ------------------------- CANISTER MANAGEMENT -------------------------
 	public query func version() : async Nat {
 		return VERSION;

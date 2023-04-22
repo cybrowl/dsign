@@ -63,8 +63,9 @@ actor ProjectMain {
 	);
 	stable var user_canisters_ref_storage : [var (UserPrincipal, [(ProjectCanisterID, [ProjectID])])] = [var];
 
-	stable var project_canister_id : Text = "";
+	stable var favorite_main_canister_id : Text = "";
 	stable var snap_main_canister_id : Text = "";
+	stable var project_canister_id : Text = "";
 
 	// ------------------------- PROJECTS MANAGEMENT -------------------------
 	public shared ({ caller }) func create_user_project_storage() : async Bool {
@@ -323,7 +324,7 @@ actor ProjectMain {
 				let matches = Utils.all_ids_match(my_ids, [project_ref.id]);
 
 				if (matches.all_match == false) {
-					return #err(#ProjectIdsDoNotMatch);
+					return #err(#ProjectIdsDoNotMatch(true));
 				};
 
 				let project_actor = actor (project_ref.canister_id) : ProjectActor;
@@ -345,7 +346,7 @@ actor ProjectMain {
 				};
 			};
 			case (_) {
-				#err(#UserNotFound);
+				#err(#UserNotFound(true));
 			};
 		};
 	};
@@ -472,31 +473,37 @@ actor ProjectMain {
 	//NOTE: dev only
 	public shared (msg) func set_canister_ids({
 		snap_main : Text;
+		favorite_main : Text;
 	}) : async Text {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "set_canister_ids")];
-
-		let project_main_principal = Principal.fromActor(ProjectMain);
-
 		let is_prod = Text.equal(
-			Principal.toText(project_main_principal),
+			Principal.toText(Principal.fromActor(ProjectMain)),
 			"nhlnj-vyaaa-aaaag-aay5q-cai"
 		);
 
 		if (is_prod == false) {
 			snap_main_canister_id := snap_main;
+			favorite_main_canister_id := favorite_main;
 		};
+
+		let message = "set_canister_ids: " # snap_main # favorite_main;
 
 		ignore Logger.log_event(
 			tags,
-			"set_canister_ids: " # snap_main
+			message
+
 		);
 
-		return "set_canister_ids";
+		return message;
 	};
 
-	private func create_project_canister(project_main_principal : Principal, snap_main_principal : Principal, is_prod : Bool) : async () {
+	private func create_project_canister(is_prod : Bool) : async () {
+		let project_main_principal = Principal.fromActor(ProjectMain);
+		let snap_main_principal = Principal.fromText(snap_main_canister_id);
+		let favorite_main_principal = Principal.fromText(favorite_main_canister_id);
+
 		Cycles.add(CYCLE_AMOUNT);
-		let project_actor = await Project.Project(project_main_principal, snap_main_principal, is_prod);
+		let project_actor = await Project.Project(project_main_principal, snap_main_principal, favorite_main_principal, is_prod);
 		let principal = Principal.fromActor(project_actor);
 
 		project_canister_id := Principal.toText(principal);
@@ -515,24 +522,22 @@ actor ProjectMain {
 	public shared (msg) func initialize_canisters() : async Text {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
 
-		let project_main_principal = Principal.fromActor(ProjectMain);
 		let is_prod = Text.equal(
-			Principal.toText(project_main_principal),
+			Principal.toText(Principal.fromActor(ProjectMain)),
 			"nhlnj-vyaaa-aaaag-aay5q-cai"
 		);
 
 		if (is_prod == true) {
 			snap_main_canister_id := "lyswl-7iaaa-aaaag-aatya-cai";
+			favorite_main_canister_id := "a7b5k-xiaaa-aaaag-aa6ja-cai";
 		};
-
-		let snap_main_principal = Principal.fromText(snap_main_canister_id);
 
 		if (project_canister_id.size() > 1) {
 			ignore Logger.log_event(tags, "exists project_canister_id: " # project_canister_id);
 
 			return project_canister_id;
 		} else {
-			await create_project_canister(project_main_principal, snap_main_principal, is_prod);
+			await create_project_canister(is_prod);
 
 			ignore Logger.log_event(tags, "created project_canister_id: " # project_canister_id);
 

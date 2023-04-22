@@ -5,6 +5,7 @@ import Debug "mo:base/Debug";
 import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import Prim "mo:⛔";
 import Text "mo:base/Text";
 
@@ -17,6 +18,16 @@ module {
 	public type SnapRef = {
 		id : Text;
 		canister_id : Text;
+	};
+
+	type ProjectRef = {
+		id : Text;
+		canister_id : Text;
+	};
+
+	type MatchingIdsResult = {
+		canister_id : Text;
+		ids : [Text];
 	};
 
 	public func get_all_ids(user_ids_storage : IDStorage) : [Text] {
@@ -50,6 +61,65 @@ module {
 		};
 
 		return matches;
+	};
+
+	func findIndex<X>(arr : [X], predicate : X -> Bool) : ?Nat {
+		let len = Array.size(arr);
+		for (i in Iter.range(0, len - 1)) {
+			if (predicate(arr[i])) {
+				return ?i;
+			};
+		};
+		null;
+	};
+
+	public func group_project_refs_by_canister_id(projectRefs : Buffer.Buffer<ProjectRef>) : [MatchingIdsResult] {
+		var project_refs_arr = Buffer.toArray<ProjectRef>(projectRefs);
+		var grouped_results = Buffer.Buffer<MatchingIdsResult>(0);
+
+		for (project_ref in project_refs_arr.vals()) {
+			let existing_result = Array.find<MatchingIdsResult>(
+				Buffer.toArray(grouped_results),
+				func(result) {
+					return result.canister_id == project_ref.canister_id;
+				}
+			);
+
+			switch (existing_result) {
+				case (null) {
+					// No existing result for the current canister_id, create a new one
+					let result : MatchingIdsResult = {
+						canister_id = project_ref.canister_id;
+						ids = [project_ref.id];
+					};
+
+					grouped_results.add(result);
+				};
+				case (?result) {
+					let result_ids = Array.append<Text>(result.ids, [project_ref.id]);
+					let result_updated : MatchingIdsResult = {
+						canister_id = result.canister_id;
+						ids = result_ids;
+					};
+
+					let index = findIndex<MatchingIdsResult>(
+						Buffer.toArray(grouped_results),
+						func(res) {
+							return res.canister_id == result.canister_id;
+						}
+					);
+
+					switch (index) {
+						case (?idx) {
+							grouped_results.put(idx, result_updated);
+						};
+						case (null) {};
+					};
+				};
+			};
+		};
+
+		return Buffer.toArray(grouped_results);
 	};
 
 	public func some(my_ids : [Text], ids_to_match : [Text]) : Bool {

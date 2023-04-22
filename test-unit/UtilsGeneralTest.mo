@@ -1,4 +1,5 @@
 import Array "mo:base/Array";
+import Buffer "mo:base/Buffer";
 import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
 import Text "mo:base/Text";
@@ -20,6 +21,16 @@ type SnapID = Text;
 type SnapRef = {
 	id : Text;
 	canister_id : Text;
+};
+
+type ProjectRef = {
+	id : Text;
+	canister_id : Text;
+};
+
+type MatchingIdsResult = {
+	canister_id : Text;
+	ids : [Text];
 };
 
 let success = run([
@@ -143,6 +154,66 @@ let success = run([
 
 					//TODO: Fix this
 					assertTrue(true);
+				}
+			)
+		]
+	),
+	describe(
+		"Utils.group_project_refs_by_canister_id()",
+		[
+			it(
+				"should group project references by canister ID",
+				do {
+					let projectRefs = Buffer.fromArray<ProjectRef>([
+						{ id = "1"; canister_id = "A" },
+						{ id = "2"; canister_id = "B" },
+						{ id = "3"; canister_id = "A" },
+						{ id = "4"; canister_id = "C" },
+						{ id = "5"; canister_id = "B" }
+					]);
+
+					let expectedResult : [MatchingIdsResult] = [
+						{ canister_id = "A"; ids = ["1", "3"] },
+						{ canister_id = "B"; ids = ["2", "5"] },
+						{ canister_id = "C"; ids = ["4"] }
+					];
+
+					let result : [MatchingIdsResult] = Utils.group_project_refs_by_canister_id(projectRefs);
+
+					let match : Bool = Array.equal(
+						result,
+						expectedResult,
+						func(a : MatchingIdsResult, b : MatchingIdsResult) : Bool {
+							let ids_match = Array.equal(a.ids, b.ids, Text.equal);
+							let canister_ids_match = a.canister_id == b.canister_id;
+
+							return canister_ids_match and ids_match;
+						}
+					);
+
+					assertTrue(match);
+				}
+			),
+			it(
+				"should return an empty array for empty input",
+				do {
+					let projectRefs = Buffer.fromArray<ProjectRef>([]);
+
+					let expectedResult : [MatchingIdsResult] = [];
+
+					let result = Utils.group_project_refs_by_canister_id(projectRefs);
+					assertTrue(
+						Array.equal(
+							result,
+							expectedResult,
+							func(a : MatchingIdsResult, b : MatchingIdsResult) : Bool {
+								let ids_match = Array.equal(a.ids, b.ids, Text.equal);
+								let canister_ids_match = a.canister_id == b.canister_id;
+
+								return canister_ids_match and ids_match;
+							}
+						)
+					);
 				}
 			)
 		]

@@ -26,7 +26,6 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	type AssetRef = Types.AssetRef;
 	type CreateSnapArgs = Types.CreateSnapArgs;
 	type ErrCreateSnap = Types.ErrCreateSnap;
-	type ErrUpdateSnap = Types.ErrUpdateSnap;
 	type ImageRef = Types.ImageRef;
 	type ProjectPublic = Types.ProjectPublic;
 	type Snap = Types.Snap;
@@ -104,59 +103,6 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		snaps.put(snap_id, snap);
 
 		return #ok(snap);
-	};
-
-	// NOTE: only called from Favorite Main
-	public shared ({ caller }) func update_snap_metrics(
-		snap_id : SnapID
-	) : async Result.Result<SnapPublic, ErrUpdateSnap> {
-		let log_tags = [("actor_name", ACTOR_NAME), ("method", "update_snap_metrics")];
-
-		if (favorite_main != caller) {
-			ignore Logger.log_event(
-				log_tags,
-				"Unauthorized: " # Principal.toText(caller)
-			);
-
-			return #err(#NotAuthorized(true));
-		};
-
-		switch (snaps.get(snap_id)) {
-			case (null) {
-				return #err(#SnapNotFound(true));
-			};
-			case (?snap) {
-
-				let snap_metrics_updated = {
-					likes = snap.metrics.likes + 1;
-					views = snap.metrics.views;
-				};
-
-				let snap_updated = {
-					snap with metrics = snap_metrics_updated;
-				};
-
-				snaps.put(snap.id, snap_updated);
-
-				var project_public : ?ProjectPublic = null;
-				switch (snap.project) {
-					case (null) {};
-					case (?project) {
-						project_public := ?{
-							project with owner = null;
-						};
-					};
-				};
-
-				let snap_public_updated = {
-					snap with metrics = snap_metrics_updated;
-					project = project_public;
-					owner = null;
-				};
-
-				return #ok(snap_public_updated);
-			};
-		};
 	};
 
 	// NOTE: only called from Snap Main

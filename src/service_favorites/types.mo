@@ -8,20 +8,26 @@ module {
 	public type FavoriteCanisterID = Text;
 	public type FavoriteID = Text;
 	public type FavoriteIDStorage = HashMap.HashMap<FavoriteCanisterID, [FavoriteID]>;
+	public type ProjectRef = ProjectTypes.ProjectRef;
+	public type ProjectPublic = ProjectTypes.ProjectPublic;
+	public type ProjectID = ProjectTypes.ProjectID;
+
+	public type ProjectActor = ProjectTypes.ProjectActor;
 
 	public type ICInterface = ICInterfaceTypes.Self;
 	public type ICInterfaceStatusResponse = ICInterfaceTypes.StatusResponse;
 
 	public type ErrSaveFavorite = {
 		#ErrorCall : Text;
-		#SnapAlreadySaved : Bool;
+		#ProjectAlreadySaved : Bool;
 		#NotAuthorized : Bool;
+		#ArgsTooLong : Bool;
 		#UserNotFound : Bool;
 	};
 
 	public type ErrGetFavorite = {
 		#ErrorCall : Text;
-		#SnapsEmpty : Bool;
+		#ProjectsEmpty : Bool;
 		#NotAuthorized : Bool;
 		#UserNotFound : Bool;
 	};
@@ -30,11 +36,11 @@ module {
 		#NotAuthorized : Bool;
 		#UserNotFound : Bool;
 		#FavoriteIdsDoNotMatch : Bool;
-		#SnapNotFound : Bool;
+		#ProjectNotFound : Bool;
 	};
 
 	// Actor Interface
 	public type FavoriteActor = actor {
-
+		get_all_projects : shared ([ProjectID]) -> async Result.Result<[ProjectPublic], ErrGetFavorite>;
 	};
 };

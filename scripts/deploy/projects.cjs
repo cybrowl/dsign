@@ -14,6 +14,7 @@ const {
 } = require('../../test-utils/actor_interface.cjs');
 const {
 	canister_ids_ledger_canister_id,
+	favorite_main_canister_id,
 	project_main_canister_id,
 	snap_main_canister_id
 } = require('../../test-utils/actor_canister_ids.cjs');
@@ -79,10 +80,11 @@ const installCode = async () => {
 		const local_canisters = project_main_canisters.map((canister) => {
 			const arg_map = {
 				project: IDL.encode(
-					[IDL.Principal, IDL.Principal, IDL.Bool],
+					[IDL.Principal, IDL.Principal, IDL.Principal, IDL.Bool],
 					[
 						Principal.fromText(project_main_canister_id),
 						Principal.fromText(snap_main_canister_id),
+						Principal.fromText(favorite_main_canister_id),
 						false
 					]
 				)
@@ -126,10 +128,11 @@ const installCode = async () => {
 		const prod_canisters = project_main_canisters.map((canister) => {
 			const arg_map = {
 				project: IDL.encode(
-					[IDL.Principal, IDL.Principal, IDL.Bool],
+					[IDL.Principal, IDL.Principal, IDL.Principal, IDL.Bool],
 					[
 						Principal.fromText(canister_ids['project_main'].ic),
 						Principal.fromText(canister_ids['snap_main'].ic),
+						Principal.fromText(canister_ids['favorite_main'].ic),
 						true
 					]
 				)

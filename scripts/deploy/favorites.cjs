@@ -4,6 +4,7 @@ const { readFileSync } = require('fs');
 const { HttpAgent, Actor } = require('@dfinity/agent');
 const { config } = require('dotenv');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
+const fetch = require('node-fetch');
 
 config();
 
@@ -18,6 +19,7 @@ const {
 const canister_ids = require('../../canister_ids.json');
 
 global.fetch = fetch;
+global.Headers = fetch.Headers;
 
 const parseIdentity = (privateKeyHex) => {
 	const privateKey = Uint8Array.from(Buffer.from(privateKeyHex, 'hex'));

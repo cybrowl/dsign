@@ -23,13 +23,14 @@ import Types "./types";
 import Utils "../utils/utils";
 import UtilsShared "../utils/utils";
 
-actor class Project(project_main : Principal, snap_main : Principal, is_prod : Bool) = this {
+actor class Project(project_main : Principal, snap_main : Principal, favorite_main : Principal, is_prod : Bool) = this {
 	type ErrAddSnapsToProject = Types.ErrAddSnapsToProject;
 	type ErrCreateProject = Types.ErrCreateProject;
 	type ErrDeleteProjects = Types.ErrDeleteProjects;
 	type ErrDeleteSnapsFromProject = Types.ErrDeleteSnapsFromProject;
 	type ErrUpdateProject = Types.ErrUpdateProject;
 	type Project = Types.Project;
+	type ProjectUpdateAction = Types.ProjectUpdateAction;
 	type ProjectID = Types.ProjectID;
 	type ProjectRef = Types.ProjectRef;
 	type Snap = Types.Snap;
@@ -51,6 +52,10 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 		name : Text;
 		owner : Null;
 		snaps : [SnapPublic];
+		metrics : {
+			likes : Nat;
+			views : Nat;
+		};
 	};
 
 	let ACTOR_NAME : Text = "Project";
@@ -108,6 +113,10 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 			owner = owner;
 			name = name;
 			snaps = snaps;
+			metrics = {
+				likes = 0;
+				views = 0;
+			};
 		};
 
 		projects.put(project_id, project);
@@ -157,12 +166,7 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 					let updated_snaps = Utils.remove_snaps(project.snaps, snaps);
 
 					let project_updated : Project = {
-						id = project.id;
-						canister_id = project.canister_id;
-						created = project.created;
-						username = project.username;
-						owner = project.owner;
-						name = project.name;
+						project with
 						snaps = updated_snaps;
 					};
 
@@ -203,12 +207,7 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 					};
 
 					let project_updated : Project = {
-						id = project.id;
-						canister_id = project.canister_id;
-						created = project.created;
-						username = project.username;
-						owner = project.owner;
-						name = project.name;
+						project with
 						snaps = Buffer.toArray(updated_snaps);
 					};
 
@@ -233,22 +232,17 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "update_project_details")];
 
 		if (project_main != caller) {
-			return #err(#NotAuthorized);
+			return #err(#NotAuthorized(true));
 		};
 
 		switch (projects.get(project_ref.id)) {
 			case null {
-				return #err(#ProjectNotFound);
+				return #err(#ProjectNotFound(true));
 			};
 			case (?project) {
 				let project_updated : Project = {
-					id = project.id;
-					canister_id = project.canister_id;
-					created = project.created;
-					username = project.username;
-					owner = project.owner;
+					project with
 					name = Option.get(update_project_args.name, project.name);
-					snaps = project.snaps;
 				};
 
 				projects.put(project_ref.id, project_updated);
@@ -256,6 +250,53 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 				ignore Logger.log_event(log_tags, "Project Details Updated");
 
 				return #ok(project_updated);
+			};
+		};
+	};
+
+	// NOTE: only called from Favorite Main
+	public shared ({ caller }) func update_project_metrics(
+		project_id : ProjectID,
+		action_type : ProjectUpdateAction
+	) : async Result.Result<(), ErrUpdateProject> {
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "update_snap_metrics")];
+
+		if (favorite_main != caller) {
+			ignore Logger.log_event(
+				log_tags,
+				"Unauthorized: " # Principal.toText(caller)
+			);
+
+			return #err(#NotAuthorized(true));
+		};
+
+		switch (projects.get(project_id)) {
+			case (null) {
+				return #err(#ProjectNotFound(true));
+			};
+			case (?project) {
+				var project_metrics_updated = {
+					likes = 0;
+					views = 0;
+				};
+
+				switch (action_type) {
+					case (#LikeAdd) {
+						project_metrics_updated := {
+							likes = project.metrics.likes + 1;
+							views = project.metrics.views;
+						};
+					};
+					case (#LikeRemove) {};
+				};
+
+				let project_updated = {
+					project with metrics = project_metrics_updated;
+				};
+
+				projects.put(project.id, project_updated);
+
+				return #ok(());
 			};
 		};
 	};
@@ -310,6 +351,7 @@ actor class Project(project_main : Principal, snap_main : Principal, is_prod : B
 						name = project.name;
 						owner = null;
 						snaps = Buffer.toArray(snap_list);
+						metrics = project.metrics;
 					};
 
 					projects_list.add(project_public);
