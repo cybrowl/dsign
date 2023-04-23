@@ -69,7 +69,7 @@
 	function login() {
 		$auth_client.login({
 			identityProvider: isProd
-				? 'https://identity.icp0.io/#authorize'
+				? 'https://identity.ic0.app/#authorize'
 				: 'http://localhost:8080/?canisterId=rwlgt-iiaaa-aaaaa-aaaaa-cai',
 			onSuccess: handleAuth
 		});

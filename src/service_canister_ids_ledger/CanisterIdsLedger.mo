@@ -25,7 +25,7 @@ actor CanisterIdsLedger = {
 
 	let ACTOR_NAME : Text = "CanisterIdsLedger";
 	let CANISTER_ID_PROD : Text = "k25dy-3yaaa-aaaag-abcpa-cai";
-	let VERSION : Nat = 4;
+	let VERSION : Nat = 5;
 
 	var canisters = List.nil<CanisterInfo>();
 	stable var canisters_stable_storage : [(CanisterInfo)] = [];
@@ -163,7 +163,11 @@ actor CanisterIdsLedger = {
 		ignore logger_actor.log_event(tags, "health");
 	};
 
-	public func start_log_canisters_health() : async Timer.TimerId {
+	public shared func health_manual() : async () {
+		ignore log_canisters_health();
+	};
+
+	public shared func start_log_canisters_health() : async Timer.TimerId {
 		if (timer_id == 0) {
 			timer_id := 1;
 
@@ -173,7 +177,7 @@ actor CanisterIdsLedger = {
 		};
 	};
 
-	public func stop_log_canisters_health() : async Timer.TimerId {
+	public shared func stop_log_canisters_health() : async Timer.TimerId {
 		timer_id := 0;
 
 		Timer.cancelTimer(1);

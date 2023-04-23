@@ -583,6 +583,29 @@ actor SnapMain {
 		ignore Logger.log_event(tags, "exists child_canister_ids: " # child_canister_ids);
 	};
 
+	public shared (msg) func add_cycles() : async Text {
+		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
+
+		let balance : Nat = Cycles.balance();
+
+		let cycles : Nat = balance - 100_000_000_000;
+
+		if (cycles > 0) {
+			Cycles.add(cycles);
+			await ic.deposit_cycles({ canister_id = Principal.fromText(snap_canister_id) });
+
+			Cycles.add(cycles);
+			await ic.deposit_cycles({ canister_id = Principal.fromText(image_assets_canister_id) });
+
+			Cycles.add(cycles);
+			await ic.deposit_cycles({ canister_id = Principal.fromText(assets_canister_id) });
+
+			return "transfered";
+		};
+
+		return "failed";
+	};
+
 	public shared func health() : async Payload {
 		let tags = [
 			("actor_name", ACTOR_NAME),
