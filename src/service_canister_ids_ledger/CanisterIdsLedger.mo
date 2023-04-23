@@ -148,6 +148,10 @@ actor CanisterIdsLedger = {
 		return VERSION;
 	};
 
+	public query func get_timer_id() : async Nat {
+		return timer_id;
+	};
+
 	public shared func health() : async () {
 		let tags = [
 			("actor_name", ACTOR_NAME),
@@ -182,7 +186,7 @@ actor CanisterIdsLedger = {
 
 		Timer.cancelTimer(1);
 
-		return 0;
+		return timer_id;
 	};
 
 	// ------------------------- System Methods -------------------------
