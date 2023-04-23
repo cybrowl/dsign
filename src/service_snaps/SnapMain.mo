@@ -523,10 +523,8 @@ actor SnapMain {
 	}) : async Text {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "set_canister_ids")];
 
-		let snap_main_principal = Principal.fromActor(SnapMain);
-
 		let is_prod = Text.equal(
-			Principal.toText(snap_main_principal),
+			Principal.toText(Principal.fromActor(SnapMain)),
 			"lyswl-7iaaa-aaaag-aatya-cai"
 		);
 

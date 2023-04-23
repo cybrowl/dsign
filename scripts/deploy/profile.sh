@@ -26,6 +26,7 @@ dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} profile
 # Check version
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call test_image_assets version
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call profile version
+dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call profile initialize_canisters
 
 # Generate test interface
 npm run generate_test_interface

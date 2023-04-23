@@ -34,6 +34,7 @@ dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call test_assets version
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call test_image_assets version
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call test_snap version
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call snap_main version
+dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call snap_main initialize_canisters
 
 # Generate test interface
 npm run generate_test_interface

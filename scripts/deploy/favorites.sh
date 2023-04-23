@@ -29,6 +29,7 @@ dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} test_favorite --argument='(princip
 # Check version
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call test_favorite version
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call favorite_main version
+dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call favorite_main initialize_canisters
 
 # Generate test interface
 npm run generate_test_interface

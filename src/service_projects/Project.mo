@@ -67,7 +67,7 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 	var projects : HashMap.HashMap<ProjectID, Project> = HashMap.HashMap(0, Text.equal, Text.hash);
 	stable var projects_stable_storage : [(ProjectID, Project)] = [];
 
-	// ------------------------- PROJECTS MANAGEMENT -------------------------
+	// ------------------------- Projects Methods -------------------------
 	public shared ({ caller }) func create_project(
 		name : Text,
 		snap_refs : ?[SnapRef],
@@ -379,7 +379,7 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 		return Buffer.toArray(projects_list);
 	};
 
-	// ------------------------- CANISTER MANAGEMENT -------------------------
+	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
 	};
@@ -417,7 +417,7 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 		return log_payload;
 	};
 
-	// ------------------------- SYSTEM METHODS -------------------------
+	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		projects_stable_storage := Iter.toArray(projects.entries());
 	};

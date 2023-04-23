@@ -28,6 +28,7 @@ dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} project_main
 # Check version
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call test_project version
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call project_main version
+dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call project_main initialize_canisters
 
 # Generate test interface
 npm run generate_test_interface
