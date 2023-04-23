@@ -452,7 +452,9 @@ actor SnapMain {
 	};
 
 	// CREATE CANISTER
-	private func create_assets_canister(snap_main_principal : Principal, is_prod : Bool) : async () {
+	private func create_assets_canister(is_prod : Bool) : async () {
+		let snap_main_principal = Principal.fromActor(SnapMain);
+
 		Cycles.add(CYCLE_AMOUNT);
 		let assets_actor = await Assets.Assets(snap_main_principal, is_prod);
 		let principal = Principal.fromActor(assets_actor);
@@ -470,7 +472,9 @@ actor SnapMain {
 		ignore CanisterIdsLedger.save_canister(canister_child);
 	};
 
-	private func create_image_assets_canister(snap_main_principal : Principal, is_prod : Bool) : async () {
+	private func create_image_assets_canister(is_prod : Bool) : async () {
+		let snap_main_principal = Principal.fromActor(SnapMain);
+
 		Cycles.add(CYCLE_AMOUNT);
 		let image_assets_actor = await ImageAssets.ImageAssets(snap_main_principal, is_prod);
 		let principal = Principal.fromActor(image_assets_actor);
@@ -488,12 +492,11 @@ actor SnapMain {
 		ignore CanisterIdsLedger.save_canister(canister_child);
 	};
 
-	private func create_snap_canister(
-		snap_main_principal : Principal,
-		project_main_principal : Principal,
-		favorite_main_principal : Principal,
-		is_prod : Bool
-	) : async () {
+	private func create_snap_canister(is_prod : Bool) : async () {
+		let snap_main_principal = Principal.fromActor(SnapMain);
+		let project_main_principal = Principal.fromText(project_main_canister_id);
+		let favorite_main_principal = Principal.fromText(favorite_main_canister_id);
+
 		Cycles.add(CYCLE_AMOUNT);
 		let snap_actor = await Snap.Snap(
 			snap_main_principal,
@@ -547,10 +550,8 @@ actor SnapMain {
 	public shared (msg) func initialize_canisters() : async () {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
 
-		let snap_main_principal = Principal.fromActor(SnapMain);
-
 		let is_prod = Text.equal(
-			Principal.toText(snap_main_principal),
+			Principal.toText(Principal.fromActor(SnapMain)),
 			"lyswl-7iaaa-aaaag-aatya-cai"
 		);
 
@@ -559,30 +560,26 @@ actor SnapMain {
 			favorite_main_canister_id := "a7b5k-xiaaa-aaaag-aa6ja-cai";
 		};
 
-		let has_assets_canister_id : Bool = assets_canister_id.size() > 0;
-		let has_image_assets_canister_id : Bool = image_assets_canister_id.size() > 0;
-		let has_snap_canister_id : Bool = snap_canister_id.size() > 0;
-
 		let project_main_principal = Principal.fromText(project_main_canister_id);
 		let favorite_main_principal = Principal.fromText(favorite_main_canister_id);
 
 		ignore Logger.log_event(tags, "main_ids: " # project_main_canister_id # "," # favorite_main_canister_id);
 
 		// create canisters
-		if (has_assets_canister_id == false) {
-			await create_assets_canister(snap_main_principal, is_prod);
+		if (assets_canister_id.size() < 3) {
+			await create_assets_canister(is_prod);
 
 			ignore Logger.log_event(tags, "created assets_canister_id: " # assets_canister_id);
 		};
 
-		if (has_image_assets_canister_id == false) {
-			await create_image_assets_canister(snap_main_principal, is_prod);
+		if (image_assets_canister_id.size() < 3) {
+			await create_image_assets_canister(is_prod);
 
 			ignore Logger.log_event(tags, "created image_assets_canister_id: " # image_assets_canister_id);
 		};
 
-		if (has_snap_canister_id == false) {
-			await create_snap_canister(snap_main_principal, project_main_principal, favorite_main_principal, is_prod);
+		if (snap_canister_id.size() < 3) {
+			await create_snap_canister(is_prod);
 
 			ignore Logger.log_event(tags, "created snap_canister_id: " # snap_canister_id);
 		};

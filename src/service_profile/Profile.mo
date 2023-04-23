@@ -445,8 +445,9 @@ actor Profile = {
 		return log_payload;
 	};
 
-	private func create_image_assets_canister(profile_principal : Principal, is_prod : Bool) : async () {
+	private func create_image_assets_canister(is_prod : Bool) : async () {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "create_image_assets_canister")];
+		let profile_principal = Principal.fromActor(Profile);
 
 		Cycles.add(CYCLE_AMOUNT);
 		let image_assets_actor = await ImageAssets.ImageAssets(profile_principal, is_prod);
@@ -508,23 +509,22 @@ actor Profile = {
 	};
 
 	public shared (msg) func initialize_canisters() : async () {
-		let profile_principal = Principal.fromActor(Profile);
+		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
+
 		let is_prod = Text.equal(
-			Principal.toText(profile_principal),
+			Principal.toText(Principal.fromActor(Profile)),
 			"kxkd5-7qaaa-aaaag-aaawa-cai"
 		);
 
-		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
-
 		// create image assets canister
-		if (image_assets_canister_id.size() < 1) {
-			await create_image_assets_canister(profile_principal, is_prod);
-		} else {
-			ignore Logger.log_event(
-				tags,
-				"image_assets_canister_id exists: " # image_assets_canister_id
-			);
+		if (image_assets_canister_id.size() < 3) {
+			await create_image_assets_canister(is_prod);
 		};
+
+		ignore Logger.log_event(
+			tags,
+			"image_assets_canister_id exists: " # image_assets_canister_id
+		);
 	};
 
 	// ------------------------- System Methods -------------------------

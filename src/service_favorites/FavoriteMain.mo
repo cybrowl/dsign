@@ -197,7 +197,9 @@ actor FavoriteMain {
 		return VERSION;
 	};
 
-	private func create_favorite_canister(favorite_main_principal : Principal, is_prod : Bool) : async () {
+	private func create_favorite_canister(is_prod : Bool) : async () {
+		let favorite_main_principal = Principal.fromActor(FavoriteMain);
+
 		Cycles.add(CYCLE_AMOUNT);
 		let favorite_actor = await Favorite.Favorite(favorite_main_principal);
 		let principal = Principal.fromActor(favorite_actor);
@@ -218,9 +220,8 @@ actor FavoriteMain {
 	public shared (msg) func initialize_canisters() : async Text {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
 
-		let favorite_main_principal = Principal.fromActor(FavoriteMain);
 		let is_prod = Text.equal(
-			Principal.toText(favorite_main_principal),
+			Principal.toText(Principal.fromActor(FavoriteMain)),
 			"a7b5k-xiaaa-aaaag-aa6ja-cai"
 		);
 
@@ -229,7 +230,7 @@ actor FavoriteMain {
 
 			return favorite_canister_id;
 		} else {
-			await create_favorite_canister(favorite_main_principal, is_prod);
+			await create_favorite_canister(is_prod);
 
 			ignore Logger.log_event(tags, "created favorite_canister_id: " # favorite_canister_id);
 

@@ -532,17 +532,15 @@ actor ProjectMain {
 			favorite_main_canister_id := "a7b5k-xiaaa-aaaag-aa6ja-cai";
 		};
 
-		if (project_canister_id.size() > 1) {
-			ignore Logger.log_event(tags, "exists project_canister_id: " # project_canister_id);
-
-			return project_canister_id;
-		} else {
+		if (project_canister_id.size() < 3) {
 			await create_project_canister(is_prod);
 
 			ignore Logger.log_event(tags, "created project_canister_id: " # project_canister_id);
 
 			return project_canister_id;
 		};
+
+		return "main_ids: " # snap_main_canister_id # "," # favorite_main_canister_id;
 	};
 
 	// UPDATE CHILD CANISTER
