@@ -104,6 +104,7 @@ actor class Favorite(favorite_main : Principal) = this {
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
 			("canister_id", Principal.toText(Principal.fromActor(this))),
+			("projects_size", Int.toText(projects.size())),
 			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
 			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
 			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))

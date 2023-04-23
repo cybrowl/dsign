@@ -4,12 +4,9 @@ const { readFileSync } = require('fs');
 const { HttpAgent, Actor } = require('@dfinity/agent');
 const { config } = require('dotenv');
 const { Ed25519KeyIdentity } = require('@dfinity/identity');
-const fetch = require('node-fetch');
 
+//NOTE: if fetch isn't working use node version 18
 config();
-
-global.fetch = fetch;
-global.Headers = fetch.Headers;
 
 const {
 	canister_ids_ledger_interface,
