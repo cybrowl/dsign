@@ -182,9 +182,9 @@ actor CanisterIdsLedger = {
 	};
 
 	public shared func stop_log_canisters_health() : async Timer.TimerId {
-		timer_id := 0;
+		Timer.cancelTimer(timer_id);
 
-		Timer.cancelTimer(1);
+		timer_id := 0;
 
 		return timer_id;
 	};
