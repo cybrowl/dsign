@@ -65,19 +65,18 @@ actor SnapMain {
 	);
 	stable var user_canisters_ref_storage : [var (UserPrincipal, [(SnapCanisterID, [SnapID])])] = [var];
 
-	// holds data until filled
-	// once filled, a new canister is created and assigned
+	//note: doesn't change after init
+	stable var project_main_canister_id : Text = "";
+	stable var favorite_main_canister_id : Text = "";
+
+	//note: this changes as space is filled
 	stable var assets_canister_id : Text = "";
 	stable var image_assets_canister_id : Text = "";
 	stable var snap_canister_id : Text = "";
 
-	// this doesn't change after init
-	stable var project_main_canister_id : Text = "";
-	stable var favorite_main_canister_id : Text = "";
-
 	private let ic : ICInterface = actor "aaaaa-aa";
 
-	// ------------------------- SNAPS MANAGEMENT -------------------------
+	// ------------------------- Snaps Methods -------------------------
 	public shared ({ caller }) func create_user_snap_storage() : async Bool {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "create_user_snap_storage")];
 
@@ -446,12 +445,11 @@ actor SnapMain {
 		};
 	};
 
-	// ------------------------- CANISTER MANAGEMENT -------------------------
+	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
 	};
 
-	// CREATE CANISTER
 	private func create_assets_canister(is_prod : Bool) : async () {
 		let snap_main_principal = Principal.fromActor(SnapMain);
 
@@ -517,8 +515,6 @@ actor SnapMain {
 
 		ignore CanisterIdsLedger.save_canister(canister_child);
 	};
-
-	// INIT CANISTERS
 
 	//NOTE: dev only
 	public shared (msg) func set_canister_ids({
@@ -621,7 +617,6 @@ actor SnapMain {
 		return log_payload;
 	};
 
-	// UPDATE CHILD CANISTERS
 	public shared ({ caller }) func install_code(
 		canister_id : Principal,
 		arg : Blob,
@@ -643,7 +638,7 @@ actor SnapMain {
 		return "not authorized";
 	};
 
-	// ------------------------- SYSTEM METHODS -------------------------
+	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		var anon_principal = Principal.fromText("2vxsx-fae");
 		user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));

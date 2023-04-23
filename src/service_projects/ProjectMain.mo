@@ -63,11 +63,14 @@ actor ProjectMain {
 	);
 	stable var user_canisters_ref_storage : [var (UserPrincipal, [(ProjectCanisterID, [ProjectID])])] = [var];
 
+	//note: doesn't change after init
 	stable var favorite_main_canister_id : Text = "";
 	stable var snap_main_canister_id : Text = "";
+
+	//note: this changes as space is filled
 	stable var project_canister_id : Text = "";
 
-	// ------------------------- PROJECTS MANAGEMENT -------------------------
+	// ------------------------- Projects Methods -------------------------
 	public shared ({ caller }) func create_user_project_storage() : async Bool {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "create_user_project_storage")];
 
@@ -433,7 +436,7 @@ actor ProjectMain {
 		};
 	};
 
-	// ------------------------- CANISTER MANAGEMENT -------------------------
+	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
 	};
@@ -543,7 +546,6 @@ actor ProjectMain {
 		return "main_ids: " # snap_main_canister_id # "," # favorite_main_canister_id;
 	};
 
-	// UPDATE CHILD CANISTER
 	public shared ({ caller }) func install_code(
 		canister_id : Principal,
 		arg : Blob,
@@ -565,7 +567,7 @@ actor ProjectMain {
 		return "not_authorized";
 	};
 
-	// ------------------------- SYSTEM METHODS -------------------------
+	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		var anon_principal = Principal.fromText("2vxsx-fae");
 		user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));

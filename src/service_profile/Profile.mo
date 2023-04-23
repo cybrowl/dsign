@@ -63,6 +63,7 @@ actor Profile = {
 	);
 	stable var profiles_stable_storage : [(UserPrincipal, Profile)] = [];
 
+	//note: this changes as space is filled
 	stable var image_assets_canister_id : Text = "";
 
 	// ------------------------- Username Methods -------------------------

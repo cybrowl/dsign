@@ -54,9 +54,10 @@ actor FavoriteMain {
 
 	private let ic : ICInterface = actor "aaaaa-aa";
 
+	//note: this changes as space is filled
 	stable var favorite_canister_id : Text = "";
 
-	// ------------------------- FAVORITES MANAGEMENT -------------------------
+	// ------------------------- Favorites Methods -------------------------
 	public shared ({ caller }) func create_user_favorite_storage() : async Bool {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "create_user_favorite_storage")];
 
@@ -192,7 +193,7 @@ actor FavoriteMain {
 		};
 	};
 
-	// ------------------------- CANISTER MANAGEMENT -------------------------
+	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
 	};
@@ -291,7 +292,7 @@ actor FavoriteMain {
 		return "not_authorized";
 	};
 
-	// ------------------------- SYSTEM METHODS -------------------------
+	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		var anon_principal = Principal.fromText("2vxsx-fae");
 		user_canisters_ref_storage := Array.init(user_canisters_ref.size(), (anon_principal, []));
