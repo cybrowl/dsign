@@ -248,7 +248,7 @@
 		<!-- Fetching Projects -->
 		{#if $project_store.isFetching === true}
 			<div
-				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
 				<ProjectCard isLoadingProject={true} />
@@ -258,7 +258,7 @@
 		<!-- No Projects Found -->
 		{#if $project_store.projects.length === 0 && $project_store.isFetching === false}
 			<div
-				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
 				{#if isProfileOwner}
@@ -272,7 +272,7 @@
 		<!-- Project -->
 		{#if $project_store.isFetching === false && $project_store.projects.length > 0}
 			<div
-				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
 			row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
 				{#each $project_store.projects as project}
@@ -296,11 +296,11 @@
 		<!-- Fetching Projects -->
 		{#if $favorite_store.isFetching === true}
 			<div
-				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
 				<div
-					class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+					class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 				>
 					<ProjectCard isLoadingProject={true} />
@@ -311,7 +311,7 @@
 		<!-- No Projects Found -->
 		{#if $favorite_store.projects.length === 0 && $favorite_store.isFetching === false}
 			<div
-				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
 				<SnapCardFavoriteEmpty />
@@ -321,11 +321,17 @@
 		<!-- Projects -->
 		{#if $favorite_store.projects.length > 0}
 			<div
-				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4 
+				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
 				{#each $favorite_store.projects as project}
-					<ProjectCard {project} showOptionsPopover={false} on:clickProject={handleProjectClick} />
+					<ProjectCard
+						{project}
+						hideSnapsCount={true}
+						on:clickProject={handleProjectClick}
+						showOptionsPopover={false}
+						showUsername={true}
+					/>
 				{/each}
 			</div>
 		{/if}
