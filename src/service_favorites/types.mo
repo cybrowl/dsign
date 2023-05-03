@@ -18,10 +18,10 @@ module {
 	public type ICInterfaceStatusResponse = ICInterfaceTypes.StatusResponse;
 
 	public type ErrSaveFavorite = {
-		#ErrorCall : Text;
-		#ProjectAlreadySaved : Bool;
-		#NotAuthorized : Bool;
 		#ArgsTooLong : Bool;
+		#ErrorCall : Text;
+		#NotAuthorized : Bool;
+		#ProjectAlreadySaved : Bool;
 		#UserNotFound : Bool;
 	};
 
@@ -33,15 +33,19 @@ module {
 	};
 
 	public type ErrDeleteFavorite = {
-		#NotAuthorized : Bool;
-		#UserNotFound : Bool;
+		#ArgsTooLong : Bool;
+		#ErrorCall : Text;
 		#FavoriteIdsDoNotMatch : Bool;
+		#NotAuthorized : Bool;
+		#NotOwner : Bool;
 		#ProjectNotFound : Bool;
+		#UserNotFound : Bool;
 	};
 
 	// Actor Interface
 	public type FavoriteActor = actor {
 		save_project : shared (ProjectRef) -> async Result.Result<ProjectRef, ErrSaveFavorite>;
+		delete_project : shared (ProjectID) -> async Result.Result<ProjectRef, ErrDeleteFavorite>;
 		get_all_projects : shared ([ProjectID]) -> async Result.Result<[ProjectPublic], ErrGetFavorite>;
 	};
 };

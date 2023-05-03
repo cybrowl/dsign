@@ -20,7 +20,6 @@ import HealthMetrics "canister:health_metrics";
 import Profile "canister:profile";
 import Logger "canister:logger";
 
-import Utils "../utils/utils";
 import UtilsShared "../utils/utils";
 
 actor FavoriteMain {
@@ -100,8 +99,8 @@ actor FavoriteMain {
 			};
 		};
 
-		let my_ids = Utils.get_all_ids(user_favorite_ids_storage);
-		let favorite_id_exists = Utils.some(my_ids, [project.id]);
+		let my_ids = UtilsShared.get_all_ids(user_favorite_ids_storage);
+		let favorite_id_exists = UtilsShared.some(my_ids, [project.id]);
 		if (favorite_id_exists == true) {
 			return #err(#ProjectAlreadySaved(true));
 		};
@@ -139,6 +138,48 @@ actor FavoriteMain {
 				user_favorite_ids_storage.put(favorite_canister_id, toArray(favorite_ids));
 
 				return #ok("Project Added To Favotires");
+			};
+		};
+	};
+
+	public shared ({ caller }) func delete_project(project : ProjectRef) : async Result.Result<Text, ErrDeleteFavorite> {
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "delete_project")];
+
+		if (project.id.size() > 50 or project.canister_id.size() > 50) {
+			return #err(#ArgsTooLong(true));
+		};
+
+		switch (user_canisters_ref.get(caller)) {
+			case (?user_favorite_ids_storage) {
+				let project_ids = UtilsShared.get_all_ids(user_favorite_ids_storage);
+				let matches = UtilsShared.all_ids_match(project_ids, [project.id]);
+
+				if (matches.all_match == false) {
+					return #err(#NotOwner(true));
+				};
+
+				let favorite_actor = actor (project.canister_id) : FavoriteActor;
+
+				switch (await favorite_actor.delete_project(project.id)) {
+					case (#err err) {
+						ignore Logger.log_event(log_tags, debug_show ("favorite_actor: ", err));
+
+						return #err(#ErrorCall(debug_show ("favorite_actor: ", err)));
+					};
+					case (#ok projec_ref) {
+						let project_ids_not_deleted = UtilsShared.get_non_exluded_ids(
+							project_ids,
+							[project.id]
+						);
+
+						user_favorite_ids_storage.put(project.canister_id, project_ids_not_deleted);
+
+						return #ok("Favorite Deleted");
+					};
+				};
+			};
+			case (_) {
+				return #err(#UserNotFound(true));
 			};
 		};
 	};
