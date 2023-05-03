@@ -34,6 +34,7 @@
 	import { profileTabsState } from '$stores_ref/page_state';
 	import {
 		favorite_store,
+		favorites_update,
 		project_store_fetching,
 		project_store,
 		projects_update
@@ -185,6 +186,24 @@
 
 		project = get(e, 'detail');
 	}
+
+	async function handleDeleteFavorite(e) {
+		const selected_project = get(e, 'detail');
+		const project_ref = {
+			id: selected_project.id,
+			canister_id: selected_project.canister_id
+		};
+
+		if ($actor_favorite_main.loggedIn) {
+			try {
+				favorites_update.delete_favorite(project_ref);
+
+				await $actor_favorite_main.actor.delete_project(project_ref);
+			} catch (error) {
+				console.log('error: call', error);
+			}
+		}
+	}
 </script>
 
 <svelte:head>
@@ -293,7 +312,7 @@
 
 	<!-- Favorites -->
 	{#if $profileTabsState.isFavoritesSelected}
-		<!-- Fetching Projects -->
+		<!-- Fetching Favorites -->
 		{#if $favorite_store.isFetching === true}
 			<div
 				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
@@ -308,7 +327,7 @@
 			</div>
 		{/if}
 
-		<!-- No Projects Found -->
+		<!-- No Favorites Found -->
 		{#if $favorite_store.projects.length === 0 && $favorite_store.isFetching === false}
 			<div
 				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
@@ -318,7 +337,7 @@
 			</div>
 		{/if}
 
-		<!-- Projects -->
+		<!-- Favorites -->
 		{#if $favorite_store.projects.length > 0}
 			<div
 				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
@@ -328,9 +347,14 @@
 					<ProjectCard
 						{project}
 						hideSnapsCount={true}
-						on:clickProject={handleProjectClick}
-						showOptionsPopover={false}
 						showUsername={true}
+						showOptionsPopover={true}
+						optionsPopoverHide={{
+							rename: true,
+							delete: false
+						}}
+						on:clickProject={handleProjectClick}
+						on:clickDeleteProject={handleDeleteFavorite}
 					/>
 				{/each}
 			</div>

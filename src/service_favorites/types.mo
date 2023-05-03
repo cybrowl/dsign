@@ -35,7 +35,7 @@ module {
 	public type ErrDeleteFavorite = {
 		#ArgsTooLong : Bool;
 		#ErrorCall : Text;
-		#FavoriteIdsDoNotMatch : Bool;
+		#FavoriteIdNotFound : Bool;
 		#NotAuthorized : Bool;
 		#NotOwner : Bool;
 		#ProjectNotFound : Bool;

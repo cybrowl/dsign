@@ -158,23 +158,30 @@ actor FavoriteMain {
 					return #err(#NotOwner(true));
 				};
 
-				let favorite_actor = actor (project.canister_id) : FavoriteActor;
-
-				switch (await favorite_actor.delete_project(project.id)) {
-					case (#err err) {
-						ignore Logger.log_event(log_tags, debug_show ("favorite_actor: ", err));
-
-						return #err(#ErrorCall(debug_show ("favorite_actor: ", err)));
+				switch (UtilsShared.get_canister_id_from_storage(user_favorite_ids_storage, project.id)) {
+					case null {
+						return #err(#FavoriteIdNotFound(true));
 					};
-					case (#ok projec_ref) {
-						let project_ids_not_deleted = UtilsShared.get_non_exluded_ids(
-							project_ids,
-							[project.id]
-						);
+					case (?fav_canister_id) {
+						let favorite_actor = actor (fav_canister_id) : FavoriteActor;
 
-						user_favorite_ids_storage.put(project.canister_id, project_ids_not_deleted);
+						switch (await favorite_actor.delete_project(project.id)) {
+							case (#err err) {
+								ignore Logger.log_event(log_tags, debug_show ("favorite_actor: ", err));
 
-						return #ok("Favorite Deleted");
+								return #err(#ErrorCall(debug_show ("favorite_actor: ", err)));
+							};
+							case (#ok projec_ref) {
+								let project_ids_not_deleted = UtilsShared.get_non_exluded_ids(
+									project_ids,
+									[project.id]
+								);
+
+								user_favorite_ids_storage.put(fav_canister_id, project_ids_not_deleted);
+
+								return #ok("Favorite Deleted");
+							};
+						};
 					};
 				};
 			};

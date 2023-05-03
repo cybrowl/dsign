@@ -42,6 +42,19 @@ export const project_store_fetching = function () {
 	});
 };
 
+function delete_favorite(favorite) {
+	favorite_store.update(({ projects }) => {
+		const updated_projects = projects.filter((project_) => {
+			return project_.id !== favorite.id;
+		});
+
+		return {
+			isFetching: false,
+			projects: updated_projects
+		};
+	});
+}
+
 function delete_projects(project) {
 	const project_snaps_ids = project.snaps.map((snap) => snap.id);
 
@@ -135,4 +148,8 @@ export const projects_update = {
 	deselect_snaps_from_project,
 	update_project,
 	update_projects
+};
+
+export const favorites_update = {
+	delete_favorite
 };

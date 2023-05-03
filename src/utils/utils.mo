@@ -217,4 +217,15 @@ module {
 			return false;
 		};
 	};
+
+	public func get_canister_id_from_storage(storage : IDStorage, target_id : Text) : ?Text {
+
+		for ((canisterId, ids) in storage.entries()) {
+			if (Arr.contains(ids, target_id, Text.equal)) {
+				return ?canisterId;
+			};
+		};
+
+		return null;
+	};
 };
