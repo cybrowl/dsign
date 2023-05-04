@@ -102,6 +102,7 @@
 				const { ok: all_favs, err: err_get_all_favs } =
 					await $actor_favorite_main.actor.save_project(project_ref);
 
+				console.log('err_get_all_favs: ', err_get_all_favs);
 				console.log('all_favs: ', all_favs);
 			} catch (error) {
 				console.log('error: call', error);
@@ -193,7 +194,7 @@
 
 		<!-- Fetching Project Snaps -->
 		<div
-			class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
+			class="hidden lg:grid col-start-2 col-end-12 grid-cols-4
 			row-start-3 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 		>
 			<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />
@@ -231,7 +232,7 @@
 			<!-- No Snaps Found -->
 			{#if $project_store.project.snaps && $project_store.project.snaps.length === 0 && $project_store.isFetching === false}
 				<div
-					class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
+					class="hidden lg:grid col-start-2 col-end-12 grid-cols-4
 				row-start-4 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 				>
 					{#if isProjectOwner}
@@ -243,7 +244,7 @@
 			<!-- Snaps -->
 			{#if $project_store.project.snaps && $project_store.project.snaps.length > 0}
 				<div
-					class="hidden lg:grid col-start-2 col-end-12 grid-cols-4 
+					class="hidden lg:grid col-start-2 col-end-12 grid-cols-4
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 				>
 					{#each $project_store.project.snaps as snap}

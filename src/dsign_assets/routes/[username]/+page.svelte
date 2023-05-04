@@ -12,7 +12,7 @@
 	import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
 	import ProjectCardCreate from 'dsign-components/components/ProjectCardCreate.svelte';
 	import ProjectPublicEmpty from 'dsign-components/components/ProjectPublicEmpty.svelte';
-	import SnapCardFavoriteEmpty from 'dsign-components/components/SnapCardFavoriteEmpty.svelte';
+	import FavoriteEmpty from 'dsign-components/components/FavoriteEmpty.svelte';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import ProjectCreationModal from '$modals_ref/ProjectCreationModal.svelte';
@@ -88,6 +88,7 @@
 				const { ok: all_projects, err: err_all_projects } = projects;
 
 				console.log('all_favs: ', all_favs);
+				console.log('err_get_all_favs: ', err_get_all_favs);
 
 				if (all_favs) {
 					favorite_store.set({ isFetching: false, projects: [...all_favs] });
@@ -333,7 +334,7 @@
 				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
 				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 			>
-				<SnapCardFavoriteEmpty />
+				<FavoriteEmpty />
 			</div>
 		{/if}
 
@@ -348,7 +349,7 @@
 						{project}
 						hideSnapsCount={true}
 						showUsername={true}
-						showOptionsPopover={true}
+						showOptionsPopover={isProfileOwner ? true : false}
 						optionsPopoverHide={{
 							rename: true,
 							delete: false

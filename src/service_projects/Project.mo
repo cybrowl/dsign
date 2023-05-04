@@ -247,6 +247,8 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 
 				projects.put(project_ref.id, project_updated);
 
+				ignore Explore.save_project(project_updated);
+
 				ignore Logger.log_event(log_tags, "Project Details Updated");
 
 				return #ok(project_updated);
