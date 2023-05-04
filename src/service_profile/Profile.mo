@@ -35,7 +35,7 @@ actor Profile = {
 
 	let ACTOR_NAME : Text = "Profile";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 2;
+	let VERSION : Nat = 3;
 
 	private let ic : ICInterface = actor "aaaaa-aa";
 
@@ -47,13 +47,6 @@ actor Profile = {
 		Text.hash
 	);
 	stable var username_owners_stable_storage : [(Username, UserPrincipal)] = [];
-
-	var usernames : HashMap.HashMap<UserPrincipal, Username> = HashMap.HashMap(
-		0,
-		Principal.equal,
-		Principal.hash
-	);
-	stable var usernames_stable_storage : [(UserPrincipal, Username)] = [];
 
 	// profiles
 	var profiles : HashMap.HashMap<UserPrincipal, Profile> = HashMap.HashMap(
@@ -79,7 +72,7 @@ actor Profile = {
 	};
 
 	private func check_user_has_a_username(caller : UserPrincipal) : Bool {
-		switch (usernames.get(caller)) {
+		switch (profiles.get(caller)) {
 			case (?username) {
 				return true;
 			};
@@ -90,9 +83,9 @@ actor Profile = {
 	};
 
 	private func get_current_username(caller : UserPrincipal) : Username {
-		switch (usernames.get(caller)) {
-			case (?current_username) {
-				return current_username;
+		switch (profiles.get(caller)) {
+			case (?profile) {
+				return profile.username;
 			};
 			case (_) {
 				return "";
@@ -123,7 +116,6 @@ actor Profile = {
 		if (user_has_username == true) {
 			return #err(#UserHasUsername);
 		} else {
-			usernames.put(caller, username);
 			username_owners.put(username, caller);
 
 			ignore Logger.log_event(tags, "created");
@@ -189,13 +181,13 @@ actor Profile = {
 	// };
 
 	public query func get_number_of_users() : async Nat {
-		return usernames.size();
+		return profiles.size();
 	};
 
 	public query ({ caller }) func get_username() : async Result.Result<Username, ErrUsername> {
-		switch (usernames.get(caller)) {
-			case (?username) {
-				#ok(username);
+		switch (profiles.get(caller)) {
+			case (?profile) {
+				#ok(profile.username);
 			};
 			case (_) {
 				#err(#UserNotFound);
@@ -204,9 +196,9 @@ actor Profile = {
 	};
 
 	public query func get_username_public(principal : UserPrincipal) : async Result.Result<Username, ErrUsername> {
-		switch (usernames.get(principal)) {
-			case (?username) {
-				#ok(username);
+		switch (profiles.get(principal)) {
+			case (?profile) {
+				#ok(profile.username);
 			};
 			case (_) {
 				#err(#UserNotFound);
@@ -418,10 +410,11 @@ actor Profile = {
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
 			("profiles_num", Int.toText(profiles.size())),
-			("usernames_size", Int.toText(usernames.size())),
+			("usernames_size", Int.toText(username_owners.size())),
 			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
 			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
-			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb())),
+			("version", Int.toText(VERSION))
 		];
 
 		ignore Logger.log_event(
@@ -531,7 +524,6 @@ actor Profile = {
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		username_owners_stable_storage := Iter.toArray(username_owners.entries());
-		usernames_stable_storage := Iter.toArray(usernames.entries());
 
 		profiles_stable_storage := Iter.toArray(profiles.entries());
 	};
@@ -545,15 +537,6 @@ actor Profile = {
 			Text.hash
 		);
 		username_owners_stable_storage := [];
-
-		// usernames
-		usernames := HashMap.fromIter<UserPrincipal, Username>(
-			usernames_stable_storage.vals(),
-			0,
-			Principal.equal,
-			Principal.hash
-		);
-		usernames_stable_storage := [];
 
 		profiles := HashMap.fromIter<UserPrincipal, Profile>(
 			profiles_stable_storage.vals(),
