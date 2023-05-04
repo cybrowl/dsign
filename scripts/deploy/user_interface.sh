@@ -19,4 +19,4 @@ fi
 
 # Deploy
 dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} dsign_assets
-dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} canister_ids_ledger start_log_canisters_health
+dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call canister_ids_ledger start_log_canisters_health
