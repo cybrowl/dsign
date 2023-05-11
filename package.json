@@ -33,14 +33,15 @@
 		"@dfinity/identity": "^0.15.4",
 		"@dfinity/principal": "^0.15.4",
 		"dotenv": "^16.0.3",
-		"dsign-components": "^0.23.0",
+		"dsign-components": "^0.23.1",
+		"dsign-components-v2": "^0.7.3",
 		"lodash": "^4.17.21",
 		"luxon": "^3.2.1",
 		"svelte-local-storage-store": "^0.2.6"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^2.0.1",
-		"@sveltejs/kit": "^1.14.0",
+		"@sveltejs/kit": "^1.16.2",
 		"autoprefixer": "^10.4.13",
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^8.5.0",

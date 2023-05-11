@@ -66,6 +66,7 @@ module {
 		canister_id : Text;
 	};
 
+	// TODO: change project to only have name, canister_id, id
 	public type Snap = {
 		canister_id : Text;
 		created : Time;

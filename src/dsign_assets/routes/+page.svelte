@@ -12,16 +12,9 @@
 
 	import { actor_explore } from '$stores_ref/actors.js';
 	import { explore_store } from '$stores_ref/fetch_store.js';
-	import { local_storage_profile } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
-	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
-
-	page_navigation_update.add_item({
-		name: 'Profile',
-		href: `${$local_storage_profile.username}`,
-		isSelected: false
-	});
+	import { page_navigation } from '$stores_ref/page_navigation';
 
 	onMount(async () => {
 		try {
@@ -49,8 +42,8 @@
 	<title>DSign</title>
 </svelte:head>
 
-<main class="hidden lg:grid grid-cols-12 gap-y-2 relative">
-	<div class="col-start-2 col-end-12 mb-8">
+<main class="hidden lg:grid grid-cols-12 gap-y-2 relative ml-12 mr-12">
+	<div class="col-start-1 col-end-13 row-start-1 row-end-auto">
 		<PageNavigation navigationItems={$page_navigation.navigationItems}>
 			<Login />
 		</PageNavigation>
@@ -73,8 +66,7 @@
 	<!-- Projects -->
 	{#if $explore_store.projects.length > 0}
 		<div
-			class="col-start-2 col-end-12 grid grid-cols-4 
-						row-start-3 row-end-auto mx-4 gap-x-10 gap-y-20 mt-2 mb-24"
+			class="hidden lg:grid col-start-1 col-end-13 grid-cols-4 row-start-2 row-end-auto gap-x-6 gap-y-12 mb-16"
 		>
 			{#each $explore_store.projects as project}
 				<ProjectCard

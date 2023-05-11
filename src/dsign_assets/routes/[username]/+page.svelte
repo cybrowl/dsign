@@ -5,14 +5,18 @@
 	import get from 'lodash/get';
 
 	import Login from '$components_ref/Login.svelte';
-	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
-	import ProfileBanner from 'dsign-components/components/ProfileBanner.svelte';
-	import ProfileInfo from 'dsign-components/components/ProfileInfo.svelte';
-	import ProfileTabs from 'dsign-components/components/ProfileTabs.svelte';
-	import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
+
 	import ProjectCardCreate from 'dsign-components/components/ProjectCardCreate.svelte';
 	import ProjectPublicEmpty from 'dsign-components/components/ProjectPublicEmpty.svelte';
-	import FavoriteEmpty from 'dsign-components/components/FavoriteEmpty.svelte';
+
+	import {
+		FavoriteCardEmpty,
+		PageNavigation,
+		ProfileBanner,
+		ProfileInfo,
+		ProfileTabs,
+		ProjectCard
+	} from 'dsign-components-v2';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import ProjectCreationModal from '$modals_ref/ProjectCreationModal.svelte';
@@ -211,8 +215,8 @@
 	<title>Profile</title>
 </svelte:head>
 
-<main class="hidden lg:grid grid-cols-12 gap-y-2 relative">
-	<div class="col-start-2 col-end-12 row-start-1 row-end-2">
+<main class="hidden lg:grid grid-cols-12 relative ml-12 mr-12">
+	<div class="col-start-1 col-end-13 row-start-1 row-end-auto">
 		<PageNavigation navigationItems={$page_navigation.navigationItems}>
 			<Login />
 		</PageNavigation>
@@ -233,7 +237,7 @@
 	{/if}
 
 	<!-- ProfileInfo -->
-	<div class="relative col-start-2 col-end-4 row-start-2 row-end-3">
+	<div class="relative col-start-1 col-end-4 row-start-2 row-end-auto">
 		<ProfileInfo
 			avatar={get(profile, 'avatar.url', '')}
 			is_authenticated={isProfileOwner}
@@ -243,7 +247,7 @@
 	</div>
 
 	<!-- ProfileBanner -->
-	<div class="col-start-4 col-end-12 row-start-2 row-end-3">
+	<div class="col-start-4 col-end-13 row-start-2 row-end-auto">
 		<ProfileBanner
 			is_authenticated={isProfileOwner}
 			profile_banner_url={get(profile, 'banner.url', '')}
@@ -253,8 +257,7 @@
 
 	<!-- ProfileTabs -->
 	<div
-		class="hidden lg:grid col-start-4 col-end-12 row-start-3 row-end-4 mt-16
-			self-end justify-between items-center h-10"
+		class="hidden lg:grid col-start-4 col-end-13 row-start-3 row-end-auto mt-12 self-end justify-between items-center mb-8"
 	>
 		<ProfileTabs
 			profileTabsState={$profileTabsState}
@@ -265,36 +268,25 @@
 
 	<!-- Projects -->
 	{#if $profileTabsState.isProjectsSelected}
-		<!-- Fetching Projects -->
-		{#if $project_store.isFetching === true}
-			<div
-				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
-				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
-			>
+		<div
+			class="hidden lg:grid col-start-4 col-end-13 grid-cols-3 row-start-4 row-end-auto gap-x-8 gap-y-12 mb-16"
+		>
+			<!-- Fetching Projects -->
+			{#if $project_store.isFetching === true}
 				<ProjectCard isLoadingProject={true} />
-			</div>
-		{/if}
+			{/if}
 
-		<!-- No Projects Found -->
-		{#if $project_store.projects.length === 0 && $project_store.isFetching === false}
-			<div
-				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
-				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
-			>
+			<!-- No Projects Found -->
+			{#if $project_store.isFetching === false && $project_store.projects.length === 0}
 				{#if isProfileOwner}
 					<ProjectCardCreate on:clickProjectCardCreate={handleProjectCreateModalOpen} />
 				{:else}
 					<ProjectPublicEmpty />
 				{/if}
-			</div>
-		{/if}
+			{/if}
 
-		<!-- Project -->
-		{#if $project_store.isFetching === false && $project_store.projects.length > 0}
-			<div
-				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
-			row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
-			>
+			<!-- Project -->
+			{#if $project_store.isFetching === false && $project_store.projects.length > 0}
 				{#each $project_store.projects as project}
 					<ProjectCard
 						{project}
@@ -307,58 +299,42 @@
 				{#if isProfileOwner}
 					<ProjectCardCreate on:clickProjectCardCreate={handleProjectCreateModalOpen} />
 				{/if}
-			</div>
-		{/if}
+			{/if}
+		</div>
 	{/if}
 
 	<!-- Favorites -->
 	{#if $profileTabsState.isFavoritesSelected}
-		<!-- Fetching Favorites -->
-		{#if $favorite_store.isFetching === true}
-			<div
-				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
-				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
-			>
-				<div
-					class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
-				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
-				>
-					<ProjectCard isLoadingProject={true} />
-				</div>
-			</div>
-		{/if}
+		<div
+			class="hidden lg:grid col-start-4 col-end-13 grid-cols-3 row-start-4 row-end-auto gap-x-8 gap-y-12 mb-16"
+		>
+			<!-- Fetching Favorites -->
+			{#if $favorite_store.isFetching === true}
+				<ProjectCard isLoadingProject={true} />
+			{/if}
 
-		<!-- No Favorites Found -->
-		{#if $favorite_store.projects.length === 0 && $favorite_store.isFetching === false}
-			<div
-				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
-				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
-			>
-				<FavoriteEmpty />
-			</div>
-		{/if}
+			<!-- No Favorites Found -->
+			{#if $favorite_store.projects.length === 0 && $favorite_store.isFetching === false}
+				<FavoriteCardEmpty />
+			{/if}
+		</div>
 
 		<!-- Favorites -->
 		{#if $favorite_store.projects.length > 0}
-			<div
-				class="hidden lg:grid col-start-4 col-end-12 grid-cols-4
-				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
-			>
-				{#each $favorite_store.projects as project}
-					<ProjectCard
-						{project}
-						hideSnapsCount={true}
-						showUsername={true}
-						showOptionsPopover={isProfileOwner ? true : false}
-						optionsPopoverHide={{
-							rename: true,
-							delete: false
-						}}
-						on:clickProject={handleProjectClick}
-						on:clickDeleteProject={handleDeleteFavorite}
-					/>
-				{/each}
-			</div>
+			{#each $favorite_store.projects as project}
+				<ProjectCard
+					{project}
+					hideSnapsCount={true}
+					showUsername={true}
+					showOptionsPopover={isProfileOwner ? true : false}
+					optionsPopoverHide={{
+						rename: true,
+						delete: false
+					}}
+					on:clickProject={handleProjectClick}
+					on:clickDeleteProject={handleDeleteFavorite}
+				/>
+			{/each}
 		{/if}
 	{/if}
 </main>
@@ -367,6 +343,3 @@
 <div class="grid lg:hidden h-screen place-items-center text-white text-4xl">
 	<h1>Sorry, Mobile Not Supported</h1>
 </div>
-
-<style>
-</style>

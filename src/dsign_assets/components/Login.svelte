@@ -1,12 +1,11 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	// import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import environment from 'environment';
 	import get from 'lodash/get.js';
 
-	import Avatar from 'dsign-components/components/Avatar.svelte';
-	import Button from 'dsign-components/components/Button.svelte';
+	import { Avatar, Button, Icon } from 'dsign-components-v2';
 
 	import { actor_profile } from '$stores_ref/actors';
 	import { auth_client, auth_profile } from '$stores_ref/auth_client';
@@ -75,6 +74,10 @@
 		});
 	}
 
+	async function navigateToProfile() {
+		goto(`/${$local_storage_profile.username}`);
+	}
+
 	async function openSettingsModal() {
 		modal_update.change_visibility('account_settings');
 	}
@@ -82,13 +85,23 @@
 
 <span>
 	{#if $actor_profile.loggedIn}
-		<div class="flex items-center">
+		<span class="flex gap-x-3 cursor-pointer">
 			<Avatar
 				avatar={$local_storage_profile.avatar_url}
 				username={$local_storage_profile.username}
-				on:click={openSettingsModal}
+				on:click={navigateToProfile}
 			/>
-		</div>
+			<Icon
+				name="settings"
+				size="2.75rem"
+				class="cursor_pointer fill_dark_grey hover_smoky_grey"
+				on:click={openSettingsModal}
+				viewSize={{
+					width: '44',
+					height: '44'
+				}}
+			/>
+		</span>
 	{:else}
 		<Button primary={true} label="Connect" on:click={login} />
 	{/if}

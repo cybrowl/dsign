@@ -7,7 +7,7 @@
 	import Login from '$components_ref/Login.svelte';
 	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
 	import SnapPreview from 'dsign-components/components/SnapPreview.svelte';
-	import Icon from 'dsign-components/components/Icon.svelte';
+	import { Icon } from 'dsign-components-v2';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
