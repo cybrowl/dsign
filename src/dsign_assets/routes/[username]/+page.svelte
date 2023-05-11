@@ -6,7 +6,6 @@
 
 	import Login from '$components_ref/Login.svelte';
 
-	import ProjectCardCreate from 'dsign-components/components/ProjectCardCreate.svelte';
 	import ProjectPublicEmpty from 'dsign-components/components/ProjectPublicEmpty.svelte';
 
 	import {
@@ -15,7 +14,8 @@
 		ProfileBanner,
 		ProfileInfo,
 		ProfileTabs,
-		ProjectCard
+		ProjectCard,
+		ProjectCardCreate
 	} from 'dsign-components-v2';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
@@ -317,25 +317,25 @@
 			{#if $favorite_store.projects.length === 0 && $favorite_store.isFetching === false}
 				<FavoriteCardEmpty />
 			{/if}
-		</div>
 
-		<!-- Favorites -->
-		{#if $favorite_store.projects.length > 0}
-			{#each $favorite_store.projects as project}
-				<ProjectCard
-					{project}
-					hideSnapsCount={true}
-					showUsername={true}
-					showOptionsPopover={isProfileOwner ? true : false}
-					optionsPopoverHide={{
-						rename: true,
-						delete: false
-					}}
-					on:clickProject={handleProjectClick}
-					on:clickDeleteProject={handleDeleteFavorite}
-				/>
-			{/each}
-		{/if}
+			<!-- Favorites -->
+			{#if $favorite_store.projects.length > 0}
+				{#each $favorite_store.projects as project}
+					<ProjectCard
+						{project}
+						hideSnapsCount={true}
+						showUsername={true}
+						showOptionsPopover={isProfileOwner ? true : false}
+						optionsPopoverHide={{
+							rename: true,
+							delete: false
+						}}
+						on:clickProject={handleProjectClick}
+						on:clickDeleteProject={handleDeleteFavorite}
+					/>
+				{/each}
+			{/if}
+		</div>
 	{/if}
 </main>
 

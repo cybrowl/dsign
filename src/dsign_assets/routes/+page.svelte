@@ -5,8 +5,9 @@
 
 	import Login from '../components/Login.svelte';
 	import Notification from 'dsign-components/components/Notification.svelte';
-	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
-	import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
+	// import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
+	// import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
+	import { PageNavigation, ProjectCard } from 'dsign-components-v2';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
