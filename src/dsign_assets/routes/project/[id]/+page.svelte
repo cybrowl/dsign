@@ -7,12 +7,21 @@
 	import isEmpty from 'lodash/isEmpty';
 
 	import Login from '$components_ref/Login.svelte';
-	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
-	import ProjectEditActionsBar from 'dsign-components/components/ProjectEditActionsBar.svelte';
-	import ProjectInfoHeader from 'dsign-components/components/ProjectInfoHeader.svelte';
-	import ProjectTabs from 'dsign-components/components/ProjectTabs.svelte';
-	import SnapCard from 'dsign-components/components/SnapCard.svelte';
-	import SnapCardCreate from 'dsign-components/components/SnapCardCreate.svelte';
+	// import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
+	// import ProjectEditActionsBar from 'dsign-components/components/ProjectEditActionsBar.svelte';
+	// import ProjectInfoHeader from 'dsign-components/components/ProjectInfoHeader.svelte';
+	// import ProjectTabs from 'dsign-components/components/ProjectTabs.svelte';
+	// import SnapCard from 'dsign-components/components/SnapCard.svelte';
+	// import SnapCardCreate from 'dsign-components/components/SnapCardCreate.svelte';
+
+	import {
+		PageNavigation,
+		ProjectEditActionsBar,
+		ProjectInfo,
+		ProjectTabs,
+		SnapCard,
+		SnapCardCreate
+	} from 'dsign-components-v2';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
@@ -41,10 +50,12 @@
 		projectTabsState
 	} from '$stores_ref/page_state';
 
-	page_navigation_update.deselect_all();
-
 	let isProjectOwner = false;
 	let project_ref = {};
+
+	page_navigation_update.deselect_all();
+	projects_update.deselect_snaps_from_project();
+	is_edit_active.set(false);
 
 	if ($disable_project_store_reset === false) {
 		project_store_fetching();
@@ -170,8 +181,8 @@
 	<title>Project</title>
 </svelte:head>
 
-<main class="grid grid-cols-12 gap-y-2">
-	<div class="col-start-2 col-end-12">
+<main class="hidden lg:grid grid-cols-12 relative ml-12 mr-12">
+	<div class="col-start-1 col-end-13 row-start-1 row-end-auto">
 		<PageNavigation navigationItems={$page_navigation.navigationItems}>
 			<Login />
 		</PageNavigation>
@@ -188,13 +199,13 @@
 	<!-- Fetching Project -->
 	{#if $project_store.isFetching === true}
 		<!-- Fetching Project Info Header -->
-		<div class="col-start-2 col-end-12 row-start-2 row-end-3 mt-2 mb-5">
-			<ProjectInfoHeader isFetching={true} />
+		<div class="col-start-1 col-end-13 row-start-2 row-end-3 mt-2 mb-5">
+			<ProjectInfo isFetching={true} />
 		</div>
 
 		<!-- Fetching Project Snaps -->
 		<div
-			class="hidden lg:grid col-start-2 col-end-12 grid-cols-4
+			class="hidden lg:grid col-start-1 col-end-13 grid-cols-4
 			row-start-3 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 		>
 			<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />
@@ -204,15 +215,14 @@
 	<!-- Project -->
 	{#if isEmpty($project_store.project) === false}
 		<!-- Project Info Header -->
-		<div class="col-start-2 col-end-6 row-start-2 row-end-3 mb-5">
-			<ProjectInfoHeader
-				project={$project_store.project}
-				on:saveToFavorites={handleAddToFavorites}
-			/>
+		<div class="relative col-start-1 col-end-13 row-start-2 row-end-auto">
+			<ProjectInfo project={$project_store.project} on:saveToFavorites={handleAddToFavorites} />
 		</div>
 
 		<!-- ProjectsTabs & ProjectEditActionsBar -->
-		<div class="col-start-2 col-end-12 row-start-3 row-end-4 mb-5">
+		<div
+			class="col-start-1 col-end-13 items-center justify-between row-start-3 row-end-auto mt-12 mb-6"
+		>
 			<ProjectTabs
 				selectedTabState={$projectTabsState}
 				on:selectSnapsTab={(e) => projectTabsState.set(e.detail)}
@@ -232,8 +242,7 @@
 			<!-- No Snaps Found -->
 			{#if $project_store.project.snaps && $project_store.project.snaps.length === 0 && $project_store.isFetching === false}
 				<div
-					class="hidden lg:grid col-start-2 col-end-12 grid-cols-4
-				row-start-4 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
+					class="hidden lg:grid col-start-1 col-end-13 grid-cols-4 row-start-4 row-end-auto gap-x-6 gap-y-12"
 				>
 					{#if isProjectOwner}
 						<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
@@ -244,8 +253,7 @@
 			<!-- Snaps -->
 			{#if $project_store.project.snaps && $project_store.project.snaps.length > 0}
 				<div
-					class="hidden lg:grid col-start-2 col-end-12 grid-cols-4
-				row-start-5 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
+					class="hidden lg:grid col-start-1 col-end-13 grid-cols-4 row-start-4 row-end-auto gap-x-6 gap-y-12 mb-16"
 				>
 					{#each $project_store.project.snaps as snap}
 						<SnapCard {snap} isEditMode={$is_edit_active} on:clickCard={handleSnapPreview} />
