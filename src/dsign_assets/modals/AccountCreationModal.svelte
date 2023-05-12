@@ -1,9 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 
-	import AccountCreation from 'dsign-components/components/AccountCreation.svelte';
-	import AccountCreationSuccess from 'dsign-components/components/AccountCreationSuccess.svelte';
-	import Modal from 'dsign-components/components/Modal.svelte';
+	import { AccountCreation, AccountCreationSuccess, Modal } from 'dsign-components-v2';
 
 	import {
 		actor_favorite_main,

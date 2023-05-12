@@ -6,8 +6,6 @@
 
 	import Login from '$components_ref/Login.svelte';
 
-	import ProjectPublicEmpty from 'dsign-components/components/ProjectPublicEmpty.svelte';
-
 	import {
 		FavoriteCardEmpty,
 		PageNavigation,
@@ -15,7 +13,8 @@
 		ProfileInfo,
 		ProfileTabs,
 		ProjectCard,
-		ProjectCardCreate
+		ProjectCardCreate,
+		ProjectCardEmpty
 	} from 'dsign-components-v2';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
@@ -52,7 +51,7 @@
 		snaps: []
 	};
 
-	let isProfileOwner = false;
+	let is_owner = false;
 	let profile = {};
 
 	page_navigation_update.delete_all();
@@ -80,7 +79,7 @@
 				if ($actor_profile.loggedIn) {
 					const username = get(auth_profile_, 'username', 'x');
 
-					isProfileOwner = username === $page.params.username;
+					is_owner = username === $page.params.username;
 				}
 			});
 
@@ -137,7 +136,7 @@
 	});
 
 	function openAccountSettingsModal() {
-		if (isProfileOwner) {
+		if (is_owner) {
 			modal_update.change_visibility('account_settings');
 		}
 	}
@@ -240,7 +239,7 @@
 	<div class="relative col-start-1 col-end-4 row-start-2 row-end-auto">
 		<ProfileInfo
 			avatar={get(profile, 'avatar.url', '')}
-			is_authenticated={isProfileOwner}
+			{is_owner}
 			username={get(profile, 'username', '')}
 			on:editProfile={openAccountSettingsModal}
 		/>
@@ -249,7 +248,7 @@
 	<!-- ProfileBanner -->
 	<div class="col-start-4 col-end-13 row-start-2 row-end-auto">
 		<ProfileBanner
-			is_authenticated={isProfileOwner}
+			is_authenticated={is_owner}
 			profile_banner_url={get(profile, 'banner.url', '')}
 			on:profileBannerChange={handleProfileBannerChange}
 		/>
@@ -278,10 +277,10 @@
 
 			<!-- No Projects Found -->
 			{#if $project_store.isFetching === false && $project_store.projects.length === 0}
-				{#if isProfileOwner}
+				{#if is_owner}
 					<ProjectCardCreate on:clickProjectCardCreate={handleProjectCreateModalOpen} />
 				{:else}
-					<ProjectPublicEmpty />
+					<ProjectCardEmpty />
 				{/if}
 			{/if}
 
@@ -290,13 +289,13 @@
 				{#each $project_store.projects as project}
 					<ProjectCard
 						{project}
-						showOptionsPopover={isProfileOwner ? true : false}
+						showOptionsPopover={is_owner ? true : false}
 						on:clickProject={handleProjectClick}
 						on:clickRenameProject={handleProjectRenameModalOpen}
 						on:clickDeleteProject={handleProjectDeleteModalOpen}
 					/>
 				{/each}
-				{#if isProfileOwner}
+				{#if is_owner}
 					<ProjectCardCreate on:clickProjectCardCreate={handleProjectCreateModalOpen} />
 				{/if}
 			{/if}
@@ -325,7 +324,7 @@
 						{project}
 						hideSnapsCount={true}
 						showUsername={true}
-						showOptionsPopover={isProfileOwner ? true : false}
+						showOptionsPopover={is_owner ? true : false}
 						optionsPopoverHide={{
 							rename: true,
 							delete: false
