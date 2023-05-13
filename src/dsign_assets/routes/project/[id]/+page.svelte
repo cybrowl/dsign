@@ -7,12 +7,6 @@
 	import isEmpty from 'lodash/isEmpty';
 
 	import Login from '$components_ref/Login.svelte';
-	// import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
-	// import ProjectEditActionsBar from 'dsign-components/components/ProjectEditActionsBar.svelte';
-	// import ProjectInfoHeader from 'dsign-components/components/ProjectInfoHeader.svelte';
-	// import ProjectTabs from 'dsign-components/components/ProjectTabs.svelte';
-	// import SnapCard from 'dsign-components/components/SnapCard.svelte';
-	// import SnapCardCreate from 'dsign-components/components/SnapCardCreate.svelte';
 
 	import {
 		PageNavigation,
@@ -53,7 +47,6 @@
 	let isProjectOwner = false;
 	let project_ref = {};
 
-	page_navigation_update.deselect_all();
 	projects_update.deselect_snaps_from_project();
 	is_edit_active.set(false);
 
@@ -166,8 +159,16 @@
 
 	function handleSnapPreview(e) {
 		const snap = e.detail;
+		const updated_snap = {
+			...snap,
+			project: {
+				id: $project_store.project.id,
+				canister_id: $project_store.project.canister_id,
+				name: $project_store.project.name
+			}
+		};
 
-		snap_preview.set(snap);
+		snap_preview.set(updated_snap);
 
 		goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
 	}
@@ -190,7 +191,7 @@
 
 	<!-- Modals -->
 	{#if $modal_visible.snap_creation}
-		<SnapCreationModal {project_ref} />
+		<SnapCreationModal project_ref={$project_store.project} />
 	{/if}
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />

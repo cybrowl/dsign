@@ -19,6 +19,7 @@ module.exports = {
 				'moon-grey': '#C6C4CC',
 				'light-grey': '#E2E1E6',
 				'tulip-purple': '#6259C8',
+				'cloud-purple': '#EBE9FF',
 				'primary-purple': '#7A71DE',
 				'foggy-purple': '#A099F4',
 				'light-purple': '#6259C8',

@@ -1,14 +1,12 @@
 <script>
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import get from 'lodash/get';
 	import last from 'lodash/last';
 
 	import Login from '$components_ref/Login.svelte';
-	import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
-	import SnapPreview from 'dsign-components/components/SnapPreview.svelte';
-	import { Icon } from 'dsign-components-v2';
-
+	import { SnapActionsBar, PageNavigation, SnapInfo } from 'dsign-components-v2';
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
 	import { actor_snap_main } from '$stores_ref/actors';
@@ -20,6 +18,7 @@
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 
 	page_navigation_update.deselect_all();
+	disable_project_store_reset.set(true);
 
 	onMount(async () => {
 		const canister_id = $page.url.searchParams.get('canister_id');
@@ -35,47 +34,54 @@
 			console.log('error projects: ', error);
 		}
 	});
+
+	function clickBackHistory() {
+		const has_project = get($snap_preview, 'project.id', '').length > 0;
+		const project_href = `/project/${get($snap_preview, 'project.id', '')}/?canister_id=${get(
+			$snap_preview,
+			'project.canister_id',
+			''
+		)}`;
+
+		if (has_project) {
+			goto(project_href);
+		} else {
+			goto(`/${$snap_preview.username}`);
+		}
+	}
 </script>
 
 <svelte:head>
 	<title>Snap</title>
 </svelte:head>
 
-<main class="grid grid-cols-12 gap-y-2">
-	<div class="col-start-2 col-end-12 mb-8">
+<main class="hidden lg:grid grid-cols-12 gap-y-2 ml-12 mr-12">
+	<div class="row-start-1 row-end-auto col-start-1 col-end-13">
 		<PageNavigation navigationItems={$page_navigation.navigationItems}>
 			<Login />
 		</PageNavigation>
 	</div>
 
 	<!-- Modals -->
-
 	<!-- AccountSettingsModal -->
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}
 
-	<div class="col-start-2 col-end-12 row-start-2 row-end-auto mb-20">
-		<div
-			class="close"
-			on:click={() => {
-				disable_project_store_reset.set(true);
-				history.back();
-			}}
-			on:keypress={console.log('todo')}
-		>
-			<Icon class="closeRounded" name="close_rounded" width="48" height="48" />
+	<!-- Snap -->
+	{#if $snap_preview.id !== undefined}
+		<div class="row-start-2 row-end-auto col-start-1 col-end-13 mb-10">
+			<SnapInfo snap={$snap_preview} />
 		</div>
-		{#if $snap_preview.id !== undefined}
-			<SnapPreview snap={$snap_preview} />
-		{/if}
-	</div>
-</main>
 
-<style>
-	.close {
-		margin-right: 12%;
-		position: absolute;
-		right: 0;
-	}
-</style>
+		<div class="row-start-3 row-end-auto col-start-1 col-end-12 mb-10">
+			{#each $snap_preview.images as image}
+				<img src={image.url} alt="" class="pb-10" />
+			{/each}
+		</div>
+
+		<div class="row-start-3 row-end-auto col-start-12 col-end-13 mb-10 flex justify-center">
+			<SnapActionsBar snap={$snap_preview} on:clickBack={clickBackHistory} />
+		</div>
+	{/if}
+</main>
