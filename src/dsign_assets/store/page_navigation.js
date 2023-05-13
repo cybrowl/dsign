@@ -14,7 +14,7 @@ export const snap_preview = writable({});
 
 export const navigate_to_home_with_notification = () => {
 	notification_visible.set({ auth_error: true });
-	notification.set({ message: 'Sign In to Access' });
+	notification.set({ message: 'Connect to Access' });
 	setTimeout(() => {
 		notification.set({ message: '' });
 		notification_visible.set({

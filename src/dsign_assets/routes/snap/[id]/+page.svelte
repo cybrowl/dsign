@@ -7,17 +7,14 @@
 
 	import Login from '$components_ref/Login.svelte';
 	import { SnapActionsBar, PageNavigation, SnapInfo } from 'dsign-components-v2';
+
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
 	import { actor_snap_main } from '$stores_ref/actors';
-	import modal_update, { modal_visible } from '$stores_ref/modal';
-	import page_navigation_update, {
-		page_navigation,
-		snap_preview
-	} from '$stores_ref/page_navigation';
+	import { modal_visible } from '$stores_ref/modal';
+	import { page_navigation, snap_preview } from '$stores_ref/page_navigation';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 
-	page_navigation_update.deselect_all();
 	disable_project_store_reset.set(true);
 
 	onMount(async () => {
@@ -74,9 +71,9 @@
 			<SnapInfo snap={$snap_preview} />
 		</div>
 
-		<div class="row-start-3 row-end-auto col-start-1 col-end-12 mb-10">
+		<div class="row-start-3 row-end-auto col-start-1 col-end-12 mb-10 flex flex-col items-center">
 			{#each $snap_preview.images as image}
-				<img src={image.url} alt="" class="pb-10" />
+				<img src={image.url} alt="" class="pb-10 max-w-full" />
 			{/each}
 		</div>
 

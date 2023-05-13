@@ -1,13 +1,10 @@
 <script>
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import get from 'lodash/get';
 
 	import Login from '../components/Login.svelte';
-	import Notification from 'dsign-components/components/Notification.svelte';
-	// import PageNavigation from 'dsign-components/components/PageNavigation.svelte';
-	// import ProjectCard from 'dsign-components/components/ProjectCard.svelte';
-	import { PageNavigation, ProjectCard } from 'dsign-components-v2';
+	import { Notification, PageNavigation, ProjectCard } from 'dsign-components-v2';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
@@ -57,7 +54,7 @@
 
 	<!-- Notification -->
 	{#if $notification_visible.auth_error}
-		<div class="absolute col-start-9 col-end-12 row-start-1 row-end-2 bottom-0 right-0">
+		<div class="absolute col-start-12 col-end-13 row-start-2 row-end-3 top-0 right-0">
 			<Notification is_visible={$notification_visible.auth_error} hide_delay_sec={2000}>
 				<p>{$notification.message}</p>
 			</Notification>

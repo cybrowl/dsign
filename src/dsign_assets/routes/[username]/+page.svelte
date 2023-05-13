@@ -5,7 +5,6 @@
 	import get from 'lodash/get';
 
 	import Login from '$components_ref/Login.svelte';
-
 	import {
 		FavoriteCardEmpty,
 		PageNavigation,

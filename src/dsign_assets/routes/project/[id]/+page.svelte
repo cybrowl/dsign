@@ -1,13 +1,12 @@
 <script>
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import get from 'lodash/get';
-	import last from 'lodash/last';
 	import isEmpty from 'lodash/isEmpty';
+	import last from 'lodash/last';
 
 	import Login from '$components_ref/Login.svelte';
-
 	import {
 		PageNavigation,
 		ProjectEditActionsBar,
@@ -34,9 +33,10 @@
 		auth_snap_main
 	} from '$stores_ref/auth_client';
 	import modal_update, { modal_visible } from '$stores_ref/modal';
-	import page_navigation_update, {
+	import {
 		snap_preview,
-		page_navigation
+		page_navigation,
+		navigate_to_home_with_notification
 	} from '$stores_ref/page_navigation';
 	import {
 		disable_project_store_reset,
@@ -111,6 +111,8 @@
 			} catch (error) {
 				console.log('error: call', error);
 			}
+		} else {
+			navigate_to_home_with_notification();
 		}
 	}
 
@@ -153,7 +155,7 @@
 
 			projects_update.update_project(project);
 		} else {
-			// navigate_to_home_with_notification();
+			navigate_to_home_with_notification();
 		}
 	}
 
@@ -239,31 +241,27 @@
 			{/if}
 		</div>
 
-		{#if $projectTabsState.isSnapsSelected}
-			<!-- No Snaps Found -->
-			{#if $project_store.project.snaps && $project_store.project.snaps.length === 0 && $project_store.isFetching === false}
-				<div
-					class="hidden lg:grid col-start-1 col-end-13 grid-cols-4 row-start-4 row-end-auto gap-x-6 gap-y-12"
-				>
+		<div
+			class="hidden lg:grid col-start-1 col-end-13 grid-cols-4 row-start-4 row-end-auto gap-x-6 gap-y-12 mb-16"
+		>
+			{#if $projectTabsState.isSnapsSelected}
+				<!-- No Snaps Found -->
+				{#if $project_store.project.snaps && $project_store.project.snaps.length === 0 && $project_store.isFetching === false}
 					{#if isProjectOwner}
 						<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
 					{/if}
-				</div>
-			{/if}
+				{/if}
 
-			<!-- Snaps -->
-			{#if $project_store.project.snaps && $project_store.project.snaps.length > 0}
-				<div
-					class="hidden lg:grid col-start-1 col-end-13 grid-cols-4 row-start-4 row-end-auto gap-x-6 gap-y-12 mb-16"
-				>
+				<!-- Snaps -->
+				{#if $project_store.project.snaps && $project_store.project.snaps.length > 0}
 					{#each $project_store.project.snaps as snap}
 						<SnapCard {snap} isEditMode={$is_edit_active} on:clickCard={handleSnapPreview} />
 					{/each}
 					{#if isProjectOwner}
 						<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
 					{/if}
-				</div>
+				{/if}
 			{/if}
-		{/if}
+		</div>
 	{/if}
 </main>
