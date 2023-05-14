@@ -6,14 +6,13 @@
 
 	import Login from '$components_ref/Login.svelte';
 	import {
-		FavoriteCardEmpty,
+		CardEmpty,
 		PageNavigation,
 		ProfileBanner,
 		ProfileInfo,
 		ProfileTabs,
 		ProjectCard,
-		ProjectCardCreate,
-		ProjectCardEmpty
+		ProjectCardCreate
 	} from 'dsign-components-v2';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
@@ -279,7 +278,11 @@
 				{#if is_owner}
 					<ProjectCardCreate on:clickProjectCardCreate={handleProjectCreateModalOpen} />
 				{:else}
-					<ProjectCardEmpty />
+					<CardEmpty
+						name="project_empty"
+						content="No projects found"
+						view_size={{ width: '92', height: '92' }}
+					/>
 				{/if}
 			{/if}
 
@@ -313,7 +316,11 @@
 
 			<!-- No Favorites Found -->
 			{#if $favorite_store.projects.length === 0 && $favorite_store.isFetching === false}
-				<FavoriteCardEmpty />
+				<CardEmpty
+					name="project_empty"
+					content="No favorite projects"
+					view_size={{ width: '92', height: '92' }}
+				/>
 			{/if}
 
 			<!-- Favorites -->

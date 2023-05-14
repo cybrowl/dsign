@@ -8,6 +8,7 @@
 
 	import Login from '$components_ref/Login.svelte';
 	import {
+		CardEmpty,
 		PageNavigation,
 		ProjectEditActionsBar,
 		ProjectInfo,
@@ -246,10 +247,15 @@
 		>
 			{#if $projectTabsState.isSnapsSelected}
 				<!-- No Snaps Found -->
-				{#if $project_store.project.snaps && $project_store.project.snaps.length === 0 && $project_store.isFetching === false}
+				{#if isEmpty($project_store.project.snaps) && $project_store.isFetching === false}
 					{#if isProjectOwner}
 						<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
 					{/if}
+					<CardEmpty
+						name="snap_empty"
+						content="No snaps found"
+						view_size={{ width: '64', height: '64' }}
+					/>
 				{/if}
 
 				<!-- Snaps -->
