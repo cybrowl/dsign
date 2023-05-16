@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	import { get, set, isEmpty } from 'lodash';
 
@@ -19,23 +19,37 @@
 
 	onMount(async () => {});
 
+	onDestroy(async () => {
+		$snap_creation = {
+			id: '',
+			images: [],
+			file_asset: {
+				file_name: '',
+				file_unit8: []
+			}
+		};
+	});
+
 	async function handleAttachFile(event) {
 		let file = event.detail;
 
 		let file_array_buffer = file && new Uint8Array(await file.arrayBuffer());
-		set($snap_creation, 'file_asset.file_name', file.name);
-		set($snap_creation, 'file_asset.file_unit8', file_array_buffer);
+
+		$snap_creation.file_asset.file_name = file.name;
+		$snap_creation.file_asset.file_unit8 = file_array_buffer;
 
 		// add to staging storage
-		// add to chunks saved to local storage
+		// save chunks_ids to local storage
 	}
 
 	function handleRemoveFile(event) {
 		let file = event.detail;
 
 		// delete from staging storage
-		set($snap_creation, 'file_asset.file_name', '');
-		set($snap_creation, 'file_asset.file_unit8', []);
+		// delete from snap
+
+		$snap_creation.file_asset.file_name = '';
+		$snap_creation.file_asset.file_unit8 = [];
 	}
 
 	function generateId() {
@@ -45,25 +59,26 @@
 	function handleAddImages(event) {
 		let { snap_base64_images, images_unit8Arrays } = event.detail;
 
-		console.log('page: images_unit8Arrays: ', images_unit8Arrays);
-		console.log('snap_creation: ', $snap_creation);
-
-		set($snap_creation, 'images', get($snap_creation, 'images', []));
-		set($snap_creation, 'images_unit8', get($snap_creation, 'images_unit8', []));
-
-		$snap_creation.images_unit8 = [...$snap_creation.images_unit8, ...images_unit8Arrays];
-
 		snap_base64_images.forEach((url, index) => {
 			let newImage = {
 				canister_id: '',
 				id: generateId(),
-				url: url
+				url: url,
+				data: images_unit8Arrays[index]
 			};
 
 			if ($snap_creation.images.length <= 12) {
 				$snap_creation.images = [...$snap_creation.images, newImage];
 			}
 		});
+
+		console.log('snap_creation: ', $snap_creation);
+	}
+
+	function handleRemoveImg(event) {
+		const image_id = event.detail;
+
+		$snap_creation.images = $snap_creation.images.filter((image) => image.id !== image_id);
 	}
 
 	function handleCancel() {
@@ -95,7 +110,7 @@
 		{#if isEmpty($snap_creation.images)}
 			<ImagesEmpty content="Please add images" />
 		{:else}
-			<Images images={$snap_creation.images} />
+			<Images images={$snap_creation.images} on:remove={handleRemoveImg} />
 		{/if}
 	</div>
 

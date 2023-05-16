@@ -9,6 +9,7 @@
 	import Login from '$components_ref/Login.svelte';
 	import {
 		CardEmpty,
+		ComingSoon,
 		PageNavigation,
 		ProjectEditActionsBar,
 		ProjectInfo,
@@ -268,6 +269,18 @@
 						<SnapCardCreate on:clickSnapCardCreate={goToSnapUpsertPage} />
 					{/if}
 				{/if}
+			{/if}
+
+			{#if $projectTabsState.isRecsSelected}
+				<div class="grid col-start-3 col-end-13 row-start-4 row-end-auto">
+					<ComingSoon />
+				</div>
+			{/if}
+
+			{#if $projectTabsState.isChangesSelected}
+				<div class="grid col-start-3 col-end-13 row-start-4 row-end-auto">
+					<ComingSoon />
+				</div>
 			{/if}
 		</div>
 	{/if}

@@ -32,7 +32,7 @@
 		auth_profile,
 		auth_project_main
 	} from '$stores_ref/auth_client';
-	import { profileTabsState } from '$stores_ref/page_state';
+	import { profileTabsState, disable_project_store_reset } from '$stores_ref/page_state';
 	import {
 		favorite_store,
 		favorites_update,
@@ -53,6 +53,8 @@
 	let profile = {};
 
 	page_navigation_update.delete_all();
+
+	disable_project_store_reset.set(false);
 
 	project_store_fetching();
 
@@ -334,9 +336,9 @@
 						hideSnapsCount={true}
 						showUsername={true}
 						showOptionsPopover={is_owner ? true : false}
-						optionsPopoverHide={{
-							rename: true,
-							delete: false
+						optionsPopover={{
+							edit: false,
+							delete: true
 						}}
 						on:clickProject={handleProjectClick}
 						on:clickDeleteProject={handleDeleteFavorite}
