@@ -21,6 +21,7 @@
 		const canister_id = $page.url.searchParams.get('canister_id');
 		const snap_id = last(get($page, 'url.pathname', '').split('/'));
 
+		console.log('snap_preview: ', $snap_preview);
 		try {
 			if ($snap_preview.id === undefined) {
 				const { ok: snap } = await $actor_snap_main.actor.get_snap(snap_id, canister_id);

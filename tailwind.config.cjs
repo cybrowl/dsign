@@ -25,7 +25,8 @@ module.exports = {
 				'light-purple': '#6259C8',
 				'bubble-purple': '#B6AFFC',
 				'lilalic-purple': '#968CFF',
-				'error-red': '#FC3030'
+				'error-red': '#FC3030',
+				'mute-red': '#F0627C'
 			}
 		}
 	},

@@ -176,8 +176,8 @@
 		goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
 	}
 
-	function handleSnapCreateModalOpen() {
-		modal_update.change_visibility('snap_creation');
+	function goToSnapUpsertPage() {
+		goto('/snap/upsert');
 	}
 </script>
 
@@ -249,13 +249,14 @@
 				<!-- No Snaps Found -->
 				{#if isEmpty($project_store.project.snaps) && $project_store.isFetching === false}
 					{#if isProjectOwner}
-						<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
+						<SnapCardCreate on:clickSnapCardCreate={goToSnapUpsertPage} />
+					{:else}
+						<CardEmpty
+							name="snap_empty"
+							content="No snaps found"
+							view_size={{ width: '64', height: '64' }}
+						/>
 					{/if}
-					<CardEmpty
-						name="snap_empty"
-						content="No snaps found"
-						view_size={{ width: '64', height: '64' }}
-					/>
 				{/if}
 
 				<!-- Snaps -->
@@ -264,7 +265,7 @@
 						<SnapCard {snap} isEditMode={$is_edit_active} on:clickCard={handleSnapPreview} />
 					{/each}
 					{#if isProjectOwner}
-						<SnapCardCreate on:clickSnapCardCreate={handleSnapCreateModalOpen} />
+						<SnapCardCreate on:clickSnapCardCreate={goToSnapUpsertPage} />
 					{/if}
 				{/if}
 			{/if}

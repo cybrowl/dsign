@@ -11,6 +11,7 @@ export const page_navigation = writable({
 });
 
 export const snap_preview = writable({});
+export const snap_creation = writable({});
 
 export const navigate_to_home_with_notification = () => {
 	notification_visible.set({ auth_error: true });

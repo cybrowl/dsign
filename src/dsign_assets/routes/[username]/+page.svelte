@@ -146,16 +146,18 @@
 	}
 
 	async function handleProfileBannerChange(event) {
-		let files = event.detail;
+		let file = event.detail;
 
 		if ($actor_assets_img_staging.loggedIn && $actor_profile.loggedIn) {
-			const selectedFile = files[0];
+			const selectedFile = file;
 
 			const imageAsUnit8ArrayBuffer = new Uint8Array(await selectedFile.arrayBuffer());
 			const create_asset_args = {
 				data: [...imageAsUnit8ArrayBuffer],
 				file_format: selectedFile.type
 			};
+
+			console.log('create_asset_args: ', create_asset_args);
 
 			try {
 				let img_asset_id = await $actor_assets_img_staging.actor.create_asset(create_asset_args);
@@ -246,7 +248,7 @@
 	<!-- ProfileBanner -->
 	<div class="col-start-4 col-end-13 row-start-2 row-end-auto">
 		<ProfileBanner
-			is_authenticated={is_owner}
+			{is_owner}
 			profile_banner_url={get(profile, 'banner.url', '')}
 			on:profileBannerChange={handleProfileBannerChange}
 		/>
@@ -292,9 +294,10 @@
 					<ProjectCard
 						{project}
 						showOptionsPopover={is_owner ? true : false}
+						optionsPopover={{ edit: true, delete: true }}
 						on:clickProject={handleProjectClick}
-						on:clickRenameProject={handleProjectRenameModalOpen}
-						on:clickDeleteProject={handleProjectDeleteModalOpen}
+						on:editProject={handleProjectRenameModalOpen}
+						on:deleteProject={handleProjectDeleteModalOpen}
 					/>
 				{/each}
 				{#if is_owner}
