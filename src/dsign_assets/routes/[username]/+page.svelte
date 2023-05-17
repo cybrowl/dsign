@@ -267,11 +267,11 @@
 		/>
 	</div>
 
-	<!-- Projects -->
-	{#if $profileTabsState.isProjectsSelected}
-		<div
-			class="hidden lg:grid col-start-4 col-end-13 grid-cols-3 row-start-4 row-end-auto gap-x-8 gap-y-12 mb-16"
-		>
+	<div
+		class="hidden lg:grid col-start-4 col-end-13 grid-cols-3 row-start-4 row-end-auto gap-x-8 gap-y-12 mb-16"
+	>
+		<!-- Projects -->
+		{#if $profileTabsState.isProjectsSelected}
 			<!-- Fetching Projects -->
 			{#if $project_store.isFetching === true}
 				<ProjectCard isLoadingProject={true} />
@@ -280,7 +280,7 @@
 			<!-- No Projects Found -->
 			{#if $project_store.isFetching === false && $project_store.projects.length === 0}
 				{#if is_owner}
-					<ProjectCardCreate on:clickProjectCardCreate={handleProjectCreateModalOpen} />
+					<ProjectCardCreate on:createProject={handleProjectCreateModalOpen} />
 				{:else}
 					<CardEmpty
 						name="project_empty"
@@ -303,17 +303,13 @@
 					/>
 				{/each}
 				{#if is_owner}
-					<ProjectCardCreate on:clickProjectCardCreate={handleProjectCreateModalOpen} />
+					<ProjectCardCreate on:createProject={handleProjectCreateModalOpen} />
 				{/if}
 			{/if}
-		</div>
-	{/if}
+		{/if}
 
-	<!-- Favorites -->
-	{#if $profileTabsState.isFavoritesSelected}
-		<div
-			class="hidden lg:grid col-start-4 col-end-13 grid-cols-3 row-start-4 row-end-auto gap-x-8 gap-y-12 mb-16"
-		>
+		<!-- Favorites -->
+		{#if $profileTabsState.isFavoritesSelected}
 			<!-- Fetching Favorites -->
 			{#if $favorite_store.isFetching === true}
 				<ProjectCard isLoadingProject={true} />
@@ -341,12 +337,12 @@
 							delete: true
 						}}
 						on:clickProject={handleProjectClick}
-						on:clickDeleteProject={handleDeleteFavorite}
+						on:deleteProject={handleDeleteFavorite}
 					/>
 				{/each}
 			{/if}
-		</div>
-	{/if}
+		{/if}
+	</div>
 </main>
 
 <!-- Mobile Not Supported -->

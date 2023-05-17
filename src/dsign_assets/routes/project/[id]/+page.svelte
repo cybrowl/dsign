@@ -2,9 +2,8 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import get from 'lodash/get';
-	import isEmpty from 'lodash/isEmpty';
-	import last from 'lodash/last';
+
+	import { get, isEmpty, last } from 'lodash';
 
 	import Login from '$components_ref/Login.svelte';
 	import {
@@ -178,7 +177,7 @@
 	}
 
 	function goToSnapUpsertPage() {
-		goto('/snap/upsert');
+		goto(`/snap/upsert?project_id=${project_ref.id}&canister_id=${project_ref.canister_id}`);
 	}
 </script>
 
@@ -210,8 +209,7 @@
 
 		<!-- Fetching Project Snaps -->
 		<div
-			class="hidden lg:grid col-start-1 col-end-13 grid-cols-4
-			row-start-3 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
+			class="hidden lg:grid grid-cols-4 col-start-1 col-end-13 row-start-3 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
 		>
 			<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />
 		</div>
@@ -220,13 +218,13 @@
 	<!-- Project -->
 	{#if isEmpty($project_store.project) === false}
 		<!-- Project Info Header -->
-		<div class="relative col-start-1 col-end-13 row-start-2 row-end-auto">
+		<div class="row-start-2 row-end-auto relative col-start-1 col-end-13">
 			<ProjectInfo project={$project_store.project} on:saveToFavorites={handleAddToFavorites} />
 		</div>
 
 		<!-- ProjectsTabs & ProjectEditActionsBar -->
 		<div
-			class="col-start-1 col-end-13 items-center justify-between row-start-3 row-end-auto mt-12 mb-6"
+			class="row-start-3 row-end-auto col-start-1 col-end-13 items-center justify-between mt-12 mb-6"
 		>
 			<ProjectTabs
 				selectedTabState={$projectTabsState}
@@ -244,7 +242,7 @@
 		</div>
 
 		<div
-			class="hidden lg:grid col-start-1 col-end-13 grid-cols-4 row-start-4 row-end-auto gap-x-6 gap-y-12 mb-16"
+			class="hidden lg:grid grid-cols-4 row-start-4 row-end-auto col-start-1 col-end-13 gap-x-6 gap-y-12 mb-16"
 		>
 			{#if $projectTabsState.isSnapsSelected}
 				<!-- No Snaps Found -->
