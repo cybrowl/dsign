@@ -10,14 +10,26 @@
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
-	import { actor_snap_main } from '$stores_ref/actors';
+	import {
+		actor_assets_file_staging,
+		actor_assets_img_staging,
+		actor_snap_main,
+		actor_project_main
+	} from '$stores_ref/actors';
+	import {
+		auth_assets_file_staging,
+		auth_assets_img_staging,
+		auth_snap_main
+	} from '$stores_ref/auth_client';
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation, snap_creation } from '$stores_ref/page_navigation';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 
 	disable_project_store_reset.set(true);
 
-	onMount(async () => {});
+	onMount(async () => {
+		await Promise.all([auth_assets_file_staging(), auth_assets_img_staging(), auth_snap_main()]);
+	});
 
 	onDestroy(async () => {
 		$snap_creation = {
@@ -57,13 +69,14 @@
 	}
 
 	function handleAddImages(event) {
-		let { snap_base64_images, images_unit8Arrays } = event.detail;
+		let { img_data_urls, images_unit8Arrays } = event.detail;
 
-		snap_base64_images.forEach((url, index) => {
+		img_data_urls.forEach(({ dataUrl, mimeType }, index) => {
 			let newImage = {
 				canister_id: '',
 				id: generateId(),
-				url: url,
+				url: dataUrl,
+				mimeType,
 				data: images_unit8Arrays[index]
 			};
 
@@ -85,8 +98,68 @@
 		console.log('cancel');
 	}
 
-	function handlePublish() {
-		console.log('publish');
+	async function commitImgAssetsToStaging(images) {
+		if (!Array.isArray(images)) {
+			console.error('images must be an array');
+			return [];
+		}
+
+		if (
+			!$actor_assets_file_staging.loggedIn ||
+			!$actor_assets_img_staging.loggedIn ||
+			!$actor_snap_main.loggedIn
+		) {
+			console.error('Not logged in');
+			return [];
+		}
+
+		let promises = images.map(async function (image) {
+			if (!image.data || !image.mimeType) {
+				console.error('image object must contain data and mimeType properties');
+				return null;
+			}
+
+			try {
+				return await $actor_assets_img_staging.actor.create_asset({
+					data: image.data,
+					file_format: image.mimeType
+				});
+			} catch (error) {
+				console.error('Error creating asset:', error);
+				return null;
+			}
+		});
+
+		try {
+			return await Promise.all(promises);
+		} catch (error) {
+			console.error('Error:', error);
+			return [];
+		}
+	}
+
+	async function handlePublish(event) {
+		const { snap_name } = event.detail;
+
+		const project_id = $page.url.searchParams.get('project_id');
+		const canister_id = $page.url.searchParams.get('canister_id');
+
+		try {
+			const image_ids = await commitImgAssetsToStaging($snap_creation.images);
+
+			const create_snap_args = {
+				title: snap_name,
+				image_cover_location: 0,
+				img_asset_ids: image_ids,
+				project: {
+					id: project_id,
+					canister_id: canister_id
+				},
+				file_asset: []
+			};
+
+			console.log('publish', create_snap_args);
+		} catch (error) {}
 	}
 </script>
 
