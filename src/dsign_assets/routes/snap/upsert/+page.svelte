@@ -25,7 +25,7 @@
 	import { page_navigation, snap_creation } from '$stores_ref/page_navigation';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 
-	disable_project_store_reset.set(true);
+	disable_project_store_reset.set(false);
 
 	let cover_img = {};
 	let is_publishing = false;
@@ -175,7 +175,11 @@
 
 			console.log('publish', create_snap_args);
 
-			const { ok: created_snap } = await $actor_snap_main.actor.create_snap(create_snap_args);
+			const { ok: created_snap, err: snap_creation_failed } =
+				await $actor_snap_main.actor.create_snap(create_snap_args);
+
+			console.log('created_snap: ', created_snap);
+			console.log('snap_creation_failed: ', snap_creation_failed);
 
 			const { ok: project } = await $actor_project_main.actor.get_project(project_id, canister_id);
 

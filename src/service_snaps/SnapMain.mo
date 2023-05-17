@@ -56,7 +56,7 @@ actor SnapMain {
 
 	let ACTOR_NAME : Text = "SnapMain";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 4;
+	let VERSION : Nat = 5;
 
 	var user_canisters_ref : HashMap.HashMap<UserPrincipal, SnapIDStorage> = HashMap.HashMap(
 		0,
@@ -115,7 +115,7 @@ actor SnapMain {
 
 		let is_anonymous = Principal.isAnonymous(caller);
 		let has_image = snap_info.img_asset_ids.size() > 0;
-		let too_many_images = snap_info.img_asset_ids.size() > 4;
+		let too_many_images = snap_info.img_asset_ids.size() > 12;
 
 		if (is_anonymous == true) {
 			return #err(#UserAnonymous);

@@ -9,6 +9,7 @@
 	import {
 		CardEmpty,
 		ComingSoon,
+		LoadingSpinner,
 		PageNavigation,
 		ProjectEditActionsBar,
 		ProjectInfo,
@@ -202,16 +203,9 @@
 
 	<!-- Fetching Project -->
 	{#if $project_store.isFetching === true}
-		<!-- Fetching Project Info Header -->
-		<div class="col-start-1 col-end-13 row-start-2 row-end-3 mt-2 mb-5">
-			<ProjectInfo isFetching={true} />
-		</div>
-
-		<!-- Fetching Project Snaps -->
-		<div
-			class="hidden lg:grid grid-cols-4 col-start-1 col-end-13 row-start-3 row-end-auto gap-x-8 gap-y-12 mt-2 mb-24"
-		>
-			<SnapCard isLoadingSnap={true} snap={{ metrics: { views: 0, likes: 0 } }} />
+		<!-- Fetching Project -->
+		<div class="loading_layout">
+			<LoadingSpinner />
 		</div>
 	{/if}
 
@@ -283,3 +277,13 @@
 		</div>
 	{/if}
 </main>
+
+<style>
+	.loading_layout {
+		position: fixed;
+		z-index: 30;
+		top: 42%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+</style>
