@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { onDestroy, onMount } from 'svelte';
 
-	import { get, set, isEmpty } from 'lodash';
+	import { get, findIndex, isEmpty } from 'lodash';
 
 	import Login from '$components_ref/Login.svelte';
 	import { ImagesEmpty, Images, PageNavigation, SnapUpsertActions } from 'dsign-components-v2';
@@ -26,6 +26,9 @@
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 
 	disable_project_store_reset.set(true);
+
+	let cover_img = {};
+	let is_publishing = false;
 
 	onMount(async () => {
 		await Promise.all([auth_assets_file_staging(), auth_assets_img_staging(), auth_snap_main()]);
@@ -88,6 +91,10 @@
 		console.log('snap_creation: ', $snap_creation);
 	}
 
+	function handleSelectCover(event) {
+		cover_img = event.detail;
+	}
+
 	function handleRemoveImg(event) {
 		const image_id = event.detail;
 
@@ -141,15 +148,23 @@
 	async function handlePublish(event) {
 		const { snap_name } = event.detail;
 
+		is_publishing = true;
+
 		const project_id = $page.url.searchParams.get('project_id');
 		const canister_id = $page.url.searchParams.get('canister_id');
 
 		try {
 			const image_ids = await commitImgAssetsToStaging($snap_creation.images);
 
+			let image_cover_location = findIndex(
+				$snap_creation.images,
+				(img) => img.id === get(cover_img, 'id', '')
+			);
+			image_cover_location = image_cover_location === -1 ? 0 : image_cover_location;
+
 			const create_snap_args = {
 				title: snap_name,
-				image_cover_location: 0,
+				image_cover_location: image_cover_location,
 				img_asset_ids: image_ids,
 				project: {
 					id: project_id,
@@ -159,7 +174,17 @@
 			};
 
 			console.log('publish', create_snap_args);
-		} catch (error) {}
+
+			const { ok: created_snap } = await $actor_snap_main.actor.create_snap(create_snap_args);
+
+			const { ok: project } = await $actor_project_main.actor.get_project(project_id, canister_id);
+
+			goto(`/project/${project_id}?canister_id=${canister_id}`);
+
+			projects_update.update_project(project);
+		} catch (error) {
+			is_publishing = false;
+		}
 	}
 </script>
 
@@ -183,7 +208,11 @@
 		{#if isEmpty($snap_creation.images)}
 			<ImagesEmpty content="Please add images" />
 		{:else}
-			<Images images={$snap_creation.images} on:remove={handleRemoveImg} />
+			<Images
+				images={$snap_creation.images}
+				on:remove={handleRemoveImg}
+				on:selectCover={handleSelectCover}
+			/>
 		{/if}
 	</div>
 
@@ -195,6 +224,7 @@
 			on:cancel={handleCancel}
 			on:publish={handlePublish}
 			snap={$snap_creation}
+			{is_publishing}
 		/>
 	</div>
 </main>
