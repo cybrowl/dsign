@@ -4,6 +4,7 @@
 	import { onDestroy, onMount } from 'svelte';
 
 	import { get, findIndex, isEmpty } from 'lodash';
+	import { replacer, reviver } from '../../../utils/big_int';
 
 	import Login from '$components_ref/Login.svelte';
 	import { ImagesEmpty, Images, PageNavigation, SnapUpsertActions } from 'dsign-components-v2';
@@ -24,13 +25,23 @@
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation, snap_creation } from '$stores_ref/page_navigation';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
+	import { local_snap_creation_design_file } from '$stores_ref/local_storage';
 
 	disable_project_store_reset.set(false);
 
 	let cover_img = {};
 	let is_publishing = false;
+	let is_uploading_design_file = false;
 
 	onMount(async () => {
+		snap_creation.update((value) => ({
+			...value,
+			file_asset: {
+				...value.file_asset,
+				file_name: $local_snap_creation_design_file.file_name
+			}
+		}));
+
 		await Promise.all([auth_assets_file_staging(), auth_assets_img_staging(), auth_snap_main()]);
 	});
 
@@ -45,16 +56,65 @@
 		};
 	});
 
-	async function handleAttachFile(event) {
-		let file = event.detail;
+	async function commitFileAssetChunksToStaging(file) {
+		if (file.size === 0) {
+			// TODO: error
+			return 'File Empty';
+		}
 
-		let file_array_buffer = file && new Uint8Array(await file.arrayBuffer());
+		const promises = [];
+		const chunkSize = 2000000;
 
-		$snap_creation.file_asset.file_name = file.name;
+		const file_name = get(file, 'name', '');
+		const file_type = get(file, 'type', '');
+		const file_array_buffer = file && new Uint8Array(await file.arrayBuffer());
+
+		$snap_creation.file_asset.file_name = file_name;
 		$snap_creation.file_asset.file_unit8 = file_array_buffer;
 
-		// add to staging storage
-		// save chunks_ids to local storage
+		const uploadChunk = async ({ chunk, file_name }) => {
+			return $actor_assets_file_staging.actor.create_chunk({
+				data: [...chunk],
+				file_name: file_name
+			});
+		};
+
+		for (let start = 0; start < file_array_buffer.length; start += chunkSize) {
+			const chunk = file_array_buffer.slice(start, start + chunkSize);
+
+			promises.push(
+				uploadChunk({
+					file_name,
+					chunk
+				})
+			);
+		}
+
+		// TODO: make sure all the chunks succeed
+		let chunk_ids = await Promise.all(promises);
+
+		return {
+			file_name,
+			file_type,
+			chunk_ids
+		};
+	}
+
+	async function handleAttachFile(event) {
+		let file = get(event, 'detail', {});
+
+		is_uploading_design_file = true;
+
+		const design_file_asset = await commitFileAssetChunksToStaging(file);
+
+		const chunk_ids_big_int_replaced = JSON.stringify(design_file_asset.chunk_ids, replacer);
+
+		local_snap_creation_design_file.set({
+			...design_file_asset,
+			chunk_ids: chunk_ids_big_int_replaced
+		});
+
+		is_uploading_design_file = false;
 	}
 
 	function handleRemoveFile(event) {
@@ -102,7 +162,7 @@
 	}
 
 	function handleCancel() {
-		console.log('cancel');
+		goto(`/project/${project_id}?canister_id=${canister_id}`);
 	}
 
 	async function commitImgAssetsToStaging(images) {
@@ -162,6 +222,11 @@
 			);
 			image_cover_location = image_cover_location === -1 ? 0 : image_cover_location;
 
+			const file_chunks = $local_snap_creation_design_file.chunk_ids;
+			const file_type = $local_snap_creation_design_file.file_type;
+
+			const design_file_chunk_ids = JSON.parse(file_chunks, reviver);
+
 			const create_snap_args = {
 				title: snap_name,
 				image_cover_location: image_cover_location,
@@ -170,23 +235,25 @@
 					id: project_id,
 					canister_id: canister_id
 				},
-				file_asset: []
+				file_asset: [
+					{
+						is_public: true,
+						content_type: file_type,
+						chunk_ids: design_file_chunk_ids
+					}
+				]
 			};
-
-			console.log('publish', create_snap_args);
 
 			const { ok: created_snap, err: snap_creation_failed } =
 				await $actor_snap_main.actor.create_snap(create_snap_args);
-
-			console.log('created_snap: ', created_snap);
-			console.log('snap_creation_failed: ', snap_creation_failed);
 
 			const { ok: project } = await $actor_project_main.actor.get_project(project_id, canister_id);
 
 			goto(`/project/${project_id}?canister_id=${canister_id}`);
 
-			projects_update.update_project(project);
+			// projects_update.update_project(project);
 		} catch (error) {
+			console.log('error: ', error);
 			is_publishing = false;
 		}
 	}
@@ -228,7 +295,7 @@
 			on:cancel={handleCancel}
 			on:publish={handlePublish}
 			snap={$snap_creation}
-			{is_publishing}
+			is_publishing={is_uploading_design_file || is_publishing}
 		/>
 	</div>
 </main>

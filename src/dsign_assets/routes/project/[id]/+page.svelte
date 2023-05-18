@@ -45,6 +45,7 @@
 		is_edit_active,
 		projectTabsState
 	} from '$stores_ref/page_state';
+	import { local_snap_creation_design_file } from '$stores_ref/local_storage';
 
 	let isProjectOwner = false;
 	let project_ref = {};
@@ -65,6 +66,8 @@
 			auth_project_main(),
 			auth_snap_main()
 		]);
+
+		local_snap_creation_design_file.set({ file_name: '', file_type: '', chunk_ids: [] });
 
 		const canister_id = $page.url.searchParams.get('canister_id');
 		const project_id = last(get($page, 'url.pathname', '').split('/'));

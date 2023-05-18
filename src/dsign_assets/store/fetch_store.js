@@ -13,10 +13,10 @@ export const explore_store_fetching = function () {
 
 export const favorite_store = writable({ isFetching: false, projects: [] });
 export const favorite_store_fetching = function () {
-	favorite_store.update(({ snaps }) => {
+	favorite_store.update(({ projects }) => {
 		return {
 			isFetching: true,
-			snaps: snaps
+			projects: projects
 		};
 	});
 };

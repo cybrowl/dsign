@@ -34,6 +34,7 @@
 	} from '$stores_ref/auth_client';
 	import { profileTabsState, disable_project_store_reset } from '$stores_ref/page_state';
 	import {
+		favorite_store_fetching,
 		favorite_store,
 		favorites_update,
 		project_store_fetching,
@@ -57,6 +58,7 @@
 	disable_project_store_reset.set(false);
 
 	project_store_fetching();
+	favorite_store_fetching();
 
 	onMount(async () => {
 		await Promise.all([
@@ -100,7 +102,6 @@
 
 				if (err_get_all_favs) {
 					favorite_store.set({ isFetching: false, projects: [] });
-					local_storage_favorites.set({ all_favorites_count: 1 });
 
 					if (err_get_all_favs['UserNotFound'] === true) {
 						await $actor_favorite_main.actor.create_user_favorite_storage();
@@ -273,9 +274,11 @@
 		<!-- Projects -->
 		{#if $profileTabsState.isProjectsSelected}
 			<!-- Fetching Projects -->
-			{#if $project_store.isFetching === true}
-				<ProjectCard isLoadingProject={true} />
-			{/if}
+			{#each { length: $local_storage_projects.all_projects_count } as _, i}
+				{#if $project_store.isFetching === true}
+					<ProjectCard isLoadingProject={true} />
+				{/if}
+			{/each}
 
 			<!-- No Projects Found -->
 			{#if $project_store.isFetching === false && $project_store.projects.length === 0}
@@ -311,9 +314,11 @@
 		<!-- Favorites -->
 		{#if $profileTabsState.isFavoritesSelected}
 			<!-- Fetching Favorites -->
-			{#if $favorite_store.isFetching === true}
-				<ProjectCard isLoadingProject={true} />
-			{/if}
+			{#each { length: $local_storage_favorites.all_favorites_count } as _, i}
+				{#if $favorite_store.isFetching === true}
+					<ProjectCard isLoadingProject={true} />
+				{/if}
+			{/each}
 
 			<!-- No Favorites Found -->
 			{#if $favorite_store.projects.length === 0 && $favorite_store.isFetching === false}
