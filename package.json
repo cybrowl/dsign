@@ -34,7 +34,7 @@
 		"@dfinity/principal": "^0.15.4",
 		"dotenv": "^16.0.3",
 		"dsign-components": "^0.23.1",
-		"dsign-components-v2": "^0.16.1",
+		"dsign-components-v2": "^0.16.6",
 		"lodash": "^4.17.21",
 		"luxon": "^3.2.1",
 		"svelte-local-storage-store": "^0.2.6"

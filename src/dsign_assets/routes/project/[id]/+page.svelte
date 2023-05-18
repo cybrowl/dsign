@@ -255,7 +255,7 @@
 				<!-- Snaps -->
 				{#if $project_store.project.snaps && $project_store.project.snaps.length > 0}
 					{#each $project_store.project.snaps as snap}
-						<SnapCard {snap} isEditMode={$is_edit_active} on:clickCard={handleSnapPreview} />
+						<SnapCard {snap} showEditMode={$is_edit_active} on:clickCard={handleSnapPreview} />
 					{/each}
 					{#if isProjectOwner}
 						<SnapCardCreate on:clickSnapCardCreate={goToSnapUpsertPage} />
@@ -263,7 +263,7 @@
 				{/if}
 			{/if}
 
-			{#if $projectTabsState.isRecsSelected}
+			{#if $projectTabsState.isFeedbackSelected}
 				<div class="grid col-start-3 col-end-13 row-start-4 row-end-auto">
 					<ComingSoon />
 				</div>
