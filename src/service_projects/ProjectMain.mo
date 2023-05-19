@@ -96,7 +96,7 @@ actor ProjectMain {
 		};
 	};
 
-	public shared ({ caller }) func create_project(name : Text, snaps : ?[SnapRef]) : async Result.Result<Text, ErrCreateProject> {
+	public shared ({ caller }) func create_project(name : Text, snaps : ?[SnapRef]) : async Result.Result<ProjectRef, ErrCreateProject> {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "create_project")];
 
 		if (name.size() > 100) {
@@ -139,10 +139,16 @@ actor ProjectMain {
 				return #err(#ErrorCall(debug_show (err)));
 			};
 			case (#ok project) {
+
+				let project_public : ProjectRef = {
+					id = project.id;
+					canister_id = project.canister_id;
+				};
+
 				project_ids.add(project.id);
 				user_project_ids_storage.put(project_canister_id, Buffer.toArray(project_ids));
 
-				#ok("Created Project");
+				#ok(project_public);
 			};
 		};
 	};

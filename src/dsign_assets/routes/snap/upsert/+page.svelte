@@ -27,8 +27,6 @@
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 	import { local_snap_creation_design_file } from '$stores_ref/local_storage';
 
-	disable_project_store_reset.set(false);
-
 	let cover_img = {};
 	let is_publishing = false;
 	let is_uploading_design_file = false;
@@ -162,6 +160,11 @@
 	}
 
 	function handleCancel() {
+		disable_project_store_reset.set(true);
+
+		const project_id = $page.url.searchParams.get('project_id');
+		const canister_id = $page.url.searchParams.get('canister_id');
+
 		goto(`/project/${project_id}?canister_id=${canister_id}`);
 	}
 
@@ -206,6 +209,8 @@
 	}
 
 	async function handlePublish(event) {
+		disable_project_store_reset.set(false);
+
 		const { snap_name } = event.detail;
 
 		is_publishing = true;
@@ -296,6 +301,7 @@
 			on:publish={handlePublish}
 			snap={$snap_creation}
 			is_publishing={is_uploading_design_file || is_publishing}
+			{is_uploading_design_file}
 		/>
 	</div>
 </main>
