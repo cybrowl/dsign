@@ -230,7 +230,12 @@
 			const file_chunks = $local_snap_creation_design_file.chunk_ids;
 			const file_type = $local_snap_creation_design_file.file_type;
 
-			const design_file_chunk_ids = JSON.parse(file_chunks, reviver);
+			const design_file_chunk_ids = !isEmpty(file_chunks) && JSON.parse(file_chunks, reviver);
+			const file_asset = {
+				is_public: true,
+				content_type: file_type,
+				chunk_ids: design_file_chunk_ids
+			};
 
 			const create_snap_args = {
 				title: snap_name,
@@ -240,19 +245,11 @@
 					id: project_id,
 					canister_id: canister_id
 				},
-				file_asset: [
-					{
-						is_public: true,
-						content_type: file_type,
-						chunk_ids: design_file_chunk_ids
-					}
-				]
+				file_asset: isEmpty(file_chunks) ? [] : file_asset
 			};
 
 			const { ok: created_snap, err: snap_creation_failed } =
 				await $actor_snap_main.actor.create_snap(create_snap_args);
-
-			const { ok: project } = await $actor_project_main.actor.get_project(project_id, canister_id);
 
 			goto(`/project/${project_id}?canister_id=${canister_id}`);
 
