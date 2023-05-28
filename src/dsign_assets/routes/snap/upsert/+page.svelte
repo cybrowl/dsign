@@ -245,8 +245,10 @@
 					id: project_id,
 					canister_id: canister_id
 				},
-				file_asset: isEmpty(file_chunks) ? [] : file_asset
+				file_asset: isEmpty(file_chunks) ? [] : [file_asset]
 			};
+
+			console.log('create_snap_args: ', create_snap_args);
 
 			const { ok: created_snap, err: snap_creation_failed } =
 				await $actor_snap_main.actor.create_snap(create_snap_args);
