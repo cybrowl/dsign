@@ -16,9 +16,8 @@
 	} from 'dsign-components-v2';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
-	import ProjectCreationModal from '$modals_ref/ProjectCreationModal.svelte';
+	import ProjectUpsertModal from '$modals_ref/ProjectUpsertModal.svelte';
 	import ProjectDeleteModal from '$modals_ref/ProjectDeleteModal.svelte';
-	import ProjectRenameModal from '$modals_ref/ProjectRenameModal.svelte';
 
 	import {
 		actor_assets_img_staging,
@@ -41,7 +40,7 @@
 		project_store,
 		projects_update
 	} from '$stores_ref/fetch_store';
-	import modal_update, { modal_visible } from '$stores_ref/modal';
+	import modal_update, { modal_visible, modal_mode } from '$stores_ref/modal';
 	import { local_storage_projects, local_storage_favorites } from '$stores_ref/local_storage';
 	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
 
@@ -179,17 +178,19 @@
 	}
 
 	function handleProjectCreateModalOpen() {
-		modal_update.change_visibility('project_creation');
+		modal_update.change_visibility('project_upsert');
+		modal_mode.set({ project_create: true });
 	}
 
-	function handleProjectRenameModalOpen(e) {
-		modal_update.change_visibility('project_rename');
-
+	function handleProjectEditModalOpen(e) {
 		project = get(e, 'detail');
+
+		modal_update.change_visibility('project_upsert');
+		modal_mode.set({ project_create: false, project });
 	}
 
 	async function handleProjectDeleteModalOpen(e) {
-		modal_update.change_visibility('project_options');
+		modal_update.change_visibility('project_delete');
 
 		project = get(e, 'detail');
 	}
@@ -228,14 +229,11 @@
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}
-	{#if $modal_visible.project_creation}
-		<ProjectCreationModal />
+	{#if $modal_visible.project_upsert}
+		<ProjectUpsertModal />
 	{/if}
-	{#if $modal_visible.project_options}
+	{#if $modal_visible.project_delete}
 		<ProjectDeleteModal {project} />
-	{/if}
-	{#if $modal_visible.project_rename}
-		<ProjectRenameModal {project} />
 	{/if}
 
 	<!-- ProfileInfo -->
@@ -301,7 +299,7 @@
 						showOptionsPopover={is_owner ? true : false}
 						optionsPopover={{ edit: true, delete: true }}
 						on:clickProject={handleProjectClick}
-						on:editProject={handleProjectRenameModalOpen}
+						on:editProject={handleProjectEditModalOpen}
 						on:deleteProject={handleProjectDeleteModalOpen}
 					/>
 				{/each}

@@ -6,9 +6,13 @@ export const modal_visible = writable({
 	snap_creation: false,
 	snaps_move: false,
 	snap_preview: false,
-	project_creation: false,
-	project_options: false,
-	project_rename: false
+	project_upsert: false,
+	project_delete: false
+});
+
+export const modal_mode = writable({
+	project_create: false,
+	project: {}
 });
 
 function change_visibility(name) {

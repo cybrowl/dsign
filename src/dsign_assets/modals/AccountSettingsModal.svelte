@@ -2,8 +2,7 @@
 	import { onMount } from 'svelte';
 	import get from 'lodash/get.js';
 
-	import AccountSettings from 'dsign-components/components/AccountSettings.svelte';
-	import Modal from 'dsign-components/components/Modal.svelte';
+	import { AccountSettings, Modal } from 'dsign-components-v2';
 
 	import { actor_assets_img_staging, actor_profile } from '$stores_ref/actors';
 	import {
@@ -18,6 +17,10 @@
 	onMount(async () => {
 		await Promise.all([auth_profile(), auth_assets_img_staging()]);
 	});
+
+	function handleCloseModal() {
+		modal_update.change_visibility('account_settings');
+	}
 
 	async function handleAvatarChange(event) {
 		let files = event.detail;
@@ -56,10 +59,6 @@
 				console.log('error', error);
 			}
 		}
-	}
-
-	function handleCloseModal() {
-		modal_update.change_visibility('account_settings');
 	}
 
 	async function handleLogOut() {

@@ -1,8 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 
-	import Modal from 'dsign-components/components/Modal.svelte';
-	import ProjectOptionsDelete from 'dsign-components/components/ProjectOptionsDelete.svelte';
+	import { ProjectDelete, Modal } from 'dsign-components-v2';
 
 	import { actor_project_main, actor_snap_main } from '$stores_ref/actors';
 	import { auth_snap_main, auth_project_main } from '$stores_ref/auth_client';
@@ -19,14 +18,14 @@
 	});
 
 	function handleCloseModal() {
-		modal_update.change_visibility('project_options');
+		modal_update.change_visibility('project_delete');
 	}
 
 	async function handleDeleteProject() {
 		if ($actor_project_main.loggedIn && $actor_snap_main.loggedIn) {
 			const project_snaps_ids = projects_update.delete_projects(project);
 
-			modal_update.change_visibility('project_options');
+			modal_update.change_visibility('project_delete');
 
 			try {
 				const { err: err_delete_projects } = await $actor_project_main.actor.delete_projects([
@@ -48,7 +47,7 @@
 </script>
 
 <Modal on:closeModal={handleCloseModal}>
-	<ProjectOptionsDelete on:clickDelete={handleDeleteProject} project_name={project.name} />
+	<ProjectDelete on:delete={handleDeleteProject} project_name={project.name} />
 </Modal>
 
 <style>

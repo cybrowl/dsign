@@ -9,7 +9,7 @@
 	import {
 		CardEmpty,
 		ComingSoon,
-		LoadingSpinner,
+		SpinnerCircle,
 		PageNavigation,
 		ProjectEditActionsBar,
 		ProjectInfo,
@@ -19,7 +19,6 @@
 	} from 'dsign-components-v2';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
-	import SnapCreationModal from '$modals_ref/SnapCreationModal.svelte';
 
 	import {
 		actor_favorite_main,
@@ -197,9 +196,6 @@
 	</div>
 
 	<!-- Modals -->
-	{#if $modal_visible.snap_creation}
-		<SnapCreationModal project_ref={$project_store.project} />
-	{/if}
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}
@@ -208,7 +204,7 @@
 	{#if $project_store.isFetching === true}
 		<!-- Fetching Project -->
 		<div class="loading_layout">
-			<LoadingSpinner />
+			<SpinnerCircle />
 		</div>
 	{/if}
 
