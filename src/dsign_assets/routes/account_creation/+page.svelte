@@ -1,7 +1,7 @@
 <script>
 	import Login from '../../components/Login.svelte';
 
-	import { PageNavigation } from 'dsign-components-v2';
+	import { PageNavigation } from 'dsign-components';
 
 	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
 

@@ -13,7 +13,7 @@
 		ProfileTabs,
 		ProjectCard,
 		ProjectCardCreate
-	} from 'dsign-components-v2';
+	} from 'dsign-components';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import ProjectUpsertModal from '$modals_ref/ProjectUpsertModal.svelte';

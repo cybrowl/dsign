@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 
-	import { ProjectDelete, Modal } from 'dsign-components-v2';
+	import { ProjectDelete, Modal } from 'dsign-components';
 
 	import { actor_project_main, actor_snap_main } from '$stores_ref/actors';
 	import { auth_snap_main, auth_project_main } from '$stores_ref/auth_client';

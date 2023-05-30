@@ -7,7 +7,7 @@
 	import { replacer, reviver } from '../../../utils/big_int';
 
 	import Login from '$components_ref/Login.svelte';
-	import { ImagesEmpty, Images, PageNavigation, SnapUpsertActions } from 'dsign-components-v2';
+	import { ImagesEmpty, Images, PageNavigation, SnapUpsertActions } from 'dsign-components';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 

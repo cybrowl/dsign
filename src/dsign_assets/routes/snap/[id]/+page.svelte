@@ -6,7 +6,7 @@
 	import last from 'lodash/last';
 
 	import Login from '$components_ref/Login.svelte';
-	import { SnapActionsBar, PageNavigation, SnapInfo } from 'dsign-components-v2';
+	import { SnapActionsBar, PageNavigation, SnapInfo } from 'dsign-components';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 

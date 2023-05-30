@@ -4,7 +4,7 @@
 	import get from 'lodash/get';
 
 	import Login from '../components/Login.svelte';
-	import { Notification, PageNavigation, ProjectCard } from 'dsign-components-v2';
+	import { Notification, PageNavigation, ProjectCard } from 'dsign-components';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 

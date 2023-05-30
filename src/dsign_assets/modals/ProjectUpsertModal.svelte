@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { get } from 'lodash';
 
-	import { ProjectUpsert, Modal } from 'dsign-components-v2';
+	import { ProjectUpsert, Modal } from 'dsign-components';
 
 	import { actor_project_main } from '$stores_ref/actors';
 	import { auth_project_main } from '$stores_ref/auth_client';

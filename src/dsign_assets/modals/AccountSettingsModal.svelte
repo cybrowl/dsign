@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import get from 'lodash/get.js';
 
-	import { AccountSettings, Modal } from 'dsign-components-v2';
+	import { AccountSettings, Modal } from 'dsign-components';
 
 	import { actor_assets_img_staging, actor_profile } from '$stores_ref/actors';
 	import {

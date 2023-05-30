@@ -5,7 +5,7 @@
 	import environment from 'environment';
 	import get from 'lodash/get.js';
 
-	import { Avatar, Button, Icon } from 'dsign-components-v2';
+	import { Avatar, Button, Icon } from 'dsign-components';
 
 	import { actor_profile } from '$stores_ref/actors';
 	import { auth_client, auth_profile } from '$stores_ref/auth_client';

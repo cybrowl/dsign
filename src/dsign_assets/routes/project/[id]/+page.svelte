@@ -16,7 +16,7 @@
 		ProjectTabs,
 		SnapCard,
 		SnapCardCreate
-	} from 'dsign-components-v2';
+	} from 'dsign-components';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
