@@ -59,14 +59,7 @@
 	project_store_fetching();
 	favorite_store_fetching();
 
-	onMount(async () => {
-		await Promise.all([
-			auth_assets_img_staging(),
-			auth_profile(),
-			auth_project_main(),
-			auth_favorite_main()
-		]);
-
+	async function get_profile() {
 		try {
 			Promise.all([
 				$actor_profile.actor.get_profile(),
@@ -83,7 +76,11 @@
 					is_owner = username === $page.params.username;
 				}
 			});
+		} catch {}
+	}
 
+	async function get_all_projects() {
+		try {
 			Promise.all([
 				$actor_favorite_main.actor.get_all_projects([$page.params.username]),
 				$actor_project_main.actor.get_all_projects([$page.params.username])
@@ -124,6 +121,24 @@
 			goto('/');
 			console.log('error: call', error);
 		}
+	}
+
+	$: if (profile.username !== $page.params.username) {
+		project_store_fetching();
+		get_profile();
+		get_all_projects();
+	}
+
+	onMount(async () => {
+		await Promise.all([
+			auth_assets_img_staging(),
+			auth_profile(),
+			auth_project_main(),
+			auth_favorite_main()
+		]);
+
+		await get_profile();
+		await get_all_projects();
 	});
 
 	onDestroy(() => {
