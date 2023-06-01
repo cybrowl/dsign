@@ -24,17 +24,19 @@
 	async function handleDeleteProject() {
 		if ($actor_project_main.loggedIn && $actor_snap_main.loggedIn) {
 			const project_snaps_ids = projects_update.delete_projects(project);
+			const project_ref = {
+				id: project.id,
+				canister_id: project.canister_id
+			};
 
 			modal_update.change_visibility('project_delete');
 
 			try {
-				const { err: err_delete_projects } = await $actor_project_main.actor.delete_projects([
-					project.id
-				]);
+				const { ok: delete_snaps_success, err: err_delete_snaps } =
+					await $actor_snap_main.actor.delete_snaps(project_snaps_ids, project_ref);
 
-				const { err: err_delete_snaps } = await $actor_snap_main.actor.delete_snaps(
-					project_snaps_ids
-				);
+				const { ok: delete_project_success, err: err_delete_projects } =
+					await $actor_project_main.actor.delete_projects([project.id]);
 
 				//TODO: handle errors
 			} catch (error) {

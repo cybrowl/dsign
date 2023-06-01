@@ -205,9 +205,8 @@
 	}
 
 	async function handleProjectDeleteModalOpen(e) {
-		modal_update.change_visibility('project_delete');
-
 		project = get(e, 'detail');
+		modal_update.change_visibility('project_delete');
 	}
 
 	async function handleDeleteFavorite(e) {

@@ -7,9 +7,10 @@
 
 	import { actor_project_main } from '$stores_ref/actors';
 	import { auth_project_main } from '$stores_ref/auth_client';
+	import { disable_project_store_reset } from '$stores_ref/page_state';
 	import { navigate_to_home_with_notification } from '$stores_ref/page_navigation';
-	import modal_update, { modal_mode } from '$stores_ref/modal';
 	import { project_store, projects_update } from '$stores_ref/fetch_store';
+	import modal_update, { modal_mode } from '$stores_ref/modal';
 
 	let header = '';
 	let project_name_default = '';
@@ -40,6 +41,8 @@
 
 	async function createProject(project_name) {
 		try {
+			disable_project_store_reset.set(false);
+
 			const { ok: created_project, err: err_create_project } =
 				await $actor_project_main.actor.create_project(project_name, []);
 

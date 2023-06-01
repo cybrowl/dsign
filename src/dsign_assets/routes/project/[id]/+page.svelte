@@ -51,8 +51,6 @@
 
 	if ($disable_project_store_reset === false) {
 		project_store_fetching();
-	} else {
-		disable_project_store_reset.set(false);
 	}
 
 	let isProjectOwner = false;
