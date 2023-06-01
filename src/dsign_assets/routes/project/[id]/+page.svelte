@@ -46,9 +46,6 @@
 	} from '$stores_ref/page_state';
 	import { local_snap_creation_design_file } from '$stores_ref/local_storage';
 
-	let isProjectOwner = false;
-	let project_ref = {};
-
 	projects_update.deselect_snaps_from_project();
 	is_edit_active.set(false);
 
@@ -58,9 +55,9 @@
 		disable_project_store_reset.set(false);
 	}
 
-	onMount(async () => {
-		console.log('project_store: ', $project_store);
+	let isProjectOwner = false;
 
+	onMount(async () => {
 		await Promise.all([
 			auth_favorite_main(),
 			auth_profile(),
@@ -132,6 +129,8 @@
 
 	async function handleDeleteSnaps() {
 		const snaps = get($project_store.project, 'snaps', []);
+		const project_id = get($project_store, 'project.id', 'x');
+		const project_canister_id = get($project_store, 'project.canister_id', 'x');
 
 		const selected_snaps = snaps.filter((snap) => snap.isSelected === true);
 		const selected_snaps_ids = selected_snaps.map((snap) => snap.id);
@@ -151,14 +150,14 @@
 			const { ok: res, err: error } = await $actor_snap_main.actor.delete_snaps(
 				selected_snaps_ids,
 				{
-					id: project_ref.id,
-					canister_id: project_ref.canister_id
+					id: project_id,
+					canister_id: project_canister_id
 				}
 			);
 
 			const { ok: project } = await $actor_project_main.actor.get_project(
-				project_ref.id,
-				project_ref.canister_id
+				project_id,
+				project_canister_id
 			);
 
 			projects_update.update_project(project);
@@ -184,7 +183,10 @@
 	}
 
 	function goToSnapUpsertPage() {
-		goto(`/snap/upsert?project_id=${project_ref.id}&canister_id=${project_ref.canister_id}`);
+		const project_id = get($project_store, 'project.id', 'x');
+		const project_canister_id = get($project_store, 'project.canister_id', 'x');
+
+		goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister_id}`);
 	}
 </script>
 

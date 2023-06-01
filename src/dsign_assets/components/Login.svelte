@@ -74,7 +74,7 @@
 	}
 
 	async function navigateToProfile() {
-		window.location.href = `/${$local_storage_profile.username}`;
+		goto(`/${$local_storage_profile.username}`);
 	}
 
 	async function openSettingsModal() {

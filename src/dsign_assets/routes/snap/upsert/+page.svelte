@@ -34,13 +34,13 @@
 	onMount(async () => {
 		await Promise.all([auth_assets_file_staging(), auth_assets_img_staging(), auth_snap_main()]);
 
-		const snap = JSON.parse($local_snap_creation.data, reviver);
+		// const snap = JSON.parse($local_snap_creation.data, reviver);
 
-		const mode = $page.url.searchParams.get('mode');
+		// const mode = $page.url.searchParams.get('mode');
 
-		if (mode === 'edit' && isEmpty($snap_creation.id)) {
-			goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
-		}
+		// if (mode === 'edit' && isEmpty($snap_creation.id)) {
+		// 	goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
+		// }
 
 		// if ($local_snap_creation_design_file.file_name) {
 		// 	snap_creation.update((value) => ({
@@ -223,6 +223,8 @@
 	}
 
 	async function handlePublish(event) {
+		await Promise.all([auth_assets_file_staging(), auth_assets_img_staging(), auth_snap_main()]);
+
 		disable_project_store_reset.set(false);
 
 		const { snap_name } = event.detail;
@@ -264,12 +266,12 @@
 
 			console.log('create_snap_args: ', create_snap_args);
 
-			const { ok: created_snap, err: snap_creation_failed } =
-				await $actor_snap_main.actor.create_snap(create_snap_args);
+			if ($actor_snap_main.loggedIn) {
+				const { ok: created_snap, err: snap_creation_failed } =
+					await $actor_snap_main.actor.create_snap(create_snap_args);
 
-			goto(`/project/${project_id}?canister_id=${canister_id}`);
-
-			// projects_update.update_project(project);
+				goto(`/project/${project_id}?canister_id=${canister_id}`);
+			}
 		} catch (error) {
 			console.log('error: ', error);
 			is_publishing = false;
