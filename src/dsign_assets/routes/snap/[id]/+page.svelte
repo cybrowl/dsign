@@ -34,10 +34,6 @@
 				snap_preview.update(() => ({
 					...snap
 				}));
-
-				console.log('$snap_preview,: ', $snap_preview);
-
-				// goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
 			}
 
 			if ($actor_profile.loggedIn) {
@@ -68,6 +64,8 @@
 	}
 
 	function handleClickEdit() {
+		console.log('$snap_preview: ', $snap_preview);
+
 		let project_id = get($snap_preview, 'project.id', '');
 		let project_canister = get($snap_preview, 'project.canister_id', '');
 		const snap = JSON.parse($local_snap_creation.data, reviver);
@@ -88,7 +86,7 @@
 		});
 
 		if (project_id) {
-			// goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister}&mode=edit`);
+			goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister}&mode=edit`);
 		}
 	}
 </script>

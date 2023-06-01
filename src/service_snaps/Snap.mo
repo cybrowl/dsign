@@ -53,7 +53,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	stable var health_metrics_canister_id : Text = "";
 
 	public shared ({ caller }) func create_snap(
-		args : CreateSnapArgs,
+		snap_info : CreateSnapArgs,
 		images_ref : [ImageRef],
 		file_asset : AssetRef,
 		owner : UserPrincipal
@@ -87,11 +87,15 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			created = Time.now();
 			file_asset = file_asset;
 			id = snap_id;
-			image_cover_location = args.image_cover_location;
+			image_cover_location = snap_info.image_cover_location;
 			images = images_ref;
 			project = null;
+			project_ref = ?{
+				id = snap_info.project.id;
+				canister_id = snap_info.project.canister_id;
+			};
 			tags = null;
-			title = args.title;
+			title = snap_info.title;
 			username = username;
 			owner = Option.make(owner);
 			metrics = {

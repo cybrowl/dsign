@@ -51,6 +51,7 @@ module {
 		image_cover_location : Nat8;
 		images : [ImageRef];
 		project : ?ProjectPublic;
+		project_ref : ?ProjectRef;
 		tags : ?[Text];
 		title : Text;
 		username : Username;
@@ -75,6 +76,7 @@ module {
 		image_cover_location : Nat8;
 		images : [ImageRef];
 		project : ?Project;
+		project_ref : ?ProjectRef;
 		tags : ?[Text];
 		title : Text;
 		username : Username;
