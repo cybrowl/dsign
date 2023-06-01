@@ -52,8 +52,6 @@
 	let is_owner = false;
 	let profile = {};
 
-	page_navigation_update.delete_all();
-
 	disable_project_store_reset.set(false);
 
 	project_store_fetching();
@@ -76,7 +74,9 @@
 					is_owner = username === $page.params.username;
 				}
 			});
-		} catch {}
+		} catch (error) {
+			console.log('error call profile: ', error);
+		}
 	}
 
 	async function get_all_projects() {
@@ -117,9 +117,7 @@
 				}
 			});
 		} catch (error) {
-			console.log('error projects: ', error);
-			goto('/');
-			console.log('error: call', error);
+			console.log('error call projects: ', error);
 		}
 	}
 
