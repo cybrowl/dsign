@@ -1,6 +1,5 @@
 <script>
 	import { goto } from '$app/navigation';
-	// import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import environment from 'environment';
 	import get from 'lodash/get.js';
@@ -75,7 +74,7 @@
 	}
 
 	async function navigateToProfile() {
-		goto(`/${$local_storage_profile.username}`);
+		window.location.href = `/${$local_storage_profile.username}`;
 	}
 
 	async function openSettingsModal() {
@@ -103,7 +102,7 @@
 			/>
 		</span>
 	{:else}
-		<Button primary={true} label="Connect" on:click={login} />
+		<Button class="hover_lilalic_purple" primary={true} label="Connect" on:click={login} />
 	{/if}
 </span>
 

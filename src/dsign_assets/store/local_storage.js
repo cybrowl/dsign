@@ -10,6 +10,8 @@ export const local_snap_creation_design_file = writable('design_file', {
 	chunk_ids: []
 });
 
+export const local_snap_creation = writable('snap_creation', {});
+
 export const local_storage_profile = writable('profile', {
 	avatar_url: '',
 	banner_url: '',

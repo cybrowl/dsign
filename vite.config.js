@@ -29,6 +29,7 @@ const config = {
 			$components_ref: resolve('./src/dsign_assets/components/'),
 			$modals_ref: resolve('./src/dsign_assets/modals/'),
 			$stores_ref: resolve('./src/dsign_assets/store/'),
+			$utils: resolve('./src/dsign_assets/utils'),
 			environment: envOptions.environment
 		},
 		dedupe: ['svelte']

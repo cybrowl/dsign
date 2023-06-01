@@ -25,22 +25,32 @@
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation, snap_creation } from '$stores_ref/page_navigation';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
-	import { local_snap_creation_design_file } from '$stores_ref/local_storage';
+	import { local_snap_creation_design_file, local_snap_creation } from '$stores_ref/local_storage';
 
 	let cover_img = {};
 	let is_publishing = false;
 	let is_uploading_design_file = false;
 
 	onMount(async () => {
-		snap_creation.update((value) => ({
-			...value,
-			file_asset: {
-				...value.file_asset,
-				file_name: $local_snap_creation_design_file.file_name
-			}
-		}));
-
 		await Promise.all([auth_assets_file_staging(), auth_assets_img_staging(), auth_snap_main()]);
+
+		const snap = JSON.parse($local_snap_creation.data, reviver);
+
+		const mode = $page.url.searchParams.get('mode');
+
+		if (mode === 'edit' && isEmpty($snap_creation.id)) {
+			goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
+		}
+
+		// if ($local_snap_creation_design_file.file_name) {
+		// 	snap_creation.update((value) => ({
+		// 		...value,
+		// 		file_asset: {
+		// 			...value.file_asset,
+		// 			file_name: $local_snap_creation_design_file.file_name
+		// 		}
+		// 	}));
+		// }
 	});
 
 	onDestroy(async () => {
@@ -165,7 +175,11 @@
 		const project_id = $page.url.searchParams.get('project_id');
 		const canister_id = $page.url.searchParams.get('canister_id');
 
-		goto(`/project/${project_id}?canister_id=${canister_id}`);
+		if ($snap_creation) {
+			goto('/snap/' + $snap_creation.id + '?canister_id=' + $snap_creation.canister_id);
+		} else {
+			goto(`/project/${project_id}?canister_id=${canister_id}`);
+		}
 	}
 
 	async function commitImgAssetsToStaging(images) {

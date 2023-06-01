@@ -33,7 +33,7 @@
 		"@dfinity/identity": "^0.15.4",
 		"@dfinity/principal": "^0.15.4",
 		"dotenv": "^16.0.3",
-		"dsign-components": "^1.0.0",
+		"dsign-components": "^1.1.2",
 		"lodash": "^4.17.21",
 		"luxon": "^3.2.1",
 		"svelte-local-storage-store": "^0.2.6"

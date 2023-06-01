@@ -9,16 +9,17 @@
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
 	import { actor_explore } from '$stores_ref/actors.js';
-	import { explore_store } from '$stores_ref/fetch_store.js';
+	import { explore_store, projects_update, project_store } from '$stores_ref/fetch_store.js';
 	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
 	import { page_navigation } from '$stores_ref/page_navigation';
+	import { disable_project_store_reset } from '$stores_ref/page_state';
+
+	disable_project_store_reset.set(true);
 
 	onMount(async () => {
 		try {
 			const all_projects = await $actor_explore.actor.get_all_projects();
-
-			console.log('all_projects: ', all_projects);
 
 			if (all_projects) {
 				explore_store.set({ isFetching: false, projects: [...all_projects] });
@@ -30,6 +31,8 @@
 
 	function handleProjectClick(e) {
 		let project = get(e, 'detail');
+
+		projects_update.update_project(project);
 
 		goto(`/project/${project.id}?canister_id=${project.canister_id}`);
 	}

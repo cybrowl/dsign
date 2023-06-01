@@ -52,7 +52,7 @@
 	let is_owner = false;
 	let profile = {};
 
-	disable_project_store_reset.set(false);
+	disable_project_store_reset.set(true);
 
 	project_store_fetching();
 	favorite_store_fetching();
@@ -156,6 +156,8 @@
 
 	function handleProjectClick(e) {
 		project = get(e, 'detail');
+
+		projects_update.update_project(project);
 
 		goto(`/project/${project.id}?canister_id=${project.canister_id}`);
 	}
@@ -285,7 +287,7 @@
 		<!-- Projects -->
 		{#if $profileTabsState.isProjectsSelected}
 			<!-- Fetching Projects -->
-			{#each { length: $local_storage_projects.all_projects_count } as _, i}
+			{#each { length: 1 } as _, i}
 				{#if $project_store.isFetching === true}
 					<ProjectCard isLoadingProject={true} />
 				{/if}

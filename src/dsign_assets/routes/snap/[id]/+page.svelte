@@ -2,48 +2,93 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import get from 'lodash/get';
-	import last from 'lodash/last';
+	import { get, last, isEmpty } from 'lodash';
+	import { replacer, reviver } from '$utils/big_int';
 
 	import Login from '$components_ref/Login.svelte';
 	import { SnapActionsBar, PageNavigation, SnapInfo } from 'dsign-components';
 
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
-	import { actor_snap_main } from '$stores_ref/actors';
-	import { modal_visible } from '$stores_ref/modal';
-	import { page_navigation, snap_preview } from '$stores_ref/page_navigation';
+	import { actor_snap_main, actor_profile } from '$stores_ref/actors';
+	import { auth_profile } from '$stores_ref/auth_client';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
+	import { modal_visible } from '$stores_ref/modal';
+	import { page_navigation, snap_creation, snap_preview } from '$stores_ref/page_navigation';
+	import { local_snap_creation } from '$stores_ref/local_storage';
 
 	disable_project_store_reset.set(true);
+
+	let is_owner = false;
 
 	onMount(async () => {
 		const canister_id = $page.url.searchParams.get('canister_id');
 		const snap_id = last(get($page, 'url.pathname', '').split('/'));
 
+		await Promise.all([auth_profile()]);
+
 		try {
 			if ($snap_preview.id === undefined) {
 				const { ok: snap } = await $actor_snap_main.actor.get_snap(snap_id, canister_id);
 
-				snap_preview.set(snap);
+				snap_preview.update(() => ({
+					...snap
+				}));
+
+				console.log('$snap_preview,: ', $snap_preview);
+
+				// goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
+			}
+
+			if ($actor_profile.loggedIn) {
+				//TODO: maybe get it from localstorage
+				const { ok: profile } = await $actor_profile.actor.get_profile();
+				const username = get(profile, 'username', 'x');
+				let snap_username = get($snap_preview, 'username', '');
+
+				if (snap_username === username) {
+					is_owner = true;
+				}
 			}
 		} catch (error) {
-			console.log('error projects: ', error);
+			console.log('error snap preview: ', error);
 		}
 	});
 
-	function clickBackHistory() {
-		const has_project = get($snap_preview, 'project.id', '').length > 0;
-		const project_href = `/project/${get($snap_preview, 'project.id', '')}/?canister_id=${get(
-			$snap_preview,
-			'project.canister_id',
-			''
-		)}`;
+	function handleClickBackHistory() {
+		const project_id = get($snap_preview, 'project.id', '');
+		const project_canister = get($snap_preview, 'project.canister_id', '');
+		const project_href = `/project/${project_id}/?canister_id=${project_canister}`;
 
-		if (has_project) {
+		if (!isEmpty(project_id)) {
 			goto(project_href);
 		} else {
 			goto(`/${$snap_preview.username}`);
+		}
+	}
+
+	function handleClickEdit() {
+		let project_id = get($snap_preview, 'project.id', '');
+		let project_canister = get($snap_preview, 'project.canister_id', '');
+		const snap = JSON.parse($local_snap_creation.data, reviver);
+
+		snap_creation.update(() => ({
+			...$snap_preview
+		}));
+
+		if (isEmpty(project_id)) {
+			project_id = snap.project.id;
+			project_canister = snap.project.canister_id;
+		}
+
+		const snap_preview_seralized = JSON.stringify($snap_preview, replacer);
+
+		local_snap_creation.set({
+			data: snap_preview_seralized
+		});
+
+		if (project_id) {
+			// goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister}&mode=edit`);
 		}
 	}
 </script>
@@ -68,7 +113,7 @@
 	<!-- Snap -->
 	{#if $snap_preview.id !== undefined}
 		<div class="row-start-2 row-end-auto col-start-1 col-end-13 mb-10">
-			<SnapInfo snap={$snap_preview} />
+			<SnapInfo snap={$snap_preview} {is_owner} on:edit={handleClickEdit} />
 		</div>
 
 		<div class="row-start-3 row-end-auto col-start-1 col-end-12 mb-10 flex flex-col items-center">
@@ -78,7 +123,7 @@
 		</div>
 
 		<div class="row-start-3 row-end-auto col-start-12 col-end-13 mb-10 flex justify-center">
-			<SnapActionsBar snap={$snap_preview} on:clickBack={clickBackHistory} />
+			<SnapActionsBar snap={$snap_preview} on:clickBack={handleClickBackHistory} />
 		</div>
 	{/if}
 </main>

@@ -59,6 +59,8 @@
 	}
 
 	onMount(async () => {
+		console.log('project_store: ', $project_store);
+
 		await Promise.all([
 			auth_favorite_main(),
 			auth_profile(),
@@ -70,30 +72,32 @@
 
 		const canister_id = $page.url.searchParams.get('canister_id');
 		const project_id = last(get($page, 'url.pathname', '').split('/'));
+		let username = '';
 
-		try {
-			Promise.all([
-				$actor_profile.actor.get_profile(),
-				$actor_project_main.actor.get_project(project_id, canister_id)
-			]).then(async ([auth_profile_, project_]) => {
-				const { ok: auth_profile, err: err_auth_profile } = auth_profile_;
-				const { ok: project, err: err_project } = project_;
+		if ($actor_profile.loggedIn) {
+			try {
+				const { ok: auth_profile } = await $actor_profile.actor.get_profile();
+				const project_username = get($project_store, 'project.username', 'x');
 
-				console.log('project: ', project);
+				username = get(auth_profile, 'username', 'x');
 
-				project_ref = project;
+				isProjectOwner = username === project_username;
+			} catch (error) {
+				console.log('error: ', error);
+			}
+		}
+
+		if ($actor_project_main.loggedIn) {
+			if (isEmpty($project_store.project)) {
+				const { ok: project } = await $actor_project_main.actor.get_project(
+					project_id,
+					canister_id
+				);
+
+				isProjectOwner = username === project.username;
+
 				projects_update.update_project(project);
-
-				if ($actor_profile.loggedIn) {
-					const username = get(auth_profile, 'username', 'x');
-
-					isProjectOwner = username === project.username;
-
-					console.log('isProjectOwner: ', isProjectOwner);
-				}
-			});
-		} catch (error) {
-			console.log('error projects: ', error);
+			}
 		}
 	});
 
