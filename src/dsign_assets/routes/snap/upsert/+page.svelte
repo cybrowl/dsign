@@ -175,11 +175,7 @@
 		const project_id = $page.url.searchParams.get('project_id');
 		const canister_id = $page.url.searchParams.get('canister_id');
 
-		if ($snap_creation) {
-			goto('/snap/' + $snap_creation.id + '?canister_id=' + $snap_creation.canister_id);
-		} else {
-			goto(`/project/${project_id}?canister_id=${canister_id}`);
-		}
+		goto(`/project/${project_id}?canister_id=${canister_id}`);
 	}
 
 	async function commitImgAssetsToStaging(images) {
@@ -285,7 +281,12 @@
 
 <main class="hidden lg:grid grid-cols-12 gap-y-2 ml-12 mr-12">
 	<div class="row-start-1 row-end-auto col-start-1 col-end-13">
-		<PageNavigation navigationItems={$page_navigation.navigationItems}>
+		<PageNavigation
+			navigationItems={$page_navigation.navigationItems}
+			on:home={() => {
+				goto('/');
+			}}
+		>
 			<Login />
 		</PageNavigation>
 	</div>

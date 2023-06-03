@@ -86,7 +86,7 @@
 		});
 
 		if (project_id) {
-			goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister}&mode=edit`);
+			// goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister}&mode=edit`);
 		}
 	}
 </script>
@@ -97,7 +97,12 @@
 
 <main class="hidden lg:grid grid-cols-12 gap-y-2 ml-12 mr-12">
 	<div class="row-start-1 row-end-auto col-start-1 col-end-13">
-		<PageNavigation navigationItems={$page_navigation.navigationItems}>
+		<PageNavigation
+			navigationItems={$page_navigation.navigationItems}
+			on:home={() => {
+				goto('/');
+			}}
+		>
 			<Login />
 		</PageNavigation>
 	</div>

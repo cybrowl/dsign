@@ -194,7 +194,12 @@
 
 <main class="hidden lg:grid grid-cols-12 relative ml-12 mr-12">
 	<div class="col-start-1 col-end-13 row-start-1 row-end-auto">
-		<PageNavigation navigationItems={$page_navigation.navigationItems}>
+		<PageNavigation
+			navigationItems={$page_navigation.navigationItems}
+			on:home={() => {
+				goto('/');
+			}}
+		>
 			<Login />
 		</PageNavigation>
 	</div>

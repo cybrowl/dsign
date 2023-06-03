@@ -1,6 +1,7 @@
 <script>
-	import Login from '../../components/Login.svelte';
+	import { goto } from '$app/navigation';
 
+	import Login from '../../components/Login.svelte';
 	import { PageNavigation } from 'dsign-components';
 
 	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
@@ -14,7 +15,12 @@
 
 <main class="grid grid-cols-12 gap-y-2">
 	<div class="col-start-2 col-end-12 mb-24">
-		<PageNavigation navigationItems={$page_navigation.navigationItems}>
+		<PageNavigation
+			navigationItems={$page_navigation.navigationItems}
+			on:home={() => {
+				goto('/');
+			}}
+		>
 			<Login />
 		</PageNavigation>
 	</div>

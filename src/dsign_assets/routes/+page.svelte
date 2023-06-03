@@ -22,7 +22,13 @@
 			const all_projects = await $actor_explore.actor.get_all_projects();
 
 			if (all_projects) {
-				explore_store.set({ isFetching: false, projects: [...all_projects] });
+				explore_store.update(({ project }) => {
+					return {
+						isFetching: false,
+						projects: all_projects,
+						project: project
+					};
+				});
 			}
 		} catch (error) {
 			console.error('error: call', error);
@@ -36,6 +42,14 @@
 
 		goto(`/project/${project.id}?canister_id=${project.canister_id}`);
 	}
+
+	function handleUsernameClick(e) {
+		let project = get(e, 'detail');
+
+		projects_update.update_project(project);
+
+		goto(`/${project.username}`);
+	}
 </script>
 
 <!-- Explore -->
@@ -45,7 +59,12 @@
 
 <main class="hidden lg:grid grid-cols-12 gap-y-2 relative ml-12 mr-12">
 	<div class="col-start-1 col-end-13 row-start-1 row-end-auto">
-		<PageNavigation navigationItems={$page_navigation.navigationItems}>
+		<PageNavigation
+			navigationItems={$page_navigation.navigationItems}
+			on:home={() => {
+				goto('/');
+			}}
+		>
 			<Login />
 		</PageNavigation>
 	</div>
@@ -69,13 +88,14 @@
 		<div
 			class="hidden lg:grid col-start-1 col-end-13 grid-cols-4 row-start-2 row-end-auto gap-x-6 gap-y-12 mb-16"
 		>
-			{#each $explore_store.projects as project}
+			{#each $explore_store.projects as project (project.id)}
 				<ProjectCard
 					{project}
 					hideSnapsCount={true}
 					showUsername={true}
 					showOptionsPopover={false}
 					on:clickProject={handleProjectClick}
+					on:clickUsername={handleUsernameClick}
 				/>
 			{/each}
 		</div>
