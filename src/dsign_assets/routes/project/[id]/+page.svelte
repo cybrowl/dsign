@@ -227,8 +227,7 @@
 			<ProjectTabs
 				selectedTabState={$projectTabsState}
 				on:selectSnapsTab={(e) => projectTabsState.set(e.detail)}
-				on:selectRecsTab={(e) => projectTabsState.set(e.detail)}
-				on:selectChangesTab={(e) => projectTabsState.set(e.detail)}
+				on:selectFeedbackTab={(e) => projectTabsState.set(e.detail)}
 			/>
 			{#if $projectTabsState.isSnapsSelected && isProjectOwner}
 				<ProjectEditActionsBar
