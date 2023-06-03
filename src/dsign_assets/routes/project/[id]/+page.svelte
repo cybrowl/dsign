@@ -2,7 +2,6 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-
 	import { get, isEmpty, last } from 'lodash';
 
 	import Login from '$components_ref/Login.svelte';
@@ -17,7 +16,6 @@
 		SnapCard,
 		SnapCardCreate
 	} from 'dsign-components';
-
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
 	import {
@@ -33,7 +31,7 @@
 		auth_project_main,
 		auth_snap_main
 	} from '$stores_ref/auth_client';
-	import modal_update, { modal_visible } from '$stores_ref/modal';
+	import { modal_visible } from '$stores_ref/modal';
 	import {
 		snap_preview,
 		page_navigation,
@@ -204,7 +202,7 @@
 		</PageNavigation>
 	</div>
 
-	<!-- Modals -->
+	<!-- AccountSettingsModal -->
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}

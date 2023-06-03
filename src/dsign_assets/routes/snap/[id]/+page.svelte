@@ -3,19 +3,19 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { get, last, isEmpty } from 'lodash';
-	import { replacer, reviver } from '$utils/big_int';
 
 	import Login from '$components_ref/Login.svelte';
 	import { SnapActionsBar, PageNavigation, SnapInfo } from 'dsign-components';
-
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
 	import { actor_snap_main, actor_profile } from '$stores_ref/actors';
 	import { auth_profile } from '$stores_ref/auth_client';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
+	import { local_snap_creation } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation, snap_creation, snap_preview } from '$stores_ref/page_navigation';
-	import { local_snap_creation } from '$stores_ref/local_storage';
+
+	import { replacer, reviver } from '$utils/big_int';
 
 	disable_project_store_reset.set(true);
 
@@ -107,7 +107,6 @@
 		</PageNavigation>
 	</div>
 
-	<!-- Modals -->
 	<!-- AccountSettingsModal -->
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />

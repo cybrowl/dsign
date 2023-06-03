@@ -5,15 +5,14 @@
 
 	import Login from '../components/Login.svelte';
 	import { Notification, PageNavigation, ProjectCard } from 'dsign-components';
-
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
 	import { actor_explore } from '$stores_ref/actors.js';
-	import { explore_store, projects_update, project_store } from '$stores_ref/fetch_store.js';
+	import { disable_project_store_reset } from '$stores_ref/page_state';
+	import { explore_store, projects_update } from '$stores_ref/fetch_store.js';
 	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
 	import { page_navigation } from '$stores_ref/page_navigation';
-	import { disable_project_store_reset } from '$stores_ref/page_state';
 
 	disable_project_store_reset.set(true);
 

@@ -2,30 +2,28 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onDestroy, onMount } from 'svelte';
-
 	import { get, findIndex, isEmpty } from 'lodash';
-	import { replacer, reviver } from '../../../utils/big_int';
 
 	import Login from '$components_ref/Login.svelte';
 	import { ImagesEmpty, Images, PageNavigation, SnapUpsertActions } from 'dsign-components';
-
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
 	import {
 		actor_assets_file_staging,
 		actor_assets_img_staging,
-		actor_snap_main,
-		actor_project_main
+		actor_snap_main
 	} from '$stores_ref/actors';
 	import {
 		auth_assets_file_staging,
 		auth_assets_img_staging,
 		auth_snap_main
 	} from '$stores_ref/auth_client';
-	import { modal_visible } from '$stores_ref/modal';
-	import { page_navigation, snap_creation } from '$stores_ref/page_navigation';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 	import { local_snap_creation_design_file, local_snap_creation } from '$stores_ref/local_storage';
+	import { modal_visible } from '$stores_ref/modal';
+	import { page_navigation, snap_creation } from '$stores_ref/page_navigation';
+
+	import { replacer, reviver } from '$utils/big_int';
 
 	let cover_img = {};
 	let is_publishing = false;

@@ -3,7 +3,6 @@
 
 	import Login from '../../components/Login.svelte';
 	import { PageNavigation } from 'dsign-components';
-
 	import AccountCreationModal from '../../modals/AccountCreationModal.svelte';
 
 	import { page_navigation } from '$stores_ref/page_navigation';
@@ -25,7 +24,7 @@
 		</PageNavigation>
 	</div>
 
-	<!-- AccountSettingsModal -->
+	<!-- AccountCreationModal -->
 	<AccountCreationModal />
 
 	<div class="h-screen" />

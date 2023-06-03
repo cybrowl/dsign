@@ -2,7 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import get from 'lodash/get';
+	import { get } from 'lodash';
 
 	import Login from '$components_ref/Login.svelte';
 	import {
@@ -14,7 +14,6 @@
 		ProjectCard,
 		ProjectCardCreate
 	} from 'dsign-components';
-
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 	import ProjectUpsertModal from '$modals_ref/ProjectUpsertModal.svelte';
 	import ProjectDeleteModal from '$modals_ref/ProjectDeleteModal.svelte';
@@ -42,7 +41,7 @@
 	} from '$stores_ref/fetch_store';
 	import modal_update, { modal_visible, modal_mode } from '$stores_ref/modal';
 	import { local_storage_projects, local_storage_favorites } from '$stores_ref/local_storage';
-	import page_navigation_update, { page_navigation } from '$stores_ref/page_navigation';
+	import { page_navigation } from '$stores_ref/page_navigation';
 
 	let project = {
 		name: '',
