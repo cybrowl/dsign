@@ -231,8 +231,8 @@
 	<title>Profile</title>
 </svelte:head>
 
-<main class="hidden lg:grid grid-cols-12 relative ml-12 mr-12">
-	<div class="col-start-1 col-end-13 row-start-1 row-end-auto">
+<main class="grid_layout">
+	<div class="navigation_main_layout">
 		<PageNavigation
 			navigationItems={$page_navigation.navigationItems}
 			on:home={() => {
@@ -243,19 +243,23 @@
 		</PageNavigation>
 	</div>
 
-	<!-- Modals -->
+	<!-- AccountSettingsModal -->
 	{#if $modal_visible.account_settings}
 		<AccountSettingsModal />
 	{/if}
+
+	<!-- ProjectUpsertModal -->
 	{#if $modal_visible.project_upsert}
 		<ProjectUpsertModal />
 	{/if}
+
+	<!-- ProjectDeleteModal -->
 	{#if $modal_visible.project_delete}
 		<ProjectDeleteModal {project} />
 	{/if}
 
 	<!-- ProfileInfo -->
-	<div class="relative col-start-1 col-end-4 row-start-2 row-end-auto">
+	<div class="profile_info_layout">
 		<ProfileInfo
 			avatar={get(profile, 'avatar.url', '')}
 			{is_owner}
@@ -265,7 +269,7 @@
 	</div>
 
 	<!-- ProfileBanner -->
-	<div class="col-start-4 col-end-13 row-start-2 row-end-auto">
+	<div class="profile_banner_layout">
 		<ProfileBanner
 			{is_owner}
 			profile_banner_url={get(profile, 'banner.url', '')}
@@ -274,9 +278,7 @@
 	</div>
 
 	<!-- ProfileTabs -->
-	<div
-		class="hidden lg:grid col-start-4 col-end-13 row-start-3 row-end-auto mt-12 self-end justify-between items-center mb-8"
-	>
+	<div class="tabs_layout">
 		<ProfileTabs
 			profileTabsState={$profileTabsState}
 			on:selectProjectsTab={(e) => profileTabsState.set(e.detail)}
@@ -284,9 +286,7 @@
 		/>
 	</div>
 
-	<div
-		class="hidden lg:grid col-start-4 col-end-13 grid-cols-3 row-start-4 row-end-auto gap-x-8 gap-y-12 mb-16"
-	>
+	<div class="content_layout">
 		<!-- Projects -->
 		{#if $profileTabsState.isProjectsSelected}
 			<!-- Fetching Projects -->
@@ -367,6 +367,30 @@
 </main>
 
 <!-- Mobile Not Supported -->
-<div class="grid lg:hidden h-screen place-items-center text-white text-4xl">
+<div class="not_supported">
 	<h1>Sorry, Mobile Not Supported</h1>
 </div>
+
+<style lang="postcss">
+	.grid_layout {
+		@apply hidden lg:grid grid-cols-12 relative ml-12 mr-12;
+	}
+	.navigation_main_layout {
+		@apply row-start-1 row-end-auto col-start-1 col-end-13;
+	}
+	.profile_info_layout {
+		@apply row-start-2 row-end-auto relative col-start-1 col-end-4;
+	}
+	.profile_banner_layout {
+		@apply row-start-2 row-end-auto col-start-4 col-end-13;
+	}
+	.tabs_layout {
+		@apply row-start-3 row-end-auto hidden lg:grid col-start-4 col-end-13 mt-12 self-end justify-between items-center mb-8;
+	}
+	.content_layout {
+		@apply row-start-4 row-end-auto hidden lg:grid grid-cols-3 col-start-4 col-end-13  gap-x-8 gap-y-12 mb-16;
+	}
+	.not_supported {
+		@apply grid lg:hidden h-screen place-items-center text-white text-4xl;
+	}
+</style>

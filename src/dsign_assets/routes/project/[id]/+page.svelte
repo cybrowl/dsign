@@ -190,8 +190,8 @@
 	<title>Project</title>
 </svelte:head>
 
-<main class="hidden lg:grid grid-cols-12 relative ml-12 mr-12">
-	<div class="col-start-1 col-end-13 row-start-1 row-end-auto">
+<main class="grid_layout">
+	<div class="navigation_main_layout">
 		<PageNavigation
 			navigationItems={$page_navigation.navigationItems}
 			on:home={() => {
@@ -218,14 +218,12 @@
 	<!-- Project -->
 	{#if isEmpty($project_store.project) === false}
 		<!-- Project Info Header -->
-		<div class="row-start-2 row-end-auto relative col-start-1 col-end-13">
+		<div class="project_info_layout">
 			<ProjectInfo project={$project_store.project} on:saveToFavorites={handleAddToFavorites} />
 		</div>
 
 		<!-- ProjectsTabs & ProjectEditActionsBar -->
-		<div
-			class="row-start-3 row-end-auto col-start-1 col-end-13 items-center justify-between mt-12 mb-6"
-		>
+		<div class="project_tabs_layout">
 			<ProjectTabs
 				selectedTabState={$projectTabsState}
 				on:selectSnapsTab={(e) => projectTabsState.set(e.detail)}
@@ -241,9 +239,7 @@
 			{/if}
 		</div>
 
-		<div
-			class="hidden lg:grid grid-cols-4 row-start-4 row-end-auto col-start-1 col-end-13 gap-x-6 gap-y-12 mb-16"
-		>
+		<div class="content_layout">
 			{#if $projectTabsState.isSnapsSelected}
 				<!-- No Snaps Found -->
 				{#if isEmpty($project_store.project.snaps) && $project_store.isFetching === false}
@@ -270,13 +266,13 @@
 			{/if}
 
 			{#if $projectTabsState.isFeedbackSelected}
-				<div class="grid col-start-3 col-end-13 row-start-4 row-end-auto">
+				<div class="coming_soon_layout">
 					<ComingSoon />
 				</div>
 			{/if}
 
 			{#if $projectTabsState.isChangesSelected}
-				<div class="grid col-start-3 col-end-13 row-start-4 row-end-auto">
+				<div class="coming_soon_layout">
 					<ComingSoon />
 				</div>
 			{/if}
@@ -284,12 +280,38 @@
 	{/if}
 </main>
 
-<style>
+<!-- Mobile Not Supported -->
+<div class="not_supported">
+	<h1>Sorry, Mobile Not Supported</h1>
+</div>
+
+<style lang="postcss">
+	.grid_layout {
+		@apply hidden lg:grid grid-cols-12 relative ml-12 mr-12;
+	}
+	.navigation_main_layout {
+		@apply row-start-1 row-end-auto col-start-1 col-end-13;
+	}
 	.loading_layout {
 		position: fixed;
 		z-index: 30;
 		top: 42%;
 		left: 50%;
 		transform: translate(-50%, -50%);
+	}
+	.project_info_layout {
+		@apply row-start-2 row-end-auto relative col-start-1 col-end-13;
+	}
+	.project_tabs_layout {
+		@apply row-start-3 row-end-auto col-start-1 col-end-13 items-center justify-between mt-12 mb-6;
+	}
+	.content_layout {
+		@apply row-start-4 row-end-auto hidden lg:grid  grid-cols-4 col-start-1 col-end-13 gap-x-6 gap-y-12 mb-16;
+	}
+	.coming_soon_layout {
+		@apply row-start-4 row-end-auto grid col-start-3 col-end-13;
+	}
+	.not_supported {
+		@apply grid lg:hidden h-screen place-items-center text-white text-4xl;
 	}
 </style>

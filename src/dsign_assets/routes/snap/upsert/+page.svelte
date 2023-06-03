@@ -19,7 +19,7 @@
 		auth_snap_main
 	} from '$stores_ref/auth_client';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
-	import { local_snap_creation_design_file, local_snap_creation } from '$stores_ref/local_storage';
+	import { local_snap_creation_design_file } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation, snap_creation } from '$stores_ref/page_navigation';
 
@@ -31,8 +31,6 @@
 
 	onMount(async () => {
 		await Promise.all([auth_assets_file_staging(), auth_assets_img_staging(), auth_snap_main()]);
-
-		// const snap = JSON.parse($local_snap_creation.data, reviver);
 
 		// const mode = $page.url.searchParams.get('mode');
 
@@ -277,8 +275,8 @@
 	<title>Snap Upsert</title>
 </svelte:head>
 
-<main class="hidden lg:grid grid-cols-12 gap-y-2 ml-12 mr-12">
-	<div class="row-start-1 row-end-auto col-start-1 col-end-13">
+<main class="grid_layout">
+	<div class="navigation_main_layout">
 		<PageNavigation
 			navigationItems={$page_navigation.navigationItems}
 			on:home={() => {
@@ -294,28 +292,43 @@
 		<AccountSettingsModal />
 	{/if}
 
-	<div class="row-start-3 row-end-auto col-start-1 col-end-9 mb-10 flex flex-col items-center mr-6">
+	<div class="content_layout">
 		{#if isEmpty($snap_creation.images)}
 			<ImagesEmpty content="Please add images" />
 		{:else}
 			<Images
-				images={$snap_creation.images}
 				on:remove={handleRemoveImg}
 				on:selectCover={handleSelectCover}
+				images={$snap_creation.images}
 			/>
 		{/if}
 	</div>
 
-	<div class="row-start-3 row-end-auto col-start-9 col-end-13 mb-10 flex justify-start">
+	<div class="actions_bar_layout">
 		<SnapUpsertActions
-			on:attachFile={handleAttachFile}
-			on:removeFile={handleRemoveFile}
 			on:addImages={handleAddImages}
+			on:attachFile={handleAttachFile}
 			on:cancel={handleCancel}
 			on:publish={handlePublish}
+			on:removeFile={handleRemoveFile}
 			snap={$snap_creation}
 			is_publishing={is_uploading_design_file || is_publishing}
 			{is_uploading_design_file}
 		/>
 	</div>
 </main>
+
+<style lang="postcss">
+	.grid_layout {
+		@apply hidden lg:grid grid-cols-12 gap-y-2 ml-12 mr-12;
+	}
+	.navigation_main_layout {
+		@apply row-start-1 row-end-auto col-start-1 col-end-13;
+	}
+	.content_layout {
+		@apply row-start-3 row-end-auto col-start-1 col-end-9 mb-10 flex flex-col items-center mr-6;
+	}
+	.actions_bar_layout {
+		@apply row-start-3 row-end-auto col-start-9 col-end-13 mb-10 flex justify-start;
+	}
+</style>

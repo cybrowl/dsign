@@ -12,8 +12,8 @@
 	<title>Account Creation</title>
 </svelte:head>
 
-<main class="grid grid-cols-12 gap-y-2">
-	<div class="col-start-2 col-end-12 mb-24">
+<main class="grid_layout">
+	<div class="navigation_main_layout">
 		<PageNavigation
 			navigationItems={$page_navigation.navigationItems}
 			on:home={() => {
@@ -30,5 +30,19 @@
 	<div class="h-screen" />
 </main>
 
-<style>
+<!-- Mobile Not Supported -->
+<div class="not_supported">
+	<h1>Sorry, Mobile Not Supported</h1>
+</div>
+
+<style lang="postcss">
+	.grid_layout {
+		@apply grid grid-cols-12 gap-y-2;
+	}
+	.navigation_main_layout {
+		@apply col-start-2 col-end-12 mb-24;
+	}
+	.not_supported {
+		@apply grid lg:hidden h-screen place-items-center text-white text-4xl;
+	}
 </style>

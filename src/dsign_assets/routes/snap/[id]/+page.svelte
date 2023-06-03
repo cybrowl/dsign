@@ -11,11 +11,8 @@
 	import { actor_snap_main, actor_profile } from '$stores_ref/actors';
 	import { auth_profile } from '$stores_ref/auth_client';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
-	import { local_snap_creation } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation, snap_creation, snap_preview } from '$stores_ref/page_navigation';
-
-	import { replacer, reviver } from '$utils/big_int';
 
 	disable_project_store_reset.set(true);
 
@@ -37,7 +34,6 @@
 			}
 
 			if ($actor_profile.loggedIn) {
-				//TODO: maybe get it from localstorage
 				const { ok: profile } = await $actor_profile.actor.get_profile();
 				const username = get(profile, 'username', 'x');
 				let snap_username = get($snap_preview, 'username', '');
@@ -64,11 +60,8 @@
 	}
 
 	function handleClickEdit() {
-		console.log('$snap_preview: ', $snap_preview);
-
 		let project_id = get($snap_preview, 'project.id', '');
 		let project_canister = get($snap_preview, 'project.canister_id', '');
-		const snap = JSON.parse($local_snap_creation.data, reviver);
 
 		snap_creation.update(() => ({
 			...$snap_preview
@@ -79,14 +72,8 @@
 			project_canister = snap.project.canister_id;
 		}
 
-		const snap_preview_seralized = JSON.stringify($snap_preview, replacer);
-
-		local_snap_creation.set({
-			data: snap_preview_seralized
-		});
-
 		if (project_id) {
-			// goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister}&mode=edit`);
+			goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister}&mode=edit`);
 		}
 	}
 </script>
@@ -95,8 +82,8 @@
 	<title>Snap</title>
 </svelte:head>
 
-<main class="hidden lg:grid grid-cols-12 gap-y-2 ml-12 mr-12">
-	<div class="row-start-1 row-end-auto col-start-1 col-end-13">
+<main class="grid_layout">
+	<div class="navigation_main_layout">
 		<PageNavigation
 			navigationItems={$page_navigation.navigationItems}
 			on:home={() => {
@@ -114,18 +101,44 @@
 
 	<!-- Snap -->
 	{#if $snap_preview.id !== undefined}
-		<div class="row-start-2 row-end-auto col-start-1 col-end-13 mb-10">
+		<div class="snap_info_layout">
 			<SnapInfo snap={$snap_preview} {is_owner} on:edit={handleClickEdit} />
 		</div>
 
-		<div class="row-start-3 row-end-auto col-start-1 col-end-12 mb-10 flex flex-col items-center">
+		<div class="content_layout">
 			{#each $snap_preview.images as image}
-				<img src={image.url} alt="" class="pb-10 max-w-full" />
+				<img src={image.url} alt="" />
 			{/each}
 		</div>
 
-		<div class="row-start-3 row-end-auto col-start-12 col-end-13 mb-10 flex justify-center">
+		<div class="actions_bar_layout">
 			<SnapActionsBar snap={$snap_preview} on:clickBack={handleClickBackHistory} />
 		</div>
 	{/if}
 </main>
+
+<!-- Mobile Not Supported -->
+<div class="grid lg:hidden h-screen place-items-center text-white text-4xl">
+	<h1>Sorry, Mobile Not Supported</h1>
+</div>
+
+<style lang="postcss">
+	.grid_layout {
+		@apply hidden lg:grid grid-cols-12 gap-y-2 ml-12 mr-12;
+	}
+	.navigation_main_layout {
+		@apply row-start-1 row-end-auto col-start-1 col-end-13;
+	}
+	.snap_info_layout {
+		@apply row-start-2 row-end-auto col-start-1 col-end-13 mb-10;
+	}
+	.content_layout {
+		@apply row-start-3 row-end-auto col-start-1 col-end-12 mb-10 flex flex-col items-center;
+	}
+	.content_layout img {
+		@apply pb-10 max-w-full;
+	}
+	.actions_bar_layout {
+		@apply row-start-3 row-end-auto col-start-12 col-end-13 mb-10 flex justify-center;
+	}
+</style>

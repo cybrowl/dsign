@@ -56,8 +56,8 @@
 	<title>DSign</title>
 </svelte:head>
 
-<main class="hidden lg:grid grid-cols-12 gap-y-2 relative ml-12 mr-12">
-	<div class="col-start-1 col-end-13 row-start-1 row-end-auto">
+<main class="grid_layout">
+	<div class="navigation_main_layout">
 		<PageNavigation
 			navigationItems={$page_navigation.navigationItems}
 			on:home={() => {
@@ -75,7 +75,7 @@
 
 	<!-- Notification -->
 	{#if $notification_visible.auth_error}
-		<div class="absolute col-start-12 col-end-13 row-start-2 row-end-3 top-0 right-0">
+		<div class="notification_layout">
 			<Notification is_visible={$notification_visible.auth_error} hide_delay_sec={2000}>
 				<p>{$notification.message}</p>
 			</Notification>
@@ -84,9 +84,7 @@
 
 	<!-- Projects -->
 	{#if $explore_store.projects.length > 0}
-		<div
-			class="hidden lg:grid col-start-1 col-end-13 grid-cols-4 row-start-2 row-end-auto gap-x-6 gap-y-12 mb-16"
-		>
+		<div class="projects_layout">
 			{#each $explore_store.projects as project (project.id)}
 				<ProjectCard
 					{project}
@@ -102,9 +100,24 @@
 </main>
 
 <!-- Mobile Not Supported -->
-<div class="grid lg:hidden h-screen place-items-center text-white text-4xl">
+<div class="not_supported">
 	<h1>Sorry, Mobile Not Supported</h1>
 </div>
 
-<style>
+<style lang="postcss">
+	.grid_layout {
+		@apply hidden lg:grid grid-cols-12 gap-y-2 relative ml-12 mr-12;
+	}
+	.navigation_main_layout {
+		@apply row-start-1 row-end-auto col-start-1 col-end-13;
+	}
+	.notification_layout {
+		@apply row-start-2 row-end-3 absolute col-start-12 col-end-13 top-0 right-0;
+	}
+	.projects_layout {
+		@apply row-start-2 row-end-auto hidden lg:grid col-start-1 grid-cols-4 col-end-13 gap-x-6 gap-y-12 mb-16;
+	}
+	.not_supported {
+		@apply grid lg:hidden h-screen place-items-center text-white text-4xl;
+	}
 </style>
