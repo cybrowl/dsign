@@ -73,7 +73,7 @@
 		}
 
 		if (project_id) {
-			goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister}&mode=edit`);
+			// goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister}&mode=edit`);
 		}
 	}
 </script>

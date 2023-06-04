@@ -1,0 +1,20 @@
+User-agent: *
+Disallow: 
+
+# Block access to directories
+User-agent: *
+Disallow: /cgi-bin/
+Disallow: /temp/
+Disallow: /private/
+
+# Block access to specific bots
+User-agent: BadBot
+Disallow: /
+
+# Allow access to specific bots
+User-agent: Googlebot
+Disallow:
+
+# Block access to specific files
+User-agent: *
+Disallow: /example.pdf
