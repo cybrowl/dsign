@@ -373,7 +373,7 @@
 
 <style lang="postcss">
 	.grid_layout {
-		@apply hidden lg:grid grid-cols-12 relative ml-12 mr-12;
+		@apply hidden lg:grid grid-cols-12 relative mx-12 2xl:mx-60;
 	}
 	.navigation_main_layout {
 		@apply row-start-1 row-end-auto col-start-1 col-end-13;
