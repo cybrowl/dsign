@@ -25,14 +25,15 @@ import UtilsShared "../utils/utils";
 actor class Snap(snap_main : Principal, project_main : Principal, favorite_main : Principal) = this {
 	type AssetRef = Types.AssetRef;
 	type CreateSnapArgs = Types.CreateSnapArgs;
+	type EditSnapArgs = Types.EditSnapArgs;
 	type ErrCreateSnap = Types.ErrCreateSnap;
+	type ErrEditSnap = Types.ErrEditSnap;
 	type ImageRef = Types.ImageRef;
 	type ProjectPublic = Types.ProjectPublic;
 	type Snap = Types.Snap;
 	type SnapID = Types.SnapID;
 	type SnapPublic = Types.SnapPublic;
 	type SnapRef = Types.SnapRef;
-	type SnapUpdateArgs = Types.SnapUpdateArgs;
 	type UserPrincipal = Types.UserPrincipal;
 
 	type Project = ProjectTypes.Project;
@@ -42,7 +43,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	type ProjectActor = ProjectTypes.ProjectActor;
 
 	let ACTOR_NAME : Text = "Snap";
-	let VERSION : Nat = 2;
+	let VERSION : Nat = 3;
 
 	private let rr = XorShift.toReader(XorShift.XorShift64(null));
 	private let se = Source.Source(rr, 0);
@@ -107,6 +108,45 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		snaps.put(snap_id, snap);
 
 		return #ok(snap);
+	};
+
+	public shared ({ caller }) func edit_snap(
+		snap_info : EditSnapArgs,
+		images_ref : ?[ImageRef],
+		file_asset : ?AssetRef,
+		owner : UserPrincipal
+	) : async Result.Result<Snap, ErrEditSnap> {
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "edit_snap")];
+
+		if (snap_main != caller) {
+			ignore Logger.log_event(
+				log_tags,
+				"Unauthorized: " # Principal.toText(caller)
+			);
+
+			return #err(#Unauthorized);
+		};
+
+		switch (snaps.get(snap_info.id)) {
+			case (null) {
+				return #err(#SnapNotFound);
+			};
+			case (?snap) {
+				let name = Option.get(snap_info.title, snap.title);
+				let images : [ImageRef] = Option.get(images_ref, snap.images);
+				let design_file = Option.get(file_asset, snap.file_asset);
+
+				let snap_updated = {
+					snap with images = images;
+					file_asset = design_file;
+					title = name;
+				};
+
+				snaps.put(snap.id, snap_updated);
+
+				return #ok(snap_updated);
+			};
+		};
 	};
 
 	public shared ({ caller }) func delete_snaps(snap_ids : [SnapID]) : async () {

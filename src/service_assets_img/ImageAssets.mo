@@ -29,14 +29,9 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	type HttpResponse = Types.HttpResponse;
 	type ImageID = Types.ImageID;
 	type ImageRef = Types.ImageRef;
+	type AssetImgErr = Types.AssetImgErr;
 
 	type Payload = HealthMetricsTypes.Payload;
-
-	type AssetImgErr = {
-		#NotAuthorized;
-		#NotOwnerOfAsset;
-		#AssetNotFound;
-	};
 
 	let ACTOR_NAME : Text = "ImageAssets";
 	let VERSION : Nat = 5;
@@ -65,6 +60,10 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 			);
 
 			return #err(#NotAuthorized);
+		};
+
+		if (img_asset_ids.size() == 0) {
+			return #err(#AssetIdsEmpty);
 		};
 
 		let images_ref = Buffer<ImageRef>(0);

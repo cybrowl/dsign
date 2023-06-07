@@ -67,7 +67,6 @@ module {
 		canister_id : Text;
 	};
 
-	// TODO: change project to only have name, canister_id, id
 	public type Snap = {
 		canister_id : Text;
 		created : Time;
@@ -87,19 +86,25 @@ module {
 		};
 	};
 
-	public type SnapUpdateArgs = {
-		id : SnapID;
-		image_cover_location : ?Nat8;
-		images : ?[ImageRef];
-		tags : ?[Text];
-		title : ?Text;
-	};
-
+	// Args
 	public type CreateSnapArgs = {
 		title : Text;
 		image_cover_location : Nat8;
 		img_asset_ids : [Nat];
 		project : ProjectRef;
+		file_asset : ?{
+			is_public : Bool;
+			content_type : Text;
+			chunk_ids : [Nat];
+		};
+	};
+
+	public type EditSnapArgs = {
+		id : Text;
+		canister_id : Text;
+		title : ?Text;
+		image_cover_location : ?Nat8;
+		img_asset_ids : ?[Nat];
 		file_asset : ?{
 			is_public : Bool;
 			content_type : Text;
@@ -113,8 +118,21 @@ module {
 		#FileTypeTooLarge;
 		#UserAnonymous;
 		#NoImageToSave;
-		#FourImagesMax;
+		#TwelveMax;
 		#UsernameNotFound;
+		#Unauthorized;
+		#UserNotFound;
+		#ErrorCall : Text;
+	};
+
+	public type ErrEditSnap = {
+		#TitleTooLarge;
+		#FileTypeTooLarge;
+		#UserAnonymous;
+		#TwelveMax;
+		#UsernameNotFound;
+		#SnapIdsDoNotMatch;
+		#SnapNotFound;
 		#Unauthorized;
 		#UserNotFound;
 		#ErrorCall : Text;
@@ -134,9 +152,8 @@ module {
 	// Actor Interface
 	public type SnapActor = actor {
 		create_snap : shared (CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, ErrCreateSnap>;
+		edit_snap : shared (EditSnapArgs, ?[ImageRef], ?AssetRef, UserPrincipal) -> async Result.Result<Snap, ErrEditSnap>;
 		delete_snaps : shared ([SnapID]) -> async ();
-		// delete_project_from_snaps : shared ([SnapRef]) -> async ();
-		add_project_to_snaps : shared (ProjectRef) -> async ();
 		get_all_snaps : query ([SnapID]) -> async [SnapPublic];
 	};
 };

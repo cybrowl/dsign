@@ -34,13 +34,14 @@ module {
 		status_code : Nat16;
 	};
 
-	// Actor Interface
-	type AssetImgErr = {
+	public type AssetImgErr = {
+		#AssetIdsEmpty;
+		#AssetNotFound;
 		#NotAuthorized;
 		#NotOwnerOfAsset;
-		#AssetNotFound;
 	};
 
+	// Actor Interface
 	public type ImageAssetsActor = actor {
 		save_images : shared ([Nat], Text, Principal) -> async Result.Result<[ImageRef], AssetImgErr>;
 		update_image : shared (Nat, Text, Text, Principal) -> async Result.Result<ImageRef, AssetImgErr>;

@@ -66,12 +66,6 @@ test('Setup Actors', async function () {
 		mishicat_identity
 	);
 
-	project_main_actor.mishicat = await get_actor(
-		project_main_canister_id,
-		project_main_interface,
-		mishicat_identity
-	);
-
 	project_actor.mishicat = await get_actor(
 		test_project_canister_id,
 		test_project_interface,

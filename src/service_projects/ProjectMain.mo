@@ -247,13 +247,6 @@ actor ProjectMain {
 						return #err(#ErrorCall(debug_show (err)));
 					};
 					case (#ok project) {
-
-						//TODO: make this faster by filtering out unique canister ids
-						for (snap in project.snaps.vals()) {
-							let snap_actor = actor (snap.canister_id) : SnapActor;
-							ignore snap_actor.add_project_to_snaps(project_ref);
-						};
-
 						return #ok("Updated Project Details");
 					};
 				};

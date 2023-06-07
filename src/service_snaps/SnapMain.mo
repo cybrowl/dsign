@@ -25,13 +25,14 @@ import Types "./types";
 import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
 import HealthMetricsTypes "../types/health_metrics.types";
 
-import Utils "../utils/utils";
 import UtilsShared "../utils/utils";
 
 actor SnapMain {
 	type CreateAssetArgs = Types.CreateAssetArgs;
 	type CreateSnapArgs = Types.CreateSnapArgs;
+	type EditSnapArgs = Types.EditSnapArgs;
 	type ErrCreateSnap = Types.ErrCreateSnap;
+	type ErrEditSnap = Types.ErrEditSnap;
 	type ErrDeleteSnaps = Types.ErrDeleteSnaps;
 	type ErrGetAllSnaps = Types.ErrGetAllSnaps;
 	type ICInterface = Types.ICInterface;
@@ -56,7 +57,7 @@ actor SnapMain {
 
 	let ACTOR_NAME : Text = "SnapMain";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 5;
+	let VERSION : Nat = 6;
 
 	var user_canisters_ref : HashMap.HashMap<UserPrincipal, SnapIDStorage> = HashMap.HashMap(
 		0,
@@ -139,7 +140,7 @@ actor SnapMain {
 		};
 
 		if (too_many_images == true) {
-			return #err(#FourImagesMax);
+			return #err(#TwelveMax);
 		};
 
 		var user_snap_ids_storage : SnapIDStorage = HashMap.HashMap(0, Text.equal, Text.hash);
@@ -266,13 +267,131 @@ actor SnapMain {
 		};
 	};
 
+	public shared ({ caller }) func edit_snap(snap_info : EditSnapArgs) : async Result.Result<Snap, ErrEditSnap> {
+		let tags = [("actor_name", ACTOR_NAME), ("method", "edit_snap")];
+
+		let is_anonymous = Principal.isAnonymous(caller);
+		let snap_name = Option.get(snap_info.title, "");
+		let img_asset_ids = Option.get(snap_info.img_asset_ids, []);
+		let design_file = Option.get(snap_info.file_asset, { content_type = ""; is_public = false; chunk_id = [] });
+
+		if (is_anonymous == true) {
+			return #err(#UserAnonymous);
+		};
+
+		if (snap_name.size() > 100) {
+			return #err(#TitleTooLarge);
+		};
+
+		if (img_asset_ids.size() > 12) {
+			return #err(#TwelveMax);
+		};
+
+		if (design_file.content_type.size() > 50) {
+			return #err(#FileTypeTooLarge);
+		};
+
+		var user_snap_ids_storage : SnapIDStorage = HashMap.HashMap(0, Text.equal, Text.hash);
+		switch (user_canisters_ref.get(caller)) {
+			case (?user_snap_ids_storage_) {
+				user_snap_ids_storage := user_snap_ids_storage_;
+			};
+			case (_) {
+				return #err(#UserNotFound);
+			};
+		};
+
+		// check user owns snap
+		var snap_ids = UtilsShared.get_all_ids(user_snap_ids_storage);
+		var matches = UtilsShared.all_ids_match(snap_ids, [snap_info.id]);
+
+		if (matches.all_match == false) {
+			return #err(#SnapIdsDoNotMatch);
+		};
+
+		let assets_actor = actor (assets_canister_id) : AssetsActor;
+		let image_assets_actor = actor (image_assets_canister_id) : ImageAssetsActor;
+		let snap_actor = actor (snap_info.canister_id) : SnapActor;
+
+		// save images from img_asset_ids
+		var images_ref : ?[ImageRef] = null;
+
+		if (img_asset_ids.size() > 0) {
+			switch (await image_assets_actor.save_images(img_asset_ids, "snap", caller)) {
+				case (#err err) {
+					ignore Logger.log_event(
+						tags,
+						debug_show ("image_assets_actor.save_images", err)
+					);
+
+					return #err(#ErrorCall(debug_show (err)));
+				};
+				case (#ok images_ref_) {
+					images_ref := ?images_ref_;
+
+					ignore ImageAssetStaging.delete_assets(img_asset_ids, caller);
+				};
+			};
+		};
+
+		// create asset from chunks
+		var file_asset = null;
+		// switch (snap_info.file_asset) {
+		//     case null {};
+		//     case (?fileAsset) {
+		//         let file_asset_snap_info : CreateAssetArgs = {
+		//             chunk_ids = fileAsset.chunk_ids;
+		//             content_type = fileAsset.content_type;
+		//             is_public = fileAsset.is_public;
+		//             principal = caller;
+		//         };
+
+		//         switch (await assets_actor.create_asset_from_chunks(file_asset_snap_info)) {
+		//             case (#err err) {
+		//                 ignore Logger.log_event(
+		//                     tags,
+		//                     debug_show ("assets_actor.create_asset_from_chunks", err)
+		//                 );
+
+		//                 return #err(#ErrorCall(debug_show (err)));
+		//             };
+		//             case (#ok file_asset_) {
+		//                 file_asset := file_asset_;
+
+		//                 ignore FileAssetStaging.delete_chunks(fileAsset.chunk_ids, caller);
+		//             };
+		//         };
+		//     };
+		// };
+
+		// edit snap
+		switch (await snap_actor.edit_snap(snap_info, images_ref, file_asset, caller)) {
+			case (#err err) {
+				ignore Logger.log_event(
+					tags,
+					debug_show ("snap_actor.edit_snap", err)
+				);
+
+				return #err(#ErrorCall(debug_show (err)));
+			};
+			case (#ok snap) {
+
+				let snap_public = {
+					snap with owner = null;
+				};
+
+				#ok(snap_public);
+			};
+		};
+	};
+
 	public shared ({ caller }) func delete_snaps(snap_ids_delete : [SnapID], project : ProjectRef) : async Result.Result<Text, ErrDeleteSnaps> {
 		let tags = [ACTOR_NAME, "delete_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_snap_ids_storage) {
-				let my_ids = Utils.get_all_ids(user_snap_ids_storage);
-				let matches = Utils.all_ids_match(my_ids, snap_ids_delete);
+				let my_ids = UtilsShared.get_all_ids(user_snap_ids_storage);
+				let matches = UtilsShared.all_ids_match(my_ids, snap_ids_delete);
 				let project_actor = actor (project.canister_id) : ProjectActor;
 
 				// Owner Check
@@ -316,7 +435,7 @@ actor SnapMain {
 
 					await snap_actor.delete_snaps(snap_ids_delete);
 
-					let snap_ids_not_deleted = Utils.get_non_exluded_ids(
+					let snap_ids_not_deleted = UtilsShared.get_non_exluded_ids(
 						snap_ids,
 						snap_ids_delete
 					);
@@ -334,7 +453,43 @@ actor SnapMain {
 		};
 	};
 
-	//TODO: update_snap_likes
+	public shared ({ caller }) func get_snap(id : SnapID, canister_id : SnapCanisterID) : async Result.Result<SnapPublic, Text> {
+		let tags = [ACTOR_NAME, "get_snap"];
+
+		if (id.size() == 0 or id.size() > 40) {
+			return #err("Snap ID is invalid");
+		};
+
+		if (canister_id.size() == 0 or canister_id.size() > 40) {
+			return #err("Snap Canister ID is invalid");
+		};
+
+		let snap_actor = actor (canister_id) : SnapActor;
+		let snap = await snap_actor.get_all_snaps([id]);
+
+		return #ok(snap[0]);
+	};
+
+	public shared ({ caller }) func get_snap_ids() : async Result.Result<[SnapID], Text> {
+		let tags = [ACTOR_NAME, "get_snap_ids"];
+
+		switch (user_canisters_ref.get(caller)) {
+			case (?snap_canister_ids) {
+				let all_snap_ids = Buffer.Buffer<SnapID>(0);
+
+				for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
+					for (snap_id in snap_ids.vals()) {
+						all_snap_ids.add(snap_id);
+					};
+				};
+
+				return #ok(Buffer.toArray(all_snap_ids));
+			};
+			case (_) {
+				return #err("user not found");
+			};
+		};
+	};
 
 	public shared ({ caller }) func get_all_snaps() : async Result.Result<[SnapPublic], ErrGetAllSnaps> {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "get_all_snaps")];
@@ -361,84 +516,6 @@ actor SnapMain {
 			};
 			case (_) {
 				#err(#UserNotFound(true));
-			};
-		};
-	};
-
-	public shared ({ caller }) func get_snap(id : SnapID, canister_id : SnapCanisterID) : async Result.Result<SnapPublic, Text> {
-		let tags = [ACTOR_NAME, "get_snap"];
-
-		if (id.size() == 0 or id.size() > 40) {
-			return #err("Snap ID is invalid");
-		};
-
-		if (canister_id.size() == 0 or canister_id.size() > 40) {
-			return #err("Snap Canister ID is invalid");
-		};
-
-		let snap_actor = actor (canister_id) : SnapActor;
-		let snap = await snap_actor.get_all_snaps([id]);
-
-		return #ok(snap[0]);
-	};
-
-	public shared ({ caller }) func get_all_snaps_without_project() : async Result.Result<[SnapPublic], ErrGetAllSnaps> {
-		let tags = [("actor_name", ACTOR_NAME), ("method", "get_all_snaps_without_project")];
-
-		//TODO: add username as optional arg
-		//TODO: if username is provided it should replace caller
-
-		switch (user_canisters_ref.get(caller)) {
-			case (?user_snap_ids_storage) {
-				let all_snaps = Buffer.Buffer<SnapPublic>(0);
-
-				for ((canister_id, snap_ids) in user_snap_ids_storage.entries()) {
-					let snap_actor = actor (canister_id) : SnapActor;
-					let snaps = await snap_actor.get_all_snaps(snap_ids);
-
-					ignore Logger.log_event(
-						tags,
-						debug_show ("snap_ids: ", snap_ids)
-					);
-
-					for (snap in snaps.vals()) {
-						switch (snap.project) {
-							case (null) {
-								all_snaps.add(snap);
-							};
-							case (_) {
-								// do nothing
-							};
-						};
-					};
-				};
-				return #ok(Buffer.toArray(all_snaps));
-
-			};
-			case (_) {
-				#err(#UserNotFound(true));
-			};
-		};
-
-	};
-
-	public shared ({ caller }) func get_snap_ids() : async Result.Result<[SnapID], Text> {
-		let tags = [ACTOR_NAME, "get_snap_ids"];
-
-		switch (user_canisters_ref.get(caller)) {
-			case (?snap_canister_ids) {
-				let all_snap_ids = Buffer.Buffer<SnapID>(0);
-
-				for ((canister_id, snap_ids) in snap_canister_ids.entries()) {
-					for (snap_id in snap_ids.vals()) {
-						all_snap_ids.add(snap_id);
-					};
-				};
-
-				return #ok(Buffer.toArray(all_snap_ids));
-			};
-			case (_) {
-				return #err("user not found");
 			};
 		};
 	};

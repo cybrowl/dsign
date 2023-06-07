@@ -1,6 +1,7 @@
 const test = require('tape');
-const fake = require('fake-words');
-const { Ed25519KeyIdentity } = require('@dfinity/identity');
+const { config } = require('dotenv');
+
+config();
 
 // Actor Interface
 const {
@@ -15,8 +16,11 @@ const {
 } = require('../test-utils/actor_canister_ids.cjs');
 
 // Identities
-let mishicat_identity = Ed25519KeyIdentity.generate();
-let motoko_identity = Ed25519KeyIdentity.generate();
+const { parseIdentity } = require('../test-utils/identities/identity.cjs');
+
+let mishicat_identity = parseIdentity(process.env.MISHICAT_IDENTITY);
+let motoko_identity = parseIdentity(process.env.MOTOKO_IDENTITY);
+let default_identity = parseIdentity(process.env.DEFAULT_IDENTITY);
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
@@ -38,6 +42,18 @@ test('Setup Actors', async function () {
 		mishicat_identity
 	);
 
+	assets_img_staging_actors.motoko = await get_actor(
+		assets_img_staging_canister_id,
+		assets_img_staging_interface,
+		motoko_identity
+	);
+
+	assets_img_staging_actors.default = await get_actor(
+		assets_img_staging_canister_id,
+		assets_img_staging_interface,
+		default_identity
+	);
+
 	profile_actors.mishicat = await get_actor(
 		profile_canister_id,
 		profile_interface,
@@ -45,6 +61,12 @@ test('Setup Actors', async function () {
 	);
 
 	profile_actors.motoko = await get_actor(profile_canister_id, profile_interface, motoko_identity);
+
+	profile_actors.default = await get_actor(
+		profile_canister_id,
+		profile_interface,
+		default_identity
+	);
 });
 
 test('Profile[mishicat].get_profile(): before user creates profile => #err - ProfileNotFound', async function (t) {
@@ -53,8 +75,20 @@ test('Profile[mishicat].get_profile(): before user creates profile => #err - Pro
 	t.deepEqual(response.err, { ProfileNotFound: true });
 });
 
+test('Profile[motoko].get_profile(): before user creates profile => #err - ProfileNotFound', async function (t) {
+	const response = await profile_actors.motoko.get_profile();
+
+	t.deepEqual(response.err, { ProfileNotFound: true });
+});
+
+test('Profile[default].get_profile(): before user creates profile => #err - ProfileNotFound', async function (t) {
+	const response = await profile_actors.default.get_profile();
+
+	t.deepEqual(response.err, { ProfileNotFound: true });
+});
+
 test('Profile[mishicat].create_username(): create first with valid username => #ok - username', async function (t) {
-	const username = fake.word();
+	const username = 'mishicat';
 
 	const { ok: created_username } = await profile_actors.mishicat.create_username(
 		username.toLowerCase()
@@ -63,8 +97,40 @@ test('Profile[mishicat].create_username(): create first with valid username => #
 	t.equal(created_username, username.toLowerCase());
 });
 
+test('Profile[motoko].create_username(): create first with valid username => #ok - username', async function (t) {
+	const username = 'motoko';
+
+	const { ok: created_username } = await profile_actors.motoko.create_username(
+		username.toLowerCase()
+	);
+
+	t.equal(created_username, username.toLowerCase());
+});
+
+test('Profile[default].create_username(): create first with valid username => #ok - username', async function (t) {
+	const username = 'default';
+
+	const { ok: created_username } = await profile_actors.default.create_username(
+		username.toLowerCase()
+	);
+
+	t.equal(created_username, username.toLowerCase());
+});
+
 test('Profile[mishicat].get_profile(): after creating profile => #ok - username', async function (t) {
 	const response = await profile_actors.mishicat.get_profile();
+
+	t.equal(response.ok.username.length > 0, true);
+});
+
+test('Profile[motoko].get_profile(): after creating profile => #ok - username', async function (t) {
+	const response = await profile_actors.motoko.get_profile();
+
+	t.equal(response.ok.username.length > 0, true);
+});
+
+test('Profile[default].get_profile(): after creating profile => #ok - username', async function (t) {
+	const response = await profile_actors.default.get_profile();
 
 	t.equal(response.ok.username.length > 0, true);
 });

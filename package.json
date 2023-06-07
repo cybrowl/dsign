@@ -18,6 +18,7 @@
 		"deploy_all": "npm run deploy_favorites && npm run deploy_profile && npm run deploy_projects && npm run deploy_snaps && npm run user_interface",
 		"test-all": "bash ./scripts/test-all.sh",
 		"test-config": "tape test-env/dfx.config.test.cjs",
+		"test-ac": "npm run generate_test_interface && tape test-canisters/account_creation.test.cjs",
 		"test-cl": "npm run generate_test_interface && tape test-canisters/canister_ids_ledger.test.cjs",
 		"test-ex": "npm run generate_test_interface && tape test-canisters/explore.test.cjs",
 		"test-lg": "npm run generate_test_interface && tape test-canisters/logger.test.cjs",
@@ -28,7 +29,7 @@
 	},
 	"dependencies": {
 		"dotenv": "^16.0.3",
-		"dsign-components": "^1.2.10",
+		"dsign-components": "^1.2.11",
 		"lodash": "^4.17.21",
 		"luxon": "^3.2.1",
 		"svelte-local-storage-store": "^0.2.6"

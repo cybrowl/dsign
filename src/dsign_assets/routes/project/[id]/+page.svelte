@@ -80,17 +80,12 @@
 			}
 		}
 
-		if ($actor_project_main.loggedIn) {
-			if (isEmpty($project_store.project)) {
-				const { ok: project } = await $actor_project_main.actor.get_project(
-					project_id,
-					canister_id
-				);
+		if (isEmpty($project_store.project)) {
+			const { ok: project } = await $actor_project_main.actor.get_project(project_id, canister_id);
 
-				isProjectOwner = username === project.username;
+			isProjectOwner = username === project.username;
 
-				projects_update.update_project(project);
-			}
+			projects_update.update_project(project);
 		}
 	});
 

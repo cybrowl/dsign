@@ -32,6 +32,8 @@
 	onMount(async () => {
 		await Promise.all([auth_assets_file_staging(), auth_assets_img_staging(), auth_snap_main()]);
 
+		console.log('$snap_creation: ', $snap_creation);
+
 		// const mode = $page.url.searchParams.get('mode');
 
 		// if (mode === 'edit' && isEmpty($snap_creation.id)) {
