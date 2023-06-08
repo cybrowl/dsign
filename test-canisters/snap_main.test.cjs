@@ -31,9 +31,13 @@ let default_identity = parseIdentity(process.env.DEFAULT_IDENTITY);
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
-const { generate_images } = require('../test-utils/utils.cjs');
-
-let images = generate_images();
+const {
+	generate_animal_images,
+	generate_figma_asset,
+	generate_figma_dsign_components,
+	generate_flower_images,
+	generate_motoko_image
+} = require('../test-utils/utils.cjs');
 
 let assets_file_chunks_actors = {};
 let assets_img_staging_actors = {};
@@ -41,7 +45,7 @@ let profile_actor = {};
 let project_main_actor = {};
 let snap_main_actor = {};
 
-// let chunk_ids = [];
+let design_file_chunk_ids = [];
 let img_asset_ids = [];
 
 let projects = [];
@@ -167,6 +171,7 @@ test('SnapMain[mishicat].create_snap(): with invalid img asset ref => #err - Ass
 
 test('ImageAssetStaging[mishicat].create_asset(): with image and valid identity => #ok - img_asset_ids', async function () {
 	let promises = [];
+	let images = generate_flower_images();
 
 	images.forEach(async function (image) {
 		const args = {
@@ -261,10 +266,10 @@ test('ImageAssetStaging[mishicat].get_asset():  => #err - no image found', async
 	t.deepEqual(response.err, { AssetNotFound: null });
 });
 
-test('SnapMain[mishicat].edit_snap(): name only => #ok - snap', async function (t) {
+test('SnapMain[mishicat].edit_snap(): name only => #ok - edited snap', async function (t) {
 	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
-
 	const snap = all_snaps[0];
+
 	let create_args = {
 		title: ['snap example renamed'],
 		id: snap.id,
@@ -274,112 +279,249 @@ test('SnapMain[mishicat].edit_snap(): name only => #ok - snap', async function (
 		file_asset: []
 	};
 
-	const response = await snap_main_actor.mishicat.edit_snap(create_args);
+	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
 
-	console.log('response: ', response);
-
-	// t.deepEqual(response.ok, 'Edited Snap');
+	t.deepEqual(snap_.title, 'snap example renamed');
+	t.deepEqual(snap_.owner, []);
+	t.equal(snap_.images.length, 3);
 });
 
-// test('FileAssetChunks[mishicat].create_chunk(): upload chunks from file to canister => chunk_id', async function (t) {
-// 	const uploadChunk = async ({ chunk, file_name }) => {
-// 		return assets_file_chunks_actors.mishicat.create_chunk({
-// 			data: [...chunk],
-// 			file_name: file_name
-// 		});
-// 	};
+test('ImageAssetStaging[mishicat].create_asset(): with image and valid identity => #ok - img_asset_ids', async function () {
+	let promises = [];
+	let images = generate_animal_images();
 
-// 	const figma_asset_buffer = generate_figma_asset();
-// 	const figma_asset_unit8Array = new Uint8Array(figma_asset_buffer);
+	images.forEach(async function (image) {
+		const args = {
+			data: image,
+			file_format: 'png'
+		};
 
-// 	const file_name = 'dsign_stage_1.fig';
+		promises.push(assets_img_staging_actors.mishicat.create_asset(args));
+	});
 
-// 	const promises = [];
-// 	const chunkSize = 2000000;
+	try {
+		img_asset_ids = await Promise.all(promises);
+	} catch (error) {
+		console.log('error: ', error);
+	}
+});
 
-// 	for (let start = 0; start < figma_asset_unit8Array.length; start += chunkSize) {
-// 		const chunk = figma_asset_unit8Array.slice(start, start + chunkSize);
+test('SnapMain[mishicat].edit_snap(): name and images => #ok - edited snap', async function (t) {
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const snap = all_snaps[0];
 
-// 		promises.push(
-// 			uploadChunk({
-// 				file_name,
-// 				chunk
-// 			})
-// 		);
-// 	}
+	let create_args = {
+		title: ['snap example animals'],
+		id: snap.id,
+		canister_id: snap.canister_id,
+		image_cover_location: [],
+		img_asset_ids: [img_asset_ids],
+		file_asset: []
+	};
 
-// 	chunk_ids = await Promise.all(promises);
+	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
 
-// 	const hasChunkIds = chunk_ids.length > 2;
-// 	t.equal(hasChunkIds, true);
-// });
+	t.deepEqual(snap_.title, 'snap example animals');
+	t.deepEqual(snap_.owner, []);
+	t.equal(snap_.images.length, 5);
+});
 
-// test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function () {
-// 	let promises = [];
+test('ImageAssetStaging[mishicat].create_asset(): with image and valid identity => #ok - img_asset_ids', async function () {
+	let promises = [];
+	let images = generate_motoko_image();
 
-// 	images.forEach(async function (image) {
-// 		const args = {
-// 			data: image,
-// 			file_format: 'png'
-// 		};
+	images.forEach(async function (image) {
+		const args = {
+			data: image,
+			file_format: 'png'
+		};
 
-// 		promises.push(assets_img_staging_actors.mishicat.create_asset(args));
-// 	});
+		promises.push(assets_img_staging_actors.mishicat.create_asset(args));
+	});
 
-// 	try {
-// 		img_asset_ids = await Promise.all(promises);
-// 	} catch (error) {
-// 		console.log('error: ', error);
-// 	}
-// });
+	try {
+		img_asset_ids = await Promise.all(promises);
+	} catch (error) {
+		console.log('error: ', error);
+	}
+});
 
-// test('SnapMain[mishicat].create_snap(): with file and images => #ok - snap', async function (t) {
-// 	let create_args = {
-// 		title: 'File Asset Example',
-// 		image_cover_location: 1,
-// 		img_asset_ids: img_asset_ids,
-// 		file_asset: [
-// 			{
-// 				is_public: true,
-// 				content_type: 'application/octet-stream',
-// 				chunk_ids: chunk_ids
-// 			}
-// 		]
-// 	};
+test('SnapMain[mishicat].edit_snap(): images only => #ok - edited snap', async function (t) {
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const snap = all_snaps[0];
 
-// 	const response = await snap_main_actor.mishicat.create_snap(create_args);
+	let create_args = {
+		title: [],
+		id: snap.id,
+		canister_id: snap.canister_id,
+		image_cover_location: [],
+		img_asset_ids: [img_asset_ids],
+		file_asset: []
+	};
 
-// 	t.deepEqual(response.ok, 'Created Snap');
-// });
+	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
 
-// test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function () {
-// 	let promises = [];
+	t.deepEqual(snap_.title, 'snap example animals');
+	t.deepEqual(snap_.owner, []);
+	t.equal(snap_.images.length, 6);
+});
 
-// 	images.forEach(async function (image) {
-// 		const args = {
-// 			data: image,
-// 			file_format: 'png'
-// 		};
+test('FileAssetChunks[mishicat].create_chunk(): upload chunks from file to canister => chunk_id', async function (t) {
+	const uploadChunk = async ({ chunk, file_name }) => {
+		return assets_file_chunks_actors.mishicat.create_chunk({
+			data: [...chunk],
+			file_name: file_name
+		});
+	};
 
-// 		promises.push(assets_img_staging_actors.mishicat.create_asset(args));
-// 	});
+	const figma_asset_buffer = generate_figma_asset();
+	const figma_asset_unit8Array = new Uint8Array(figma_asset_buffer);
 
-// 	try {
-// 		img_asset_ids = await Promise.all(promises);
-// 	} catch (error) {
-// 		console.log('error: ', error);
-// 	}
-// });
+	const file_name = 'dsign_stage_1.fig';
 
-// test('SnapMain[mishicat].create_snap(): without file asset => #ok - snap', async function (t) {
-// 	let create_args = {
-// 		title: 'Delete Example',
-// 		image_cover_location: 1,
-// 		img_asset_ids: img_asset_ids,
-// 		file_asset: []
-// 	};
+	const promises = [];
+	const chunkSize = 2000000;
 
-// 	const response = await snap_main_actor.mishicat.create_snap(create_args);
+	for (let start = 0; start < figma_asset_unit8Array.length; start += chunkSize) {
+		const chunk = figma_asset_unit8Array.slice(start, start + chunkSize);
 
-// 	t.deepEqual(response.ok, 'Created Snap');
-// });
+		promises.push(
+			uploadChunk({
+				file_name,
+				chunk
+			})
+		);
+	}
+
+	design_file_chunk_ids = await Promise.all(promises);
+
+	const hasChunkIds = design_file_chunk_ids.length > 2;
+	t.equal(hasChunkIds, true);
+});
+
+test('SnapMain[mishicat].edit_snap(): file only => #ok - snap', async function (t) {
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const snap = all_snaps[0];
+
+	let create_args = {
+		title: [],
+		id: snap.id,
+		canister_id: snap.canister_id,
+		image_cover_location: [],
+		img_asset_ids: [],
+		file_asset: [
+			{
+				is_public: true,
+				content_type: 'application/octet-stream',
+				chunk_ids: design_file_chunk_ids
+			}
+		]
+	};
+
+	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
+
+	t.equal(snap_.file_asset.id.length > 3, true);
+	t.equal(snap_.file_asset.file_name, 'dsign_stage_1.fig');
+});
+
+test('FileAssetChunks[mishicat].create_chunk(): upload chunks from file to canister => chunk_id', async function (t) {
+	const uploadChunk = async ({ chunk, file_name }) => {
+		return assets_file_chunks_actors.mishicat.create_chunk({
+			data: [...chunk],
+			file_name: file_name
+		});
+	};
+
+	const figma_asset_buffer = generate_figma_dsign_components();
+	const figma_asset_unit8Array = new Uint8Array(figma_asset_buffer);
+
+	const file_name = 'dsign_components.fig';
+
+	const promises = [];
+	const chunkSize = 2000000;
+
+	for (let start = 0; start < figma_asset_unit8Array.length; start += chunkSize) {
+		const chunk = figma_asset_unit8Array.slice(start, start + chunkSize);
+
+		promises.push(
+			uploadChunk({
+				file_name,
+				chunk
+			})
+		);
+	}
+
+	design_file_chunk_ids = await Promise.all(promises);
+
+	const hasChunkIds = design_file_chunk_ids.length > 2;
+	t.equal(hasChunkIds, true);
+});
+
+test('SnapMain[mishicat].edit_snap(): file only => #err - SnapIdsDoNotMatch', async function (t) {
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const snap = all_snaps[0];
+
+	let create_args = {
+		title: [],
+		id: snap.id,
+		canister_id: snap.canister_id,
+		image_cover_location: [],
+		img_asset_ids: [],
+		file_asset: [
+			{
+				is_public: true,
+				content_type: 'application/octet-stream',
+				chunk_ids: design_file_chunk_ids
+			}
+		]
+	};
+
+	const { ok: snap_, err: error_ } = await snap_main_actor.motoko.edit_snap(create_args);
+
+	t.deepEqual(error_, { SnapIdsDoNotMatch: null });
+	t.equal(snap_, undefined);
+});
+
+test('SnapMain[mishicat].edit_snap(): file only => #ok - snap', async function (t) {
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const snap = all_snaps[0];
+
+	let create_args = {
+		title: [],
+		id: snap.id,
+		canister_id: snap.canister_id,
+		image_cover_location: [],
+		img_asset_ids: [],
+		file_asset: [
+			{
+				is_public: true,
+				content_type: 'application/octet-stream',
+				chunk_ids: design_file_chunk_ids
+			}
+		]
+	};
+
+	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
+
+	t.equal(snap_.file_asset.id.length > 3, true);
+	t.equal(snap_.file_asset.file_name, 'dsign_components.fig');
+});
+
+test('SnapMain[mishicat].edit_snap(): all empty => #ok - snap', async function (t) {
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const snap = all_snaps[0];
+
+	let create_args = {
+		title: [],
+		id: snap.id,
+		canister_id: snap.canister_id,
+		image_cover_location: [],
+		img_asset_ids: [],
+		file_asset: []
+	};
+
+	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
+
+	t.equal(snap_.file_asset.id.length > 3, true);
+	t.equal(snap_.file_asset.file_name, 'dsign_components.fig');
+});

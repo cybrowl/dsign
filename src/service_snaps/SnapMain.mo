@@ -28,6 +28,7 @@ import HealthMetricsTypes "../types/health_metrics.types";
 import UtilsShared "../utils/utils";
 
 actor SnapMain {
+	type AssetRef = Types.AssetRef;
 	type CreateAssetArgs = Types.CreateAssetArgs;
 	type CreateSnapArgs = Types.CreateSnapArgs;
 	type EditSnapArgs = Types.EditSnapArgs;
@@ -335,34 +336,34 @@ actor SnapMain {
 		};
 
 		// create asset from chunks
-		var file_asset = null;
-		// switch (snap_info.file_asset) {
-		//     case null {};
-		//     case (?fileAsset) {
-		//         let file_asset_snap_info : CreateAssetArgs = {
-		//             chunk_ids = fileAsset.chunk_ids;
-		//             content_type = fileAsset.content_type;
-		//             is_public = fileAsset.is_public;
-		//             principal = caller;
-		//         };
+		var file_asset = { canister_id = ""; id = ""; file_name = ""; url = ""; is_public = false };
+		switch (snap_info.file_asset) {
+			case null {};
+			case (?fileAsset) {
+				let file_asset_snap_info : CreateAssetArgs = {
+					chunk_ids = fileAsset.chunk_ids;
+					content_type = fileAsset.content_type;
+					is_public = fileAsset.is_public;
+					principal = caller;
+				};
 
-		//         switch (await assets_actor.create_asset_from_chunks(file_asset_snap_info)) {
-		//             case (#err err) {
-		//                 ignore Logger.log_event(
-		//                     tags,
-		//                     debug_show ("assets_actor.create_asset_from_chunks", err)
-		//                 );
+				switch (await assets_actor.create_asset_from_chunks(file_asset_snap_info)) {
+					case (#err err) {
+						ignore Logger.log_event(
+							tags,
+							debug_show ("assets_actor.create_asset_from_chunks", err)
+						);
 
-		//                 return #err(#ErrorCall(debug_show (err)));
-		//             };
-		//             case (#ok file_asset_) {
-		//                 file_asset := file_asset_;
+						return #err(#ErrorCall(debug_show (err)));
+					};
+					case (#ok file_asset_) {
+						file_asset := file_asset_;
 
-		//                 ignore FileAssetStaging.delete_chunks(fileAsset.chunk_ids, caller);
-		//             };
-		//         };
-		//     };
-		// };
+						ignore FileAssetStaging.delete_chunks(fileAsset.chunk_ids, caller);
+					};
+				};
+			};
+		};
 
 		// edit snap
 		switch (await snap_actor.edit_snap(snap_info, images_ref, file_asset, caller)) {

@@ -54,6 +54,7 @@
 				"assets_file_staging",
 				"assets_img_staging",
 				"canister_ids_ledger",
+				"explore",
 				"health_metrics",
 				"logger",
 				"profile"
@@ -87,7 +88,7 @@
 		"test_snap": {
 			"main": "src/service_snaps/Snap.mo",
 			"type": "motoko",
-			"dependencies": ["health_metrics", "logger", "profile"]
+			"dependencies": ["explore", "health_metrics", "logger", "profile"]
 		}
 	},
 	"defaults": {

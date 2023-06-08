@@ -19,6 +19,8 @@ import UtilsShared "../utils/utils";
 actor Explore = {
 	type Project = Types.Project;
 	type ProjectID = Types.ProjectID;
+	type ProjectRef = Types.ProjectRef;
+	type ProjectActor = Types.ProjectActor;
 	type SnapPublic = SnapTypes.SnapPublic;
 	type Time = Int;
 
@@ -39,7 +41,7 @@ actor Explore = {
 	stable var projects_stable_storage : [(ProjectID, ProjectPublic)] = [];
 
 	let ACTOR_NAME : Text = "Explore";
-	let VERSION : Nat = 1;
+	let VERSION : Nat = 2;
 
 	public shared ({ caller }) func save_project(project : Project) : async Text {
 		let authorized = await CanisterIdsLedger.canister_exists(Principal.toText(caller));
@@ -68,6 +70,40 @@ actor Explore = {
 		projects.put(project.id, project_public);
 
 		return "Saved project";
+	};
+
+	public shared func update_project(project_ref : ProjectRef) : async Text {
+		let project_actor = actor (project_ref.canister_id) : ProjectActor;
+
+		switch (await project_actor.get_projects([project_ref.id])) {
+			case (projects_) {
+				let project = projects_[0];
+				var snap_list = Buffer<SnapPublic>(0);
+
+				//TODO: there is an optimization here
+				for (snap in project.snaps.vals()) {
+					let snap_actor = actor (snap.canister_id) : SnapActor;
+
+					switch (await snap_actor.get_all_snaps([snap.id])) {
+						case (snap_) {
+							if (snap_.size() > 0) {
+								snap_list.add(snap_[0]);
+							};
+						};
+					};
+				};
+
+				let project_public : ProjectPublic = {
+					project and {} with owner = null;
+					snaps = toArray(snap_list);
+				};
+
+				projects.put(project.id, project_public);
+
+				return "Updated project";
+			};
+		};
+
 	};
 
 	public shared ({ caller }) func delete_projects(project_ids : [ProjectID]) : async () {

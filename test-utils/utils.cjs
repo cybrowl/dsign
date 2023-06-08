@@ -49,8 +49,39 @@ function generate_images() {
 	return images;
 }
 
+function generate_flower_images() {
+	const images = [
+		[...new Uint8Array(fs.readFileSync('test-utils/images/flowers.webp'))],
+		[...new Uint8Array(fs.readFileSync('test-utils/images/lotus.jpeg'))],
+		[...new Uint8Array(fs.readFileSync('test-utils/images/tulip.webp'))]
+	];
+
+	return images;
+}
+
+function generate_animal_images() {
+	const images = [
+		[...new Uint8Array(fs.readFileSync('test-utils/images/cat.webp'))],
+		[...new Uint8Array(fs.readFileSync('test-utils/images/woodpecker.webp'))]
+	];
+
+	return images;
+}
+
+function generate_motoko_image() {
+	const images = [[...new Uint8Array(fs.readFileSync('test-utils/images/motoko.png'))]];
+
+	return images;
+}
+
 function generate_figma_asset() {
 	const figma_asset_buffer = fs.readFileSync('test-utils/assets/dsign_stage_1.fig');
+
+	return figma_asset_buffer;
+}
+
+function generate_figma_dsign_components() {
+	const figma_asset_buffer = fs.readFileSync('test-utils/assets/dsign_components.fig');
 
 	return figma_asset_buffer;
 }
@@ -62,8 +93,12 @@ function generate_large_img_asset() {
 }
 
 module.exports = {
-	request_image_canister,
-	generate_images,
+	generate_animal_images,
 	generate_figma_asset,
-	generate_large_img_asset
+	generate_flower_images,
+	generate_images,
+	generate_figma_dsign_components,
+	generate_large_img_asset,
+	generate_motoko_image,
+	request_image_canister
 };

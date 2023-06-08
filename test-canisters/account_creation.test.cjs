@@ -118,6 +118,24 @@ test('Profile[default].create_username(): create first with valid username => #o
 	t.equal(created_username, username.toLowerCase());
 });
 
+test('Profile[mishicat].get_profile(): before user creates profile => #err - ProfileNotFound', async function (t) {
+	const response = await profile_actors.mishicat.get_profile();
+
+	t.deepEqual(response.err, { ProfileNotFound: true });
+});
+
+test('Profile[motoko].get_profile(): before user creates profile => #err - ProfileNotFound', async function (t) {
+	const response = await profile_actors.motoko.get_profile();
+
+	t.deepEqual(response.err, { ProfileNotFound: true });
+});
+
+test('Profile[default].get_profile(): before user creates profile => #err - ProfileNotFound', async function (t) {
+	const response = await profile_actors.default.get_profile();
+
+	t.deepEqual(response.err, { ProfileNotFound: true });
+});
+
 test('SnapMain[mishicat].create_user_snap_storage(): create initial storage for snaps => #ok - true', async function (t) {
 	const response = await snap_main_actor.mishicat.create_user_snap_storage();
 

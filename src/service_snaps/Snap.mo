@@ -15,6 +15,7 @@ import XorShift "mo:rand/XorShift";
 import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 import Profile "canister:profile";
+import Explore "canister:explore";
 
 import HealthMetricsTypes "../types/health_metrics.types";
 import ProjectTypes "../service_projects/types";
@@ -113,7 +114,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	public shared ({ caller }) func edit_snap(
 		snap_info : EditSnapArgs,
 		images_ref : ?[ImageRef],
-		file_asset : ?AssetRef,
+		file_asset : AssetRef,
 		owner : UserPrincipal
 	) : async Result.Result<Snap, ErrEditSnap> {
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "edit_snap")];
@@ -133,8 +134,13 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			};
 			case (?snap) {
 				let name = Option.get(snap_info.title, snap.title);
-				let images : [ImageRef] = Option.get(images_ref, snap.images);
-				let design_file = Option.get(file_asset, snap.file_asset);
+				let images_refs = Option.get(images_ref, []);
+				let images = Array.flatten([snap.images, images_refs]);
+
+				var design_file = snap.file_asset;
+				if (file_asset.id != "") {
+					design_file := file_asset;
+				};
 
 				let snap_updated = {
 					snap with images = images;
@@ -143,6 +149,14 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 				};
 
 				snaps.put(snap.id, snap_updated);
+
+				switch (snap.project_ref) {
+					case (null) {};
+					case (?project_ref) {
+						ignore Explore.update_project(project_ref);
+
+					};
+				};
 
 				return #ok(snap_updated);
 			};
