@@ -23,7 +23,7 @@ test('Logger: [motoko].version()', async function (t) {
 test('Logger: [motoko].authorize() - should return false meaning authorized person choosen', async function (t) {
 	const response = await logger.authorize();
 
-	t.equal(response, true);
+	t.equal(response, false);
 });
 
 test('Logger: [motoko].get_logs() - should not be authorized', async function (t) {

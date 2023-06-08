@@ -186,43 +186,6 @@ actor ProjectMain {
 		};
 	};
 
-	public shared ({ caller }) func delete_snaps_from_project(
-		snaps : [SnapRef],
-		project_ref : ProjectRef
-	) : async Result.Result<Text, ErrDeleteSnapsFromProject> {
-		let tags = [ACTOR_NAME, "delete_snaps_from_project"];
-
-		if (snaps.size() > SNAP_ARG_SIZE_LIMIT) {
-			return #err(#NumberSnapsTooLarge);
-		};
-
-		switch (user_canisters_ref.get(caller)) {
-			case (?user_project_ids_storage) {
-				let my_ids = Utils.get_all_ids(user_project_ids_storage);
-				let matches = Utils.all_ids_match(my_ids, [project_ref.id]);
-
-				if (matches.all_match == false) {
-					return #err(#ProjectIdsDoNotMatch);
-				};
-
-				let project_actor = actor (project_ref.canister_id) : ProjectActor;
-
-				switch (await project_actor.delete_snaps_from_project(snaps, project_ref.id, caller)) {
-					case (#err err) {
-						return #err(#ErrorCall(debug_show (err)));
-					};
-					case (#ok _) {
-						//TODO: ignore Snap.delete_snaps
-						return #ok("Deleted Snaps From Project");
-					};
-				};
-			};
-			case (_) {
-				#err(#UserNotFound);
-			};
-		};
-	};
-
 	public shared ({ caller }) func update_project_details(
 		update_project_args : UpdateProject,
 		project_ref : ProjectRef
@@ -257,6 +220,43 @@ actor ProjectMain {
 		};
 	};
 
+	// public shared ({ caller }) func delete_snaps_from_project(
+	//     snaps : [SnapRef],
+	//     project_ref : ProjectRef
+	// ) : async Result.Result<Text, ErrDeleteSnapsFromProject> {
+	//     let tags = [ACTOR_NAME, "delete_snaps_from_project"];
+
+	//     if (snaps.size() > SNAP_ARG_SIZE_LIMIT) {
+	//         return #err(#NumberSnapsTooLarge);
+	//     };
+
+	//     switch (user_canisters_ref.get(caller)) {
+	//         case (?user_project_ids_storage) {
+	//             let my_ids = Utils.get_all_ids(user_project_ids_storage);
+	//             let matches = Utils.all_ids_match(my_ids, [project_ref.id]);
+
+	//             if (matches.all_match == false) {
+	//                 return #err(#ProjectIdsDoNotMatch);
+	//             };
+
+	//             let project_actor = actor (project_ref.canister_id) : ProjectActor;
+
+	//             switch (await project_actor.delete_snaps_from_project(snaps, project_ref.id, caller)) {
+	//                 case (#err err) {
+	//                     return #err(#ErrorCall(debug_show (err)));
+	//                 };
+	//                 case (#ok _) {
+	//                     //TODO: ignore Snap.delete_snaps
+	//                     return #ok("Deleted Snaps From Project");
+	//                 };
+	//             };
+	//         };
+	//         case (_) {
+	//             #err(#UserNotFound);
+	//         };
+	//     };
+	// };
+
 	public shared ({ caller }) func get_all_projects(username : ?Text) : async Result.Result<[ProjectPublic], ErrGetProjects> {
 		let tags = [ACTOR_NAME, "get_projects"];
 
@@ -287,10 +287,6 @@ actor ProjectMain {
 					for (project in projects.vals()) {
 						all_projects.add(project);
 					};
-				};
-
-				if (all_projects.size() == 0) {
-					return #err(#NoProjects(true));
 				};
 
 				return #ok(Buffer.toArray(all_projects));
