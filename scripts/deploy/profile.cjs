@@ -45,34 +45,39 @@ const get_actor = async (canisterId, can_interface, is_prod) => {
 	});
 };
 
-const installCode = async (run_in_prod, profile_canisters, wasmPath) => {
-	console.log(
-		run_in_prod
-			? '======== Installing Prod Profile Child Canisters ========'
-			: '======== Installing Local Profile Child Canisters ========'
-	);
+const installCode = async (profile_child_canisters, profile_id, is_prod, wasm) => {
+	console.log('profile_child_canisters: ', profile_child_canisters);
+	console.log('is_prod: ', is_prod);
+	console.log('wasm: ', wasm);
 
-	const canisters = profile_canisters.map((canister) => {
-		const profile_id = run_in_prod
-			? Principal.fromText(canister_ids['profile'].ic)
-			: Principal.fromText(profile_canister_id);
+	const profile_id_principal = Principal.fromText(profile_id);
+
+	const canisters = profile_child_canisters.map((canister) => {
 		const arg_map = {
-			image_assets: IDL.encode([IDL.Principal, IDL.Bool], [profile_id, run_in_prod])
+			image_assets: IDL.encode([IDL.Principal, IDL.Bool], [profile_id_principal, is_prod])
 		};
 
 		return {
 			name: canister.name,
 			is_prod: canister.isProd,
+			canister_id_principal: profile_id_principal,
 			canister_id: profile_id,
 			can_interface: profile_interface,
 			child_canister_principal: Principal.fromText(canister.id),
-			wasm: get_wasm(`test_${canister.name}`, wasmPath),
+			child_canister_id: canister.id,
+			wasm: get_wasm(`test_${canister.name}`, wasm),
 			arg: arg_map[canister.name]
 		};
 	});
 
+	console.log('canisters: ', canisters);
+
 	canisters.forEach(async (canister) => {
-		const actor = await get_actor(canister.canister_id, canister.can_interface, canister.is_prod);
+		const actor = await get_actor(
+			canister.canister_id_principal,
+			canister.can_interface,
+			canister.is_prod
+		);
 		const res = await actor.install_code(
 			canister.child_canister_principal,
 			[...canister.arg],
@@ -85,20 +90,54 @@ const installCode = async (run_in_prod, profile_canisters, wasmPath) => {
 
 const init = async () => {
 	try {
-		const run_in_prod = process.env.DEPLOY_ENV === 'prod';
+		const envConfig = {
+			prod: {
+				canister_id: canister_ids['canister_ids_ledger'].ic,
+				profile_id: canister_ids['profile'].ic,
+				is_prod: true,
+				wasm: '.dfx/ic/canisters'
+			},
+			// staging: {
+			// 	canister_id: canister_ids['canister_ids_ledger'].staging,
+			// 	profile_id: canister_ids['profile'].staging,
+			// 	is_prod: true,
+			// 	wasm: '.dfx/staging/canisters'
+			// },
+			dev: {
+				canister_id: canister_ids_ledger_canister_id,
+				profile_id: profile_canister_id,
+				is_prod: false,
+				wasm: '.dfx/local/canisters'
+			},
+			default: {
+				canister_id: canister_ids_ledger_canister_id,
+				profile_id: profile_canister_id,
+				is_prod: false,
+				wasm: '.dfx/local/canisters'
+			}
+		};
+
+		const env = process.env.DEPLOY_ENV;
+
+		console.log('--------------------------');
+		console.log('env: ', env);
+		console.log('--------------------------');
+
+		const config = envConfig[env] || envConfig['default'];
+
 		const canister_ids_ledger_actor = await get_actor(
-			run_in_prod ? canister_ids['canister_ids_ledger'].ic : canister_ids_ledger_canister_id,
+			config.canister_id,
 			canister_ids_ledger_interface,
-			run_in_prod
+			config.is_prod
 		);
+
 		const canister_children = await canister_ids_ledger_actor.get_canisters();
-		const profile_canisters = canister_children.filter((canister) => {
+
+		const profile_child_canisters = canister_children.filter((canister) => {
 			return canister.parent_name === 'Profile';
 		});
 
-		const wasmPath = run_in_prod ? '.dfx/ic/canisters' : '.dfx/local/canisters';
-
-		await installCode(run_in_prod, profile_canisters, wasmPath);
+		await installCode(profile_child_canisters, config.profile_id, config.is_prod, config.wasm);
 	} catch (err) {
 		console.error(err);
 	}

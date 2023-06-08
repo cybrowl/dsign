@@ -6,9 +6,10 @@ import { generateCanisterAliases, getEnvironmentPath } from './config/dfx.config
 
 const isDevelopment = process.env.DFX_NETWORK !== 'ic';
 const isProduction = process.env.DFX_NETWORK === 'ic';
+const isStaging = process.env.DFX_NETWORK === 'staging';
 
 const aliases = generateCanisterAliases();
-const environment = getEnvironmentPath(isDevelopment);
+const environment = getEnvironmentPath(isDevelopment, isStaging);
 
 const envOptions = {
 	isDevelopment,

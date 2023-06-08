@@ -12,7 +12,11 @@ import environment from 'environment';
 
 const env = environment();
 
-const isProd = env['DFX_NETWORK'] === 'ic';
+let isProd = false;
+
+if (env['DFX_NETWORK'] === 'ic' || env['DFX_NETWORK'] === 'staging') {
+	isProd = true;
+}
 
 export function createActor(options) {
 	const canisterIds = env.canisterIds[options.actor_name];

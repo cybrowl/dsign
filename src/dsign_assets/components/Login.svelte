@@ -12,7 +12,11 @@
 	import modal_update from '$stores_ref/modal';
 
 	const env = environment();
-	const isProd = env['DFX_NETWORK'] === 'ic' || false;
+	let isProd = false;
+
+	if (env['DFX_NETWORK'] === 'ic' || env['DFX_NETWORK'] === 'staging') {
+		isProd = true;
+	}
 
 	onMount(async () => {
 		await auth_profile();

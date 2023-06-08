@@ -1,40 +1,58 @@
-// const path = require("path");
-const dfxConfig = require("../dfx.json");
+const dfxConfig = require('../dfx.json');
 
 function generateCanisterAliases() {
-  const dfxNetwork = process.env["DFX_NETWORK"] || "local";
-  const rootPath = __dirname.split("/config")[0];
+	const dfxNetwork = process.env['DFX_NETWORK'] || 'local';
+	const rootPath = __dirname.split('/config')[0];
 
-  let aliases = {
-    ["local-canister-ids"]: "".concat(rootPath, "/", ".dfx", "/", dfxNetwork, "/", "canister_ids.json")
-  };
+	let aliases = {
+		['local-canister-ids']: ''.concat(
+			rootPath,
+			'/',
+			'.dfx',
+			'/',
+			dfxNetwork,
+			'/',
+			'canister_ids.json'
+		)
+	};
 
-  if (dfxConfig.canisters) {
-    const listOfCanisterNames = Object.keys(dfxConfig.canisters);
+	if (dfxConfig.canisters) {
+		const listOfCanisterNames = Object.keys(dfxConfig.canisters);
 
-    aliases = listOfCanisterNames.reduce((acc, name) => {
-      const outputRoot = "".concat(rootPath, "/", ".dfx", "/", dfxNetwork, "/", "canisters", "/", name);
+		aliases = listOfCanisterNames.reduce((acc, name) => {
+			const outputRoot = ''.concat(
+				rootPath,
+				'/',
+				'.dfx',
+				'/',
+				dfxNetwork,
+				'/',
+				'canisters',
+				'/',
+				name
+			);
 
-      return {
-        ...acc,
-        ["$IDL" + name]: "".concat(outputRoot + "/" + name + ".did.js")
-      };
-    }, aliases);
-  }
-  
-  return aliases;
+			return {
+				...acc,
+				['$IDL' + name]: ''.concat(outputRoot + '/' + name + '.did.js')
+			};
+		}, aliases);
+	}
+
+	return aliases;
 }
 
-function getEnvironmentPath(isDevelopment) {  
-
-  if (isDevelopment) {
-    return "".concat(__dirname, "/", "env.dev.config.js");
-  } else {
-    return "".concat(__dirname, "/", "env.prod.config.js");
-  }
+function getEnvironmentPath(isDevelopment, isStaging) {
+	if (isDevelopment) {
+		return ''.concat(__dirname, '/', 'env.dev.config.js');
+	} else if (isStaging) {
+		return ''.concat(__dirname, '/', 'env.staging.config.js');
+	} else {
+		return ''.concat(__dirname, '/', 'env.prod.config.js');
+	}
 }
 
 module.exports = {
-  generateCanisterAliases,
-  getEnvironmentPath
+	generateCanisterAliases,
+	getEnvironmentPath
 };
