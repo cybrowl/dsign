@@ -24,9 +24,7 @@ let default_identity = parseIdentity(process.env.DEFAULT_IDENTITY);
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
-const { generate_images } = require('../test-utils/utils.cjs');
-
-let images = generate_images();
+const { generate_flower_images } = require('../test-utils/utils.cjs');
 
 let assets_img_staging_actors = {};
 let profile_actors = {};
@@ -89,6 +87,8 @@ test('Profile[default].get_profile(): after creating profile => #ok - username',
 
 test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - img_asset_ids', async function () {
 	try {
+		const images = generate_flower_images();
+
 		const args = {
 			data: images[0],
 			file_format: 'png'
@@ -112,8 +112,10 @@ test('ImageAssetStaging[mishicat].create_asset(): should create images => #ok - 
 	try {
 		img_asset_ids = [];
 
+		const images = generate_flower_images();
+
 		const args = {
-			data: images[1],
+			data: images[2],
 			file_format: 'png'
 		};
 
