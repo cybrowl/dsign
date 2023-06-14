@@ -10,6 +10,11 @@ if [ "$DEPLOY_ENV" == "prod" ]; then
 
   DEPLOY_NETWORK="--network ic"
   DEPLOY_WALLET="--wallet=l2eht-qyaaa-aaaag-aaarq-cai"
+elif [ "$DEPLOY_ENV" == "staging" ]; then
+    echo "env: staging"
+
+  DEPLOY_NETWORK="--network staging"
+  DEPLOY_WALLET="--wallet=l2eht-qyaaa-aaaag-aaarq-cai"
 else
     echo "env: dev"
 
