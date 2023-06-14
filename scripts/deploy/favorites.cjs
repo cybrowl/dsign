@@ -81,6 +81,7 @@ const installCode = async () => {
 	console.log('--------------------------');
 	console.log('env: ', env);
 	console.log('--------------------------');
+	console.log('======== Installing Favorite Main Child Canisters =========');
 
 	const config = envConfig[env] || envConfig['default'];
 
@@ -97,6 +98,8 @@ const installCode = async () => {
 	});
 
 	const canisters = favorite_main_canisters.map((canister) => {
+		console.log('canister: ', canister);
+
 		const arg_map = {
 			favorite: IDL.encode([IDL.Principal], [Principal.fromText(config.favorite_id)])
 		};

@@ -79,6 +79,7 @@ const init = async () => {
 		console.log('--------------------------');
 		console.log('env: ', env);
 		console.log('--------------------------');
+		console.log('======== Installing Profile Child Canisters =========');
 
 		const config = envConfig[env] || envConfig['default'];
 
@@ -95,6 +96,8 @@ const init = async () => {
 		});
 
 		const canisters = profile_child_canisters.map((canister) => {
+			console.log('canister: ', canister);
+
 			const arg_map = {
 				image_assets: IDL.encode(
 					[IDL.Principal, IDL.Bool],
