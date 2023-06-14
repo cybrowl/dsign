@@ -91,10 +91,9 @@ const installCode = async () => {
 	console.log('--------------------------');
 	console.log('env: ', env);
 	console.log('--------------------------');
+	console.log('======== Installing Project Main Child Canisters =========');
 
 	const config = envConfig[env] || envConfig['default'];
-
-	console.log('======== Installing Project Main Child Canisters =========');
 
 	const canister_ids_ledger_actor = await get_actor(
 		config.canister_ids_ledger,

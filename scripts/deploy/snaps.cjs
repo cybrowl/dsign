@@ -28,13 +28,8 @@ const parseIdentity = (privateKeyHex) => {
 
 const dev_identity = parseIdentity(process.env.ADMIN_IDENTITY);
 
-const get_wasm = (name) => {
-	const buffer = readFileSync(`${process.cwd()}/.dfx/local/canisters/${name}/${name}.wasm`);
-	return [...new Uint8Array(buffer)];
-};
-
-const get_wasm_prod = (name) => {
-	const buffer = readFileSync(`${process.cwd()}/.dfx/ic/canisters/${name}/${name}.wasm`);
+const get_wasm = (name, wasmPath) => {
+	const buffer = readFileSync(`${process.cwd()}/${wasmPath}/${name}/${name}.wasm`);
 	return [...new Uint8Array(buffer)];
 };
 
@@ -56,123 +51,103 @@ const get_actor = async (canisterId, can_interface, is_prod) => {
 const installCode = async () => {
 	console.log('Installing canisters...');
 
-	let run_in_prod = process.env.DEPLOY_ENV === 'prod' ? true : false;
+	const envConfig = {
+		prod: {
+			canister_ids_ledger: canister_ids['canister_ids_ledger'].ic,
+			snap_id: canister_ids['snap_main'].ic,
+			project_id: canister_ids['project_main'].ic,
+			favorite_id: canister_ids['favorite_main'].ic,
+			is_prod: true,
+			wasm: '.dfx/ic/canisters'
+		},
+		staging: {
+			canister_ids_ledger: canister_ids['canister_ids_ledger'].staging,
+			snap_id: canister_ids['snap_main'].staging,
+			project_id: canister_ids['project_main'].staging,
+			favorite_id: canister_ids['favorite_main'].staging,
+			is_prod: true,
+			wasm: '.dfx/staging/canisters'
+		},
+		dev: {
+			canister_ids_ledger: canister_ids_ledger_canister_id,
+			snap_id: snap_main_canister_id,
+			project_id: project_main_canister_id,
+			favorite_id: favorite_main_canister_id,
+			is_prod: false,
+			wasm: '.dfx/local/canisters'
+		},
+		default: {
+			canister_ids_ledger: canister_ids_ledger_canister_id,
+			snap_id: snap_main_canister_id,
+			project_id: project_main_canister_id,
+			favorite_id: favorite_main_canister_id,
+			is_prod: false,
+			wasm: '.dfx/local/canisters'
+		}
+	};
 
-	if (run_in_prod === false) {
-		console.log('======== Installing Local Snap Main Child Canisters =========');
+	const env = process.env.DEPLOY_ENV;
 
-		const canister_ids_ledger_actor = await get_actor(
-			canister_ids_ledger_canister_id,
-			canister_ids_ledger_interface,
-			false
+	console.log('--------------------------');
+	console.log('env: ', env);
+	console.log('--------------------------');
+	console.log('======== Installing Snap Main Child Canisters =========');
+
+	const config = envConfig[env] || envConfig['default'];
+
+	const canister_ids_ledger_actor = await get_actor(
+		config.canister_ids_ledger,
+		canister_ids_ledger_interface,
+		config.is_prod
+	);
+	const snap_main_actor = await get_actor(config.snap_id, snap_main_interface, config.is_prod);
+
+	const canister_children = await canister_ids_ledger_actor.get_canisters();
+	const snap_main_canisters = canister_children.filter((canister) => {
+		return canister.parent_name == 'SnapMain';
+	});
+
+	const canisters = snap_main_canisters.map((canister) => {
+		console.log('canister: ', canister);
+
+		const arg_map = {
+			assets: IDL.encode(
+				[IDL.Principal, IDL.Bool],
+				[Principal.fromText(config.snap_id), config.is_prod]
+			),
+			image_assets: IDL.encode(
+				[IDL.Principal, IDL.Bool],
+				[Principal.fromText(config.snap_id), config.is_prod]
+			),
+			snap: IDL.encode(
+				[IDL.Principal, IDL.Principal, IDL.Principal],
+				[
+					Principal.fromText(config.snap_id),
+					Principal.fromText(config.project_id),
+					Principal.fromText(config.favorite_id)
+				]
+			)
+		};
+
+		return {
+			name: canister.name,
+			is_prod: canister.isProd,
+			id: canister.id,
+			principal: Principal.fromText(canister.id),
+			wasm: get_wasm(`test_${canister.name}`, config.wasm),
+			arg: arg_map[canister.name]
+		};
+	});
+
+	canisters.forEach(async (canister) => {
+		const res = await snap_main_actor.install_code(
+			canister.principal,
+			[...canister.arg],
+			canister.wasm
 		);
 
-		const canister_children = await canister_ids_ledger_actor.get_canisters();
-
-		const snap_main_canisters = canister_children.filter((canister) => {
-			return canister.parent_name == 'SnapMain';
-		});
-
-		const local_canisters = snap_main_canisters.map((canister) => {
-			const arg_map = {
-				assets: IDL.encode(
-					[IDL.Principal, IDL.Bool],
-					[Principal.fromText(snap_main_canister_id), false]
-				),
-				image_assets: IDL.encode(
-					[IDL.Principal, IDL.Bool],
-					[Principal.fromText(snap_main_canister_id), false]
-				),
-				snap: IDL.encode(
-					[IDL.Principal, IDL.Principal, IDL.Principal],
-					[
-						Principal.fromText(snap_main_canister_id),
-						Principal.fromText(project_main_canister_id),
-						Principal.fromText(favorite_main_canister_id)
-					]
-				)
-			};
-
-			return {
-				name: canister.name,
-				is_prod: canister.isProd,
-				canister_id: snap_main_canister_id,
-				can_interface: snap_main_interface,
-				child_canister_principal: Principal.fromText(canister.id),
-				wasm: get_wasm(`test_${canister.name}`),
-				arg: arg_map[canister.name]
-			};
-		});
-
-		local_canisters.forEach(async (canister) => {
-			const actor = await get_actor(canister.canister_id, canister.can_interface, canister.is_prod);
-
-			const res = await actor.install_code(
-				canister.child_canister_principal,
-				[...canister.arg],
-				canister.wasm
-			);
-
-			console.log('done => ', res);
-		});
-	} else {
-		console.log('======== Installing Prod Snap Main Child Canisters =========');
-
-		const canister_ids_ledger_actor = await get_actor(
-			canister_ids['canister_ids_ledger'].ic,
-			canister_ids_ledger_interface,
-			true
-		);
-
-		const canister_children = await canister_ids_ledger_actor.get_canisters();
-
-		const snap_main_canisters = canister_children.filter((canister) => {
-			return canister.parent_name == 'SnapMain';
-		});
-
-		const prod_canisters = snap_main_canisters.map((canister) => {
-			const arg_map = {
-				assets: IDL.encode(
-					[IDL.Principal, IDL.Bool],
-					[Principal.fromText(canister_ids['snap_main'].ic), true]
-				),
-				image_assets: IDL.encode(
-					[IDL.Principal, IDL.Bool],
-					[Principal.fromText(canister_ids['snap_main'].ic), true]
-				),
-				snap: IDL.encode(
-					[IDL.Principal, IDL.Principal, IDL.Principal],
-					[
-						Principal.fromText(canister_ids['snap_main'].ic),
-						Principal.fromText(canister_ids['project_main'].ic),
-						Principal.fromText(canister_ids['favorite_main'].ic)
-					]
-				)
-			};
-
-			return {
-				name: canister.name,
-				is_prod: canister.isProd,
-				canister_id: canister_ids['snap_main'].ic,
-				can_interface: snap_main_interface,
-				child_canister_principal: Principal.fromText(canister.id),
-				wasm: get_wasm_prod(`test_${canister.name}`),
-				arg: arg_map[canister.name]
-			};
-		});
-
-		prod_canisters.forEach(async (canister) => {
-			const actor = await get_actor(canister.canister_id, canister.can_interface, canister.is_prod);
-
-			const res = await actor.install_code(
-				canister.child_canister_principal,
-				[...canister.arg],
-				canister.wasm
-			);
-
-			console.log('done => ', res);
-		});
-	}
+		console.log(`Deployed ${canister.id}  => `, res);
+	});
 };
 
 const init = async () => {
