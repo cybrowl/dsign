@@ -51,25 +51,25 @@ const installCode = async () => {
 
 	const envConfig = {
 		prod: {
-			canister_id: canister_ids['canister_ids_ledger'].ic,
+			canister_ids_ledger: canister_ids['canister_ids_ledger'].ic,
 			favorite_id: canister_ids['favorite_main'].ic,
 			is_prod: true,
 			wasm: '.dfx/ic/canisters'
 		},
 		staging: {
-			canister_id: canister_ids['canister_ids_ledger'].staging,
+			canister_ids_ledger: canister_ids['canister_ids_ledger'].staging,
 			favorite_id: canister_ids['favorite_main'].staging,
 			is_prod: true,
 			wasm: '.dfx/staging/canisters'
 		},
 		dev: {
-			canister_id: canister_ids_ledger_canister_id,
+			canister_ids_ledger: canister_ids_ledger_canister_id,
 			favorite_id: favorite_main_canister_id,
 			is_prod: false,
 			wasm: '.dfx/local/canisters'
 		},
 		default: {
-			canister_id: canister_ids_ledger_canister_id,
+			canister_ids_ledger: canister_ids_ledger_canister_id,
 			favorite_id: favorite_main_canister_id,
 			is_prod: false,
 			wasm: '.dfx/local/canisters'
@@ -85,13 +85,13 @@ const installCode = async () => {
 	const config = envConfig[env] || envConfig['default'];
 
 	const canister_ids_ledger_actor = await get_actor(
-		config.canister_id,
+		config.canister_ids_ledger,
 		canister_ids_ledger_interface,
 		config.is_prod
 	);
+	const actor = await get_actor(config.favorite_id, favorite_main_interface, config.is_prod);
 
 	const canister_children = await canister_ids_ledger_actor.get_canisters();
-
 	const favorite_main_canisters = canister_children.filter((canister) => {
 		return canister.parent_name === 'FavoriteMain';
 	});
@@ -104,27 +104,17 @@ const installCode = async () => {
 		return {
 			name: canister.name,
 			is_prod: canister.isProd,
-			canister_id: config.favorite_id,
-			can_interface: favorite_main_interface,
-			child_canister_principal: Principal.fromText(canister.id),
-			child_canister_id: canister.id,
+			canister_id: canister.id,
+			principal: Principal.fromText(canister.id),
 			wasm: get_wasm(`test_${canister.name}`, config.wasm),
 			arg: arg_map[canister.name]
 		};
 	});
 
-	console.log('canisters: ', canisters);
-
 	canisters.forEach(async (canister) => {
-		const actor = await get_actor(config.favorite_id, canister.can_interface, canister.is_prod);
+		const res = await actor.install_code(canister.principal, [...canister.arg], canister.wasm);
 
-		const res = await actor.install_code(
-			canister.child_canister_principal,
-			[...canister.arg],
-			canister.wasm
-		);
-
-		console.log(`Done ${canister.child_canister_id}  => `, res);
+		console.log(`Deployed ${canister.canister_id}  => `, res);
 	});
 };
 
