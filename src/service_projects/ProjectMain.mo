@@ -22,6 +22,7 @@ import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
 import HealthMetricsTypes "../types/health_metrics.types";
 import SnapTypes "../service_snaps/types";
 
+import { IS_PROD } "../env/env";
 import Utils "../utils/utils";
 import UtilsShared "../utils/utils";
 
@@ -424,18 +425,13 @@ actor ProjectMain {
 	public shared (msg) func initialize_canisters() : async Text {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
 
-		let is_prod = Text.equal(
-			Principal.toText(Principal.fromActor(ProjectMain)),
-			"nhlnj-vyaaa-aaaag-aay5q-cai"
-		);
-
-		if (is_prod == true) {
+		if (IS_PROD == true) {
 			snap_main_canister_id := "lyswl-7iaaa-aaaag-aatya-cai";
 			favorite_main_canister_id := "a7b5k-xiaaa-aaaag-aa6ja-cai";
 		};
 
 		if (project_canister_id.size() < 3) {
-			await create_project_canister(is_prod);
+			await create_project_canister(IS_PROD);
 
 			ignore Logger.log_event(tags, "created project_canister_id: " # project_canister_id);
 

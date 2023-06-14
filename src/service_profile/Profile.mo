@@ -19,6 +19,7 @@ import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
 import HealthMetricsTypes "../types/health_metrics.types";
 
 import Utils "./utils";
+import { IS_PROD } "../env/env";
 import UtilsShared "../utils/utils";
 
 actor Profile = {
@@ -505,14 +506,9 @@ actor Profile = {
 	public shared (msg) func initialize_canisters() : async () {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
 
-		let is_prod = Text.equal(
-			Principal.toText(Principal.fromActor(Profile)),
-			"kxkd5-7qaaa-aaaag-aaawa-cai"
-		);
-
 		// create image assets canister
 		if (image_assets_canister_id.size() < 3) {
-			await create_image_assets_canister(is_prod);
+			await create_image_assets_canister(IS_PROD);
 		};
 
 		ignore Logger.log_event(

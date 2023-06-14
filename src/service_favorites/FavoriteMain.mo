@@ -20,6 +20,7 @@ import HealthMetrics "canister:health_metrics";
 import Profile "canister:profile";
 import Logger "canister:logger";
 
+import { IS_PROD } "../env/env";
 import UtilsShared "../utils/utils";
 
 actor FavoriteMain {
@@ -269,17 +270,12 @@ actor FavoriteMain {
 	public shared (msg) func initialize_canisters() : async Text {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
 
-		let is_prod = Text.equal(
-			Principal.toText(Principal.fromActor(FavoriteMain)),
-			"a7b5k-xiaaa-aaaag-aa6ja-cai"
-		);
-
 		if (favorite_canister_id.size() > 1) {
 			ignore Logger.log_event(tags, "exists favorite_canister_id: " # favorite_canister_id);
 
 			return favorite_canister_id;
 		} else {
-			await create_favorite_canister(is_prod);
+			await create_favorite_canister(IS_PROD);
 
 			ignore Logger.log_event(tags, "created favorite_canister_id: " # favorite_canister_id);
 

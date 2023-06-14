@@ -7,20 +7,24 @@ DEPLOY_ENV=${1:-$DEPLOY_ENV}
 
 if [ "$DEPLOY_ENV" == "prod" ]; then
     echo "env: prod"
+    cp ./src/env/env_ic.mo ./src/env/env.mo
 
   DEPLOY_NETWORK="--network ic"
   DEPLOY_WALLET="--wallet=l2eht-qyaaa-aaaag-aaarq-cai"
 elif [ "$DEPLOY_ENV" == "staging" ]; then
     echo "env: staging"
+    cp ./src/env/env_staging.mo ./src/env/env.mo
 
   DEPLOY_NETWORK="--network staging"
   DEPLOY_WALLET="--wallet=l2eht-qyaaa-aaaag-aaarq-cai"
 else
     echo "env: dev"
+    cp ./src/env/env_local.mo ./src/env/env.mo
 
   DEPLOY_NETWORK=""
   DEPLOY_WALLET=""
 fi
+
 
 export PROJECT_MAIN_PRINCIPAL=$(dfx canister ${DEPLOY_NETWORK} id project_main)
 export SNAP_MAIN_PRINCIPAL=$(dfx canister ${DEPLOY_NETWORK} id snap_main)

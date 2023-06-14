@@ -25,6 +25,7 @@ import Types "./types";
 import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
 import HealthMetricsTypes "../types/health_metrics.types";
 
+import { IS_PROD } "../env/env";
 import UtilsShared "../utils/utils";
 
 actor SnapMain {
@@ -620,12 +621,7 @@ actor SnapMain {
 	public shared (msg) func initialize_canisters() : async () {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
 
-		let is_prod = Text.equal(
-			Principal.toText(Principal.fromActor(SnapMain)),
-			"lyswl-7iaaa-aaaag-aatya-cai"
-		);
-
-		if (is_prod == true) {
+		if (IS_PROD == true) {
 			project_main_canister_id := "nhlnj-vyaaa-aaaag-aay5q-cai";
 			favorite_main_canister_id := "a7b5k-xiaaa-aaaag-aa6ja-cai";
 		};
@@ -637,19 +633,19 @@ actor SnapMain {
 
 		// create canisters
 		if (assets_canister_id.size() < 3) {
-			await create_assets_canister(is_prod);
+			await create_assets_canister(IS_PROD);
 
 			ignore Logger.log_event(tags, "created assets_canister_id: " # assets_canister_id);
 		};
 
 		if (image_assets_canister_id.size() < 3) {
-			await create_image_assets_canister(is_prod);
+			await create_image_assets_canister(IS_PROD);
 
 			ignore Logger.log_event(tags, "created image_assets_canister_id: " # image_assets_canister_id);
 		};
 
 		if (snap_canister_id.size() < 3) {
-			await create_snap_canister(is_prod);
+			await create_snap_canister(IS_PROD);
 
 			ignore Logger.log_event(tags, "created snap_canister_id: " # snap_canister_id);
 		};
