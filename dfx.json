@@ -97,6 +97,12 @@
 			"packtool": "vessel sources"
 		}
 	},
+	"networks": {
+		"staging": {
+			"providers": ["https://icp0.io"],
+			"type": "persistent"
+		}
+	},
 	"dfx": "0.14.0",
 	"version": 1
 }

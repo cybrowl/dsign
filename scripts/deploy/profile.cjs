@@ -94,17 +94,17 @@ const init = async () => {
 			return canister.parent_name === 'Profile';
 		});
 
-		const profile_id_principal = Principal.fromText(config.profile_id);
-
 		const canisters = profile_child_canisters.map((canister) => {
 			const arg_map = {
-				image_assets: IDL.encode([IDL.Principal, IDL.Bool], [profile_id_principal, config.is_prod])
+				image_assets: IDL.encode(
+					[IDL.Principal, IDL.Bool],
+					[Principal.fromText(config.profile_id), config.is_prod]
+				)
 			};
 
 			return {
 				name: canister.name,
 				is_prod: canister.isProd,
-				canister_id_principal: profile_id_principal,
 				canister_id: config.profile_id,
 				can_interface: profile_interface,
 				child_canister_principal: Principal.fromText(canister.id),
@@ -117,11 +117,7 @@ const init = async () => {
 		console.log('canisters: ', canisters);
 
 		canisters.forEach(async (canister) => {
-			const actor = await get_actor(
-				canister.canister_id_principal,
-				canister.can_interface,
-				canister.is_prod
-			);
+			const actor = await get_actor(config.profile_id, canister.can_interface, canister.is_prod);
 
 			const res = await actor.install_code(
 				canister.child_canister_principal,
