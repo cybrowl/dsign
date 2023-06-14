@@ -43,9 +43,9 @@ function generateCanisterAliases() {
 }
 
 function getEnvironmentPath(isDevelopment, isStaging) {
-	if (isDevelopment && isStaging === false) {
+	if (isDevelopment) {
 		return ''.concat(__dirname, '/', 'env.dev.config.js');
-	} else if (isStaging && isDevelopment === false) {
+	} else if (isStaging) {
 		return ''.concat(__dirname, '/', 'env.staging.config.js');
 	} else {
 		return ''.concat(__dirname, '/', 'env.prod.config.js');

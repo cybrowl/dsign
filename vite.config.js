@@ -4,7 +4,7 @@ import { resolve } from 'path';
 
 import { generateCanisterAliases, getEnvironmentPath } from './config/dfx.config.cjs';
 
-const isDevelopment = process.env.DFX_NETWORK !== 'ic';
+const isDevelopment = process.env.DFX_NETWORK !== 'ic' && process.env.DFX_NETWORK !== 'staging';
 const isProduction = process.env.DFX_NETWORK === 'ic';
 const isStaging = process.env.DFX_NETWORK === 'staging';
 
