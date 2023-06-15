@@ -29,6 +29,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	type EditSnapArgs = Types.EditSnapArgs;
 	type ErrCreateSnap = Types.ErrCreateSnap;
 	type ErrEditSnap = Types.ErrEditSnap;
+	type ImageID = Types.ImageID;
 	type ImageRef = Types.ImageRef;
 	type ProjectPublic = Types.ProjectPublic;
 	type Snap = Types.Snap;
@@ -182,6 +183,46 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 				case null {};
 				case (?snap) {
 					snaps.delete(snap_id);
+				};
+			};
+		};
+	};
+
+	public shared ({ caller }) func delete_images(snap_id : SnapID, image_refs : [ImageRef]) : async () {
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "delete_images")];
+
+		if (snap_main != caller) {
+			ignore Logger.log_event(
+				log_tags,
+				"Unauthorized: " # Principal.toText(caller)
+			);
+
+			return ();
+		};
+
+		switch (snaps.get(snap_id)) {
+			case null {};
+			case (?snap) {
+				let updated_images = Array.filter(
+					snap.images,
+					func(snap_image_ref : ImageRef) : Bool {
+						Array.find(
+							image_refs,
+							func(image_ref : ImageRef) : Bool {
+								snap_image_ref.id == image_ref.id;
+							}
+						) == null;
+					}
+				);
+
+				snaps.put(snap_id, { snap with images = updated_images });
+
+				switch (snap.project_ref) {
+					case (null) {};
+					case (?project_ref) {
+						ignore Explore.update_project(project_ref);
+
+					};
 				};
 			};
 		};

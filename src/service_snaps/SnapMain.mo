@@ -26,7 +26,7 @@ import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
 import HealthMetricsTypes "../types/health_metrics.types";
 
 import { IS_PROD } "../env/env";
-import UtilsShared "../utils/utils";
+import Utils "../utils/utils";
 
 actor SnapMain {
 	type AssetRef = Types.AssetRef;
@@ -34,19 +34,21 @@ actor SnapMain {
 	type CreateSnapArgs = Types.CreateSnapArgs;
 	type EditSnapArgs = Types.EditSnapArgs;
 	type ErrCreateSnap = Types.ErrCreateSnap;
-	type ErrEditSnap = Types.ErrEditSnap;
+	type ErrDeleteImages = Types.ErrDeleteImages;
 	type ErrDeleteSnaps = Types.ErrDeleteSnaps;
+	type ErrEditSnap = Types.ErrEditSnap;
 	type ErrGetAllSnaps = Types.ErrGetAllSnaps;
 	type ICInterface = Types.ICInterface;
 	type ICInterfaceStatusResponse = Types.ICInterfaceStatusResponse;
+	type ImageID = Types.ImageID;
 	type ImageRef = Types.ImageRef;
 	type ProjectRef = Types.ProjectRef;
 	type Snap = Types.Snap;
-	type SnapRef = Types.SnapRef;
 	type SnapCanisterID = Types.SnapCanisterID;
 	type SnapID = Types.SnapID;
 	type SnapIDStorage = Types.SnapIDStorage;
 	type SnapPublic = Types.SnapPublic;
+	type SnapRef = Types.SnapRef;
 	type UserPrincipal = Types.UserPrincipal;
 
 	type AssetsActor = Types.AssetsActor;
@@ -304,8 +306,8 @@ actor SnapMain {
 		};
 
 		// check user owns snap
-		var snap_ids = UtilsShared.get_all_ids(user_snap_ids_storage);
-		var matches = UtilsShared.all_ids_match(snap_ids, [snap_info.id]);
+		var snap_ids = Utils.get_all_ids(user_snap_ids_storage);
+		var matches = Utils.all_ids_match(snap_ids, [snap_info.id]);
 
 		if (matches.all_match == false) {
 			return #err(#SnapIdsDoNotMatch);
@@ -387,13 +389,43 @@ actor SnapMain {
 		};
 	};
 
+	public shared ({ caller }) func delete_images(images : [ImageRef], snap_ref : SnapRef) : async Result.Result<Text, ErrDeleteImages> {
+		let tags = [ACTOR_NAME, "delete_images"];
+
+		switch (user_canisters_ref.get(caller)) {
+			case (?user_snap_ids_storage) {
+				let my_ids = Utils.get_all_ids(user_snap_ids_storage);
+				let matches = Utils.all_ids_match(my_ids, [snap_ref.id]);
+
+				if (matches.all_match == false) {
+					return #err(#NotOwnerOfSnaps);
+				};
+
+				for (image in images.vals()) {
+					if (Text.size(image.canister_id) > 1) {
+						let image_assets_actor = actor (image.canister_id) : ImageAssetsActor;
+						ignore image_assets_actor.delete_image(image.id);
+					};
+				};
+
+				let snap_actor = actor (snap_ref.canister_id) : SnapActor;
+				ignore snap_actor.delete_images(snap_ref.id, images);
+
+				return #ok("Deleted Images");
+			};
+			case (_) {
+				#err(#UserNotFound);
+			};
+		};
+	};
+
 	public shared ({ caller }) func delete_snaps(snap_ids_delete : [SnapID], project : ProjectRef) : async Result.Result<Text, ErrDeleteSnaps> {
 		let tags = [ACTOR_NAME, "delete_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_snap_ids_storage) {
-				let my_ids = UtilsShared.get_all_ids(user_snap_ids_storage);
-				let matches = UtilsShared.all_ids_match(my_ids, snap_ids_delete);
+				let my_ids = Utils.get_all_ids(user_snap_ids_storage);
+				let matches = Utils.all_ids_match(my_ids, snap_ids_delete);
 				let project_actor = actor (project.canister_id) : ProjectActor;
 
 				// Owner Check
@@ -430,7 +462,7 @@ actor SnapMain {
 
 					await snap_actor.delete_snaps(snap_ids_delete);
 
-					let snap_ids_not_deleted = UtilsShared.get_non_exluded_ids(
+					let snap_ids_not_deleted = Utils.get_non_exluded_ids(
 						snap_ids,
 						snap_ids_delete
 					);
@@ -653,9 +685,9 @@ actor SnapMain {
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
 			("user_canisters_ref_num", Int.toText(user_canisters_ref.size())),
-			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
-			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
-			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+			("cycles_balance", Int.toText(Utils.get_cycles_balance())),
+			("memory_in_mb", Int.toText(Utils.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(Utils.get_heap_in_mb()))
 		];
 
 		ignore Logger.log_event(
@@ -666,9 +698,9 @@ actor SnapMain {
 		let log_payload : Payload = {
 			metrics = [
 				("user_can_refs", user_canisters_ref.size()),
-				("cycles_balance", UtilsShared.get_cycles_balance()),
-				("memory_in_mb", UtilsShared.get_memory_in_mb()),
-				("heap_in_mb", UtilsShared.get_heap_in_mb())
+				("cycles_balance", Utils.get_cycles_balance()),
+				("memory_in_mb", Utils.get_memory_in_mb()),
+				("heap_in_mb", Utils.get_heap_in_mb())
 			];
 			name = ACTOR_NAME;
 			child_canister_id = Principal.toText(Principal.fromActor(SnapMain));

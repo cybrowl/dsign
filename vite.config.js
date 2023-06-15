@@ -1,4 +1,3 @@
-// import { terser } from 'rollup-plugin-terser';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { resolve } from 'path';
 

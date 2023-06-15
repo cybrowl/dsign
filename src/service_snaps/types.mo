@@ -17,6 +17,7 @@ module {
 
 	public type ImageRef = ImgAssetTypes.ImageRef;
 	public type ImageAssetsActor = ImgAssetTypes.ImageAssetsActor;
+	public type ImageID = Text;
 
 	public type AssetRef = AssetTypes.AssetRef;
 	public type AssetsActor = AssetTypes.AssetsActor;
@@ -144,6 +145,11 @@ module {
 		#NotOwnerOfProject;
 	};
 
+	public type ErrDeleteImages = {
+		#UserNotFound;
+		#NotOwnerOfSnaps;
+	};
+
 	public type ErrGetAllSnaps = {
 		#NotAuthorized : Bool;
 		#UserNotFound : Bool;
@@ -154,6 +160,7 @@ module {
 		create_snap : shared (CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, ErrCreateSnap>;
 		edit_snap : shared (EditSnapArgs, ?[ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, ErrEditSnap>;
 		delete_snaps : shared ([SnapID]) -> async ();
+		delete_images : shared (SnapID, [ImageRef]) -> async ();
 		get_all_snaps : query ([SnapID]) -> async [SnapPublic];
 	};
 };
