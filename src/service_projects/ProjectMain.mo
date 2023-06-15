@@ -17,14 +17,13 @@ import Logger "canister:logger";
 import Profile "canister:profile";
 import Project "Project";
 
-import Types "./types";
 import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
 import HealthMetricsTypes "../types/health_metrics.types";
 import SnapTypes "../service_snaps/types";
+import Types "./types";
 
 import { IS_PROD } "../env/env";
 import Utils "../utils/utils";
-import UtilsShared "../utils/utils";
 
 actor ProjectMain {
 	type ErrAddSnapsToProject = Types.ErrAddSnapsToProject;
@@ -221,43 +220,6 @@ actor ProjectMain {
 		};
 	};
 
-	// public shared ({ caller }) func delete_snaps_from_project(
-	//     snaps : [SnapRef],
-	//     project_ref : ProjectRef
-	// ) : async Result.Result<Text, ErrDeleteSnapsFromProject> {
-	//     let tags = [ACTOR_NAME, "delete_snaps_from_project"];
-
-	//     if (snaps.size() > SNAP_ARG_SIZE_LIMIT) {
-	//         return #err(#NumberSnapsTooLarge);
-	//     };
-
-	//     switch (user_canisters_ref.get(caller)) {
-	//         case (?user_project_ids_storage) {
-	//             let my_ids = Utils.get_all_ids(user_project_ids_storage);
-	//             let matches = Utils.all_ids_match(my_ids, [project_ref.id]);
-
-	//             if (matches.all_match == false) {
-	//                 return #err(#ProjectIdsDoNotMatch);
-	//             };
-
-	//             let project_actor = actor (project_ref.canister_id) : ProjectActor;
-
-	//             switch (await project_actor.delete_snaps_from_project(snaps, project_ref.id, caller)) {
-	//                 case (#err err) {
-	//                     return #err(#ErrorCall(debug_show (err)));
-	//                 };
-	//                 case (#ok _) {
-	//                     //TODO: ignore Snap.delete_snaps
-	//                     return #ok("Deleted Snaps From Project");
-	//                 };
-	//             };
-	//         };
-	//         case (_) {
-	//             #err(#UserNotFound);
-	//         };
-	//     };
-	// };
-
 	public shared ({ caller }) func get_all_projects(username : ?Text) : async Result.Result<[ProjectPublic], ErrGetProjects> {
 		let tags = [ACTOR_NAME, "get_projects"];
 
@@ -346,9 +308,9 @@ actor ProjectMain {
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
 			("user_canisters_ref_num", Int.toText(user_canisters_ref.size())),
-			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
-			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
-			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+			("cycles_balance", Int.toText(Utils.get_cycles_balance())),
+			("memory_in_mb", Int.toText(Utils.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(Utils.get_heap_in_mb()))
 		];
 
 		ignore Logger.log_event(
@@ -359,9 +321,9 @@ actor ProjectMain {
 		let log_payload : Payload = {
 			metrics = [
 				("user_can_refs", user_canisters_ref.size()),
-				("cycles_balance", UtilsShared.get_cycles_balance()),
-				("memory_in_mb", UtilsShared.get_memory_in_mb()),
-				("heap_in_mb", UtilsShared.get_heap_in_mb())
+				("cycles_balance", Utils.get_cycles_balance()),
+				("memory_in_mb", Utils.get_memory_in_mb()),
+				("heap_in_mb", Utils.get_heap_in_mb())
 			];
 			name = ACTOR_NAME;
 			child_canister_id = Principal.toText(Principal.fromActor(ProjectMain));

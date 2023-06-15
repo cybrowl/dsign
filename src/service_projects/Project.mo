@@ -21,7 +21,6 @@ import SnapTypes "../service_snaps/types";
 import Types "./types";
 
 import Utils "../utils/utils";
-import UtilsShared "../utils/utils";
 
 actor class Project(project_main : Principal, snap_main : Principal, favorite_main : Principal, is_prod : Bool) = this {
 	type ErrAddSnapsToProject = Types.ErrAddSnapsToProject;
@@ -394,9 +393,9 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 			("method", "health"),
 			("canister_id", Principal.toText(Principal.fromActor(this))),
 			("projects_size", Int.toText(projects.size())),
-			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
-			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
-			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+			("cycles_balance", Int.toText(Utils.get_cycles_balance())),
+			("memory_in_mb", Int.toText(Utils.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(Utils.get_heap_in_mb()))
 		];
 
 		ignore Logger.log_event(
@@ -407,9 +406,9 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 		let log_payload : Payload = {
 			metrics = [
 				("projects_num", projects.size()),
-				("cycles_balance", UtilsShared.get_cycles_balance()),
-				("memory_in_mb", UtilsShared.get_memory_in_mb()),
-				("heap_in_mb", UtilsShared.get_heap_in_mb())
+				("cycles_balance", Utils.get_cycles_balance()),
+				("memory_in_mb", Utils.get_memory_in_mb()),
+				("heap_in_mb", Utils.get_heap_in_mb())
 			];
 			name = ACTOR_NAME;
 			child_canister_id = Principal.toText(Principal.fromActor(this));

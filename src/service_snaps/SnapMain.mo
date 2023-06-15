@@ -401,13 +401,6 @@ actor SnapMain {
 					return #err(#NotOwnerOfSnaps);
 				};
 
-				switch (await project_actor.owner_check(project.id, caller)) {
-					case (true) {};
-					case (false) {
-						return #err(#NotOwnerOfProject);
-					};
-				};
-
 				var snap_refs = Buffer.Buffer<SnapRef>(0);
 
 				for ((canister_id, snap_ids) in user_snap_ids_storage.entries()) {

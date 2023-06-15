@@ -1,6 +1,5 @@
 const test = require('tape');
 const { config } = require('dotenv');
-const { get } = require('lodash');
 
 config();
 
@@ -106,16 +105,31 @@ test('Setup Actors', async function () {
 	profile_actor.default = await get_actor(profile_canister_id, profile_interface, default_identity);
 });
 
-test('ProjectMain[mishicat].create_project(): with name => #ok - project', async function (t) {
-	let { ok: projects_, err: error } = await project_main_actor.mishicat.get_all_projects([]);
+test('ProjectMain[mishicat].delete_all_projects(): with valid project ids => #ok - "Deleted Projects"', async function (t) {
+	const { ok: ids } = await project_main_actor.mishicat.get_project_ids();
 
-	projects = projects_;
+	if (ids.length > 0) {
+		const response = await project_main_actor.mishicat.delete_projects(ids);
 
-	if (get(error, 'NoProjects', false) === true) {
-		projects = await project_main_actor.mishicat.create_project('Project One', []);
+		t.equal(response.ok, 'Deleted Projects');
+	} else {
+		t.equal(ids.length, 0);
 	}
+});
 
-	t.true(projects.length > 0);
+test('ProjectMain[mishicat].create_project(): with name => #ok - project', async function (t) {
+	let { ok: projects_before } = await project_main_actor.mishicat.get_all_projects([]);
+
+	if (projects_before.length === 0) {
+		await project_main_actor.mishicat.create_project('Project One', []);
+
+		let { ok: projects_, err: error } = await project_main_actor.mishicat.get_all_projects([]);
+
+		projects = projects_;
+
+		t.true(projects.length > 0);
+		t.equal(error, undefined);
+	}
 });
 
 test('SnapMain[mishicat].create_snap(): with no image => #err - NoImageToSave', async function (t) {
