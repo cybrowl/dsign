@@ -280,7 +280,7 @@ test('ImageAssetStaging[mishicat].get_asset():  => #err - no image found', async
 	t.deepEqual(response.err, { AssetNotFound: null });
 });
 
-test('SnapMain[mishicat].edit_snap(): name only => #ok - edited snap', async function (t) {
+test('SnapMain[mishicat].edit_snap(): change name only => #ok - edited snap', async function (t) {
 	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
 	const snap = all_snaps[0];
 
@@ -320,7 +320,7 @@ test('ImageAssetStaging[mishicat].create_asset(): with image and valid identity 
 	}
 });
 
-test('SnapMain[mishicat].edit_snap(): name and images => #ok - edited snap', async function (t) {
+test('SnapMain[mishicat].edit_snap(): change name and images => #ok - edited snap', async function (t) {
 	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
 	const snap = all_snaps[0];
 
@@ -360,7 +360,7 @@ test('ImageAssetStaging[mishicat].create_asset(): with image and valid identity 
 	}
 });
 
-test('SnapMain[mishicat].edit_snap(): images only => #ok - edited snap', async function (t) {
+test('SnapMain[mishicat].edit_snap(): change images only => #ok - edited snap', async function (t) {
 	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
 	const snap = all_snaps[0];
 
@@ -413,7 +413,7 @@ test('FileAssetChunks[mishicat].create_chunk(): upload chunks from file to canis
 	t.equal(hasChunkIds, true);
 });
 
-test('SnapMain[mishicat].edit_snap(): file only => #ok - snap', async function (t) {
+test('SnapMain[mishicat].edit_snap(): change file only => #ok - snap', async function (t) {
 	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
 	const snap = all_snaps[0];
 
@@ -471,7 +471,7 @@ test('FileAssetChunks[mishicat].create_chunk(): upload chunks from file to canis
 	t.equal(hasChunkIds, true);
 });
 
-test('SnapMain[mishicat].edit_snap(): file only => #err - SnapIdsDoNotMatch', async function (t) {
+test('SnapMain[motoko].edit_snap(): change file only => #err - SnapIdsDoNotMatch', async function (t) {
 	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
 	const snap = all_snaps[0];
 
@@ -496,7 +496,7 @@ test('SnapMain[mishicat].edit_snap(): file only => #err - SnapIdsDoNotMatch', as
 	t.equal(snap_, undefined);
 });
 
-test('SnapMain[mishicat].edit_snap(): file only => #ok - snap', async function (t) {
+test('SnapMain[mishicat].edit_snap(): change file only => #ok - snap', async function (t) {
 	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
 	const snap = all_snaps[0];
 
@@ -537,5 +537,24 @@ test('SnapMain[mishicat].edit_snap(): all empty => #ok - snap', async function (
 	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
 
 	t.equal(snap_.file_asset.id.length > 3, true);
+	t.equal(snap_.image_cover_location, 1);
 	t.equal(snap_.file_asset.file_name, 'dsign_components.fig');
+});
+
+test('SnapMain[mishicat].edit_snap(): change image_cover_location => #ok - snap', async function (t) {
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const snap = all_snaps[0];
+
+	let create_args = {
+		title: [],
+		id: snap.id,
+		canister_id: snap.canister_id,
+		image_cover_location: [3],
+		img_asset_ids: [],
+		file_asset: []
+	};
+
+	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
+
+	t.equal(snap_.image_cover_location, 3);
 });
