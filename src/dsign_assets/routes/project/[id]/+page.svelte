@@ -25,12 +25,7 @@
 		actor_snap_main
 	} from '$stores_ref/actors';
 	import { project_store, project_store_fetching, projects_update } from '$stores_ref/fetch_store';
-	import {
-		auth_favorite_main,
-		auth_profile,
-		auth_project_main,
-		auth_snap_main
-	} from '$stores_ref/auth_client';
+	import { auth } from '$stores_ref/auth_client';
 	import { modal_visible } from '$stores_ref/modal';
 	import {
 		snap_preview,
@@ -55,10 +50,10 @@
 
 	onMount(async () => {
 		await Promise.all([
-			auth_favorite_main(),
-			auth_profile(),
-			auth_project_main(),
-			auth_snap_main()
+			auth.favorite_main(),
+			auth.profile(),
+			auth.project_main(),
+			auth.snap_main()
 		]);
 
 		local_snap_creation_design_file.set({ file_name: '', file_type: '', chunk_ids: [] });

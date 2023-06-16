@@ -4,7 +4,7 @@
 	import { ProjectDelete, Modal } from 'dsign-components';
 
 	import { actor_project_main, actor_snap_main } from '$stores_ref/actors';
-	import { auth_snap_main, auth_project_main } from '$stores_ref/auth_client';
+	import { auth } from '$stores_ref/auth_client';
 	import { navigate_to_home_with_notification } from '$stores_ref/page_navigation';
 	import { projects_update } from '$stores_ref/fetch_store';
 	import modal_update from '$stores_ref/modal';
@@ -14,7 +14,7 @@
 	};
 
 	onMount(async () => {
-		await Promise.all([auth_snap_main(), auth_project_main()]);
+		await Promise.all([auth.snap_main(), auth.project_main()]);
 	});
 
 	function handleCloseModal() {

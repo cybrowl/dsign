@@ -1,6 +1,5 @@
 import { writable } from 'svelte/store';
 import { AuthClient } from '@dfinity/auth-client';
-
 import {
 	actor_assets_file_staging,
 	actor_assets_img_staging,
@@ -14,170 +13,53 @@ import {
 
 export const auth_client = writable({});
 
-export const auth_assets_file_staging = async () => {
+const authActors = [
+	{ name: 'assets_file_staging', actor: actor_assets_file_staging },
+	{ name: 'assets_img_staging', actor: actor_assets_img_staging },
+	{ name: 'explore', actor: actor_explore },
+	{ name: 'favorite_main', actor: actor_favorite_main },
+	{ name: 'profile', actor: actor_profile },
+	{ name: 'project_main', actor: actor_project_main },
+	{ name: 'snap_main', actor: actor_snap_main }
+];
+
+const authenticateActor = async (actor_name, actor) => {
 	const authClient = await AuthClient.create();
 	const isAuthenticated = await authClient.isAuthenticated();
 
 	if (isAuthenticated) {
-		actor_assets_file_staging.update(() => ({
+		actor.update(() => ({
 			loggedIn: true,
 			actor: createActor({
-				actor_name: 'assets_file_staging',
+				actor_name,
 				identity: authClient.getIdentity()
 			})
 		}));
 	}
 };
 
-export const auth_assets_img_staging = async () => {
+const logoutActor = async (actor_name, actor) => {
 	const authClient = await AuthClient.create();
 	const isAuthenticated = await authClient.isAuthenticated();
 
-	if (isAuthenticated) {
-		actor_assets_img_staging.update(() => ({
-			loggedIn: true,
+	if (!isAuthenticated) {
+		actor.update(() => ({
+			loggedIn: false,
 			actor: createActor({
-				actor_name: 'assets_img_staging',
+				actor_name,
 				identity: authClient.getIdentity()
 			})
 		}));
 	}
 };
 
-export const auth_explore = async () => {
-	const authClient = await AuthClient.create();
-	const isAuthenticated = await authClient.isAuthenticated();
-
-	if (isAuthenticated) {
-		actor_explore.update(() => ({
-			loggedIn: true,
-			actor: createActor({
-				actor_name: 'explore',
-				identity: authClient.getIdentity()
-			})
-		}));
-	}
-};
-
-export const auth_favorite_main = async () => {
-	const authClient = await AuthClient.create();
-	const isAuthenticated = await authClient.isAuthenticated();
-
-	if (isAuthenticated) {
-		actor_favorite_main.update(() => ({
-			loggedIn: true,
-			actor: createActor({
-				actor_name: 'favorite_main',
-				identity: authClient.getIdentity()
-			})
-		}));
-	}
-};
-
-export const auth_project_main = async () => {
-	const authClient = await AuthClient.create();
-	const isAuthenticated = await authClient.isAuthenticated();
-
-	if (isAuthenticated) {
-		actor_project_main.update(() => ({
-			loggedIn: true,
-			actor: createActor({
-				actor_name: 'project_main',
-				identity: authClient.getIdentity()
-			})
-		}));
-	}
-};
-
-export const auth_snap_main = async () => {
-	const authClient = await AuthClient.create();
-	const isAuthenticated = await authClient.isAuthenticated();
-
-	if (isAuthenticated) {
-		actor_snap_main.update(() => ({
-			loggedIn: true,
-			actor: createActor({
-				actor_name: 'snap_main',
-				identity: authClient.getIdentity()
-			})
-		}));
-	}
-};
-
-export const auth_profile = async () => {
-	const authClient = await AuthClient.create();
-	const isAuthenticated = await authClient.isAuthenticated();
-
-	if (isAuthenticated) {
-		actor_profile.update(() => ({
-			loggedIn: true,
-			actor: createActor({
-				actor_name: 'profile',
-				identity: authClient.getIdentity()
-			})
-		}));
-	}
-};
+export const auth = {};
+authActors.forEach(({ name, actor }) => {
+	auth[name] = () => authenticateActor(name, actor);
+});
 
 export const auth_logout_all = async () => {
-	const authClient = await AuthClient.create();
-	const isAuthenticated = await authClient.isAuthenticated();
-
-	if (isAuthenticated === false) {
-		actor_assets_file_staging.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'assets_file_staging',
-				identity: authClient.getIdentity()
-			})
-		}));
-
-		actor_assets_img_staging.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'assets_img_staging',
-				identity: authClient.getIdentity()
-			})
-		}));
-
-		actor_explore.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'explore',
-				identity: authClient.getIdentity()
-			})
-		}));
-
-		actor_profile.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'profile',
-				identity: authClient.getIdentity()
-			})
-		}));
-
-		actor_project_main.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'project_main',
-				identity: authClient.getIdentity()
-			})
-		}));
-
-		actor_favorite_main.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'favorite_main',
-				identity: authClient.getIdentity()
-			})
-		}));
-
-		actor_snap_main.update(() => ({
-			loggedIn: false,
-			actor: createActor({
-				actor_name: 'snap_main',
-				identity: authClient.getIdentity()
-			})
-		}));
-	}
+	authActors.forEach(({ name, actor }) => {
+		logoutActor(name, actor);
+	});
 };

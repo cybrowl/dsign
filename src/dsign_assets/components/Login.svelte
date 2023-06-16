@@ -7,7 +7,7 @@
 	import { Avatar, Button, Icon } from 'dsign-components';
 
 	import { actor_profile } from '$stores_ref/actors';
-	import { auth_client, auth_profile } from '$stores_ref/auth_client';
+	import { auth_client, auth } from '$stores_ref/auth_client';
 	import { local_storage_profile } from '$stores_ref/local_storage';
 	import modal_update from '$stores_ref/modal';
 
@@ -19,7 +19,7 @@
 	}
 
 	onMount(async () => {
-		await auth_profile();
+		await auth.profile();
 
 		if ($actor_profile.loggedIn) {
 			try {
@@ -44,7 +44,7 @@
 	});
 
 	async function handleAuth() {
-		await auth_profile();
+		await auth.profile();
 
 		try {
 			if ($actor_profile.loggedIn) {
@@ -73,6 +73,7 @@
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'
 				: 'http://localhost:8080/?canisterId=bnz7o-iuaaa-aaaaa-qaaaa-cai',
+			maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000),
 			onSuccess: handleAuth
 		});
 	}

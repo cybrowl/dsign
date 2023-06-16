@@ -9,7 +9,7 @@
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
 	import { actor_snap_main, actor_profile } from '$stores_ref/actors';
-	import { auth_profile } from '$stores_ref/auth_client';
+	import { auth } from '$stores_ref/auth_client';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation, snap_creation, snap_preview } from '$stores_ref/page_navigation';
@@ -22,7 +22,7 @@
 		const canister_id = $page.url.searchParams.get('canister_id');
 		const snap_id = last(get($page, 'url.pathname', '').split('/'));
 
-		await Promise.all([auth_profile()]);
+		await Promise.all([auth.profile()]);
 
 		try {
 			if ($snap_preview.id === undefined) {

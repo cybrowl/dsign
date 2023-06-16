@@ -13,11 +13,7 @@
 		actor_assets_img_staging,
 		actor_snap_main
 	} from '$stores_ref/actors';
-	import {
-		auth_assets_file_staging,
-		auth_assets_img_staging,
-		auth_snap_main
-	} from '$stores_ref/auth_client';
+	import { auth } from '$stores_ref/auth_client';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 	import { local_snap_creation_design_file } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
@@ -28,27 +24,24 @@
 	let cover_img = {};
 	let is_publishing = false;
 	let is_uploading_design_file = false;
+	let mode = '';
 
 	onMount(async () => {
-		await Promise.all([auth_assets_file_staging(), auth_assets_img_staging(), auth_snap_main()]);
+		await Promise.all([auth.assets_file_staging(), auth.assets_img_staging(), auth.snap_main()]);
 
 		console.log('$snap_creation: ', $snap_creation);
 
-		// const mode = $page.url.searchParams.get('mode');
+		mode = $page.url.searchParams.get('mode');
 
-		// if (mode === 'edit' && isEmpty($snap_creation.id)) {
-		// 	goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
-		// }
-
-		// if ($local_snap_creation_design_file.file_name) {
-		// 	snap_creation.update((value) => ({
-		// 		...value,
-		// 		file_asset: {
-		// 			...value.file_asset,
-		// 			file_name: $local_snap_creation_design_file.file_name
-		// 		}
-		// 	}));
-		// }
+		if ($local_snap_creation_design_file.file_name) {
+			snap_creation.update((value) => ({
+				...value,
+				file_asset: {
+					...value.file_asset,
+					file_name: $local_snap_creation_design_file.file_name
+				}
+			}));
+		}
 	});
 
 	onDestroy(async () => {
@@ -123,14 +116,26 @@
 		is_uploading_design_file = false;
 	}
 
-	function handleRemoveFile(event) {
-		let file = event.detail;
-
-		// delete from staging storage
-		// delete from snap
-
+	async function handleRemoveFile() {
 		$snap_creation.file_asset.file_name = '';
 		$snap_creation.file_asset.file_unit8 = [];
+
+		// delete from staging storage
+		local_snap_creation_design_file.set({
+			file_name: '',
+			file_type: '',
+			chunk_ids: []
+		});
+
+		// delete from snap
+		const snap_ref = {
+			id: $snap_creation.id,
+			canister_id: $snap_creation.canister_id
+		};
+
+		const { ok: deleted, err: err_delete } = await $actor_snap_main.actor.delete_design_file(
+			snap_ref
+		);
 	}
 
 	function generateId() {
@@ -191,12 +196,9 @@
 			return [];
 		}
 
-		let promises = images.map(async function (image) {
-			if (!image.data || !image.mimeType) {
-				console.error('image object must contain data and mimeType properties');
-				return null;
-			}
+		let validImages = images.filter((image) => image.data && image.mimeType);
 
+		let promises = validImages.map(async function (image) {
 			try {
 				return await $actor_assets_img_staging.actor.create_asset({
 					data: image.data,
@@ -204,7 +206,6 @@
 				});
 			} catch (error) {
 				console.error('Error creating asset:', error);
-				return null;
 			}
 		});
 
@@ -217,7 +218,7 @@
 	}
 
 	async function handlePublish(event) {
-		await Promise.all([auth_assets_file_staging(), auth_assets_img_staging(), auth_snap_main()]);
+		await Promise.all([auth.assets_file_staging(), auth.assets_img_staging(), auth.snap_main()]);
 
 		disable_project_store_reset.set(false);
 
@@ -258,13 +259,31 @@
 				file_asset: isEmpty(file_chunks) ? [] : [file_asset]
 			};
 
+			let edit_snap_args = {
+				title: [snap_name],
+				id: $snap_creation.id,
+				canister_id: $snap_creation.canister_id,
+				image_cover_location: [image_cover_location],
+				img_asset_ids: [image_ids],
+				file_asset: isEmpty(file_chunks) ? [] : [file_asset]
+			};
+
 			console.log('create_snap_args: ', create_snap_args);
+			console.log('edit_snap_args: ', edit_snap_args);
 
 			if ($actor_snap_main.loggedIn) {
-				const { ok: created_snap, err: snap_creation_failed } =
-					await $actor_snap_main.actor.create_snap(create_snap_args);
+				if (mode === 'edit') {
+					const { ok: edited_snap, err: err_edit_snap } = await $actor_snap_main.actor.edit_snap(
+						edit_snap_args
+					);
 
-				goto(`/project/${project_id}?canister_id=${canister_id}`);
+					goto(`/project/${project_id}?canister_id=${canister_id}`);
+				} else {
+					const { ok: created_snap, err: snap_creation_failed } =
+						await $actor_snap_main.actor.create_snap(create_snap_args);
+
+					goto(`/project/${project_id}?canister_id=${canister_id}`);
+				}
 			}
 		} catch (error) {
 			console.log('error: ', error);

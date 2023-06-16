@@ -6,7 +6,7 @@
 	import { ProjectUpsert, Modal } from 'dsign-components';
 
 	import { actor_project_main } from '$stores_ref/actors';
-	import { auth_project_main } from '$stores_ref/auth_client';
+	import { auth } from '$stores_ref/auth_client';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 	import { navigate_to_home_with_notification } from '$stores_ref/page_navigation';
 	import { project_store, projects_update } from '$stores_ref/fetch_store';
@@ -30,7 +30,7 @@
 	}
 
 	onMount(async () => {
-		await auth_project_main();
+		await auth.project_main();
 	});
 
 	onDestroy(() => (is_sending = false));

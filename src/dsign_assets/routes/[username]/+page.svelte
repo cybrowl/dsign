@@ -24,12 +24,7 @@
 		actor_profile,
 		actor_project_main
 	} from '$stores_ref/actors';
-	import {
-		auth_assets_img_staging,
-		auth_favorite_main,
-		auth_profile,
-		auth_project_main
-	} from '$stores_ref/auth_client';
+	import { auth } from '$stores_ref/auth_client';
 	import { profileTabsState, disable_project_store_reset } from '$stores_ref/page_state';
 	import {
 		favorite_store_fetching,
@@ -128,10 +123,10 @@
 
 	onMount(async () => {
 		await Promise.all([
-			auth_assets_img_staging(),
-			auth_profile(),
-			auth_project_main(),
-			auth_favorite_main()
+			auth.assets_img_staging(),
+			auth.profile(),
+			auth.project_main(),
+			auth.favorite_main()
 		]);
 
 		await get_profile();
