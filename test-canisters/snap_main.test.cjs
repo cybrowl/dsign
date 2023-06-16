@@ -471,7 +471,7 @@ test('FileAssetChunks[mishicat].create_chunk(): upload chunks from file to canis
 	t.equal(hasChunkIds, true);
 });
 
-test('SnapMain[motoko].edit_snap(): change file only => #err - SnapIdsDoNotMatch', async function (t) {
+test('SnapMain[motoko].edit_snap(): change file only => #err - NotOwnerOfSnaps', async function (t) {
 	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
 	const snap = all_snaps[0];
 
@@ -492,7 +492,7 @@ test('SnapMain[motoko].edit_snap(): change file only => #err - SnapIdsDoNotMatch
 
 	const { ok: snap_, err: error_ } = await snap_main_actor.motoko.edit_snap(create_args);
 
-	t.deepEqual(error_, { SnapIdsDoNotMatch: null });
+	t.deepEqual(error_, { NotOwnerOfSnaps: null });
 	t.equal(snap_, undefined);
 });
 

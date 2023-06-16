@@ -1,47 +1,18 @@
-const {
-	idlFactory: assets_img_staging_interface
-} = require('../.dfx/local/canisters/assets_img_staging/service.did.test.cjs');
-const {
-	idlFactory: assets_file_staging_interface
-} = require('../.dfx/local/canisters/assets_file_staging/service.did.test.cjs');
-const {
-	idlFactory: canister_ids_ledger_interface
-} = require('../.dfx/local/canisters/canister_ids_ledger/service.did.test.cjs');
-const {
-	idlFactory: explore_interface
-} = require('../.dfx/local/canisters/explore/service.did.test.cjs');
-const {
-	idlFactory: favorite_main_interface
-} = require('../.dfx/local/canisters/favorite_main/service.did.test.cjs');
-const {
-	idlFactory: profile_interface
-} = require('../.dfx/local/canisters/profile/service.did.test.cjs');
-const {
-	idlFactory: project_main_interface
-} = require('../.dfx/local/canisters/project_main/service.did.test.cjs');
-const {
-	idlFactory: snap_main_interface
-} = require('../.dfx/local/canisters/snap_main/service.did.test.cjs');
-const {
-	idlFactory: test_assets_interface
-} = require('../.dfx/local/canisters/test_assets/service.did.test.cjs');
-const {
-	idlFactory: test_image_assets_interface
-} = require('../.dfx/local/canisters/test_image_assets/service.did.test.cjs');
-const {
-	idlFactory: test_project_interface
-} = require('../.dfx/local/canisters/test_project/service.did.test.cjs');
+function getInterface(canister) {
+	const { idlFactory } = require(`../.dfx/local/canisters/${canister}/service.did.test.cjs`);
+	return idlFactory;
+}
 
 module.exports = {
-	assets_file_staging_interface,
-	assets_img_staging_interface,
-	canister_ids_ledger_interface,
-	explore_interface,
-	favorite_main_interface,
-	profile_interface,
-	project_main_interface,
-	snap_main_interface,
-	test_assets_interface,
-	test_image_assets_interface,
-	test_project_interface
+	assets_file_staging_interface: getInterface('assets_file_staging'),
+	assets_img_staging_interface: getInterface('assets_img_staging'),
+	canister_ids_ledger_interface: getInterface('canister_ids_ledger'),
+	explore_interface: getInterface('explore'),
+	favorite_main_interface: getInterface('favorite_main'),
+	profile_interface: getInterface('profile'),
+	project_main_interface: getInterface('project_main'),
+	snap_main_interface: getInterface('snap_main'),
+	test_assets_interface: getInterface('test_assets'),
+	test_image_assets_interface: getInterface('test_image_assets'),
+	test_project_interface: getInterface('test_project')
 };
