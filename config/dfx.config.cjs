@@ -34,7 +34,7 @@ function generateCanisterAliases() {
 
 			return {
 				...acc,
-				['$IDL' + name]: ''.concat(outputRoot + '/' + name + '.did.js')
+				['$IDL' + name]: ''.concat(outputRoot + '/' + 'service.did.js')
 			};
 		}, aliases);
 	}

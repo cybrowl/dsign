@@ -7,32 +7,32 @@ test('DFX Config: generateCanisterAliases()', async function (t) {
 	const expected = {
 		'local-canister-ids': '/Users/cyberowl/Projects/dsign/.dfx/local/canister_ids.json',
 		$IDLdsign_assets:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/dsign_assets.did.js',
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/service.did.js',
 		$IDLassets_file_staging:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/assets_file_staging/assets_file_staging.did.js',
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/assets_file_staging/service.did.js',
 		$IDLassets_img_staging:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/assets_img_staging/assets_img_staging.did.js',
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/assets_img_staging/service.did.js',
 		$IDLcanister_ids_ledger:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/canister_ids_ledger/canister_ids_ledger.did.js',
-		$IDLexplore: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/explore/explore.did.js',
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/canister_ids_ledger/service.did.js',
+		$IDLexplore: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/explore/service.did.js',
 		$IDLfavorite_main:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/favorite_main/favorite_main.did.js',
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/favorite_main/service.did.js',
 		$IDLhealth_metrics:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/health_metrics/health_metrics.did.js',
-		$IDLprofile: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile/profile.did.js',
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/health_metrics/service.did.js',
+		$IDLprofile: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile/service.did.js',
 		$IDLproject_main:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/project_main/project_main.did.js',
-		$IDLsnap_main: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/snap_main/snap_main.did.js',
-		$IDLlogger: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/logger/logger.did.js',
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/project_main/service.did.js',
+		$IDLsnap_main: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/snap_main/service.did.js',
+		$IDLlogger: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/logger/service.did.js',
 		$IDLtest_assets:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_assets/test_assets.did.js',
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_assets/service.did.js',
 		$IDLtest_favorite:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_favorite/test_favorite.did.js',
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_favorite/service.did.js',
 		$IDLtest_image_assets:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_image_assets/test_image_assets.did.js',
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_image_assets/service.did.js',
 		$IDLtest_project:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_project/test_project.did.js',
-		$IDLtest_snap: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_snap/test_snap.did.js'
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_project/service.did.js',
+		$IDLtest_snap: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_snap/service.did.js'
 	};
 
 	t.deepEqual(aliases, expected);
