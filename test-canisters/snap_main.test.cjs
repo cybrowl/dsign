@@ -31,6 +31,7 @@ let default_identity = parseIdentity(process.env.DEFAULT_IDENTITY);
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
 const {
+	request_resource,
 	generate_animal_images,
 	generate_figma_asset,
 	generate_figma_dsign_components,
@@ -660,4 +661,36 @@ test('SnapMain[mishicat].create_snap(): with images only => #ok - snap', async f
 	const response = await snap_main_actor.mishicat.create_snap(create_args);
 
 	t.deepEqual(response.ok, 'Created Snap');
+});
+
+test('Assets[mishicat].http_request():  => #ok - 200', async function (t) {
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const snap = all_snaps[0];
+
+	const asset_file_res = await request_resource(snap.file_asset.url);
+	t.equal(asset_file_res.statusCode, 200);
+});
+
+test('SnapMain[mishicat].delete_design_file():  => #ok - Deleted Design File', async function (t) {
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const snap = all_snaps[0];
+
+	const snap_ref = {
+		id: snap.id,
+		canister_id: snap.canister_id
+	};
+
+	const response = await snap_main_actor.mishicat.delete_design_file(snap_ref);
+
+	const asset_file_res_after = await request_resource(snap.file_asset.url);
+	t.equal(asset_file_res_after.statusCode, 404);
+
+	t.deepEqual(response.ok, 'Deleted Design File');
+});
+
+test('SnapMain[mishicat].get_all_snaps(): check deleted file on snap => #ok - snap', async function (t) {
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const snap = all_snaps[0];
+
+	t.equal(snap.file_asset.id, '');
 });

@@ -34,6 +34,7 @@ actor SnapMain {
 	type CreateSnapArgs = Types.CreateSnapArgs;
 	type EditSnapArgs = Types.EditSnapArgs;
 	type ErrCreateSnap = Types.ErrCreateSnap;
+	type ErrDeleteDesignFile = Types.ErrDeleteDesignFile;
 	type ErrDeleteImages = Types.ErrDeleteImages;
 	type ErrDeleteSnaps = Types.ErrDeleteSnaps;
 	type ErrEditSnap = Types.ErrEditSnap;
@@ -306,11 +307,10 @@ actor SnapMain {
 		};
 
 		// check user owns snap
-		var snap_ids = Utils.get_all_ids(user_snap_ids_storage);
-		var matches = Utils.all_ids_match(snap_ids, [snap_info.id]);
+		let is_owner = Utils.check_user_ownership(user_snap_ids_storage, [snap_info.id]);
 
-		if (matches.all_match == false) {
-			return #err(#SnapIdsDoNotMatch);
+		if (not is_owner) {
+			return #err(#NotOwnerOfSnaps);
 		};
 
 		let assets_actor = actor (assets_canister_id) : AssetsActor;
@@ -394,10 +394,9 @@ actor SnapMain {
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_snap_ids_storage) {
-				let my_ids = Utils.get_all_ids(user_snap_ids_storage);
-				let matches = Utils.all_ids_match(my_ids, [snap_ref.id]);
+				let is_owner = Utils.check_user_ownership(user_snap_ids_storage, [snap_ref.id]);
 
-				if (matches.all_match == false) {
+				if (not is_owner) {
 					return #err(#NotOwnerOfSnaps);
 				};
 
@@ -419,22 +418,55 @@ actor SnapMain {
 		};
 	};
 
+	public shared ({ caller }) func delete_design_file(snap_ref : SnapRef) : async Result.Result<Text, ErrDeleteDesignFile> {
+		let tags = [ACTOR_NAME, "delete_design_file"];
+
+		switch (user_canisters_ref.get(caller)) {
+			case (?user_snap_ids_storage) {
+				let is_owner = Utils.check_user_ownership(user_snap_ids_storage, [snap_ref.id]);
+
+				if (not is_owner) {
+					return #err(#NotOwnerOfSnaps);
+				};
+
+				let snap_actor = actor (snap_ref.canister_id) : SnapActor;
+				let snaps = await snap_actor.get_all_snaps([snap_ref.id]);
+
+				if (snaps.size() > 0) {
+					let snap = snaps[0];
+
+					if (Text.size(snap.file_asset.canister_id) > 1) {
+						let assets_actor = actor (snap.file_asset.canister_id) : AssetsActor;
+						ignore assets_actor.delete_asset(snap.file_asset.id);
+					};
+
+					ignore snap_actor.delete_design_file(snap.id);
+
+					return #ok("Deleted Design File");
+
+				} else {
+					return #err(#NoSnap);
+				};
+			};
+			case (_) {
+				#err(#UserNotFound);
+			};
+		};
+	};
+
 	public shared ({ caller }) func delete_snaps(snap_ids_delete : [SnapID], project : ProjectRef) : async Result.Result<Text, ErrDeleteSnaps> {
 		let tags = [ACTOR_NAME, "delete_snaps"];
 
 		switch (user_canisters_ref.get(caller)) {
 			case (?user_snap_ids_storage) {
-				let my_ids = Utils.get_all_ids(user_snap_ids_storage);
-				let matches = Utils.all_ids_match(my_ids, snap_ids_delete);
-				let project_actor = actor (project.canister_id) : ProjectActor;
 
-				// Owner Check
-				if (matches.all_match == false) {
+				let is_owner = Utils.check_user_ownership(user_snap_ids_storage, snap_ids_delete);
+
+				if (not is_owner) {
 					return #err(#NotOwnerOfSnaps);
 				};
 
 				var snap_refs = Buffer.Buffer<SnapRef>(0);
-
 				for ((canister_id, snap_ids) in user_snap_ids_storage.entries()) {
 					let snap_actor = actor (canister_id) : SnapActor;
 					let snaps = await snap_actor.get_all_snaps(snap_ids_delete);
@@ -469,6 +501,8 @@ actor SnapMain {
 
 					user_snap_ids_storage.put(canister_id, snap_ids_not_deleted);
 				};
+
+				let project_actor = actor (project.canister_id) : ProjectActor;
 
 				ignore project_actor.delete_snaps_from_project(Buffer.toArray(snap_refs), project.id, caller);
 

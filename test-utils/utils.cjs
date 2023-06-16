@@ -1,12 +1,16 @@
 const http = require('http');
 const fs = require('fs');
 
-function request_image_canister(path) {
+function extractPath(url) {
+	return url.replace('http://localhost:8080', '');
+}
+
+function request_resource(url) {
 	const options = {
 		hostname: '127.0.0.1',
-		port: 8000,
+		port: 8080,
 		secure: false,
-		path: path,
+		path: extractPath(url),
 		method: 'GET',
 		headers: {
 			'Content-Type': 'image/png'
@@ -100,5 +104,5 @@ module.exports = {
 	generate_figma_dsign_components,
 	generate_large_img_asset,
 	generate_motoko_image,
-	request_image_canister
+	request_resource
 };

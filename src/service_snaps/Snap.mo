@@ -28,6 +28,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	type CreateSnapArgs = Types.CreateSnapArgs;
 	type EditSnapArgs = Types.EditSnapArgs;
 	type ErrCreateSnap = Types.ErrCreateSnap;
+	type ErrDeleteDesignFile = Types.ErrDeleteDesignFile;
 	type ErrEditSnap = Types.ErrEditSnap;
 	type ImageID = Types.ImageID;
 	type ImageRef = Types.ImageRef;
@@ -224,6 +225,51 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 
 					};
 				};
+			};
+		};
+	};
+
+	public shared ({ caller }) func delete_design_file(
+		snap_id : SnapID
+	) : async Result.Result<Snap, ErrDeleteDesignFile> {
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "delete_design_file")];
+
+		if (snap_main != caller) {
+			ignore Logger.log_event(
+				log_tags,
+				"Unauthorized: " # Principal.toText(caller)
+			);
+
+			return #err(#Unauthorized);
+		};
+
+		switch (snaps.get(snap_id)) {
+			case (null) {
+				return #err(#SnapNotFound);
+			};
+			case (?snap) {
+				let file_asset = {
+					canister_id = "";
+					id = "";
+					file_name = "";
+					url = "";
+					is_public = false;
+				};
+
+				let snap_updated : Snap = {
+					snap with file_asset;
+				};
+
+				snaps.put(snap.id, snap_updated);
+
+				switch (snap.project_ref) {
+					case (null) {};
+					case (?project_ref) {
+						ignore Explore.update_project(project_ref);
+					};
+				};
+
+				return #ok(snap_updated);
 			};
 		};
 	};

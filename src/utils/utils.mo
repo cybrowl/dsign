@@ -228,4 +228,12 @@ module {
 
 		return null;
 	};
+
+	public func check_user_ownership(storage : IDStorage, ids : [Text]) : Bool {
+		let myIds = get_all_ids(storage);
+		let matches = all_ids_match(myIds, ids);
+
+		return matches.all_match;
+	};
+
 };

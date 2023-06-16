@@ -139,15 +139,21 @@ const installCode = async () => {
 		};
 	});
 
-	canisters.forEach(async (canister) => {
-		const res = await snap_main_actor.install_code(
-			canister.principal,
-			[...canister.arg],
-			canister.wasm
-		);
+	const canisterPromises = canisters.map((canister) => {
+		const res = snap_main_actor.install_code(canister.principal, [...canister.arg], canister.wasm);
 
 		console.log(`Deployed ${canister.id}  => `, res);
+		return res; // return the result so it can be used after Promise.all resolves
 	});
+
+	Promise.all(canisterPromises)
+		.then((results) => {
+			// 'results' is an array containing the results of all resolved promises
+			console.log('All canisters deployed', results);
+		})
+		.catch((error) => {
+			console.error('Error deploying canisters', error);
+		});
 };
 
 const init = async () => {

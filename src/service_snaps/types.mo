@@ -132,7 +132,7 @@ module {
 		#UserAnonymous;
 		#TwelveMax;
 		#UsernameNotFound;
-		#SnapIdsDoNotMatch;
+		#NotOwnerOfSnaps;
 		#SnapNotFound;
 		#Unauthorized;
 		#UserNotFound;
@@ -150,6 +150,14 @@ module {
 		#NotOwnerOfSnaps;
 	};
 
+	public type ErrDeleteDesignFile = {
+		#Unauthorized;
+		#SnapNotFound;
+		#UserNotFound;
+		#NotOwnerOfSnaps;
+		#NoSnap;
+	};
+
 	public type ErrGetAllSnaps = {
 		#NotAuthorized : Bool;
 		#UserNotFound : Bool;
@@ -161,6 +169,7 @@ module {
 		edit_snap : shared (EditSnapArgs, ?[ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, ErrEditSnap>;
 		delete_snaps : shared ([SnapID]) -> async ();
 		delete_images : shared (SnapID, [ImageRef]) -> async ();
+		delete_design_file : shared (SnapID) -> async Result.Result<Snap, ErrDeleteDesignFile>;
 		get_all_snaps : query ([SnapID]) -> async [SnapPublic];
 	};
 };
