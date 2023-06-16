@@ -113,6 +113,8 @@ const installCode = async () => {
 	});
 
 	const canisters = project_main_canisters.map((canister) => {
+		console.log('canister: ', canister);
+
 		const arg_map = {
 			project: IDL.encode(
 				[IDL.Principal, IDL.Principal, IDL.Principal, IDL.Bool],
