@@ -55,6 +55,10 @@
 		};
 	});
 
+	function generateId() {
+		return Math.random().toString(36).substr(2, 9);
+	}
+
 	async function commitFileAssetChunksToStaging(file) {
 		if (file.size === 0) {
 			// TODO: error
@@ -99,6 +103,91 @@
 		};
 	}
 
+	async function commitImgAssetsToStaging(images) {
+		if (!Array.isArray(images)) {
+			console.error('images must be an array');
+			return [];
+		}
+
+		if (
+			!$actor_assets_file_staging.loggedIn ||
+			!$actor_assets_img_staging.loggedIn ||
+			!$actor_snap_main.loggedIn
+		) {
+			console.error('Not logged in');
+			return [];
+		}
+
+		let validImages = images.filter((image) => image.data && image.mimeType);
+
+		let promises = validImages.map(async function (image) {
+			try {
+				return await $actor_assets_img_staging.actor.create_asset({
+					data: image.data,
+					file_format: image.mimeType
+				});
+			} catch (error) {
+				console.error('Error creating asset:', error);
+			}
+		});
+
+		try {
+			return await Promise.all(promises);
+		} catch (error) {
+			console.error('Error:', error);
+			return [];
+		}
+	}
+
+	function handleAddImages(event) {
+		let { img_data_urls, images_unit8Arrays } = event.detail;
+
+		img_data_urls.forEach(({ dataUrl, mimeType }, index) => {
+			let newImage = {
+				canister_id: '',
+				id: generateId(),
+				url: dataUrl,
+				mimeType,
+				data: images_unit8Arrays[index]
+			};
+
+			if ($snap_creation.images.length <= 12) {
+				$snap_creation.images = [...$snap_creation.images, newImage];
+			}
+		});
+
+		console.log('snap_creation: ', $snap_creation);
+	}
+
+	function handleSelectCover(event) {
+		cover_img = event.detail;
+	}
+
+	async function handleRemoveImg(event) {
+		const image_removed = event.detail;
+		console.log('image_removed: ', image_removed);
+
+		$snap_creation.images = $snap_creation.images.filter((image) => image.id !== image_removed.id);
+
+		const snap_ref = {
+			id: $snap_creation.id,
+			canister_id: $snap_creation.canister_id
+		};
+
+		const image_ref = {
+			id: image_removed.id,
+			canister_id: image_removed.canister_id,
+			url: image_removed.url
+		};
+
+		const { ok: deleted_images } = await $actor_snap_main.actor.delete_images(
+			[image_ref],
+			snap_ref
+		);
+
+		console.log('deleted_images: ', deleted_images);
+	}
+
 	async function handleAttachFile(event) {
 		let file = get(event, 'detail', {});
 
@@ -138,40 +227,6 @@
 		);
 	}
 
-	function generateId() {
-		return Math.random().toString(36).substr(2, 9);
-	}
-
-	function handleAddImages(event) {
-		let { img_data_urls, images_unit8Arrays } = event.detail;
-
-		img_data_urls.forEach(({ dataUrl, mimeType }, index) => {
-			let newImage = {
-				canister_id: '',
-				id: generateId(),
-				url: dataUrl,
-				mimeType,
-				data: images_unit8Arrays[index]
-			};
-
-			if ($snap_creation.images.length <= 12) {
-				$snap_creation.images = [...$snap_creation.images, newImage];
-			}
-		});
-
-		console.log('snap_creation: ', $snap_creation);
-	}
-
-	function handleSelectCover(event) {
-		cover_img = event.detail;
-	}
-
-	function handleRemoveImg(event) {
-		const image_id = event.detail;
-
-		$snap_creation.images = $snap_creation.images.filter((image) => image.id !== image_id);
-	}
-
 	function handleCancel() {
 		disable_project_store_reset.set(true);
 
@@ -179,42 +234,6 @@
 		const canister_id = $page.url.searchParams.get('canister_id');
 
 		goto(`/project/${project_id}?canister_id=${canister_id}`);
-	}
-
-	async function commitImgAssetsToStaging(images) {
-		if (!Array.isArray(images)) {
-			console.error('images must be an array');
-			return [];
-		}
-
-		if (
-			!$actor_assets_file_staging.loggedIn ||
-			!$actor_assets_img_staging.loggedIn ||
-			!$actor_snap_main.loggedIn
-		) {
-			console.error('Not logged in');
-			return [];
-		}
-
-		let validImages = images.filter((image) => image.data && image.mimeType);
-
-		let promises = validImages.map(async function (image) {
-			try {
-				return await $actor_assets_img_staging.actor.create_asset({
-					data: image.data,
-					file_format: image.mimeType
-				});
-			} catch (error) {
-				console.error('Error creating asset:', error);
-			}
-		});
-
-		try {
-			return await Promise.all(promises);
-		} catch (error) {
-			console.error('Error:', error);
-			return [];
-		}
 	}
 
 	async function handlePublish(event) {
@@ -318,7 +337,7 @@
 			<ImagesEmpty content="Please add images" />
 		{:else}
 			<Images
-				on:remove={handleRemoveImg}
+				on:removeImg={handleRemoveImg}
 				on:selectCover={handleSelectCover}
 				images={$snap_creation.images}
 			/>
