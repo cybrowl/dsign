@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import environment from 'environment';
-	import get from 'lodash/get.js';
+	import { get } from 'lodash';
 
 	import { Avatar, Button, Icon } from 'dsign-components';
 
