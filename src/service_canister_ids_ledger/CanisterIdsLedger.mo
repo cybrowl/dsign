@@ -171,24 +171,6 @@ actor CanisterIdsLedger = {
 		ignore log_canisters_health();
 	};
 
-	public shared func start_log_canisters_health() : async Timer.TimerId {
-		if (timer_id == 0) {
-			timer_id := 1;
-
-			return Timer.recurringTimer(#seconds(60), log_canisters_health);
-		} else {
-			return timer_id;
-		};
-	};
-
-	public shared func stop_log_canisters_health() : async Timer.TimerId {
-		Timer.cancelTimer(timer_id);
-
-		timer_id := 0;
-
-		return timer_id;
-	};
-
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		authorized_stable_storage := Iter.toArray(authorized.entries());
@@ -204,6 +186,8 @@ actor CanisterIdsLedger = {
 			Text.hash
 		);
 		canisters := List.fromArray<CanisterInfo>(canisters_stable_storage);
+
+		ignore Timer.recurringTimer(#seconds(60), log_canisters_health);
 
 		authorized_stable_storage := [];
 		canisters_stable_storage := [];
