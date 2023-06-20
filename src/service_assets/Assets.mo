@@ -230,6 +230,17 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 			return ?token;
 		};
 	};
+
+	public shared query func get_all_asset_ids() : async [Text] {
+		var asset_ids = Buffer<Text>(0);
+
+		for (asset in assets.vals()) {
+			asset_ids.add(asset.id);
+		};
+
+		return toArray(asset_ids);
+	};
+
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;

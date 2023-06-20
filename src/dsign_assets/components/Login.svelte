@@ -73,7 +73,7 @@
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'
 				: 'http://localhost:8080/?canisterId=bnz7o-iuaaa-aaaaa-qaaaa-cai',
-			maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000),
+			maxTimeToLive: BigInt(30 * 24 * 60 * 60 * 1000 * 1000 * 1000 * 1000),
 			onSuccess: handleAuth
 		});
 	}

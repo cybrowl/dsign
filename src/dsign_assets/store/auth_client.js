@@ -26,8 +26,8 @@ const authActors = [
 const authenticateActor = async (actor_name, actor) => {
 	const authClient = await AuthClient.create({
 		idleOptions: {
-			idleTimeout: 1000 * 60 * 60 * 24 * 3,
-			disableDefaultIdleCallback: false
+			idleTimeout: 1000 * 60 * 60 * 24 * 30,
+			disableDefaultIdleCallback: true
 		}
 	});
 
