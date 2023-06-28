@@ -18,6 +18,10 @@ const envOptions = {
 };
 
 const config = {
+	build: {
+		brotliSize: true,
+		cssCodeSplit: true
+	},
 	server: {
 		fs: {
 			allow: ['config', '.dfx/local']

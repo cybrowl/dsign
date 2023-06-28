@@ -1,4 +1,5 @@
 module.exports = {
+	mode: 'jit',
 	content: ['./src/dsign_assets/**/*.{html,js,cjs,svelte}', './src/**/*.html', './src/**/*.svelte'],
 	darkMode: 'class', // or 'media' or 'class'
 	theme: {
