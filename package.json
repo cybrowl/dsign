@@ -1,7 +1,7 @@
 {
 	"private": true,
 	"name": "dsign",
-	"version": "0.8.0",
+	"version": "0.8.1",
 	"type": "module",
 	"scripts": {
 		"build": "vite build",
@@ -28,7 +28,7 @@
 	},
 	"dependencies": {
 		"dotenv": "^16.0.3",
-		"dsign-components": "^1.2.14",
+		"dsign-components": "^1.2.15",
 		"lodash": "^4.17.21",
 		"luxon": "^3.2.1",
 		"svelte-local-storage-store": "^0.2.6"
@@ -43,13 +43,13 @@
 		"@sveltejs/kit": "^1.16.2",
 		"autoprefixer": "^10.4.13",
 		"fake-words": "^0.5.3",
-		"postcss-load-config": "^3.1.1",
 		"postcss": "^8.4.5",
+		"postcss-load-config": "^3.1.1",
+		"prettier": "^2.8.0",
 		"prettier-plugin-motoko": "^0.2.3",
 		"prettier-plugin-svelte": "^2.8.1",
-		"prettier": "^2.8.0",
-		"svelte-preprocess": "^4.10.7",
 		"svelte": "^3.52.1",
+		"svelte-preprocess": "^4.10.7",
 		"tailwindcss": "^3.2.4",
 		"tap-nyan": "^1.1.0",
 		"tape": "^5.6.1",
