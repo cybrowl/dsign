@@ -52,9 +52,6 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	private let rr = XorShift.toReader(XorShift.XorShift64(null));
 	private let se = Source.Source(rr, 0);
 
-	var snaps : HashMap.HashMap<SnapID, Snap> = HashMap.HashMap(0, Text.equal, Text.hash);
-	stable var snaps_stable_storage : [(SnapID, Snap)] = [];
-
 	var snaps_v2 : HashMap.HashMap<SnapID, Snap_V2> = HashMap.HashMap(0, Text.equal, Text.hash);
 	stable var snaps_v2_stable_storage : [(SnapID, Snap_V2)] = [];
 
@@ -311,7 +308,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
 			("canister_id", Principal.toText(Principal.fromActor(this))),
-			("snaps_size", Int.toText(snaps.size())),
+			("snaps_size", Int.toText(snaps_v2.size())),
 			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
 			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
 			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
@@ -324,7 +321,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 
 		let log_payload : Payload = {
 			metrics = [
-				("snaps_num", snaps.size()),
+				("snaps_num", snaps_v2.size()),
 				("cycles_balance", UtilsShared.get_cycles_balance()),
 				("memory_in_mb", UtilsShared.get_memory_in_mb()),
 				("heap_in_mb", UtilsShared.get_heap_in_mb())
@@ -341,42 +338,12 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
-		snaps_stable_storage := Iter.toArray(snaps.entries());
-		// snaps_v2_stable_storage := Iter.toArray(snaps_v2.entries());
+		snaps_v2_stable_storage := Iter.toArray(snaps_v2.entries());
 	};
 
 	system func postupgrade() {
-		let snap_v2_conversion = Iter.map<(SnapID, Snap), (SnapID, Snap_V2)>(
-			snaps_stable_storage.vals(),
-			func((snapId, oldSnap) : (SnapID, Snap)) : (SnapID, Snap_V2) {
-				let newSnap : Snap_V2 = {
-					canister_id = oldSnap.canister_id;
-					created = oldSnap.created;
-					file_asset = oldSnap.file_asset;
-					id = oldSnap.id;
-					image_cover_location = oldSnap.image_cover_location;
-					images = oldSnap.images;
-					project_ref = oldSnap.project_ref;
-					title = oldSnap.title;
-					tags = []; // default value for tags
-					username = oldSnap.username;
-					owner = oldSnap.owner;
-					metrics = oldSnap.metrics;
-				};
+		snaps_v2 := HashMap.fromIter<SnapID, Snap_V2>(snaps_v2_stable_storage.vals(), 0, Text.equal, Text.hash);
 
-				return (snapId, newSnap);
-			}
-		);
-
-		snaps := HashMap.fromIter<SnapID, Snap>(
-			snaps_stable_storage.vals(),
-			0,
-			Text.equal,
-			Text.hash
-		);
-
-		snaps_v2 := HashMap.fromIter<SnapID, Snap_V2>(snap_v2_conversion, 0, Text.equal, Text.hash);
-
-		snaps_stable_storage := [];
+		snaps_v2_stable_storage := [];
 	};
 };
