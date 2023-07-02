@@ -82,8 +82,8 @@
 				const { ok: all_favs, err: err_get_all_favs } = favorites;
 				const { ok: all_projects, err: err_all_projects } = projects;
 
-				console.log('all_favs: ', all_favs);
-				console.log('err_get_all_favs: ', err_get_all_favs);
+				console.log('all_projects: ', all_projects);
+				console.log('err_all_projects: ', err_all_projects);
 
 				if (all_favs) {
 					favorite_store.set({ isFetching: false, projects: [...all_favs] });
@@ -118,7 +118,6 @@
 	$: if (profile.username !== $page.params.username) {
 		project_store_fetching();
 		get_profile();
-		get_all_projects();
 	}
 
 	onMount(async () => {

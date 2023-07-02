@@ -100,9 +100,11 @@
 </main>
 
 <!-- Mobile Not Supported -->
-<div class="not_supported">
-	<h1>Sorry, Mobile Not Supported</h1>
-</div>
+{#if $explore_store.projects.length > 0}
+	<div class="not_supported">
+		<h1>Sorry, Mobile Not Supported</h1>
+	</div>
+{/if}
 
 <style lang="postcss">
 	.grid_layout {
