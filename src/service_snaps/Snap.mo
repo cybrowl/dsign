@@ -98,7 +98,6 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 				id = snap_info.project.id;
 				canister_id = snap_info.project.canister_id;
 			};
-			tags = null;
 			title = snap_info.title;
 			username = username;
 			owner = Option.make(owner);

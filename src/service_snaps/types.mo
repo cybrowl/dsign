@@ -53,7 +53,6 @@ module {
 		images : [ImageRef];
 		project : ?ProjectPublic;
 		project_ref : ?ProjectRef;
-		tags : ?[Text];
 		title : Text;
 		username : Username;
 		owner : Null;
@@ -77,7 +76,6 @@ module {
 		images : [ImageRef];
 		project : ?Project;
 		project_ref : ?ProjectRef;
-		tags : ?[Text];
 		title : Text;
 		username : Username;
 		owner : ?Principal;
