@@ -34,6 +34,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	type ImageRef = Types.ImageRef;
 	type ProjectPublic = Types.ProjectPublic;
 	type Snap = Types.Snap;
+	type Snap_V2 = Types.Snap_V2;
 	type SnapID = Types.SnapID;
 	type SnapPublic = Types.SnapPublic;
 	type SnapRef = Types.SnapRef;
@@ -46,13 +47,16 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	type ProjectActor = ProjectTypes.ProjectActor;
 
 	let ACTOR_NAME : Text = "Snap";
-	let VERSION : Nat = 3;
+	let VERSION : Nat = 4;
 
 	private let rr = XorShift.toReader(XorShift.XorShift64(null));
 	private let se = Source.Source(rr, 0);
 
 	var snaps : HashMap.HashMap<SnapID, Snap> = HashMap.HashMap(0, Text.equal, Text.hash);
 	stable var snaps_stable_storage : [(SnapID, Snap)] = [];
+
+	var snaps_v2 : HashMap.HashMap<SnapID, Snap_V2> = HashMap.HashMap(0, Text.equal, Text.hash);
+	stable var snaps_v2_stable_storage : [(SnapID, Snap_V2)] = [];
 
 	stable var health_metrics_canister_id : Text = "";
 
@@ -61,7 +65,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		images_ref : [ImageRef],
 		file_asset : AssetRef,
 		owner : UserPrincipal
-	) : async Result.Result<Snap, ErrCreateSnap> {
+	) : async Result.Result<Snap_V2, ErrCreateSnap> {
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "create_snap")];
 
 		if (snap_main != caller) {
@@ -86,18 +90,18 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			};
 		};
 
-		let snap : Snap = {
+		let snap : Snap_V2 = {
 			canister_id = snap_canister_id;
 			created = Time.now();
 			file_asset = file_asset;
 			id = snap_id;
 			image_cover_location = snap_info.image_cover_location;
 			images = images_ref;
-			project = null;
 			project_ref = ?{
 				id = snap_info.project.id;
 				canister_id = snap_info.project.canister_id;
 			};
+			tags = [];
 			title = snap_info.title;
 			username = username;
 			owner = Option.make(owner);
@@ -107,7 +111,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			};
 		};
 
-		snaps.put(snap_id, snap);
+		snaps_v2.put(snap_id, snap);
 
 		return #ok(snap);
 	};
@@ -117,7 +121,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		images_ref : ?[ImageRef],
 		file_asset : AssetRef,
 		owner : UserPrincipal
-	) : async Result.Result<Snap, ErrEditSnap> {
+	) : async Result.Result<Snap_V2, ErrEditSnap> {
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "edit_snap")];
 
 		if (snap_main != caller) {
@@ -129,7 +133,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			return #err(#Unauthorized);
 		};
 
-		switch (snaps.get(snap_info.id)) {
+		switch (snaps_v2.get(snap_info.id)) {
 			case (null) {
 				return #err(#SnapNotFound);
 			};
@@ -147,11 +151,12 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 				let snap_updated = {
 					snap with images = images;
 					file_asset = design_file;
+					tags = [];
 					image_cover_location = image_cover_location;
 					title = name;
 				};
 
-				snaps.put(snap.id, snap_updated);
+				snaps_v2.put(snap.id, snap_updated);
 
 				switch (snap.project_ref) {
 					case (null) {};
@@ -179,10 +184,10 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		};
 
 		for (snap_id in snap_ids.vals()) {
-			switch (snaps.get(snap_id)) {
+			switch (snaps_v2.get(snap_id)) {
 				case null {};
 				case (?snap) {
-					snaps.delete(snap_id);
+					snaps_v2.delete(snap_id);
 				};
 			};
 		};
@@ -200,7 +205,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			return ();
 		};
 
-		switch (snaps.get(snap_id)) {
+		switch (snaps_v2.get(snap_id)) {
 			case null {};
 			case (?snap) {
 				let updated_images = Array.filter(
@@ -215,7 +220,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 					}
 				);
 
-				snaps.put(snap_id, { snap with images = updated_images });
+				snaps_v2.put(snap_id, { snap with images = updated_images });
 
 				switch (snap.project_ref) {
 					case (null) {};
@@ -230,7 +235,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 
 	public shared ({ caller }) func delete_design_file(
 		snap_id : SnapID
-	) : async Result.Result<Snap, ErrDeleteDesignFile> {
+	) : async Result.Result<Snap_V2, ErrDeleteDesignFile> {
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "delete_design_file")];
 
 		if (snap_main != caller) {
@@ -242,7 +247,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			return #err(#Unauthorized);
 		};
 
-		switch (snaps.get(snap_id)) {
+		switch (snaps_v2.get(snap_id)) {
 			case (null) {
 				return #err(#SnapNotFound);
 			};
@@ -255,11 +260,12 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 					is_public = false;
 				};
 
-				let snap_updated : Snap = {
+				let snap_updated : Snap_V2 = {
 					snap with file_asset;
+					tags = [];
 				};
 
-				snaps.put(snap.id, snap_updated);
+				snaps_v2.put(snap.id, snap_updated);
 
 				switch (snap.project_ref) {
 					case (null) {};
@@ -279,34 +285,12 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		var snaps_list = Buffer.Buffer<SnapPublic>(0);
 
 		for (snap_id in snap_ids.vals()) {
-			switch (snaps.get(snap_id)) {
+			switch (snaps_v2.get(snap_id)) {
 				case null {};
 				case (?snap) {
 
-					let project_public = label project : ?ProjectPublic {
-						switch (snap.project) {
-							case (null) {
-								null;
-							};
-							case (?project) {
-								var project_public : ProjectPublic = {
-									id = project.id;
-									canister_id = project.canister_id;
-									created = project.created;
-									username = project.username;
-									name = project.name;
-									snaps = [];
-								};
-
-								?project_public;
-
-							};
-						};
-					};
-
 					let snap_public : SnapPublic = {
 						snap and {} with owner = null;
-						project = project_public;
 					};
 
 					snaps_list.add(snap_public);
@@ -358,15 +342,41 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		snaps_stable_storage := Iter.toArray(snaps.entries());
+		// snaps_v2_stable_storage := Iter.toArray(snaps_v2.entries());
 	};
 
 	system func postupgrade() {
+		let snap_v2_conversion = Iter.map<(SnapID, Snap), (SnapID, Snap_V2)>(
+			snaps_stable_storage.vals(),
+			func((snapId, oldSnap) : (SnapID, Snap)) : (SnapID, Snap_V2) {
+				let newSnap : Snap_V2 = {
+					canister_id = oldSnap.canister_id;
+					created = oldSnap.created;
+					file_asset = oldSnap.file_asset;
+					id = oldSnap.id;
+					image_cover_location = oldSnap.image_cover_location;
+					images = oldSnap.images;
+					project_ref = oldSnap.project_ref;
+					title = oldSnap.title;
+					tags = []; // default value for tags
+					username = oldSnap.username;
+					owner = oldSnap.owner;
+					metrics = oldSnap.metrics;
+				};
+
+				return (snapId, newSnap);
+			}
+		);
+
 		snaps := HashMap.fromIter<SnapID, Snap>(
 			snaps_stable_storage.vals(),
 			0,
 			Text.equal,
 			Text.hash
 		);
+
+		snaps_v2 := HashMap.fromIter<SnapID, Snap_V2>(snap_v2_conversion, 0, Text.equal, Text.hash);
+
 		snaps_stable_storage := [];
 	};
 };

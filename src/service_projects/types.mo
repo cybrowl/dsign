@@ -76,9 +76,9 @@ module {
 		id : SnapID;
 		image_cover_location : Nat8;
 		images : [ImageRef];
-		project : ?ProjectPublic;
-		tags : ?[Text];
+		project_ref : ?ProjectRef;
 		title : Text;
+		tags : [Text];
 		username : Username;
 		owner : Null;
 		metrics : {
