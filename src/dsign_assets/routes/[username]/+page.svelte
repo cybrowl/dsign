@@ -118,6 +118,7 @@
 	$: if (profile.username !== $page.params.username) {
 		project_store_fetching();
 		get_profile();
+		get_all_projects();
 	}
 
 	onMount(async () => {
@@ -128,8 +129,10 @@
 			auth.favorite_main()
 		]);
 
-		await get_profile();
-		await get_all_projects();
+		if (profile.username === $page.params.username) {
+			await get_profile();
+			await get_all_projects();
+		}
 	});
 
 	onDestroy(() => {
