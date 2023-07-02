@@ -53,21 +53,20 @@
 
 	async function get_profile() {
 		try {
-			Promise.all([
+			const [auth_profile, public_profile] = await Promise.all([
 				$actor_profile.actor.get_profile(),
 				$actor_profile.actor.get_profile_public($page.params.username)
-			]).then(async ([auth_profile, public_profile]) => {
-				const { ok: auth_profile_, err: err_auth_profile } = auth_profile;
-				const { ok: public_profile_, err: err_public_profile } = public_profile;
+			]);
 
-				profile = public_profile_;
+			const { ok: auth_profile_, err: err_auth_profile } = auth_profile;
+			const { ok: public_profile_, err: err_public_profile } = public_profile;
 
-				if ($actor_profile.loggedIn) {
-					const username = get(auth_profile_, 'username', 'x');
+			profile = public_profile_;
 
-					is_owner = username === $page.params.username;
-				}
-			});
+			if ($actor_profile.loggedIn) {
+				const username = get(auth_profile_, 'username', 'x');
+				is_owner = username === $page.params.username;
+			}
 		} catch (error) {
 			console.log('error call profile: ', error);
 		}
@@ -75,41 +74,40 @@
 
 	async function get_all_projects() {
 		try {
-			Promise.all([
+			const [favorites, projects] = await Promise.all([
 				$actor_favorite_main.actor.get_all_projects([$page.params.username]),
 				$actor_project_main.actor.get_all_projects([$page.params.username])
-			]).then(async ([favorites, projects]) => {
-				const { ok: all_favs, err: err_get_all_favs } = favorites;
-				const { ok: all_projects, err: err_all_projects } = projects;
+			]);
 
-				console.log('all_projects: ', all_projects);
-				console.log('err_all_projects: ', err_all_projects);
+			const { ok: all_favs, err: err_get_all_favs } = favorites;
+			const { ok: all_projects, err: err_all_projects } = projects;
 
-				if (all_favs) {
-					favorite_store.set({ isFetching: false, projects: [...all_favs] });
-					local_storage_favorites.set({ all_favorites_count: all_favs.length || 1 });
+			console.log('all_projects: ', all_projects);
+			console.log('err_all_projects: ', err_all_projects);
+
+			if (all_favs) {
+				favorite_store.set({ isFetching: false, projects: [...all_favs] });
+				local_storage_favorites.set({ all_favorites_count: all_favs.length || 1 });
+			}
+
+			if (err_get_all_favs) {
+				favorite_store.set({ isFetching: false, projects: [] });
+
+				if (err_get_all_favs['UserNotFound'] === true) {
+					await $actor_favorite_main.actor.create_user_favorite_storage();
 				}
+			}
 
-				if (err_get_all_favs) {
-					favorite_store.set({ isFetching: false, projects: [] });
+			if (all_projects) {
+				project_store.set({ isFetching: false, projects: [...all_projects] });
+				local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
+			} else {
+				project_store.set({ isFetching: false, projects: [] });
 
-					if (err_get_all_favs['UserNotFound'] === true) {
-						await $actor_favorite_main.actor.create_user_favorite_storage();
-					}
+				if (err_all_projects['UserNotFound'] === true) {
+					await $actor_project_main.actor.create_user_project_storage();
 				}
-
-				if (all_projects) {
-					project_store.set({ isFetching: false, projects: [...all_projects] });
-
-					local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
-				} else {
-					project_store.set({ isFetching: false, projects: [] });
-
-					if (err_all_projects['UserNotFound'] === true) {
-						await $actor_project_main.actor.create_user_project_storage();
-					}
-				}
-			});
+			}
 		} catch (error) {
 			console.log('error call projects: ', error);
 		}
@@ -364,9 +362,11 @@
 </main>
 
 <!-- Mobile Not Supported -->
-<div class="not_supported">
-	<h1>Sorry, Mobile Not Supported</h1>
-</div>
+{#if $project_store.projects.length > 0 > 0}
+	<div class="not_supported">
+		<h1>Sorry, Mobile Not Supported</h1>
+	</div>
+{/if}
 
 <style lang="postcss">
 	.grid_layout {

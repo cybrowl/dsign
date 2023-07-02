@@ -118,9 +118,11 @@
 </main>
 
 <!-- Mobile Not Supported -->
-<div class="grid lg:hidden h-screen place-items-center text-white text-4xl">
-	<h1>Sorry, Mobile Not Supported</h1>
-</div>
+{#if $snap_preview.id !== undefined}
+	<div class="grid lg:hidden h-screen place-items-center text-white text-4xl">
+		<h1>Sorry, Mobile Not Supported</h1>
+	</div>
+{/if}
 
 <style lang="postcss">
 	.grid_layout {
