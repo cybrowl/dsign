@@ -290,11 +290,35 @@ test('SnapMain[mishicat].edit_snap(): change name only => #ok - edited snap', as
 		id: snap.id,
 		canister_id: snap.canister_id,
 		image_cover_location: [],
+		tags: [],
 		img_asset_ids: [],
 		file_asset: []
 	};
 
 	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
+
+	t.deepEqual(snap_.title, 'snap example renamed');
+	t.deepEqual(snap_.owner, []);
+	t.equal(snap_.images.length, 3);
+});
+
+test('SnapMain[mishicat].edit_snap(): change tags only => #ok - edited snap', async function (t) {
+	const { ok: all_snaps } = await snap_main_actor.mishicat.get_all_snaps();
+	const snap = all_snaps[0];
+
+	let create_args = {
+		title: ['snap example renamed'],
+		id: snap.id,
+		canister_id: snap.canister_id,
+		tags: [['ux', 'dark']],
+		image_cover_location: [],
+		img_asset_ids: [],
+		file_asset: []
+	};
+
+	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
+
+	console.log('snap_: ', snap_);
 
 	t.deepEqual(snap_.title, 'snap example renamed');
 	t.deepEqual(snap_.owner, []);

@@ -44,7 +44,7 @@ actor SnapMain {
 	type ImageID = Types.ImageID;
 	type ImageRef = Types.ImageRef;
 	type ProjectRef = Types.ProjectRef;
-	type Snap = Types.Snap;
+	type Snap_V2 = Types.Snap;
 	type SnapCanisterID = Types.SnapCanisterID;
 	type SnapID = Types.SnapID;
 	type SnapIDStorage = Types.SnapIDStorage;
@@ -62,7 +62,7 @@ actor SnapMain {
 
 	let ACTOR_NAME : Text = "SnapMain";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 6;
+	let VERSION : Nat = 7;
 
 	var user_canisters_ref : HashMap.HashMap<UserPrincipal, SnapIDStorage> = HashMap.HashMap(
 		0,
@@ -272,7 +272,7 @@ actor SnapMain {
 		};
 	};
 
-	public shared ({ caller }) func edit_snap(snap_info : EditSnapArgs) : async Result.Result<Snap, ErrEditSnap> {
+	public shared ({ caller }) func edit_snap(snap_info : EditSnapArgs) : async Result.Result<SnapPublic, ErrEditSnap> {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "edit_snap")];
 
 		let is_anonymous = Principal.isAnonymous(caller);
