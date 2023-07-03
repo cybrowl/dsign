@@ -295,11 +295,12 @@ test('SnapMain[mishicat].edit_snap(): change name only => #ok - edited snap', as
 		file_asset: []
 	};
 
-	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
+	const { ok: snap_, err: error } = await snap_main_actor.mishicat.edit_snap(create_args);
 
 	t.deepEqual(snap_.title, 'snap example renamed');
-	t.deepEqual(snap_.owner, []);
+	t.deepEqual(snap_.owner, null);
 	t.equal(snap_.images.length, 3);
+	t.equal(error, undefined);
 });
 
 test('SnapMain[mishicat].edit_snap(): change tags only => #ok - edited snap', async function (t) {
@@ -318,11 +319,7 @@ test('SnapMain[mishicat].edit_snap(): change tags only => #ok - edited snap', as
 
 	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
 
-	console.log('snap_: ', snap_);
-
-	t.deepEqual(snap_.title, 'snap example renamed');
-	t.deepEqual(snap_.owner, []);
-	t.equal(snap_.images.length, 3);
+	t.deepEqual(snap_.tags, ['ux', 'dark']);
 });
 
 test('ImageAssetStaging[mishicat].create_asset(): with image and valid identity => #ok - img_asset_ids', async function () {
@@ -354,6 +351,7 @@ test('SnapMain[mishicat].edit_snap(): change name and images => #ok - edited sna
 		id: snap.id,
 		canister_id: snap.canister_id,
 		image_cover_location: [],
+		tags: [],
 		img_asset_ids: [img_asset_ids],
 		file_asset: []
 	};
@@ -361,7 +359,7 @@ test('SnapMain[mishicat].edit_snap(): change name and images => #ok - edited sna
 	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
 
 	t.deepEqual(snap_.title, 'snap example animals');
-	t.deepEqual(snap_.owner, []);
+	t.deepEqual(snap_.owner, null);
 	t.equal(snap_.images.length, 5);
 });
 
@@ -394,6 +392,7 @@ test('SnapMain[mishicat].edit_snap(): change images only => #ok - edited snap', 
 		id: snap.id,
 		canister_id: snap.canister_id,
 		image_cover_location: [],
+		tags: [],
 		img_asset_ids: [img_asset_ids],
 		file_asset: []
 	};
@@ -401,7 +400,7 @@ test('SnapMain[mishicat].edit_snap(): change images only => #ok - edited snap', 
 	const { ok: snap_ } = await snap_main_actor.mishicat.edit_snap(create_args);
 
 	t.deepEqual(snap_.title, 'snap example animals');
-	t.deepEqual(snap_.owner, []);
+	t.deepEqual(snap_.owner, null);
 	t.equal(snap_.images.length, 6);
 });
 
@@ -447,6 +446,7 @@ test('SnapMain[mishicat].edit_snap(): change file only => #ok - snap', async fun
 		id: snap.id,
 		canister_id: snap.canister_id,
 		image_cover_location: [],
+		tags: [],
 		img_asset_ids: [],
 		file_asset: [
 			{
@@ -506,6 +506,7 @@ test('SnapMain[motoko].edit_snap(): change file only => #err - NotOwnerOfSnaps',
 		canister_id: snap.canister_id,
 		image_cover_location: [],
 		img_asset_ids: [],
+		tags: [],
 		file_asset: [
 			{
 				is_public: true,
@@ -531,6 +532,7 @@ test('SnapMain[mishicat].edit_snap(): change file only => #ok - snap', async fun
 		canister_id: snap.canister_id,
 		image_cover_location: [],
 		img_asset_ids: [],
+		tags: [],
 		file_asset: [
 			{
 				is_public: true,
@@ -556,6 +558,7 @@ test('SnapMain[mishicat].edit_snap(): all empty => #ok - snap', async function (
 		canister_id: snap.canister_id,
 		image_cover_location: [],
 		img_asset_ids: [],
+		tags: [],
 		file_asset: []
 	};
 
@@ -576,6 +579,7 @@ test('SnapMain[mishicat].edit_snap(): change image_cover_location => #ok - snap'
 		canister_id: snap.canister_id,
 		image_cover_location: [3],
 		img_asset_ids: [],
+		tags: [],
 		file_asset: []
 	};
 
@@ -639,6 +643,7 @@ test('SnapMain[mishicat].edit_snap(): change image_cover_location => #ok - snap'
 		canister_id: snap.canister_id,
 		image_cover_location: [4],
 		img_asset_ids: [],
+		tags: [],
 		file_asset: []
 	};
 

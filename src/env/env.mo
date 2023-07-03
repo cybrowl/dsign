@@ -1,3 +1,3 @@
 module {
-	public let IS_PROD = true;
+	public let IS_PROD = false;
 };

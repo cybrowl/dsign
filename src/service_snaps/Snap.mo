@@ -138,6 +138,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 				let image_cover_location = Option.get(snap_info.image_cover_location, snap.image_cover_location);
 				let images_refs = Option.get(images_ref, []);
 				let images = Array.flatten([snap.images, images_refs]);
+				let tags = Option.get(snap_info.tags, snap.tags);
 
 				var design_file = snap.file_asset;
 				if (file_asset.id != "") {
@@ -147,7 +148,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 				let snap_updated = {
 					snap with images = images;
 					file_asset = design_file;
-					tags = [];
+					tags = tags;
 					image_cover_location = image_cover_location;
 					title = name;
 				};

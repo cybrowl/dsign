@@ -104,6 +104,7 @@ module {
 		title : ?Text;
 		image_cover_location : ?Nat8;
 		img_asset_ids : ?[Nat];
+		tags : ?[Text];
 		file_asset : ?{
 			is_public : Bool;
 			content_type : Text;
