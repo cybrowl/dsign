@@ -32,28 +32,11 @@ module {
 		canister_id : Text;
 	};
 
-	public type Snap = {
-		canister_id : Text;
-		created : Time;
-		file_asset : AssetRef;
-		id : SnapID;
-		image_cover_location : Nat8;
-		images : [ImageRef];
-		project : ?Project;
-		tags : ?[Text];
-		title : Text;
-		username : Username;
-		owner : ?Principal;
-		metrics : {
-			likes : Nat;
-			views : Nat;
-		};
-	};
-
 	public type Project = {
 		id : Text;
 		canister_id : Text;
 		created : Time;
+		description : ?Text;
 		username : Text;
 		owner : UserPrincipal;
 		name : Text;
@@ -91,6 +74,7 @@ module {
 		id : Text;
 		canister_id : Text;
 		created : Time;
+		description : Text;
 		username : Text;
 		name : Text;
 		owner : Null;
@@ -101,8 +85,16 @@ module {
 		};
 	};
 
-	public type UpdateProject = {
+	// Args
+	public type CreateProjectArgs = {
+		name : Text;
+		description : Text;
+		snaps : ?[SnapRef];
+	};
+
+	public type UpdateProjectArgs = {
 		name : ?Text;
+		description : ?Text;
 	};
 
 	// Errors
@@ -160,11 +152,11 @@ module {
 
 	// Actor Interface
 	public type ProjectActor = actor {
-		create_project : shared (Text, ?[SnapRef], UserPrincipal) -> async Result.Result<Project, ErrCreateProject>;
+		create_project : shared (CreateProjectArgs, UserPrincipal) -> async Result.Result<Project, ErrCreateProject>;
+		edit_project : shared (UpdateProjectArgs, ProjectRef) -> async Result.Result<Project, ErrUpdateProject>;
 		delete_projects : shared ([ProjectID]) -> async ();
 		delete_snaps_from_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Text, ErrDeleteSnapsFromProject>;
 		add_snaps_to_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Project, ErrAddSnapsToProject>;
-		update_project_details : shared (UpdateProject, ProjectRef) -> async Result.Result<Project, ErrUpdateProject>;
 		update_snap_metrics : shared (ProjectID, ProjectUpdateAction) -> async Result.Result<(), ErrUpdateProject>;
 		owner_check : query (ProjectID, Principal) -> async Bool;
 		get_projects : query ([ProjectID]) -> async [ProjectPublic];

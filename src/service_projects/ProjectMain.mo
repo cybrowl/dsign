@@ -26,6 +26,7 @@ import { IS_PROD } "../env/env";
 import Utils "../utils/utils";
 
 actor ProjectMain {
+	type CreateProjectArgs = Types.CreateProjectArgs;
 	type ErrAddSnapsToProject = Types.ErrAddSnapsToProject;
 	type ErrCreateProject = Types.ErrCreateProject;
 	type ErrDeleteProjects = Types.ErrDeleteProjects;
@@ -40,7 +41,7 @@ actor ProjectMain {
 	type ProjectPublic = Types.ProjectPublic;
 	type ProjectRef = Types.ProjectRef;
 	type SnapRef = Types.SnapRef;
-	type UpdateProject = Types.UpdateProject;
+	type UpdateProjectArgs = Types.UpdateProjectArgs;
 	type UserPrincipal = Types.UserPrincipal;
 
 	type ProjectActor = Types.ProjectActor;
@@ -96,14 +97,14 @@ actor ProjectMain {
 		};
 	};
 
-	public shared ({ caller }) func create_project(name : Text, snaps : ?[SnapRef]) : async Result.Result<ProjectRef, ErrCreateProject> {
+	public shared ({ caller }) func create_project(args : CreateProjectArgs) : async Result.Result<ProjectRef, ErrCreateProject> {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "create_project")];
 
-		if (name.size() > 100) {
+		if (args.name.size() > 100) {
 			return #err(#NameTooLarge);
 		};
 
-		if (Option.get(snaps, []).size() > SNAP_ARG_SIZE_LIMIT) {
+		if (Option.get(args.snaps, []).size() > SNAP_ARG_SIZE_LIMIT) {
 			return #err(#NumberSnapsTooLarge);
 		};
 
@@ -134,7 +135,7 @@ actor ProjectMain {
 		let project_actor = actor (project_canister_id) : ProjectActor;
 
 		// save project
-		switch (await project_actor.create_project(name, snaps, caller)) {
+		switch (await project_actor.create_project(args, caller)) {
 			case (#err err) {
 				return #err(#ErrorCall(debug_show (err)));
 			};
@@ -149,6 +150,40 @@ actor ProjectMain {
 				user_project_ids_storage.put(project_canister_id, Buffer.toArray(project_ids));
 
 				#ok(project_public);
+			};
+		};
+	};
+
+	public shared ({ caller }) func edit_project(
+		update_project_args : UpdateProjectArgs,
+		project_ref : ProjectRef
+	) : async Result.Result<Text, ErrUpdateProject> {
+		let tags = [ACTOR_NAME, "update_project_details"];
+
+		//TODO: check update_project_args
+
+		switch (user_canisters_ref.get(caller)) {
+			case (?user_project_ids_storage) {
+				let my_ids = Utils.get_all_ids(user_project_ids_storage);
+				let matches = Utils.all_ids_match(my_ids, [project_ref.id]);
+
+				if (matches.all_match == false) {
+					return #err(#ProjectIdsDoNotMatch(true));
+				};
+
+				let project_actor = actor (project_ref.canister_id) : ProjectActor;
+
+				switch (await project_actor.edit_project(update_project_args, project_ref)) {
+					case (#err err) {
+						return #err(#ErrorCall(debug_show (err)));
+					};
+					case (#ok project) {
+						return #ok("Updated Project Details");
+					};
+				};
+			};
+			case (_) {
+				#err(#UserNotFound(true));
 			};
 		};
 	};
@@ -182,40 +217,6 @@ actor ProjectMain {
 			};
 			case (_) {
 				#err(#UserNotFound);
-			};
-		};
-	};
-
-	public shared ({ caller }) func update_project_details(
-		update_project_args : UpdateProject,
-		project_ref : ProjectRef
-	) : async Result.Result<Text, ErrUpdateProject> {
-		let tags = [ACTOR_NAME, "update_project_details"];
-
-		//TODO: check update_project_args
-
-		switch (user_canisters_ref.get(caller)) {
-			case (?user_project_ids_storage) {
-				let my_ids = Utils.get_all_ids(user_project_ids_storage);
-				let matches = Utils.all_ids_match(my_ids, [project_ref.id]);
-
-				if (matches.all_match == false) {
-					return #err(#ProjectIdsDoNotMatch(true));
-				};
-
-				let project_actor = actor (project_ref.canister_id) : ProjectActor;
-
-				switch (await project_actor.update_project_details(update_project_args, project_ref)) {
-					case (#err err) {
-						return #err(#ErrorCall(debug_show (err)));
-					};
-					case (#ok project) {
-						return #ok("Updated Project Details");
-					};
-				};
-			};
-			case (_) {
-				#err(#UserNotFound(true));
 			};
 		};
 	};

@@ -83,7 +83,11 @@ test('ProjectMain[mishicat].delete_projects(): should delete all', async functio
 });
 
 test('ProjectMain[mishicat].create_project():  => #ok - project', async function (t) {
-	const { ok: project_ref } = await project_main_actor.mishicat.create_project('Project One', []);
+	const { ok: project_ref } = await project_main_actor.mishicat.create_project({
+		name: 'Project One',
+		description: 'Descripton of Project',
+		snaps: []
+	});
 
 	t.equal(project_ref.id.length > 3, true);
 	t.equal(project_ref.canister_id.length > 3, true);
@@ -97,18 +101,19 @@ test('ProjectMain[mishicat].get_all_projects(): should have both projects => #ok
 
 	t.equal(projects.length > 0, true);
 	t.equal(first_project.username, 'mishicat');
+	t.equal(first_project.description, 'Descripton of Project');
 	t.equal(first_project.name, 'Project One');
 });
 
-test('ProjectMain[motoko].update_project_details(): with wrong identity => #err - ', async function (t) {
+test('ProjectMain[motoko].edit_project(): with wrong identity => #err - ', async function (t) {
 	let { ok: projects } = await project_main_actor.mishicat.get_all_projects([]);
 
 	let first_project = projects[0];
 	let project_ref = { id: first_project.id, canister_id: first_project.canister_id };
 
 	let { ok: updated_project, err: err_update_project } =
-		await project_main_actor.motoko.update_project_details(
-			{ name: ['Project One Updated'] },
+		await project_main_actor.motoko.edit_project(
+			{ name: ['Project One Updated'], description: ['Descripton of Project Updated'] },
 			project_ref
 		);
 
@@ -120,24 +125,29 @@ test('ProjectMain[motoko].update_project_details(): with wrong identity => #err 
 	t.equal(updated_projects[0].name, 'Project One');
 });
 
-test('ProjectMain[mishicat].update_project_details(): should update project name => #ok - project name updated', async function (t) {
+test('ProjectMain[mishicat].edit_project(): should update project name => #ok - project name updated', async function (t) {
 	let { ok: projects } = await project_main_actor.mishicat.get_all_projects([]);
 
 	let first_project = projects[0];
 	let project_ref = { id: first_project.id, canister_id: first_project.canister_id };
 
-	let { ok: updated_project } = await project_main_actor.mishicat.update_project_details(
-		{ name: ['Project One Updated'] },
+	let { ok: updated_project } = await project_main_actor.mishicat.edit_project(
+		{ name: ['Project One Updated'], description: ['Descripton of Project Updated'] },
 		project_ref
 	);
 	let { ok: updated_projects } = await project_main_actor.mishicat.get_all_projects([]);
 
 	t.deepEqual(updated_project, 'Updated Project Details');
 	t.equal(updated_projects[0].name, 'Project One Updated');
+	t.equal(updated_projects[0].description, 'Descripton of Project Updated');
 });
 
 test('ProjectMain[mishicat].create_project():  => #ok - project', async function (t) {
-	const { ok: project_ref } = await project_main_actor.mishicat.create_project('Project Two', []);
+	const { ok: project_ref } = await project_main_actor.mishicat.create_project({
+		name: 'Project Two',
+		description: 'Descripton of Project',
+		snaps: []
+	});
 
 	t.equal(project_ref.id.length > 3, true);
 	t.equal(project_ref.canister_id.length > 3, true);
@@ -182,8 +192,11 @@ test('Setup Actors', async function () {
 
 test('Project[mishicat].create_project(): with wrong caller => #err - NotAuthorized', async function (t) {
 	const response = await project_actor.mishicat.create_project(
-		'Test',
-		[],
+		{
+			name: 'Test',
+			description: 'Descripton of Project',
+			snaps: []
+		},
 		mishicat_identity.getPrincipal()
 	);
 

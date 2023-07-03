@@ -122,7 +122,11 @@ test('ProjectMain[mishicat].create_project(): with name => #ok - project', async
 	let { ok: projects_before } = await project_main_actor.mishicat.get_all_projects([]);
 
 	if (projects_before.length === 0) {
-		await project_main_actor.mishicat.create_project('Project One', []);
+		const { ok: project_ref } = await project_main_actor.mishicat.create_project({
+			name: 'Project One',
+			description: 'Descripton of Project',
+			snaps: []
+		});
 
 		let { ok: projects_, err: error } = await project_main_actor.mishicat.get_all_projects([]);
 
@@ -141,6 +145,7 @@ test('SnapMain[mishicat].create_snap(): with no image => #err - NoImageToSave', 
 			canister_id: projects[0].canister_id
 		},
 		image_cover_location: 1,
+		tags: [],
 		img_asset_ids: [],
 		file_asset: []
 	};
@@ -158,6 +163,7 @@ test('SnapMain[mishicat].create_snap(): with more than 12 images => #err - Twelv
 			canister_id: projects[0].canister_id
 		},
 		image_cover_location: 1,
+		tags: [],
 		img_asset_ids: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
 		file_asset: []
 	};
@@ -175,6 +181,7 @@ test('SnapMain[mishicat].create_snap(): with invalid img asset ref => #err - Ass
 			canister_id: projects[0].canister_id
 		},
 		image_cover_location: 1,
+		tags: [],
 		img_asset_ids: [10000000],
 		file_asset: []
 	};
@@ -212,6 +219,7 @@ test('SnapMain[motoko].create_snap(): with invalid asset owner => #err - NotOwne
 			canister_id: projects[0].canister_id
 		},
 		image_cover_location: 1,
+		tags: [],
 		img_asset_ids: img_asset_ids,
 		file_asset: []
 	};
@@ -263,6 +271,7 @@ test('SnapMain[mishicat].create_snap(): with images only => #ok - snap', async f
 			canister_id: projects[0].canister_id
 		},
 		image_cover_location: 1,
+		tags: [],
 		img_asset_ids: img_asset_ids,
 		file_asset: []
 	};
@@ -683,6 +692,7 @@ test('SnapMain[mishicat].create_snap(): with images only => #ok - snap', async f
 			canister_id: snap.project_ref[0].canister_id
 		},
 		image_cover_location: 1,
+		tags: [],
 		img_asset_ids: img_asset_ids,
 		file_asset: []
 	};

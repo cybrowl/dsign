@@ -23,39 +23,26 @@ import Types "./types";
 import Utils "../utils/utils";
 
 actor class Project(project_main : Principal, snap_main : Principal, favorite_main : Principal, is_prod : Bool) = this {
+	type CreateProjectArgs = Types.CreateProjectArgs;
 	type ErrAddSnapsToProject = Types.ErrAddSnapsToProject;
 	type ErrCreateProject = Types.ErrCreateProject;
 	type ErrDeleteProjects = Types.ErrDeleteProjects;
 	type ErrDeleteSnapsFromProject = Types.ErrDeleteSnapsFromProject;
 	type ErrUpdateProject = Types.ErrUpdateProject;
 	type Project = Types.Project;
-	type ProjectUpdateAction = Types.ProjectUpdateAction;
 	type ProjectID = Types.ProjectID;
+	type ProjectPublic = Types.ProjectPublic;
 	type ProjectRef = Types.ProjectRef;
-	type Snap = Types.Snap;
+	type ProjectUpdateAction = Types.ProjectUpdateAction;
 	type SnapRef = Types.SnapRef;
 	type Time = Types.Time;
-	type UpdateProject = Types.UpdateProject;
+	type UpdateProjectArgs = Types.UpdateProjectArgs;
 	type UserPrincipal = Types.UserPrincipal;
 
 	type SnapActor = SnapTypes.SnapActor;
 
 	type SnapPublic = SnapTypes.SnapPublic;
 	type Payload = HealthMetricsTypes.Payload;
-
-	public type ProjectPublic = {
-		id : Text;
-		canister_id : Text;
-		created : Time;
-		username : Text;
-		name : Text;
-		owner : Null;
-		snaps : [SnapPublic];
-		metrics : {
-			likes : Nat;
-			views : Nat;
-		};
-	};
 
 	let ACTOR_NAME : Text = "Project";
 	let VERSION : Nat = 3;
@@ -68,8 +55,7 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 
 	// ------------------------- Projects Methods -------------------------
 	public shared ({ caller }) func create_project(
-		name : Text,
-		snap_refs : ?[SnapRef],
+		args : CreateProjectArgs,
 		owner : UserPrincipal
 	) : async Result.Result<Project, ErrCreateProject> {
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "create_project")];
@@ -97,7 +83,7 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 		};
 
 		var snaps : [SnapRef] = [];
-		switch (snap_refs) {
+		switch (args.snaps) {
 			case (?snaps_) {
 				snaps := snaps_;
 			};
@@ -108,9 +94,10 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 			id = project_id;
 			canister_id = project_canister_id;
 			created = Time.now();
+			description = Option.make(args.description);
 			username = username;
 			owner = owner;
-			name = name;
+			name = args.name;
 			snaps = snaps;
 			metrics = {
 				likes = 0;
@@ -121,6 +108,47 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 		projects.put(project_id, project);
 
 		return #ok(project);
+	};
+
+	public shared ({ caller }) func edit_project(
+		update_project_args : UpdateProjectArgs,
+		project_ref : ProjectRef
+	) : async Result.Result<Project, ErrUpdateProject> {
+		let log_tags = [("actor_name", ACTOR_NAME), ("method", "update_project_details")];
+
+		if (project_main != caller) {
+			return #err(#NotAuthorized(true));
+		};
+
+		switch (projects.get(project_ref.id)) {
+			case null {
+				return #err(#ProjectNotFound(true));
+			};
+			case (?project) {
+				let description : ?Text = switch (update_project_args.description) {
+					case (null) { project.description };
+					case (?description) { update_project_args.description };
+				};
+
+				let name : Text = Option.get(update_project_args.name, project.name);
+
+				let project_updated : Project = {
+					project with
+					name = name;
+					description = description;
+				};
+
+				projects.put(project_ref.id, project_updated);
+
+				if (project.snaps.size() > 0) {
+					ignore Explore.save_project(project_updated);
+				};
+
+				ignore Logger.log_event(log_tags, "Project Details Updated");
+
+				return #ok(project_updated);
+			};
+		};
 	};
 
 	public shared ({ caller }) func delete_projects(project_ids : [ProjectID]) : async Result.Result<(), ErrDeleteProjects> {
@@ -224,39 +252,6 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 		};
 	};
 
-	public shared ({ caller }) func update_project_details(
-		update_project_args : UpdateProject,
-		project_ref : ProjectRef
-	) : async Result.Result<Project, ErrUpdateProject> {
-		let log_tags = [("actor_name", ACTOR_NAME), ("method", "update_project_details")];
-
-		if (project_main != caller) {
-			return #err(#NotAuthorized(true));
-		};
-
-		switch (projects.get(project_ref.id)) {
-			case null {
-				return #err(#ProjectNotFound(true));
-			};
-			case (?project) {
-				let project_updated : Project = {
-					project with
-					name = Option.get(update_project_args.name, project.name);
-				};
-
-				projects.put(project_ref.id, project_updated);
-
-				if (project.snaps.size() > 0) {
-					ignore Explore.save_project(project_updated);
-				};
-
-				ignore Logger.log_event(log_tags, "Project Details Updated");
-
-				return #ok(project_updated);
-			};
-		};
-	};
-
 	// NOTE: only called from Favorite Main
 	public shared ({ caller }) func update_project_metrics(
 		project_id : ProjectID,
@@ -330,6 +325,7 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 			switch (projects.get(project_id)) {
 				case null {};
 				case (?project) {
+					let description = Option.get(project.description, "");
 
 					var snap_list = Buffer.Buffer<SnapPublic>(0);
 
@@ -347,14 +343,10 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 					};
 
 					let project_public : ProjectPublic = {
-						id = project.id;
-						canister_id = project.canister_id;
-						created = project.created;
-						username = project.username;
-						name = project.name;
+						project with
 						owner = null;
+						description;
 						snaps = Buffer.toArray(snap_list);
-						metrics = project.metrics;
 					};
 
 					projects_list.add(project_public);

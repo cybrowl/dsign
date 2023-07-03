@@ -44,7 +44,11 @@
 			disable_project_store_reset.set(false);
 
 			const { ok: created_project, err: err_create_project } =
-				await $actor_project_main.actor.create_project(project_name, []);
+				await $actor_project_main.actor.create_project({
+					name: project_name,
+					description: '',
+					snaps: []
+				});
 
 			const id = get(created_project, 'id', null);
 			const canister_id = get(created_project, 'canister_id', null);
@@ -71,8 +75,8 @@
 			};
 
 			let { ok: updated_project, err: err_update_project_details } =
-				await $actor_project_main.actor.update_project_details(
-					{ name: [project_name] },
+				await $actor_project_main.actor.edit_project(
+					{ name: [project_name], description: [''] },
 					project_ref
 				);
 
