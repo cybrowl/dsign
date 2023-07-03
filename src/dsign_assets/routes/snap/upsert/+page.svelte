@@ -275,6 +275,7 @@
 					id: project_id,
 					canister_id: canister_id
 				},
+				tags: [tags_added],
 				file_asset: isEmpty(file_chunks) ? [] : [file_asset]
 			};
 

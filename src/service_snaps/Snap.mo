@@ -63,6 +63,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		owner : UserPrincipal
 	) : async Result.Result<Snap, ErrCreateSnap> {
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "create_snap")];
+		let tags = Option.get(snap_info.tags, []);
 
 		if (snap_main != caller) {
 			ignore Logger.log_event(
@@ -97,7 +98,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 				id = snap_info.project.id;
 				canister_id = snap_info.project.canister_id;
 			};
-			tags = [];
+			tags = tags;
 			title = snap_info.title;
 			username = username;
 			owner = Option.make(owner);
