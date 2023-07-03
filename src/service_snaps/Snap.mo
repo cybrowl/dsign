@@ -34,7 +34,6 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	type ImageRef = Types.ImageRef;
 	type ProjectPublic = Types.ProjectPublic;
 	type Snap = Types.Snap;
-	type Snap_V2 = Types.Snap_V2;
 	type SnapID = Types.SnapID;
 	type SnapPublic = Types.SnapPublic;
 	type SnapRef = Types.SnapRef;
@@ -47,13 +46,13 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 	type ProjectActor = ProjectTypes.ProjectActor;
 
 	let ACTOR_NAME : Text = "Snap";
-	let VERSION : Nat = 4;
+	let VERSION : Nat = 5;
 
 	private let rr = XorShift.toReader(XorShift.XorShift64(null));
 	private let se = Source.Source(rr, 0);
 
-	var snaps_v2 : HashMap.HashMap<SnapID, Snap_V2> = HashMap.HashMap(0, Text.equal, Text.hash);
-	stable var snaps_v2_stable_storage : [(SnapID, Snap_V2)] = [];
+	var snaps : HashMap.HashMap<SnapID, Snap> = HashMap.HashMap(0, Text.equal, Text.hash);
+	stable var snaps_stable_storage : [(SnapID, Snap)] = [];
 
 	stable var health_metrics_canister_id : Text = "";
 
@@ -62,7 +61,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		images_ref : [ImageRef],
 		file_asset : AssetRef,
 		owner : UserPrincipal
-	) : async Result.Result<Snap_V2, ErrCreateSnap> {
+	) : async Result.Result<Snap, ErrCreateSnap> {
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "create_snap")];
 
 		if (snap_main != caller) {
@@ -87,7 +86,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			};
 		};
 
-		let snap : Snap_V2 = {
+		let snap : Snap = {
 			canister_id = snap_canister_id;
 			created = Time.now();
 			file_asset = file_asset;
@@ -108,7 +107,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			};
 		};
 
-		snaps_v2.put(snap_id, snap);
+		snaps.put(snap_id, snap);
 
 		return #ok(snap);
 	};
@@ -118,7 +117,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		images_ref : ?[ImageRef],
 		file_asset : AssetRef,
 		owner : UserPrincipal
-	) : async Result.Result<Snap_V2, ErrEditSnap> {
+	) : async Result.Result<Snap, ErrEditSnap> {
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "edit_snap")];
 
 		if (snap_main != caller) {
@@ -130,7 +129,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			return #err(#Unauthorized);
 		};
 
-		switch (snaps_v2.get(snap_info.id)) {
+		switch (snaps.get(snap_info.id)) {
 			case (null) {
 				return #err(#SnapNotFound);
 			};
@@ -153,7 +152,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 					title = name;
 				};
 
-				snaps_v2.put(snap.id, snap_updated);
+				snaps.put(snap.id, snap_updated);
 
 				switch (snap.project_ref) {
 					case (null) {};
@@ -181,10 +180,10 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		};
 
 		for (snap_id in snap_ids.vals()) {
-			switch (snaps_v2.get(snap_id)) {
+			switch (snaps.get(snap_id)) {
 				case null {};
 				case (?snap) {
-					snaps_v2.delete(snap_id);
+					snaps.delete(snap_id);
 				};
 			};
 		};
@@ -202,7 +201,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			return ();
 		};
 
-		switch (snaps_v2.get(snap_id)) {
+		switch (snaps.get(snap_id)) {
 			case null {};
 			case (?snap) {
 				let updated_images = Array.filter(
@@ -217,7 +216,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 					}
 				);
 
-				snaps_v2.put(snap_id, { snap with images = updated_images });
+				snaps.put(snap_id, { snap with images = updated_images });
 
 				switch (snap.project_ref) {
 					case (null) {};
@@ -232,7 +231,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 
 	public shared ({ caller }) func delete_design_file(
 		snap_id : SnapID
-	) : async Result.Result<Snap_V2, ErrDeleteDesignFile> {
+	) : async Result.Result<Snap, ErrDeleteDesignFile> {
 		let log_tags = [("actor_name", ACTOR_NAME), ("method", "delete_design_file")];
 
 		if (snap_main != caller) {
@@ -244,7 +243,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			return #err(#Unauthorized);
 		};
 
-		switch (snaps_v2.get(snap_id)) {
+		switch (snaps.get(snap_id)) {
 			case (null) {
 				return #err(#SnapNotFound);
 			};
@@ -257,12 +256,12 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 					is_public = false;
 				};
 
-				let snap_updated : Snap_V2 = {
+				let snap_updated : Snap = {
 					snap with file_asset;
 					tags = [];
 				};
 
-				snaps_v2.put(snap.id, snap_updated);
+				snaps.put(snap.id, snap_updated);
 
 				switch (snap.project_ref) {
 					case (null) {};
@@ -282,7 +281,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		var snaps_list = Buffer.Buffer<SnapPublic>(0);
 
 		for (snap_id in snap_ids.vals()) {
-			switch (snaps_v2.get(snap_id)) {
+			switch (snaps.get(snap_id)) {
 				case null {};
 				case (?snap) {
 
@@ -308,7 +307,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
 			("canister_id", Principal.toText(Principal.fromActor(this))),
-			("snaps_size", Int.toText(snaps_v2.size())),
+			("snaps_size", Int.toText(snaps.size())),
 			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
 			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
 			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
@@ -321,7 +320,7 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 
 		let log_payload : Payload = {
 			metrics = [
-				("snaps_num", snaps_v2.size()),
+				("snaps_num", snaps.size()),
 				("cycles_balance", UtilsShared.get_cycles_balance()),
 				("memory_in_mb", UtilsShared.get_memory_in_mb()),
 				("heap_in_mb", UtilsShared.get_heap_in_mb())
@@ -338,12 +337,12 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
-		snaps_v2_stable_storage := Iter.toArray(snaps_v2.entries());
+		snaps_stable_storage := Iter.toArray(snaps.entries());
 	};
 
 	system func postupgrade() {
-		snaps_v2 := HashMap.fromIter<SnapID, Snap_V2>(snaps_v2_stable_storage.vals(), 0, Text.equal, Text.hash);
+		snaps := HashMap.fromIter<SnapID, Snap>(snaps_stable_storage.vals(), 0, Text.equal, Text.hash);
 
-		snaps_v2_stable_storage := [];
+		snaps_stable_storage := [];
 	};
 };

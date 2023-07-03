@@ -74,24 +74,6 @@ module {
 		id : SnapID;
 		image_cover_location : Nat8;
 		images : [ImageRef];
-		project : ?Project;
-		project_ref : ?ProjectRef;
-		title : Text;
-		username : Username;
-		owner : ?Principal;
-		metrics : {
-			likes : Nat;
-			views : Nat;
-		};
-	};
-
-	public type Snap_V2 = {
-		canister_id : Text;
-		created : Time;
-		file_asset : AssetRef;
-		id : SnapID;
-		image_cover_location : Nat8;
-		images : [ImageRef];
 		project_ref : ?ProjectRef;
 		title : Text;
 		tags : [Text];
@@ -181,11 +163,11 @@ module {
 
 	// Actor Interface
 	public type SnapActor = actor {
-		create_snap : shared (CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap_V2, ErrCreateSnap>;
-		edit_snap : shared (EditSnapArgs, ?[ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap_V2, ErrEditSnap>;
+		create_snap : shared (CreateSnapArgs, [ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, ErrCreateSnap>;
+		edit_snap : shared (EditSnapArgs, ?[ImageRef], AssetRef, UserPrincipal) -> async Result.Result<Snap, ErrEditSnap>;
 		delete_snaps : shared ([SnapID]) -> async ();
 		delete_images : shared (SnapID, [ImageRef]) -> async ();
-		delete_design_file : shared (SnapID) -> async Result.Result<Snap_V2, ErrDeleteDesignFile>;
+		delete_design_file : shared (SnapID) -> async Result.Result<Snap, ErrDeleteDesignFile>;
 		get_all_snaps : query ([SnapID]) -> async [SnapPublic];
 	};
 };
