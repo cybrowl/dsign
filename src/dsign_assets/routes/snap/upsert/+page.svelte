@@ -241,7 +241,7 @@
 
 		disable_project_store_reset.set(false);
 
-		const { snap_name } = event.detail;
+		const { snap_name, tags_added } = event.detail;
 
 		is_publishing = true;
 
@@ -284,6 +284,7 @@
 				canister_id: $snap_creation.canister_id,
 				image_cover_location: [image_cover_location],
 				img_asset_ids: [image_ids],
+				tags: [tags_added],
 				file_asset: isEmpty(file_chunks) ? [] : [file_asset]
 			};
 
