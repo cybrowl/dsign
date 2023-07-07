@@ -47,7 +47,6 @@
 	}
 
 	let isProjectOwner = false;
-	let is_mounted = false;
 
 	onMount(async () => {
 		await Promise.all([
@@ -56,8 +55,6 @@
 			auth.project_main(),
 			auth.snap_main()
 		]);
-
-		is_mounted = true;
 
 		local_snap_creation_design_file.set({ file_name: '', file_type: '', chunk_ids: [] });
 
@@ -270,14 +267,12 @@
 			{/if}
 		</div>
 	{/if}
-</main>
 
-<!-- Mobile Not Supported -->
-{#if is_mounted}
+	<!-- Mobile Not Supported -->
 	<div class="not_supported">
 		<h1>Sorry, Mobile Not Supported</h1>
 	</div>
-{/if}
+</main>
 
 <style lang="postcss">
 	.grid_layout {

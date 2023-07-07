@@ -13,6 +13,6 @@
 
 <slot />
 
-<style lang="postcss" global>
+<style lang="postcss">
 	@import '../app.css';
 </style>

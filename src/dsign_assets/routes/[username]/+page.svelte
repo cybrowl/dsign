@@ -362,11 +362,9 @@
 </main>
 
 <!-- Mobile Not Supported -->
-{#if $project_store.projects.length > 0 > 0}
-	<div class="not_supported">
-		<h1>Sorry, Mobile Not Supported</h1>
-	</div>
-{/if}
+<div class="not_supported">
+	<h1>Sorry, Mobile Not Supported</h1>
+</div>
 
 <style lang="postcss">
 	.grid_layout {
