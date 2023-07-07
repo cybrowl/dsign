@@ -1,5 +1,4 @@
 <script lang="js">
-	import '../app.css';
 	import { AuthClient } from '@dfinity/auth-client';
 	import { onMount } from 'svelte';
 
@@ -14,5 +13,6 @@
 
 <slot />
 
-<style lang="postcss">
+<style lang="postcss" global>
+	@import '../app.css';
 </style>

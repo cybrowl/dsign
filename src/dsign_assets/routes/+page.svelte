@@ -102,7 +102,8 @@
 <!-- Mobile Not Supported -->
 {#if $explore_store.projects.length > 0}
 	<div class="not_supported">
-		<h1>Sorry, Mobile Not Supported</h1>
+		<h1>Sorry, Mobile</h1>
+		<h1>Coming Soon</h1>
 	</div>
 {/if}
 
@@ -120,6 +121,6 @@
 		@apply row-start-2 row-end-auto hidden lg:grid col-start-1 grid-cols-4 col-end-13 gap-x-6 gap-y-12 mb-16;
 	}
 	.not_supported {
-		@apply grid lg:hidden h-screen place-items-center text-white text-4xl;
+		@apply lg:hidden flex flex-col items-center justify-center w-screen h-screen text-white text-4xl;
 	}
 </style>

@@ -105,6 +105,6 @@
 			"type": "persistent"
 		}
 	},
-	"dfx": "0.14.1",
+	"dfx": "0.14.2",
 	"version": 1
 }

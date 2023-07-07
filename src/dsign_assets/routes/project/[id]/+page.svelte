@@ -47,6 +47,7 @@
 	}
 
 	let isProjectOwner = false;
+	let is_mounted = false;
 
 	onMount(async () => {
 		await Promise.all([
@@ -55,6 +56,8 @@
 			auth.project_main(),
 			auth.snap_main()
 		]);
+
+		is_mounted = true;
 
 		local_snap_creation_design_file.set({ file_name: '', file_type: '', chunk_ids: [] });
 
@@ -270,7 +273,7 @@
 </main>
 
 <!-- Mobile Not Supported -->
-{#if isEmpty($project_store.project) === false}
+{#if is_mounted}
 	<div class="not_supported">
 		<h1>Sorry, Mobile Not Supported</h1>
 	</div>
