@@ -72,7 +72,7 @@
 		$auth_client.login({
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'
-				: 'http://localhost:8080/?canisterId=bnz7o-iuaaa-aaaaa-qaaaa-cai',
+				: 'http://cinef-v4aaa-aaaaa-qaalq-cai.localhost:8080/',
 			maxTimeToLive: BigInt(30 * 24 * 60 * 60 * 1000 * 1000 * 1000 * 1000),
 			onSuccess: handleAuth
 		});

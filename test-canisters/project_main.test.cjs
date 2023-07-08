@@ -149,8 +149,15 @@ test('ProjectMain[mishicat].create_project():  => #ok - project', async function
 		snaps: []
 	});
 
+	const { ok: project } = await project_main_actor.mishicat.get_project(
+		project_ref.id,
+		project_ref.canister_id
+	);
+
 	t.equal(project_ref.id.length > 3, true);
 	t.equal(project_ref.canister_id.length > 3, true);
+	t.equal(project.name, 'Project Two');
+	t.equal(project.description, 'Descripton of Project');
 });
 
 test('ProjectMain[mishicat].get_all_projects(): => #ok - two projects', async function (t) {

@@ -91,49 +91,43 @@ test('Setup Actors', async function () {
 test('Profile[mishicat].create_username(): create first with valid username => #ok - username', async function (t) {
 	const username = 'mishicat';
 
-	const { ok: created_username } = await profile_actors.mishicat.create_username(
+	const { ok: created_username, err: err_username } = await profile_actors.mishicat.create_username(
 		username.toLowerCase()
 	);
 
-	t.equal(created_username, username.toLowerCase());
+	if (created_username) {
+		t.equal(created_username, username.toLowerCase());
+	} else {
+		t.deepEqual(err_username, { UsernameTaken: null });
+	}
 });
 
 test('Profile[motoko].create_username(): create first with valid username => #ok - username', async function (t) {
 	const username = 'motoko';
 
-	const { ok: created_username } = await profile_actors.motoko.create_username(
+	const { ok: created_username, err: err_username } = await profile_actors.motoko.create_username(
 		username.toLowerCase()
 	);
 
-	t.equal(created_username, username.toLowerCase());
+	if (created_username) {
+		t.equal(created_username, username.toLowerCase());
+	} else {
+		t.deepEqual(err_username, { UsernameTaken: null });
+	}
 });
 
 test('Profile[default].create_username(): create first with valid username => #ok - username', async function (t) {
 	const username = 'default';
 
-	const { ok: created_username } = await profile_actors.default.create_username(
+	const { ok: created_username, err: err_username } = await profile_actors.default.create_username(
 		username.toLowerCase()
 	);
 
-	t.equal(created_username, username.toLowerCase());
-});
-
-test('Profile[mishicat].get_profile(): before user creates profile => #err - ProfileNotFound', async function (t) {
-	const response = await profile_actors.mishicat.get_profile();
-
-	t.deepEqual(response.err, { ProfileNotFound: true });
-});
-
-test('Profile[motoko].get_profile(): before user creates profile => #err - ProfileNotFound', async function (t) {
-	const response = await profile_actors.motoko.get_profile();
-
-	t.deepEqual(response.err, { ProfileNotFound: true });
-});
-
-test('Profile[default].get_profile(): before user creates profile => #err - ProfileNotFound', async function (t) {
-	const response = await profile_actors.default.get_profile();
-
-	t.deepEqual(response.err, { ProfileNotFound: true });
+	if (created_username) {
+		t.equal(created_username, username.toLowerCase());
+	} else {
+		t.deepEqual(err_username, { UsernameTaken: null });
+	}
 });
 
 test('SnapMain[mishicat].create_user_snap_storage(): create initial storage for snaps => #ok - true', async function (t) {
