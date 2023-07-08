@@ -14,6 +14,7 @@
 
 	let header = '';
 	let project_name_default = '';
+	let project_description_default = '';
 	let loading_msg = '';
 	let submit_button_label = '';
 	let is_sending = false;
@@ -25,7 +26,8 @@
 	} else {
 		header = 'Edit Project';
 		loading_msg = 'Changing to';
-		project_name_default = $modal_mode.project.name;
+		project_name_default = $modal_mode.project.name || '';
+		project_description_default = $modal_mode.project.description || '';
 		submit_button_label = 'Done';
 	}
 
@@ -39,14 +41,16 @@
 		modal_update.change_visibility('project_upsert');
 	}
 
-	async function createProject(project_name) {
+	async function createProject(project_name, project_description) {
 		try {
 			disable_project_store_reset.set(false);
+
+			debugger;
 
 			const { ok: created_project, err: err_create_project } =
 				await $actor_project_main.actor.create_project({
 					name: project_name,
-					description: '',
+					description: project_description,
 					snaps: []
 				});
 
@@ -63,7 +67,7 @@
 		}
 	}
 
-	async function editProject(project_name) {
+	async function editProject(project_name, project_description) {
 		try {
 			projects_update.rename_project($modal_mode.project, project_name);
 
@@ -76,7 +80,7 @@
 
 			let { ok: updated_project, err: err_update_project_details } =
 				await $actor_project_main.actor.edit_project(
-					{ name: [project_name], description: [''] },
+					{ name: [project_name], description: [project_description] },
 					project_ref
 				);
 
@@ -92,15 +96,15 @@
 	}
 
 	function handleSubmit(e) {
-		const { project_name } = e.detail;
+		const { project_name, project_description } = e.detail;
 
 		if ($actor_project_main.loggedIn) {
 			if ($modal_mode.project_create) {
 				is_sending = !is_sending;
 
-				createProject(project_name);
+				createProject(project_name, project_description);
 			} else {
-				editProject(project_name);
+				editProject(project_name, project_description);
 			}
 		} else {
 			navigate_to_home_with_notification();
@@ -114,6 +118,7 @@
 		{loading_msg}
 		{is_sending}
 		{project_name_default}
+		{project_description_default}
 		{submit_button_label}
 		on:cancel={handleCancel}
 		on:submit={handleSubmit}

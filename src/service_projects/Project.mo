@@ -45,7 +45,7 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "Project";
-	let VERSION : Nat = 3;
+	let VERSION : Nat = 4;
 
 	private let rr = XorShift.toReader(XorShift.XorShift64(null));
 	private let se = Source.Source(rr, 0);
@@ -140,9 +140,7 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 
 				projects.put(project_ref.id, project_updated);
 
-				if (project.snaps.size() > 0) {
-					ignore Explore.save_project(project_updated);
-				};
+				ignore Explore.update_project(project_ref);
 
 				ignore Logger.log_event(log_tags, "Project Details Updated");
 

@@ -53,17 +53,15 @@
 
 	async function get_profile() {
 		try {
-			const [auth_profile, public_profile] = await Promise.all([
-				$actor_profile.actor.get_profile(),
-				$actor_profile.actor.get_profile_public($page.params.username)
-			]);
-
-			const { ok: auth_profile_, err: err_auth_profile } = auth_profile;
-			const { ok: public_profile_, err: err_public_profile } = public_profile;
+			const { ok: public_profile_, err: err_public_profile } =
+				await $actor_profile.actor.get_profile_public($page.params.username);
 
 			profile = public_profile_;
 
 			if ($actor_profile.loggedIn) {
+				const { ok: auth_profile_, err: err_auth_profile } =
+					await $actor_profile.actor.get_profile();
+
 				const username = get(auth_profile_, 'username', 'x');
 				is_owner = username === $page.params.username;
 			}
@@ -113,7 +111,7 @@
 		}
 	}
 
-	$: if (profile.username !== $page.params.username) {
+	$: if (profile.username && profile.username !== $page.params.username) {
 		project_store_fetching();
 		get_profile();
 		get_all_projects();
@@ -127,10 +125,8 @@
 			auth.favorite_main()
 		]);
 
-		if (profile.username === $page.params.username) {
-			await get_profile();
-			await get_all_projects();
-		}
+		await get_profile();
+		await get_all_projects();
 	});
 
 	onDestroy(() => {

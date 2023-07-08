@@ -301,6 +301,16 @@
 		@apply row-start-4 row-end-auto grid col-start-3 col-end-13;
 	}
 	.not_supported {
-		@apply grid lg:hidden h-screen place-items-center text-white text-4xl;
+		display: grid;
+		height: 100vh;
+		justify-items: center;
+		align-items: center;
+		color: white;
+		font-size: 2.25rem;
+	}
+	@media (min-width: 1024px) {
+		.not_supported {
+			display: none;
+		}
 	}
 </style>

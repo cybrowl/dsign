@@ -2,6 +2,7 @@ import { Buffer; toArray } "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
+import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
@@ -18,21 +19,12 @@ import UtilsShared "../utils/utils";
 
 actor Explore = {
 	type Project = Types.Project;
-	type ProjectID = Types.ProjectID;
-	type ProjectRef = Types.ProjectRef;
 	type ProjectActor = Types.ProjectActor;
+	type ProjectID = Types.ProjectID;
+	type ProjectPublic = Types.ProjectPublic;
+	type ProjectRef = Types.ProjectRef;
 	type SnapPublic = SnapTypes.SnapPublic;
 	type Time = Int;
-
-	public type ProjectPublic = {
-		id : Text;
-		canister_id : Text;
-		created : Time;
-		username : Text;
-		name : Text;
-		owner : Null;
-		snaps : [SnapPublic];
-	};
 
 	type SnapActor = SnapTypes.SnapActor;
 	type Payload = HealthMetricsTypes.Payload;
@@ -41,10 +33,11 @@ actor Explore = {
 	stable var projects_stable_storage : [(ProjectID, ProjectPublic)] = [];
 
 	let ACTOR_NAME : Text = "Explore";
-	let VERSION : Nat = 2;
+	let VERSION : Nat = 3;
 
 	public shared ({ caller }) func save_project(project : Project) : async Text {
 		let authorized = await CanisterIdsLedger.canister_exists(Principal.toText(caller));
+		let description : Text = Option.get(project.description, "");
 
 		// covert project to public project to save
 		var snap_list = Buffer<SnapPublic>(0);
@@ -64,6 +57,7 @@ actor Explore = {
 
 		let project_public : ProjectPublic = {
 			project and {} with owner = null;
+			description = description;
 			snaps = toArray(snap_list);
 		};
 

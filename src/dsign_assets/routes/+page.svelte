@@ -36,6 +36,7 @@
 
 	function handleProjectClick(e) {
 		let project = get(e, 'detail');
+		console.log('project: ', project);
 
 		projects_update.update_project(project);
 
