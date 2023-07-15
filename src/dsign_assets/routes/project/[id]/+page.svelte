@@ -156,11 +156,13 @@
 		const snap = e.detail;
 		const updated_snap = {
 			...snap,
-			project: {
-				id: $project_store.project.id,
-				canister_id: $project_store.project.canister_id,
-				name: $project_store.project.name
-			}
+			project_name: $project_store.project.name,
+			project_ref: [
+				{
+					id: $project_store.project.id,
+					canister_id: $project_store.project.canister_id
+				}
+			]
 		};
 
 		snap_preview.set(updated_snap);

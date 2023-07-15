@@ -48,8 +48,8 @@
 	});
 
 	function handleClickBackHistory() {
-		const project_id = get($snap_preview, 'project.id', '');
-		const project_canister = get($snap_preview, 'project.canister_id', '');
+		const project_id = get($snap_preview, 'project_ref[0].id', '');
+		const project_canister = get($snap_preview, 'project_ref[0].canister_id', '');
 		const project_href = `/project/${project_id}/?canister_id=${project_canister}`;
 
 		if (!isEmpty(project_id)) {
@@ -60,17 +60,15 @@
 	}
 
 	function handleClickEdit() {
-		let project_id = get($snap_preview, 'project.id', '');
-		let project_canister = get($snap_preview, 'project.canister_id', '');
+		let project_id = get($snap_preview, 'project_ref[0].id', '');
+		let project_canister = get($snap_preview, 'project_ref[0].canister_id', '');
 
 		snap_creation.update(() => ({
 			...$snap_preview
 		}));
 
-		if (isEmpty(project_id)) {
-			project_id = snap.project.id;
-			project_canister = snap.project.canister_id;
-		}
+		console.log('$snap_preview: ', $snap_preview);
+		debugger;
 
 		if (project_id) {
 			goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister}&mode=edit`);
@@ -102,7 +100,12 @@
 	<!-- Snap -->
 	{#if $snap_preview.id !== undefined}
 		<div class="snap_info_layout">
-			<SnapInfo snap={$snap_preview} {is_owner} on:edit={handleClickEdit} />
+			<SnapInfo
+				snap={$snap_preview}
+				project_name={$snap_preview.project_name}
+				{is_owner}
+				on:edit={handleClickEdit}
+			/>
 		</div>
 
 		<div class="content_layout">
