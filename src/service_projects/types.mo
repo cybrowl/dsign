@@ -32,6 +32,26 @@ module {
 		canister_id : Text;
 	};
 
+	type Message = {
+		created : Time;
+		content : Text;
+		username : Text;
+	};
+
+	type File = {
+		created : Time;
+		name : Text;
+		size : Nat;
+		url : Text;
+	};
+
+	public type Topic = {
+		snap_ref : SnapRef;
+		name : Text;
+		file : ?File;
+		messages : [Message];
+	};
+
 	public type Project = {
 		id : Text;
 		canister_id : Text;
@@ -41,6 +61,7 @@ module {
 		owner : UserPrincipal;
 		name : Text;
 		snaps : [SnapRef];
+		topics : ?[Topic];
 		metrics : {
 			likes : Nat;
 			views : Nat;

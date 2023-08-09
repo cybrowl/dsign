@@ -129,7 +129,7 @@ const installCode = async () => {
 
 		return {
 			name: canister.name,
-			is_prod: canister.isProd,
+			is_prod: config.is_prod,
 			id: canister.id,
 			principal: Principal.fromText(canister.id),
 			wasm: get_wasm(`test_${canister.name}`, config.wasm),

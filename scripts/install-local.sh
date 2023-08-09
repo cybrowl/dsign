@@ -1,5 +1,11 @@
 #!/bin/bash
 
+echo "env: dev"
+cp ./src/env/env_local.mo ./src/env/env.mo
+
+# ii
+dfx deploy internet_identity
+
 # asset staging
 dfx deploy assets_file_staging
 

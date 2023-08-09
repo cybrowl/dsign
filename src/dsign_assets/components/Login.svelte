@@ -72,7 +72,7 @@
 		$auth_client.login({
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'
-				: 'http://cinef-v4aaa-aaaaa-qaalq-cai.localhost:8080/',
+				: 'http://bd3sg-teaaa-aaaaa-qaaba-cai.localhost:8080/',
 			maxTimeToLive: BigInt(30 * 24 * 60 * 60 * 1000 * 1000 * 1000 * 1000),
 			onSuccess: handleAuth
 		});
@@ -107,7 +107,7 @@
 			/>
 		</span>
 	{:else}
-		<Button class="hover_lilalic_purple" primary={true} label="Connect" on:click={login} />
+		<Button class="hover_lilalic_purple" primary={true} label="Get Started" on:click={login} />
 	{/if}
 </span>
 

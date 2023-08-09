@@ -254,6 +254,8 @@ actor SnapMain {
 							tags,
 							debug_show ("project_actor.add_snaps_to_project", err)
 						);
+
+						return #err(#ErrorCall(debug_show (err)));
 					};
 					case (#ok project) {
 						//TODO: call Snap.add_project_to_snaps
@@ -261,12 +263,12 @@ actor SnapMain {
 							tags,
 							debug_show ("project_actor.add_snaps_to_project", debug_show (project))
 						);
+
+						user_snap_ids_storage.put(snap_canister_id, Buffer.toArray(snap_ids));
+
+						#ok("Created Snap");
 					};
 				};
-
-				user_snap_ids_storage.put(snap_canister_id, Buffer.toArray(snap_ids));
-
-				#ok("Created Snap");
 			};
 		};
 	};

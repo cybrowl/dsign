@@ -99,6 +99,7 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 			owner = owner;
 			name = args.name;
 			snaps = snaps;
+			topics = null;
 			metrics = {
 				likes = 0;
 				views = 0;

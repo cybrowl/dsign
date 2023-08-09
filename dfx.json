@@ -1,5 +1,16 @@
 {
 	"canisters": {
+		"internet_identity": {
+			"type": "custom",
+			"candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+			"wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz",
+			"shrink": false,
+			"remote": {
+				"id": {
+					"ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+				}
+			}
+		},
 		"dsign_assets": {
 			"dependencies": [],
 			"frontend": {
@@ -105,6 +116,6 @@
 			"type": "persistent"
 		}
 	},
-	"dfx": "0.14.2",
+	"dfx": "0.14.3",
 	"version": 1
 }
