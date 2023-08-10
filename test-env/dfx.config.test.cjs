@@ -6,6 +6,8 @@ test('DFX Config: generateCanisterAliases()', async function (t) {
 
 	const expected = {
 		'local-canister-ids': '/Users/cyberowl/Projects/dsign/.dfx/local/canister_ids.json',
+		$IDLinternet_identity:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/internet_identity/service.did.js',
 		$IDLdsign_assets:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/dsign_assets/service.did.js',
 		$IDLassets_file_staging:
