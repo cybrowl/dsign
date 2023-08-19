@@ -72,7 +72,7 @@
 		$auth_client.login({
 			identityProvider: isProd
 				? 'https://identity.ic0.app/#authorize'
-				: 'http://bd3sg-teaaa-aaaaa-qaaba-cai.localhost:8080/',
+				: 'http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:8080/',
 			maxTimeToLive: BigInt(30 * 24 * 60 * 60 * 1000 * 1000 * 1000 * 1000),
 			onSuccess: handleAuth
 		});

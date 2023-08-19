@@ -29,8 +29,6 @@
 	onMount(async () => {
 		await Promise.all([auth.assets_file_staging(), auth.assets_img_staging(), auth.snap_main()]);
 
-		console.log('$snap_creation: ', $snap_creation);
-
 		mode = $page.url.searchParams.get('mode');
 
 		if ($local_snap_creation_design_file.file_name) {
@@ -155,8 +153,6 @@
 				$snap_creation.images = [...$snap_creation.images, newImage];
 			}
 		});
-
-		console.log('snap_creation: ', $snap_creation);
 	}
 
 	function handleSelectCover(event) {
@@ -165,27 +161,26 @@
 
 	async function handleRemoveImg(event) {
 		const image_removed = event.detail;
-		console.log('image_removed: ', image_removed);
 
 		$snap_creation.images = $snap_creation.images.filter((image) => image.id !== image_removed.id);
 
-		const snap_ref = {
-			id: $snap_creation.id,
-			canister_id: $snap_creation.canister_id
-		};
+		if (mode === 'edit') {
+			const snap_ref = {
+				id: $snap_creation.id,
+				canister_id: $snap_creation.canister_id
+			};
 
-		const image_ref = {
-			id: image_removed.id,
-			canister_id: image_removed.canister_id,
-			url: image_removed.url
-		};
+			const image_ref = {
+				id: image_removed.id,
+				canister_id: image_removed.canister_id,
+				url: image_removed.url
+			};
 
-		const { ok: deleted_images } = await $actor_snap_main.actor.delete_images(
-			[image_ref],
-			snap_ref
-		);
-
-		console.log('deleted_images: ', deleted_images);
+			const { ok: deleted_images } = await $actor_snap_main.actor.delete_images(
+				[image_ref],
+				snap_ref
+			);
+		}
 	}
 
 	async function handleAttachFile(event) {
@@ -209,22 +204,24 @@
 		$snap_creation.file_asset.file_name = '';
 		$snap_creation.file_asset.file_unit8 = [];
 
-		// delete from staging storage
+		// delete from local storage
 		local_snap_creation_design_file.set({
 			file_name: '',
 			file_type: '',
 			chunk_ids: []
 		});
 
-		// delete from snap
-		const snap_ref = {
-			id: $snap_creation.id,
-			canister_id: $snap_creation.canister_id
-		};
+		if (mode === 'edit') {
+			// delete from snap
+			const snap_ref = {
+				id: $snap_creation.id,
+				canister_id: $snap_creation.canister_id
+			};
 
-		const { ok: deleted, err: err_delete } = await $actor_snap_main.actor.delete_design_file(
-			snap_ref
-		);
+			const { ok: deleted, err: err_delete } = await $actor_snap_main.actor.delete_design_file(
+				snap_ref
+			);
+		}
 	}
 
 	function handleCancel() {
@@ -260,7 +257,14 @@
 			const file_chunks = $local_snap_creation_design_file.chunk_ids;
 			const file_type = $local_snap_creation_design_file.file_type;
 
-			const design_file_chunk_ids = !isEmpty(file_chunks) && JSON.parse(file_chunks, reviver);
+			let design_file_chunk_ids = [];
+			if (!isEmpty(file_chunks)) {
+				const parsed = JSON.parse(file_chunks, reviver);
+				design_file_chunk_ids = Array.isArray(parsed) ? parsed : [parsed];
+			}
+
+			console.log('design_file_chunk_ids: ', design_file_chunk_ids);
+
 			const file_asset = {
 				is_public: true,
 				content_type: file_type,
@@ -279,7 +283,7 @@
 				file_asset: isEmpty(file_chunks) ? [] : [file_asset]
 			};
 
-			let edit_snap_args = {
+			const edit_snap_args = {
 				title: [snap_name],
 				id: $snap_creation.id,
 				canister_id: $snap_creation.canister_id,
@@ -289,18 +293,23 @@
 				file_asset: isEmpty(file_chunks) ? [] : [file_asset]
 			};
 
+			console.log('mode: ', mode);
 			console.log('create_snap_args: ', create_snap_args);
 			console.log('edit_snap_args: ', edit_snap_args);
 
 			if ($actor_snap_main.loggedIn) {
 				if (mode === 'edit') {
+					console.log('edit');
+
 					const { ok: edited_snap, err: err_edit_snap } = await $actor_snap_main.actor.edit_snap(
 						edit_snap_args
 					);
 
 					goto(`/project/${project_id}?canister_id=${canister_id}`);
 				} else {
-					const { ok: created_snap, err: snap_creation_failed } =
+					console.log('create');
+
+					const { ok: created_snap, err: err_snap_creation } =
 						await $actor_snap_main.actor.create_snap(create_snap_args);
 
 					goto(`/project/${project_id}?canister_id=${canister_id}`);

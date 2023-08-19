@@ -46,6 +46,7 @@ module {
 	};
 
 	public type Topic = {
+		id : Text;
 		snap_ref : SnapRef;
 		name : Text;
 		file : ?File;
