@@ -205,7 +205,7 @@ actor CanisterIdsLedger = {
 		canisters := List.fromArray<CanisterInfo>(canisters_stable_storage);
 
 		ignore Timer.recurringTimer(#seconds(60), log_canisters_health);
-		ignore Timer.recurringTimer(#seconds(120), trigger_logs_cron);
+		// ignore Timer.recurringTimer(#seconds(120), trigger_logs_cron);
 
 		authorized_stable_storage := [];
 		canisters_stable_storage := [];
