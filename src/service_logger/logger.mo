@@ -12,8 +12,6 @@ import Timer "mo:base/Timer";
 import Result "mo:base/Result";
 
 import CanisterIdsLedger "canister:canister_ids_ledger";
-
-import ICTypes "../types/ic.types";
 import CanisterLedgerTypes "../types/canidster_ids_ledger.types";
 
 import UtilsShared "../utils/utils";

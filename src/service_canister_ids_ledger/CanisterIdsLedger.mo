@@ -11,6 +11,7 @@ import Timer "mo:base/Timer";
 import CanisterLedgerTypes "../types/canidster_ids_ledger.types";
 import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
+import ICTypes "../types/ic.types";
 
 import UtilsShared "../utils/utils";
 
@@ -25,7 +26,7 @@ actor CanisterIdsLedger = {
 
 	let ACTOR_NAME : Text = "CanisterIdsLedger";
 	let CANISTER_ID_PROD : Text = "k25dy-3yaaa-aaaag-abcpa-cai";
-	let VERSION : Nat = 5;
+	let VERSION : Nat = 6;
 
 	var canisters = List.nil<CanisterInfo>();
 	stable var canisters_stable_storage : [(CanisterInfo)] = [];
@@ -37,6 +38,7 @@ actor CanisterIdsLedger = {
 	stable var timer_id : Nat = 0;
 
 	stable var logger_canister_id : Text = "jaypp-oiaaa-aaaag-aaa6q-cai";
+	let ic : ICTypes.Self = actor ("aaaaa-aa");
 
 	// ------------------------- CanisterIdsLedger Methods -------------------------
 	public shared ({ caller }) func save_canister(canister_child : CanisterInfo) : async Text {
@@ -143,6 +145,21 @@ actor CanisterIdsLedger = {
 		return ();
 	};
 
+	func trigger_logs_cron() : async () {
+		let url = "https://new-relic-logger.vercel.app/api/cron";
+		let request_headers = [{ name = "User-Agent"; value = "logs_canister" }];
+		let http_request : ICTypes.CanisterHttpRequestArgs = {
+			url = url;
+			max_response_bytes = null;
+			headers = request_headers;
+			body = null;
+			method = #get;
+			transform = null;
+		};
+
+		ignore ic.http_request(http_request);
+	};
+
 	// ------------------------- Canister Management Methods -------------------------
 	public query func version() : async Nat {
 		return VERSION;
@@ -188,6 +205,7 @@ actor CanisterIdsLedger = {
 		canisters := List.fromArray<CanisterInfo>(canisters_stable_storage);
 
 		ignore Timer.recurringTimer(#seconds(60), log_canisters_health);
+		ignore Timer.recurringTimer(#seconds(120), trigger_logs_cron);
 
 		authorized_stable_storage := [];
 		canisters_stable_storage := [];
