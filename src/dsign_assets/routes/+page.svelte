@@ -13,11 +13,14 @@
 	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
 	import { page_navigation } from '$stores_ref/page_navigation';
+	import { init_auth } from '$stores_ref/auth_client';
 
 	disable_project_store_reset.set(true);
 
 	onMount(async () => {
 		try {
+			await init_auth();
+
 			const all_projects = await $actor_explore.actor.get_all_projects();
 
 			if (all_projects) {

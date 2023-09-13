@@ -28,6 +28,8 @@ const authActors = [
 const authenticate_actor = async (actor_name, actor, authClient) => {
 	const isAuthenticated = await authClient.isAuthenticated();
 
+	console.log('isAuthenticated: ', isAuthenticated);
+
 	if (isAuthenticated) {
 		actor.update(() => ({
 			loggedIn: true,

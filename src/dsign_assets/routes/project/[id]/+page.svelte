@@ -25,7 +25,7 @@
 		actor_snap_main
 	} from '$stores_ref/actors';
 	import { project_store, project_store_fetching, projects_update } from '$stores_ref/fetch_store';
-	import { auth } from '$stores_ref/auth_client';
+	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { modal_visible } from '$stores_ref/modal';
 	import {
 		snap_preview,
@@ -49,6 +49,7 @@
 	let isProjectOwner = false;
 
 	onMount(async () => {
+		await init_auth();
 		await Promise.all([
 			auth.favorite_main(),
 			auth.profile(),

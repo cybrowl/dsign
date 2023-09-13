@@ -9,7 +9,7 @@
 		actor_project_main,
 		actor_snap_main
 	} from '$stores_ref/actors';
-	import { auth } from '$stores_ref/auth_client';
+	import { init_auth } from '$stores_ref/auth_client';
 	let username_input_err_msgs = {
 		UsernameInvalid: 'Use lower case letters and numbers only, 2 - 20 characters in length',
 		UsernameTaken: 'Username already taken'
@@ -21,7 +21,13 @@
 	let username_input_err = '';
 
 	onMount(async () => {
-		await Promise.all([auth.project_main(), auth.snap_main(), auth.favorite_main()]);
+		await init_auth();
+		await Promise.all([
+			auth.profile(),
+			auth.project_main(),
+			auth.snap_main(),
+			auth.favorite_main()
+		]);
 	});
 
 	async function handleAccountCreation(e) {

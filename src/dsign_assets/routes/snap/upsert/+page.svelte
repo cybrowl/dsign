@@ -13,7 +13,7 @@
 		actor_assets_img_staging,
 		actor_snap_main
 	} from '$stores_ref/actors';
-	import { auth } from '$stores_ref/auth_client';
+	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 	import { local_snap_creation_design_file } from '$stores_ref/local_storage';
 	import { modal_visible } from '$stores_ref/modal';
@@ -27,6 +27,8 @@
 	let mode = '';
 
 	onMount(async () => {
+		await init_auth();
+
 		await Promise.all([auth.assets_file_staging(), auth.assets_img_staging(), auth.snap_main()]);
 
 		mode = $page.url.searchParams.get('mode');
@@ -234,8 +236,6 @@
 	}
 
 	async function handlePublish(event) {
-		await Promise.all([auth.assets_file_staging(), auth.assets_img_staging(), auth.snap_main()]);
-
 		disable_project_store_reset.set(false);
 
 		const { snap_name, tags_added } = event.detail;
@@ -296,6 +296,8 @@
 			console.log('mode: ', mode);
 			console.log('create_snap_args: ', create_snap_args);
 			console.log('edit_snap_args: ', edit_snap_args);
+
+			console.log('$actor_snap_main.loggedIn: ', $actor_snap_main.loggedIn);
 
 			if ($actor_snap_main.loggedIn) {
 				if (mode === 'edit') {

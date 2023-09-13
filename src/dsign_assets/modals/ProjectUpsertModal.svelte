@@ -45,8 +45,6 @@
 		try {
 			disable_project_store_reset.set(false);
 
-			debugger;
-
 			const { ok: created_project, err: err_create_project } =
 				await $actor_project_main.actor.create_project({
 					name: project_name,
