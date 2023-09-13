@@ -12,7 +12,9 @@ import {
 } from '$stores_ref/actors';
 
 export const auth_client = writable({});
+export const auth = {};
 
+// Init Auth
 const authActors = [
 	{ name: 'assets_file_staging', actor: actor_assets_file_staging },
 	{ name: 'assets_img_staging', actor: actor_assets_img_staging },
@@ -23,14 +25,7 @@ const authActors = [
 	{ name: 'snap_main', actor: actor_snap_main }
 ];
 
-const authenticateActor = async (actor_name, actor) => {
-	const authClient = await AuthClient.create({
-		idleOptions: {
-			idleTimeout: 1000 * 60 * 60 * 24 * 30,
-			disableDefaultIdleCallback: true
-		}
-	});
-
+const authenticate_actor = async (actor_name, actor, authClient) => {
 	const isAuthenticated = await authClient.isAuthenticated();
 
 	if (isAuthenticated) {
@@ -44,6 +39,22 @@ const authenticateActor = async (actor_name, actor) => {
 	}
 };
 
+export async function init_auth() {
+	const authClient = await AuthClient.create({
+		idleOptions: {
+			idleTimeout: 1000 * 60 * 60 * 24 * 30,
+			disableDefaultIdleCallback: true
+		}
+	});
+
+	auth_client.set(authClient);
+
+	authActors.forEach(({ name, actor }) => {
+		auth[name] = () => authenticate_actor(name, actor, authClient);
+	});
+}
+
+// Logout
 const logoutActor = async (actor_name, actor) => {
 	const authClient = await AuthClient.create();
 	const isAuthenticated = await authClient.isAuthenticated();
@@ -58,11 +69,6 @@ const logoutActor = async (actor_name, actor) => {
 		}));
 	}
 };
-
-export const auth = {};
-authActors.forEach(({ name, actor }) => {
-	auth[name] = () => authenticateActor(name, actor);
-});
 
 export const auth_logout_all = async () => {
 	authActors.forEach(({ name, actor }) => {

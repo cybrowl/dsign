@@ -7,7 +7,7 @@
 	import { Avatar, Button, Icon } from 'dsign-components';
 
 	import { actor_profile } from '$stores_ref/actors';
-	import { auth_client, auth } from '$stores_ref/auth_client';
+	import { auth_client, auth, init_auth } from '$stores_ref/auth_client';
 	import { local_storage_profile } from '$stores_ref/local_storage';
 	import modal_update from '$stores_ref/modal';
 
@@ -19,6 +19,8 @@
 	}
 
 	onMount(async () => {
+		await init_auth();
+
 		await auth.profile();
 
 		if ($actor_profile.loggedIn) {
