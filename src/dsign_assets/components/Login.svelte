@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import environment from 'environment';
 	import { get } from 'lodash';
+	import { page } from '$app/stores';
 
 	import { Avatar, Button, Icon } from 'dsign-components';
 
@@ -54,16 +55,16 @@
 			if ($actor_profile.loggedIn) {
 				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
 
-				console.log('profile: ', profile);
-				console.log('err_profile: ', err_profile);
-
 				if (profile) {
 					local_storage_profile.set({
 						avatar_url: get(profile, 'avatar.url', ''),
 						username: get(profile, 'username', '')
 					});
 
-					window.location.reload();
+					await goto('/loading');
+
+					const path = get($page, 'url.pathname', `/${profile.username}`);
+					await goto(path);
 				}
 
 				if (err_profile) {
