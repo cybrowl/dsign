@@ -22,7 +22,7 @@ import HealthMetricsTypes "../types/health_metrics.types";
 import SnapTypes "../service_snaps/types";
 import Types "./types";
 
-import { IS_PROD } "../env/env";
+import { IS_PROD; ENV } "../env/env";
 import Utils "../utils/utils";
 
 actor ProjectMain {
@@ -388,9 +388,14 @@ actor ProjectMain {
 	public shared (msg) func initialize_canisters() : async Text {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
 
-		if (IS_PROD == true) {
+		if (IS_PROD == true and ENV == "ic") {
 			snap_main_canister_id := "lyswl-7iaaa-aaaag-aatya-cai";
 			favorite_main_canister_id := "a7b5k-xiaaa-aaaag-aa6ja-cai";
+		};
+
+		if (IS_PROD == true and ENV == "staging") {
+			snap_main_canister_id := "g46iw-nyaaa-aaaag-abqlq-cai";
+			favorite_main_canister_id := "gv5dk-3qaaa-aaaag-abqka-cai";
 		};
 
 		if (project_canister_id.size() < 3) {

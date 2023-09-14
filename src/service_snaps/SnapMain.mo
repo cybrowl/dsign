@@ -25,7 +25,7 @@ import Types "./types";
 import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
 import HealthMetricsTypes "../types/health_metrics.types";
 
-import { IS_PROD } "../env/env";
+import { IS_PROD; ENV } "../env/env";
 import Utils "../utils/utils";
 
 actor SnapMain {
@@ -681,9 +681,14 @@ actor SnapMain {
 	public shared (msg) func initialize_canisters() : async () {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
 
-		if (IS_PROD == true) {
+		if (IS_PROD == true and ENV == "ic") {
 			project_main_canister_id := "nhlnj-vyaaa-aaaag-aay5q-cai";
 			favorite_main_canister_id := "a7b5k-xiaaa-aaaag-aa6ja-cai";
+		};
+
+		if (IS_PROD == true and ENV == "staging") {
+			project_main_canister_id := "g37oc-aaaaa-aaaag-abqla-cai";
+			favorite_main_canister_id := "gv5dk-3qaaa-aaaag-abqka-cai";
 		};
 
 		let project_main_principal = Principal.fromText(project_main_canister_id);
