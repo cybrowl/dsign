@@ -38,7 +38,7 @@ actor Logger {
 	var logs_pending = Buffer<LogEvent>(0);
 	stable var logs_pending_stable_storage : [LogEvent] = [];
 
-	let VERSION : Nat = 4;
+	let VERSION : Nat = 5;
 	let ACTOR_NAME : Text = "Logger";
 
 	stable var authorized : ?Principal = null;
@@ -64,14 +64,17 @@ actor Logger {
 			return ();
 		};
 
-		let profile_principal = Principal.fromActor(Logger);
+		let logger_principal = Principal.fromActor(Logger);
 
 		var env = "dev";
 
 		// Note: change me to your canister id
-		switch (Principal.toText(profile_principal)) {
+		switch (Principal.toText(logger_principal)) {
 			case ("jaypp-oiaaa-aaaag-aaa6q-cai") {
 				env := "prod";
+			};
+			case ("goy7p-biaaa-aaaag-abqiq-cai") {
+				env := "staging";
 			};
 			case _ {
 				env := "dev";

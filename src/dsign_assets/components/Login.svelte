@@ -46,11 +46,16 @@
 	});
 
 	async function handleAuth() {
+		console.log('auth triggered after creation: ');
+
 		await auth.profile();
 
 		try {
 			if ($actor_profile.loggedIn) {
 				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
+
+				console.log('profile: ', profile);
+				console.log('err_profile: ', err_profile);
 
 				if (profile) {
 					local_storage_profile.set({
@@ -67,7 +72,9 @@
 					}
 				}
 			}
-		} catch (error) {}
+		} catch (error) {
+			console.log('error: ', error);
+		}
 	}
 
 	function login() {
