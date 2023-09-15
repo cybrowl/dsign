@@ -115,6 +115,10 @@ actor Logger {
 		};
 	};
 
+	public query ({ caller }) func size() : async Nat {
+		return logs_pending.size();
+	};
+
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
