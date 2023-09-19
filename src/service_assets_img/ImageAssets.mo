@@ -237,6 +237,10 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 		return log_payload;
 	};
 
+	public query func cycles_low() : async Bool {
+		return UtilsShared.get_cycles_low();
+	};
+
 	public query func is_full() : async Bool {
 		return UtilsShared.is_full();
 	};

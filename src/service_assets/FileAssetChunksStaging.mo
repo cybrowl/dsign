@@ -117,6 +117,10 @@ actor FileAssetChunksStaging = {
 		return log_payload;
 	};
 
+	public query func cycles_low() : async Bool {
+		return UtilsShared.get_cycles_low();
+	};
+
 	public shared (message) func whoami() : async Principal {
 		return message.caller;
 	};

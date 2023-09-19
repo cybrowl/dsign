@@ -752,6 +752,10 @@ actor SnapMain {
 		return log_payload;
 	};
 
+	public query func cycles_low() : async Bool {
+		return Utils.get_cycles_low();
+	};
+
 	public shared ({ caller }) func install_code(
 		canister_id : Principal,
 		arg : Blob,

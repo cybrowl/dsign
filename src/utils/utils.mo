@@ -204,6 +204,14 @@ module {
 		return ExperimentalCycles.balance();
 	};
 
+	public func get_cycles_low() : Bool {
+		if (ExperimentalCycles.balance() < 2_000_000_000_000) {
+			return true;
+		} else {
+			return false;
+		};
+	};
+
 	public func is_full() : Bool {
 		let MAX_SIZE_THRESHOLD_MB : Float = 2000;
 

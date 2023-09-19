@@ -233,6 +233,10 @@ actor HealthMetrics = {
 		return log_payload;
 	};
 
+	public query func cycles_low() : async Bool {
+		return UtilsShared.get_cycles_low();
+	};
+
 	// ------------------------- SYSTEM METHODS -------------------------
 	system func preupgrade() {
 		logs_unique_stable_storage := Iter.toArray(logs_unique.entries());

@@ -14,6 +14,7 @@ module {
 	// Actor Interface
 	public type CanisterActor = actor {
 		health : shared () -> async Payload;
+		cycles_low : query () -> async Bool;
 	};
 
 	public type Tags = [(Text, Text)];

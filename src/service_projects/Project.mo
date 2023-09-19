@@ -411,6 +411,10 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 		return log_payload;
 	};
 
+	public query func cycles_low() : async Bool {
+		return Utils.get_cycles_low();
+	};
+
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		projects_stable_storage := Iter.toArray(projects.entries());

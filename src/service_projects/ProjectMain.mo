@@ -336,6 +336,10 @@ actor ProjectMain {
 		return log_payload;
 	};
 
+	public query func cycles_low() : async Bool {
+		return Utils.get_cycles_low();
+	};
+
 	//NOTE: dev only
 	public shared (msg) func set_canister_ids({
 		snap_main : Text;

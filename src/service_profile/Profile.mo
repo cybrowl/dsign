@@ -440,6 +440,10 @@ actor Profile = {
 		return log_payload;
 	};
 
+	public query func cycles_low() : async Bool {
+		return UtilsShared.get_cycles_low();
+	};
+
 	private func create_image_assets_canister(is_prod : Bool) : async () {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "create_image_assets_canister")];
 		let profile_principal = Principal.fromActor(Profile);

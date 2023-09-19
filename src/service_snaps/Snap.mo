@@ -337,6 +337,10 @@ actor class Snap(snap_main : Principal, project_main : Principal, favorite_main 
 		return log_payload;
 	};
 
+	public query func cycles_low() : async Bool {
+		return UtilsShared.get_cycles_low();
+	};
+
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		snaps_stable_storage := Iter.toArray(snaps.entries());

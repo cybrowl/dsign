@@ -122,6 +122,10 @@ actor Explore = {
 	};
 
 	// ------------------------- Canister Management -------------------------
+	public query func version() : async Nat {
+		return VERSION;
+	};
+
 	public shared func health() : async Payload {
 		let tags = [
 			("actor_name", ACTOR_NAME),
@@ -154,8 +158,8 @@ actor Explore = {
 		return log_payload;
 	};
 
-	public query func version() : async Nat {
-		return VERSION;
+	public query func cycles_low() : async Bool {
+		return UtilsShared.get_cycles_low();
 	};
 
 	// ------------------------- System Methods -------------------------

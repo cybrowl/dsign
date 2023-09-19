@@ -281,6 +281,10 @@ actor class Assets(controller : Principal, is_prod : Bool) = this {
 		return log_payload;
 	};
 
+	public query func cycles_low() : async Bool {
+		return UtilsShared.get_cycles_low();
+	};
+
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		assets_stable_storage := Iter.toArray(assets.entries());

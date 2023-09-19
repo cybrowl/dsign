@@ -131,6 +131,10 @@ actor class Favorite(favorite_main : Principal) = this {
 		return log_payload;
 	};
 
+	public query func cycles_low() : async Bool {
+		return UtilsShared.get_cycles_low();
+	};
+
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		projects_stable_storage := Iter.toArray(projects.entries());

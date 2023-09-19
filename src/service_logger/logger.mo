@@ -147,6 +147,10 @@ actor Logger {
 		return ();
 	};
 
+	public query func cycles_low() : async Bool {
+		return UtilsShared.get_cycles_low();
+	};
+
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		logs_storage_stable_storage := toArray(logs_storage);
