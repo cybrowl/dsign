@@ -1,4 +1,5 @@
 import { Buffer; toArray } "mo:base/Buffer";
+import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
@@ -26,6 +27,7 @@ actor CanisterIdsLedger = {
 
 	let ACTOR_NAME : Text = "CanisterIdsLedger";
 	let CANISTER_ID_PROD : Text = "k25dy-3yaaa-aaaag-abcpa-cai";
+	let CANISTER_ID_STAGING : Text = "etfrh-saaaa-aaaag-abqha-cai";
 	let VERSION : Nat = 6;
 
 	var canisters = List.nil<CanisterInfo>();
@@ -80,7 +82,12 @@ actor CanisterIdsLedger = {
 			CANISTER_ID_PROD
 		);
 
-		if (is_production == true) {
+		let is_staging = Text.equal(
+			Principal.toText(Principal.fromActor(CanisterIdsLedger)),
+			CANISTER_ID_STAGING
+		);
+
+		if (is_production == true or is_staging == true) {
 			return "Try Dev";
 		};
 
@@ -103,7 +110,12 @@ actor CanisterIdsLedger = {
 			CANISTER_ID_PROD
 		);
 
-		if (is_production == true) {
+		let is_staging = Text.equal(
+			Principal.toText(Principal.fromActor(CanisterIdsLedger)),
+			CANISTER_ID_STAGING
+		);
+
+		if (is_production == true or is_staging == true) {
 			return "Try Dev";
 		};
 
@@ -160,6 +172,24 @@ actor CanisterIdsLedger = {
 		ignore ic.http_request(http_request);
 	};
 
+	func check_cycles() : async () {
+		let all_canisters = List.toArray<CanisterInfo>(canisters);
+
+		for (canister in all_canisters.vals()) {
+			let canister_actor = actor (canister.id) : CanisterActor;
+
+			switch (await canister_actor.cycles_low()) {
+				case (true) {
+					Cycles.add(1_000_000_000_000);
+					await ic.deposit_cycles({ canister_id = Principal.fromText(canister.id) });
+				};
+				case (false) {};
+			};
+		};
+
+		return ();
+	};
+
 	// ------------------------- Canister Management Methods -------------------------
 	public query func version() : async Nat {
 		return VERSION;
@@ -205,6 +235,7 @@ actor CanisterIdsLedger = {
 		canisters := List.fromArray<CanisterInfo>(canisters_stable_storage);
 
 		ignore Timer.recurringTimer(#seconds(60), log_canisters_health);
+		ignore Timer.recurringTimer(#seconds(120), check_cycles);
 		// ignore Timer.recurringTimer(#seconds(120), trigger_logs_cron);
 
 		authorized_stable_storage := [];
