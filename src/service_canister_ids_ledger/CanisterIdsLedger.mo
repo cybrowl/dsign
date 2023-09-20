@@ -180,6 +180,7 @@ actor CanisterIdsLedger = {
 
 			switch (await canister_actor.cycles_low()) {
 				case (true) {
+
 					Cycles.add(1_000_000_000_000);
 					await ic.deposit_cycles({ canister_id = Principal.fromText(canister.id) });
 				};
@@ -212,6 +213,10 @@ actor CanisterIdsLedger = {
 		let logger_actor = actor (logger_canister_id) : LoggerActor;
 
 		ignore logger_actor.log_event(tags, "health");
+	};
+
+	public query func cycles_low() : async Bool {
+		return UtilsShared.get_cycles_low();
 	};
 
 	public shared func health_manual() : async () {
