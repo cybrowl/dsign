@@ -7,10 +7,8 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
-import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 
-import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
 
 import UtilsShared "../utils/utils";
@@ -24,8 +22,6 @@ actor class Favorite(favorite_main : Principal) = this {
 	type ProjectPublic = Types.ProjectPublic;
 
 	type ProjectActor = Types.ProjectActor;
-
-	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "Favorite";
 	let VERSION : Nat = 1;
@@ -99,7 +95,7 @@ actor class Favorite(favorite_main : Principal) = this {
 		return VERSION;
 	};
 
-	public shared func health() : async Payload {
+	public shared func health() : async () {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
@@ -114,21 +110,6 @@ actor class Favorite(favorite_main : Principal) = this {
 			tags,
 			"health"
 		);
-
-		let log_payload : Payload = {
-			metrics = [
-				("cycles_balance", UtilsShared.get_cycles_balance()),
-				("memory_in_mb", UtilsShared.get_memory_in_mb()),
-				("heap_in_mb", UtilsShared.get_heap_in_mb())
-			];
-			name = ACTOR_NAME;
-			child_canister_id = Principal.toText(Principal.fromActor(this));
-			parent_canister_id = Principal.toText(favorite_main);
-		};
-
-		ignore HealthMetrics.log_event(log_payload);
-
-		return log_payload;
 	};
 
 	public query func cycles_low() : async Bool {

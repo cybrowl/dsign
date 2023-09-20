@@ -13,7 +13,7 @@ module {
 
 	// Actor Interface
 	public type CanisterActor = actor {
-		health : shared () -> async Payload;
+		health : shared () -> async ();
 		cycles_low : query () -> async Bool;
 	};
 

@@ -11,12 +11,10 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
-import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
 
 import CanisterIdsLedger "canister:canister_ids_ledger";
 import Favorite "Favorite";
-import HealthMetrics "canister:health_metrics";
 import Profile "canister:profile";
 import Logger "canister:logger";
 
@@ -39,7 +37,6 @@ actor FavoriteMain {
 	type ProjectActor = Types.ProjectActor;
 
 	type CanisterInfo = CanisterIdsLedgerTypes.CanisterInfo;
-	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "FavoriteMain";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
@@ -247,7 +244,7 @@ actor FavoriteMain {
 		return VERSION;
 	};
 
-	public shared func health() : async Payload {
+	public shared func health() : async () {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
@@ -261,22 +258,6 @@ actor FavoriteMain {
 			tags,
 			"health"
 		);
-
-		let log_payload : Payload = {
-			metrics = [
-				("user_can_refs", user_canisters_ref.size()),
-				("cycles_balance", UtilsShared.get_cycles_balance()),
-				("memory_in_mb", UtilsShared.get_memory_in_mb()),
-				("heap_in_mb", UtilsShared.get_heap_in_mb())
-			];
-			name = ACTOR_NAME;
-			child_canister_id = Principal.toText(Principal.fromActor(FavoriteMain));
-			parent_canister_id = "";
-		};
-
-		ignore HealthMetrics.log_event(log_payload);
-
-		return log_payload;
 	};
 
 	public query func cycles_low() : async Bool {

@@ -13,16 +13,11 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import Logger "canister:logger";
-import HealthMetrics "canister:health_metrics";
-
-import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
 
 import UtilsShared "../utils/utils";
 
 actor FileAssetChunksStaging = {
-	type Payload = HealthMetricsTypes.Payload;
-
 	let { nhash } = Map;
 
 	private stable var chunk_id_count : Nat = 0;
@@ -84,7 +79,7 @@ actor FileAssetChunksStaging = {
 		return VERSION;
 	};
 
-	public shared func health() : async Payload {
+	public shared func health() : async () {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
@@ -99,22 +94,6 @@ actor FileAssetChunksStaging = {
 			tags,
 			"health"
 		);
-
-		let log_payload : Payload = {
-			metrics = [
-				("assets_num", Map.size(chunks)),
-				("cycles_balance", UtilsShared.get_cycles_balance()),
-				("memory_in_mb", UtilsShared.get_memory_in_mb()),
-				("heap_in_mb", UtilsShared.get_heap_in_mb())
-			];
-			name = ACTOR_NAME;
-			child_canister_id = Principal.toText(Principal.fromActor(FileAssetChunksStaging));
-			parent_canister_id = "";
-		};
-
-		ignore HealthMetrics.log_event(log_payload);
-
-		return log_payload;
 	};
 
 	public query func cycles_low() : async Bool {

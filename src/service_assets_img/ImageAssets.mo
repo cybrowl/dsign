@@ -13,12 +13,10 @@ import Text "mo:base/Text";
 import ULID "mo:ulid/ULID";
 import XorShift "mo:rand/XorShift";
 
-import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 import ImageAssetStaging "canister:assets_img_staging";
 
 import Types "./types";
-import HealthMetricsTypes "../types/health_metrics.types";
 
 import Utils "./utils";
 import UtilsShared "../utils/utils";
@@ -30,8 +28,6 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 	type ImageID = Types.ImageID;
 	type ImageRef = Types.ImageRef;
 	type AssetImgErr = Types.AssetImgErr;
-
-	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "ImageAssets";
 	let VERSION : Nat = 5;
@@ -203,7 +199,7 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 		return VERSION;
 	};
 
-	public shared func health() : async Payload {
+	public shared func health() : async () {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
@@ -219,22 +215,6 @@ actor class ImageAssets(controller : Principal, is_prod : Bool) = this {
 			tags,
 			"health"
 		);
-
-		let log_payload : Payload = {
-			metrics = [
-				("images_num", image_assets.size()),
-				("cycles_balance", UtilsShared.get_cycles_balance()),
-				("memory_in_mb", UtilsShared.get_memory_in_mb()),
-				("heap_in_mb", UtilsShared.get_heap_in_mb())
-			];
-			name = ACTOR_NAME;
-			child_canister_id = Principal.toText(Principal.fromActor(this));
-			parent_canister_id = Principal.toText(controller);
-		};
-
-		ignore HealthMetrics.log_event(log_payload);
-
-		return log_payload;
 	};
 
 	public query func cycles_low() : async Bool {

@@ -12,9 +12,7 @@ import Result "mo:base/Result";
 import Time "mo:base/Time";
 
 import Logger "canister:logger";
-import HealthMetrics "canister:health_metrics";
 
-import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
 
 import Utils "./utils";
@@ -27,8 +25,6 @@ actor ImageAssetStaging = {
 		#AssetNotFound;
 		#NotOwnerOfAsset;
 	};
-
-	type Payload = HealthMetricsTypes.Payload;
 
 	let { nhash } = Map;
 
@@ -96,7 +92,7 @@ actor ImageAssetStaging = {
 		return VERSION;
 	};
 
-	public shared func health() : async Payload {
+	public shared func health() : async () {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
@@ -111,22 +107,6 @@ actor ImageAssetStaging = {
 			tags,
 			"health"
 		);
-
-		let log_payload : Payload = {
-			metrics = [
-				("images_num", Map.size(assets)),
-				("cycles_balance", UtilsShared.get_cycles_balance()),
-				("memory_in_mb", UtilsShared.get_memory_in_mb()),
-				("heap_in_mb", UtilsShared.get_heap_in_mb())
-			];
-			name = ACTOR_NAME;
-			child_canister_id = Principal.toText(Principal.fromActor(ImageAssetStaging));
-			parent_canister_id = "";
-		};
-
-		ignore HealthMetrics.log_event(log_payload);
-
-		return log_payload;
 	};
 
 	public query func cycles_low() : async Bool {

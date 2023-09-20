@@ -14,7 +14,6 @@ import Result "mo:base/Result";
 import Assets "../service_assets/Assets";
 import CanisterIdsLedger "canister:canister_ids_ledger";
 import FileAssetStaging "canister:assets_file_staging";
-import HealthMetrics "canister:health_metrics";
 import ImageAssets "../service_assets_img/ImageAssets";
 import ImageAssetStaging "canister:assets_img_staging";
 import Logger "canister:logger";
@@ -23,7 +22,6 @@ import Snap "Snap";
 
 import Types "./types";
 import CanisterIdsLedgerTypes "../types/canidster_ids_ledger.types";
-import HealthMetricsTypes "../types/health_metrics.types";
 
 import { IS_PROD; ENV } "../env/env";
 import Utils "../utils/utils";
@@ -57,7 +55,6 @@ actor SnapMain {
 	type SnapActor = Types.SnapActor;
 
 	type CanisterInfo = CanisterIdsLedgerTypes.CanisterInfo;
-	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "SnapMain";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
@@ -720,7 +717,7 @@ actor SnapMain {
 		ignore Logger.log_event(tags, "exists child_canister_ids: " # child_canister_ids);
 	};
 
-	public shared func health() : async Payload {
+	public shared func health() : async () {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
@@ -734,22 +731,6 @@ actor SnapMain {
 			tags,
 			"health"
 		);
-
-		let log_payload : Payload = {
-			metrics = [
-				("user_can_refs", user_canisters_ref.size()),
-				("cycles_balance", Utils.get_cycles_balance()),
-				("memory_in_mb", Utils.get_memory_in_mb()),
-				("heap_in_mb", Utils.get_heap_in_mb())
-			];
-			name = ACTOR_NAME;
-			child_canister_id = Principal.toText(Principal.fromActor(SnapMain));
-			parent_canister_id = "";
-		};
-
-		ignore HealthMetrics.log_event(log_payload);
-
-		return log_payload;
 	};
 
 	public query func cycles_low() : async Bool {

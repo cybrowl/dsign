@@ -24,12 +24,12 @@
 		"assets_file_staging": {
 			"main": "src/service_assets/FileAssetChunksStaging.mo",
 			"type": "motoko",
-			"dependencies": ["health_metrics", "logger", "canister_ids_ledger"]
+			"dependencies": ["logger", "canister_ids_ledger"]
 		},
 		"assets_img_staging": {
 			"main": "src/service_assets_img/ImageAssetStaging.mo",
 			"type": "motoko",
-			"dependencies": ["health_metrics", "logger"]
+			"dependencies": ["logger"]
 		},
 		"canister_ids_ledger": {
 			"main": "src/service_canister_ids_ledger/CanisterIdsLedger.mo",
@@ -38,12 +38,12 @@
 		"explore": {
 			"main": "src/service_explore/Explore.mo",
 			"type": "motoko",
-			"dependencies": ["health_metrics", "logger", "canister_ids_ledger"]
+			"dependencies": ["logger", "canister_ids_ledger"]
 		},
 		"favorite_main": {
 			"main": "src/service_favorites/FavoriteMain.mo",
 			"type": "motoko",
-			"dependencies": ["canister_ids_ledger", "health_metrics", "logger", "profile"]
+			"dependencies": ["canister_ids_ledger", "logger", "profile"]
 		},
 		"health_metrics": {
 			"main": "src/service_health_metrics/HealthMetrics.mo",
@@ -53,12 +53,12 @@
 		"profile": {
 			"main": "src/service_profile/Profile.mo",
 			"type": "motoko",
-			"dependencies": ["assets_img_staging", "canister_ids_ledger", "health_metrics", "logger"]
+			"dependencies": ["assets_img_staging", "canister_ids_ledger", "logger"]
 		},
 		"project_main": {
 			"main": "src/service_projects/ProjectMain.mo",
 			"type": "motoko",
-			"dependencies": ["explore", "canister_ids_ledger", "health_metrics", "logger", "profile"]
+			"dependencies": ["explore", "canister_ids_ledger", "logger", "profile"]
 		},
 		"snap_main": {
 			"main": "src/service_snaps/SnapMain.mo",
@@ -68,7 +68,6 @@
 				"assets_img_staging",
 				"canister_ids_ledger",
 				"explore",
-				"health_metrics",
 				"logger",
 				"profile"
 			]
@@ -81,12 +80,12 @@
 		"test_assets": {
 			"main": "src/service_assets/Assets.mo",
 			"type": "motoko",
-			"dependencies": ["health_metrics", "logger", "assets_file_staging"]
+			"dependencies": ["logger", "assets_file_staging"]
 		},
 		"test_favorite": {
 			"main": "src/service_favorites/Favorite.mo",
 			"type": "motoko",
-			"dependencies": ["health_metrics", "logger"]
+			"dependencies": ["logger"]
 		},
 		"test_image_assets": {
 			"main": "src/service_assets_img/ImageAssets.mo",
@@ -96,12 +95,12 @@
 		"test_project": {
 			"main": "src/service_projects/Project.mo",
 			"type": "motoko",
-			"dependencies": ["explore", "health_metrics", "logger", "profile"]
+			"dependencies": ["explore", "logger", "profile"]
 		},
 		"test_snap": {
 			"main": "src/service_snaps/Snap.mo",
 			"type": "motoko",
-			"dependencies": ["explore", "health_metrics", "logger", "profile"]
+			"dependencies": ["explore", "logger", "profile"]
 		}
 	},
 	"defaults": {

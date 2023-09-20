@@ -8,10 +8,8 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import CanisterIdsLedger "canister:canister_ids_ledger";
-import HealthMetrics "canister:health_metrics";
 import Logger "canister:logger";
 
-import HealthMetricsTypes "../types/health_metrics.types";
 import SnapTypes "../service_snaps/types";
 import Types "./types";
 
@@ -27,7 +25,6 @@ actor Explore = {
 	type Time = Int;
 
 	type SnapActor = SnapTypes.SnapActor;
-	type Payload = HealthMetricsTypes.Payload;
 
 	var projects : HashMap.HashMap<ProjectID, ProjectPublic> = HashMap.HashMap(0, Text.equal, Text.hash);
 	stable var projects_stable_storage : [(ProjectID, ProjectPublic)] = [];
@@ -126,7 +123,7 @@ actor Explore = {
 		return VERSION;
 	};
 
-	public shared func health() : async Payload {
+	public shared func health() : async () {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
@@ -140,22 +137,6 @@ actor Explore = {
 			tags,
 			"health"
 		);
-
-		let log_payload : Payload = {
-			metrics = [
-				("projects_num", projects.size()),
-				("cycles_balance", UtilsShared.get_cycles_balance()),
-				("memory_in_mb", UtilsShared.get_memory_in_mb()),
-				("heap_in_mb", UtilsShared.get_heap_in_mb())
-			];
-			name = ACTOR_NAME;
-			child_canister_id = Principal.toText(Principal.fromActor(Explore));
-			parent_canister_id = "";
-		};
-
-		ignore HealthMetrics.log_event(log_payload);
-
-		return log_payload;
 	};
 
 	public query func cycles_low() : async Bool {
