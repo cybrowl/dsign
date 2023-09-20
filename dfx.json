@@ -45,11 +45,6 @@
 			"type": "motoko",
 			"dependencies": ["canister_ids_ledger", "logger", "profile"]
 		},
-		"health_metrics": {
-			"main": "src/service_health_metrics/HealthMetrics.mo",
-			"type": "motoko",
-			"dependencies": ["canister_ids_ledger", "logger"]
-		},
 		"profile": {
 			"main": "src/service_profile/Profile.mo",
 			"type": "motoko",
@@ -90,7 +85,7 @@
 		"test_image_assets": {
 			"main": "src/service_assets_img/ImageAssets.mo",
 			"type": "motoko",
-			"dependencies": ["logger", "assets_img_staging", "health_metrics"]
+			"dependencies": ["logger", "assets_img_staging"]
 		},
 		"test_project": {
 			"main": "src/service_projects/Project.mo",
