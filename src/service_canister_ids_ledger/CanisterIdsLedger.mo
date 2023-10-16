@@ -10,7 +10,6 @@ import Time "mo:base/Time";
 import Timer "mo:base/Timer";
 
 import CanisterLedgerTypes "../types/canidster_ids_ledger.types";
-import HealthMetricsTypes "../types/health_metrics.types";
 import Types "./types";
 import ICTypes "../types/ic.types";
 
@@ -22,8 +21,6 @@ actor CanisterIdsLedger = {
 
 	type CanisterIds = Types.CanisterIds;
 	type CanisterInfo = CanisterLedgerTypes.CanisterInfo;
-
-	type Payload = HealthMetricsTypes.Payload;
 
 	let ACTOR_NAME : Text = "CanisterIdsLedger";
 	let CANISTER_ID_PROD : Text = "k25dy-3yaaa-aaaag-abcpa-cai";

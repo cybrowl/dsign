@@ -9,7 +9,6 @@ canisters=(
 "canister_ids_ledger"
 "explore"
 "favorite_main"
-"health_metrics"
 "logger"
 "profile"
 "project_main"

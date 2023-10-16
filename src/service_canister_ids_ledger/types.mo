@@ -1,8 +1,4 @@
-import HealthMetricsTypes "../types/health_metrics.types";
-
 module {
-	type Payload = HealthMetricsTypes.Payload;
-
 	public type CanisterIds = {
 		explore : Text;
 		favorite_main : Text;

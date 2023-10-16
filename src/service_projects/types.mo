@@ -53,6 +53,11 @@ module {
 		messages : [Message];
 	};
 
+	public type Feedback = {
+		canister_id : Text;
+		topics : [Topic];
+	};
+
 	public type Project = {
 		id : Text;
 		canister_id : Text;
@@ -62,7 +67,7 @@ module {
 		owner : UserPrincipal;
 		name : Text;
 		snaps : [SnapRef];
-		topics : ?[Topic];
+		feedback : ?Feedback;
 		metrics : {
 			likes : Nat;
 			views : Nat;

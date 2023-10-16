@@ -18,9 +18,6 @@ dfx deploy logger
 # canister ids ledger
 dfx deploy canister_ids_ledger
 
-# health_metrics
-dfx deploy health_metrics
-
 # profile
 dfx deploy profile
 
