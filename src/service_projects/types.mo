@@ -48,13 +48,13 @@ module {
 	public type Topic = {
 		id : Text;
 		snap_ref : SnapRef;
+		snap_name : Text;
 		name : Text;
 		file : ?File;
 		messages : [Message];
 	};
 
 	public type Feedback = {
-		canister_id : Text;
 		topics : [Topic];
 	};
 
