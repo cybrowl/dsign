@@ -102,6 +102,7 @@ module {
 		canister_id : Text;
 		created : Time;
 		description : Text;
+		feedback : ?Feedback;
 		username : Text;
 		name : Text;
 		owner : Null;
@@ -117,6 +118,13 @@ module {
 		name : Text;
 		description : Text;
 		snaps : ?[SnapRef];
+	};
+
+	public type CreateTopicArgs = {
+		snap_ref : SnapRef;
+		name : Text;
+		note : Text;
+		file : ?File;
 	};
 
 	public type UpdateProjectArgs = {
@@ -177,9 +185,17 @@ module {
 		#ErrorCall : Text;
 	};
 
+	public type ErrCreateTopic = {
+		#NotAuthorized;
+		#UsernameNotFound;
+		#ProjectNotFound : Bool;
+		#ErrorCall : Text;
+	};
+
 	// Actor Interface
 	public type ProjectActor = actor {
 		create_project : shared (CreateProjectArgs, UserPrincipal) -> async Result.Result<Project, ErrCreateProject>;
+		create_topic : shared (ProjectID, UserPrincipal, CreateTopicArgs) -> async Result.Result<Topic, ErrCreateTopic>;
 		edit_project : shared (UpdateProjectArgs, ProjectRef) -> async Result.Result<Project, ErrUpdateProject>;
 		delete_projects : shared ([ProjectID]) -> async ();
 		delete_snaps_from_project : shared ([SnapRef], ProjectID, Principal) -> async Result.Result<Text, ErrDeleteSnapsFromProject>;

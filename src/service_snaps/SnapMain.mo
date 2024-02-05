@@ -255,7 +255,6 @@ actor SnapMain {
 						return #err(#ErrorCall(debug_show (err)));
 					};
 					case (#ok project) {
-						//TODO: call Snap.add_project_to_snaps
 						ignore Logger.log_event(
 							tags,
 							debug_show ("project_actor.add_snaps_to_project", debug_show (project))

@@ -1,7 +1,6 @@
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
-import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
@@ -25,8 +24,10 @@ import Utils "../utils/utils";
 
 actor ProjectMain {
 	type CreateProjectArgs = Types.CreateProjectArgs;
+	type CreateTopicArgs = Types.CreateTopicArgs;
 	type ErrAddSnapsToProject = Types.ErrAddSnapsToProject;
 	type ErrCreateProject = Types.ErrCreateProject;
+	type ErrCreateTopic = Types.ErrCreateTopic;
 	type ErrDeleteProjects = Types.ErrDeleteProjects;
 	type ErrDeleteSnapsFromProject = Types.ErrDeleteSnapsFromProject;
 	type ErrGetProjects = Types.ErrGetProjects;
@@ -39,6 +40,7 @@ actor ProjectMain {
 	type ProjectPublic = Types.ProjectPublic;
 	type ProjectRef = Types.ProjectRef;
 	type SnapRef = Types.SnapRef;
+	type Topic = Types.Topic;
 	type UpdateProjectArgs = Types.UpdateProjectArgs;
 	type UserPrincipal = Types.UserPrincipal;
 
@@ -50,7 +52,7 @@ actor ProjectMain {
 	let ACTOR_NAME : Text = "ProjectMain";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
 	let SNAP_ARG_SIZE_LIMIT : Nat = 50;
-	let VERSION : Nat = 2;
+	let VERSION : Nat = 3;
 
 	private let ic : ICInterface = actor "aaaaa-aa";
 
@@ -147,6 +149,23 @@ actor ProjectMain {
 				user_project_ids_storage.put(project_canister_id, Buffer.toArray(project_ids));
 
 				#ok(project_public);
+			};
+		};
+	};
+
+	public shared ({ caller }) func create_topic(id : ProjectID, canister_id : ProjectCanisterID, topic_info : CreateTopicArgs) : async Result.Result<Topic, ErrCreateTopic> {
+		let tags = [("actor_name", ACTOR_NAME), ("method", "create_topic")];
+
+		let project_actor = actor (canister_id) : ProjectActor;
+
+		switch (await project_actor.create_topic(id, caller : UserPrincipal, topic_info)) {
+			case (#err err) {
+				ignore Logger.log_event(tags, debug_show (err));
+
+				return #err(#ErrorCall(debug_show (err)));
+			};
+			case (#ok topic) {
+				#ok(topic);
 			};
 		};
 	};

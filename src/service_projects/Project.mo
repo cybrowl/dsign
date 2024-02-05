@@ -22,8 +22,10 @@ import Utils "../utils/utils";
 
 actor class Project(project_main : Principal, snap_main : Principal, favorite_main : Principal, is_prod : Bool) = this {
 	type CreateProjectArgs = Types.CreateProjectArgs;
+	type CreateTopicArgs = Types.CreateTopicArgs;
 	type ErrAddSnapsToProject = Types.ErrAddSnapsToProject;
 	type ErrCreateProject = Types.ErrCreateProject;
+	type ErrCreateTopic = Types.ErrCreateTopic;
 	type ErrDeleteProjects = Types.ErrDeleteProjects;
 	type ErrDeleteSnapsFromProject = Types.ErrDeleteSnapsFromProject;
 	type ErrUpdateProject = Types.ErrUpdateProject;
@@ -34,6 +36,7 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 	type ProjectUpdateAction = Types.ProjectUpdateAction;
 	type SnapRef = Types.SnapRef;
 	type Time = Types.Time;
+	type Topic = Types.Topic;
 	type UpdateProjectArgs = Types.UpdateProjectArgs;
 	type UserPrincipal = Types.UserPrincipal;
 
@@ -42,7 +45,7 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 	type SnapPublic = SnapTypes.SnapPublic;
 
 	let ACTOR_NAME : Text = "Project";
-	let VERSION : Nat = 4;
+	let VERSION : Nat = 5;
 
 	private let rr = XorShift.toReader(XorShift.XorShift64(null));
 	private let se = Source.Source(rr, 0);
@@ -106,6 +109,74 @@ actor class Project(project_main : Principal, snap_main : Principal, favorite_ma
 		projects.put(project_id, project);
 
 		return #ok(project);
+	};
+
+	public shared ({ caller }) func create_topic(project_id : ProjectID, owner : UserPrincipal, topic_info : CreateTopicArgs) : async Result.Result<Topic, ErrCreateTopic> {
+
+		if (project_main != caller) {
+			return #err(#NotAuthorized);
+		};
+
+		var username = "";
+		switch (await Profile.get_username_public(owner)) {
+			case (#ok username_) {
+				username := username_;
+			};
+			case (#err error) {
+				return #err(#UsernameNotFound);
+			};
+		};
+
+		let snap_actor = actor (topic_info.snap_ref.canister_id) : SnapActor;
+
+		var snap_name = "";
+		switch (await snap_actor.get_all_snaps([topic_info.snap_ref.id])) {
+			case (snaps) {
+				snap_name := snaps[0].title;
+			};
+		};
+
+		switch (projects.get(project_id)) {
+			case (null) {
+				return #err(#ProjectNotFound(true));
+			};
+			case (?project) {
+				var topics_buffer = switch (project.feedback) {
+					case (null) {
+						Buffer.Buffer<Topic>(0);
+					};
+					case (?feedback) {
+						Buffer.fromArray<Topic>(feedback.topics);
+					};
+				};
+
+				let message = {
+					created = Time.now();
+					content = topic_info.note;
+					username = username;
+				};
+
+				let new_topic : Topic = {
+					id = ULID.toText(se.new());
+					snap_ref = topic_info.snap_ref;
+					snap_name = snap_name;
+					name = topic_info.name;
+					file = topic_info.file;
+					messages = [message];
+				};
+
+				topics_buffer.add(new_topic);
+
+				let updated_feedback = ?{ topics = Buffer.toArray(topics_buffer) };
+				let project_updated = {
+					project with feedback = updated_feedback;
+				};
+
+				projects.put(project_id, project_updated);
+
+				return #ok(new_topic);
+			};
+		};
 	};
 
 	public shared ({ caller }) func edit_project(

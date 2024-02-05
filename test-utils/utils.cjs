@@ -96,6 +96,16 @@ function generate_large_img_asset() {
 	return large_img_asset_buffer;
 }
 
+function replacer(key, value) {
+	if (typeof value === 'bigint') {
+		// Convert BigInt to a string (or another serializable format)
+		return value.toString();
+	} else {
+		// Return other values unchanged
+		return value;
+	}
+}
+
 module.exports = {
 	generate_animal_images,
 	generate_figma_asset,
@@ -104,5 +114,6 @@ module.exports = {
 	generate_figma_dsign_components,
 	generate_large_img_asset,
 	generate_motoko_image,
-	request_resource
+	request_resource,
+	replacer
 };
