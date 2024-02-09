@@ -52,10 +52,12 @@ actor Creator = {
 	// snaps
 	var snaps : HashMap.HashMap<SnapID, Snap> = HashMap.HashMap(0, Text.equal, Text.hash);
 
-	//// Profile
-	// check_user_has_a_username (needs to go to username registry)
+	// ------------------------- Profile -------------------------
+	public query func get_number_of_users() : async Nat {
+		return profiles.size();
+	};
 
-	// get_number_of_users
+	// check_user_has_a_username (needs to go to username registry)
 
 	// create_profile
 	public shared ({ caller }) func create_profile(username : Username) : async Result.Result<Username, ErrUsername> {
