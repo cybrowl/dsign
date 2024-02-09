@@ -53,6 +53,7 @@ module {
 		#UsernameTaken;
 		#UsernameNotFound;
 		#UserNotFound;
+		#MaxUsers;
 	};
 
 	// Project
