@@ -117,7 +117,7 @@
 			/>
 		</span>
 	{:else}
-		<Button class="hover_lilalic_purple" primary={true} label="Get Started" on:click={login} />
+		<Button class="hover_lilalic_purple" primary={true} label="Login / Register" on:click={login} />
 	{/if}
 </span>
 
