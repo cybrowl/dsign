@@ -13,6 +13,7 @@ const { username_registry_canister_id } = require('../test-utils/actor_canister_
 const { parseIdentity } = require('../test-utils/identities/identity.cjs');
 
 let mishicat_identity = parseIdentity(process.env.MISHICAT_IDENTITY);
+let anonymous_identity = null;
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
@@ -27,6 +28,11 @@ test('Setup Actors', async function () {
 		username_registry_canister_id,
 		username_registry_interface,
 		mishicat_identity
+	);
+	username_registry_actor.anonymous = await get_actor(
+		username_registry_canister_id,
+		username_registry_interface,
+		anonymous_identity
 	);
 });
 
@@ -48,4 +54,18 @@ test('UsernameRegistry[mishicat].get_username_info(): with invalid unsername => 
 		await username_registry_actor.mishicat.get_username_info('mishicat');
 
 	t.deepEqual(err_username, { UsernameNotFound: true });
+});
+
+test('UsernameRegistry[anonymous].create_profile(): with anon identity => #err - UsernameNotFound', async function (t) {
+	const { ok: _, err: err_profile } =
+		await username_registry_actor.anonymous.create_profile('mishicat');
+
+	t.deepEqual(err_profile, { CallerAnonymous: true });
+});
+
+test('UsernameRegistry[mishicat].create_profile(): with invalid username => #err - UsernameInvalid', async function (t) {
+	const { ok: _, err: err_profile } =
+		await username_registry_actor.mishicat.create_profile('Mishicat');
+
+	t.deepEqual(err_profile, { UsernameInvalid: true });
 });

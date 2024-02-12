@@ -2,7 +2,7 @@ import Char "mo:base/Char";
 import Text "mo:base/Text";
 
 module {
-	public func is_valid_username(username : Text) : Bool {
+	public func username_valid(username : Text) : Bool {
 		if (username.size() > 20) {
 			return false;
 		};

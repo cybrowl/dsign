@@ -18,15 +18,11 @@ actor UsernameRegistry = {
 		canister_id : Text;
 	};
 	type ErrUsername = {
-		#UserAnonymous;
-		#UsernameInvalid;
-		#UsernameTaken;
-
-		#NotAuthorizedCaller;
-
+		#CallerAnonymous : Bool;
+		#UsernameInvalid : Bool;
+		#UsernameTaken : Bool;
 		#UserPrincipalNotFound : Bool;
 		#UsernameNotFound : Bool;
-
 		#ErrorCall : Text;
 	};
 
@@ -98,15 +94,15 @@ actor UsernameRegistry = {
 		];
 
 		if (Principal.isAnonymous(caller)) {
-			return #err(#UserAnonymous);
+			return #err(#CallerAnonymous(true));
 		};
 
-		if (Utils.is_valid_username(username)) {
-			return #err(#UsernameInvalid);
+		if (Utils.username_valid(username) == false) {
+			return #err(#UsernameInvalid(true));
 		};
 
-		if (username_available(username)) {
-			return #err(#UsernameTaken);
+		if (username_available(username) == false) {
+			return #err(#UsernameTaken(true));
 		};
 
 		let creator_actor : CreatorActor = actor (creator_canister_id);
@@ -116,7 +112,7 @@ actor UsernameRegistry = {
 				switch (err) {
 					case (#MaxUsersExceeded) {
 						// TODO: create a new `creator` canister and asign the user to that `canister_id`
-						return #err(#UsernameTaken);
+						return #err(#ErrorCall(debug_show (err)));
 					};
 					case (#NotAuthorizedCaller) {
 						return #err(#ErrorCall(debug_show (err)));
