@@ -119,22 +119,6 @@ actor Creator = {
 		return #ok("");
 	};
 
-	// ------------------------- Favorites -------------------------
-	// Get Number of Favorites
-	public query func total_favorites() : async Nat {
-		return favorites.size();
-	};
-
-	// Save Project as Favorite
-	public shared ({ caller }) func save_project_as_fav() : async Result.Result<Text, Text> {
-		return #ok("");
-	};
-
-	// Delete Project from Favorites
-	public shared ({ caller }) func delete_project_from_favs() : async Result.Result<Text, Text> {
-		return #ok("");
-	};
-
 	// ------------------------- Projects -------------------------
 	// Get Number of Projects
 	public query func total_projects() : async Nat {
@@ -211,6 +195,22 @@ actor Creator = {
 
 	// Delete Snap Design File
 	public shared ({ caller }) func delete_snap_design_file() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
+
+	// ------------------------- Favorites -------------------------
+	// Get Number of Favorites
+	public query func total_favorites() : async Nat {
+		return favorites.size();
+	};
+
+	// Save Project as Favorite
+	public shared ({ caller }) func save_project_as_fav() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
+
+	// Delete Project from Favorites
+	public shared ({ caller }) func delete_project_from_favs() : async Result.Result<Text, Text> {
 		return #ok("");
 	};
 
