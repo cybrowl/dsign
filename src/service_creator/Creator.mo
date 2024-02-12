@@ -26,7 +26,7 @@ actor Creator = {
 	// Images and Files will be stored in scalable storage units.
 
 	// ------------------------- Variables -------------------------
-	let VERSION : Nat = 1;
+	let VERSION : Nat = 1; // The Version in Production
 	let CANISTER_ID : Text = "";
 	let Max_Users : Nat = 100;
 	stable var users : Nat = 0;
