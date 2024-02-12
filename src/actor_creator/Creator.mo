@@ -7,11 +7,9 @@ import Time "mo:base/Time";
 import Logger "canister:logger";
 
 import Types "./types";
-import Utils "./utils";
 
 actor Creator = {
 	type ErrProfile = Types.ErrProfile;
-	type ErrUsername = Types.ErrUsername;
 	type Profile = Types.Profile;
 	type Project = Types.Project;
 	type ProjectID = Types.ProjectID;
@@ -28,7 +26,6 @@ actor Creator = {
 	// ------------------------- Variables -------------------------
 	let VERSION : Nat = 1; // The Version in Production
 	let CANISTER_ID : Text = "";
-	let Max_Users : Nat = 100;
 	stable var users : Nat = 0;
 
 	// ------------------------- Storage Data -------------------------
@@ -59,31 +56,10 @@ actor Creator = {
 	};
 
 	// Create Profile
-	public shared ({ caller }) func create_profile(username : Username) : async Result.Result<Username, ErrUsername> {
-		let tags = [("canister_id", CANISTER_ID), ("method", "create_username")];
-		let is_anonymous = Principal.isAnonymous(caller);
+	public shared ({ caller }) func create_profile(username : Username) : async Username {
+		let tags = [("canister_id", CANISTER_ID), ("method", "create_profile")];
 
-		let valid_username : Bool = Utils.is_valid_username(username);
-		// let user_has_username : Bool = check_user_has_a_username(caller);
-
-		if (is_anonymous == true) {
-			return #err(#UserAnonymous);
-		};
-
-		if (valid_username == false) {
-			return #err(#UsernameInvalid);
-		};
-
-		if (users >= Max_Users) {
-			return #err(#MaxUsers);
-		};
-
-		//TODO: check username_registry to see if username is taken
-		// if (username_available == false) {
-		//     return #err(#UsernameTaken);
-		// };
-
-		ignore Logger.log_event(tags, "created");
+		// TODO: Only `username_registry` should be allowd to execute this call
 
 		let profile : Profile = {
 			avatar = {
@@ -106,7 +82,9 @@ actor Creator = {
 
 		profiles.put(caller, profile);
 
-		return #ok(username);
+		ignore Logger.log_event(tags, "created");
+
+		return username;
 	};
 
 	// Update Profile Avatar

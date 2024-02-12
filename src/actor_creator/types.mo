@@ -45,17 +45,6 @@ module {
 		#ErrorCall : Text;
 	};
 
-	public type ErrUsername = {
-		#UserAnonymous;
-		#UserHasUsername;
-		#UserNotAuthorized;
-		#UsernameInvalid;
-		#UsernameTaken;
-		#UsernameNotFound;
-		#UserNotFound;
-		#MaxUsers;
-	};
-
 	// Project
 	public type ProjectID = Text;
 
