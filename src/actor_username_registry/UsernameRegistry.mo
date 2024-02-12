@@ -3,14 +3,12 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
 
+import CreatorTypes "../actor_creator/types";
+
 import Utils "./utils";
 
 actor UsernameRegistry = {
-	let VERSION : Nat = 1; // The Version in Production
-	let MAX_USERS : Nat = 100;
-	let ACTOR_NAME : Text = "UsernameRegistry";
-
-	//NOTE:
+	// NOTE:
 	// Principal, CanisterId, Username
 	// Manages Usernames & the CanisterId Associated with that Username
 	// Source of Truth to Principal ownership of Username
@@ -24,10 +22,21 @@ actor UsernameRegistry = {
 		#UsernameInvalid;
 		#UsernameTaken;
 
-		#UserNotAuthorized;
+		#NotAuthorizedCaller;
 		#UsernameNotFound;
 		#UserNotFound;
+
+		#ErrorCall : Text;
 	};
+
+	type CreatorActor = CreatorTypes.CreatorActor;
+
+	// ------------------------- Variables -------------------------
+
+	let VERSION : Nat = 1; // The Version in Production
+	let MAX_USERS : Nat = 100;
+	let ACTOR_NAME : Text = "UsernameRegistry";
+	var creator_canister_id = "";
 
 	// Username Info
 	var username_info : HashMap.HashMap<Username, UsernameInfo> = HashMap.HashMap(
@@ -76,11 +85,29 @@ actor UsernameRegistry = {
 			return #err(#UsernameTaken);
 		};
 
-		return #ok("");
+		let creator_actor : CreatorActor = actor (creator_canister_id);
 
-		//TODO: call `creator` to create profile
-		//TODO: check if there is enough space in the `creator` canister
-		// if not then create a new `creator` canister and assign the user to it
+		switch (await creator_actor.create_profile(username)) {
+			case (#err err) {
+				switch (err) {
+					case (#MaxUsersExceeded) {
+						// TODO: create a new `creator` canister and asign the user to that `canister_id`
+						return #err(#UsernameTaken);
+					};
+					case (#NotAuthorizedCaller) {
+						return #err(#ErrorCall(debug_show (err)));
+					};
+					case _ {
+						return #err(#ErrorCall(debug_show (err)));
+					};
+				};
+			};
+			case (#ok _) {
+				// On successful profile creation, perform necessary storage operations
+				// TODO: Implement storage logic for username and username_info
+				return #ok(username);
+			};
+		};
 	};
 
 	// ------------------------- Canister Management -------------------------

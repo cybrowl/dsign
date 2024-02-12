@@ -1,4 +1,5 @@
 import Principal "mo:base/Principal";
+import Result "mo:base/Result";
 
 // import ICInterfaceTypes "../types/ic.types";
 import ImgAssetTypes "../service_assets_img/types";
@@ -39,10 +40,11 @@ module {
 	};
 
 	public type ErrProfile = {
+		#NotAuthorizedCaller;
+		#MaxUsersExceeded;
 		#ProfileNotFound : Bool;
-		#ProfileInvalidArgs : Bool;
-		#PrincipalNotFoundForUsername;
-		#ErrorCall : Text;
+		#InvalidProfileArguments : Bool;
+		#UsernamePrincipalNotFound;
 	};
 
 	// Project
@@ -121,4 +123,8 @@ module {
 		};
 	};
 
+	// Actor Interface
+	public type CreatorActor = actor {
+		create_profile : shared (Username) -> async Result.Result<Username, ErrProfile>;
+	};
 };

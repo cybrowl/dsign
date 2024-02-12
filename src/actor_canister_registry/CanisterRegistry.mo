@@ -5,7 +5,7 @@ actor CanisterRegistry = {
 
 	//NOTE:
 	// Principal, CanisterId, Username
-	// Manages Creator Canisters (Created)
+	// Manages Creator Canisters
 
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {

@@ -26,6 +26,9 @@ actor Creator = {
 	// ------------------------- Variables -------------------------
 	let VERSION : Nat = 1; // The Version in Production
 	let CANISTER_ID : Text = "";
+	let USERNAME_REGISTRY_ID : Text = "";
+	let MAX_USERS : Nat = 100;
+
 	stable var users : Nat = 0;
 
 	// ------------------------- Storage Data -------------------------
@@ -56,10 +59,16 @@ actor Creator = {
 	};
 
 	// Create Profile
-	public shared ({ caller }) func create_profile(username : Username) : async Username {
+	public shared ({ caller }) func create_profile(username : Username) : async Result.Result<Username, ErrProfile> {
 		let tags = [("canister_id", CANISTER_ID), ("method", "create_profile")];
 
-		// TODO: Only `username_registry` should be allowd to execute this call
+		if (Principal.toText(caller) != USERNAME_REGISTRY_ID) {
+			return #err(#NotAuthorizedCaller);
+		};
+
+		if (users > MAX_USERS) {
+			return #err(#MaxUsersExceeded);
+		};
 
 		let profile : Profile = {
 			avatar = {
@@ -82,9 +91,9 @@ actor Creator = {
 
 		profiles.put(caller, profile);
 
-		ignore Logger.log_event(tags, "created");
+		ignore Logger.log_event(tags, "profile_created");
 
-		return username;
+		return #ok(username);
 	};
 
 	// Update Profile Avatar
