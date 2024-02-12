@@ -26,7 +26,8 @@
 		"test-sm": "npm run generate_test_interface && tape test-canisters/snap_main.test.cjs",
 		"test-p": "npm run generate_test_interface && tape test-canisters/profile.test.cjs",
 		"test-pm": "npm run generate_test_interface && tape test-canisters/project_main.test.cjs",
-		"test-pt": "npm run generate_test_interface && tape test-canisters/project_topic.test.cjs"
+		"test-pt": "npm run generate_test_interface && tape test-canisters/project_topic.test.cjs",
+		"test-pc": "npm run generate_test_interface && tape test_e2e/profile_creation.test.cjs"
 	},
 	"dependencies": {
 		"dotenv": "^16.0.3",

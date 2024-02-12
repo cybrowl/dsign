@@ -14,5 +14,6 @@ module.exports = {
 	snap_main_interface: getInterface('snap_main'),
 	test_assets_interface: getInterface('test_assets'),
 	test_image_assets_interface: getInterface('test_image_assets'),
-	test_project_interface: getInterface('test_project')
+	test_project_interface: getInterface('test_project'),
+	username_registry_interface: getInterface('username_registry')
 };

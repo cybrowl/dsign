@@ -96,6 +96,11 @@
 			"main": "src/service_snaps/Snap.mo",
 			"type": "motoko",
 			"dependencies": ["explore", "logger", "profile"]
+		},
+		"username_registry": {
+			"main": "src/actor_username_registry/UsernameRegistry.mo",
+			"type": "motoko",
+			"dependencies": []
 		}
 	},
 	"defaults": {

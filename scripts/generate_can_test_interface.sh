@@ -16,7 +16,8 @@ canisters=(
 "test_assets"
 "test_image_assets"
 "test_project"
-"test_snap"
+"test_snap",
+"username_registry"
 )
 
 for canister in ${canisters[@]}; do
