@@ -152,6 +152,8 @@ actor UsernameRegistry = {
 
 				usernames_info.delete(username);
 
+				// TODO: delete from CreatorActor
+
 				return #ok(true);
 			};
 			case (_) {
