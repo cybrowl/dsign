@@ -32,7 +32,6 @@ actor UsernameRegistry = {
 	type CreatorActor = CreatorTypes.CreatorActor;
 
 	// ------------------------- Variables -------------------------
-
 	let VERSION : Nat = 1; // The Version in Production
 	let MAX_USERS : Nat = 100;
 	let ACTOR_NAME : Text = "UsernameRegistry";
@@ -53,7 +52,6 @@ actor UsernameRegistry = {
 	);
 
 	// ------------------------- Profile -------------------------
-
 	private func username_available(username : Username) : Bool {
 		switch (username_info.get(username)) {
 			case (?owner) {
