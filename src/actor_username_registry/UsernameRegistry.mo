@@ -23,8 +23,9 @@ actor UsernameRegistry = {
 		#UsernameTaken;
 
 		#NotAuthorizedCaller;
+
+		#UserPrincipalNotFound;
 		#UsernameNotFound;
-		#UserNotFound;
 
 		#ErrorCall : Text;
 	};
@@ -51,7 +52,32 @@ actor UsernameRegistry = {
 		Principal.hash
 	);
 
-	// ------------------------- Profile -------------------------
+	// ------------------------- Username -------------------------
+	// Get Username
+	public query ({ caller }) func get_username() : async Result.Result<Username, ErrUsername> {
+		switch (usernames.get(caller)) {
+			case (?username) {
+				#ok(username);
+			};
+			case (_) {
+				#err(#UserPrincipalNotFound);
+			};
+		};
+	};
+
+	// Get Username Info
+	public query ({ caller }) func get_username_info(username : Username) : async Result.Result<UsernameInfo, ErrUsername> {
+		switch (username_info.get(username)) {
+			case (?info) {
+				#ok(info);
+			};
+			case (_) {
+				#err(#UsernameNotFound);
+			};
+		};
+	};
+
+	// ------------------------- Profile Creation -------------------------
 	private func username_available(username : Username) : Bool {
 		switch (username_info.get(username)) {
 			case (?owner) {
