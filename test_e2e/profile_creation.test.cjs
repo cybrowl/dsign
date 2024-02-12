@@ -37,4 +37,15 @@ test('UsernameRegistry[mishicat].version(): => #ok - Version Number', async func
 	t.end();
 });
 
-test('UsernameRegistry[mishicat].get_username(): with invalid unsername => #err - UserPrincipalNotFound', async function (t) {});
+test('UsernameRegistry[mishicat].get_username(): with invalid principal => #err - UserPrincipalNotFound', async function (t) {
+	const { ok: _, err: err_username } = await username_registry_actor.mishicat.get_username();
+
+	t.deepEqual(err_username, { UserPrincipalNotFound: true });
+});
+
+test('UsernameRegistry[mishicat].get_username_info(): with invalid unsername => #err - UsernameNotFound', async function (t) {
+	const { ok: _, err: err_username } =
+		await username_registry_actor.mishicat.get_username_info('mishicat');
+
+	t.deepEqual(err_username, { UsernameNotFound: true });
+});

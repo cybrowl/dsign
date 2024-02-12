@@ -24,8 +24,8 @@ actor UsernameRegistry = {
 
 		#NotAuthorizedCaller;
 
-		#UserPrincipalNotFound;
-		#UsernameNotFound;
+		#UserPrincipalNotFound : Bool;
+		#UsernameNotFound : Bool;
 
 		#ErrorCall : Text;
 	};
@@ -60,7 +60,7 @@ actor UsernameRegistry = {
 				#ok(username);
 			};
 			case (_) {
-				#err(#UserPrincipalNotFound);
+				#err(#UserPrincipalNotFound(true));
 			};
 		};
 	};
@@ -72,7 +72,7 @@ actor UsernameRegistry = {
 				#ok(info);
 			};
 			case (_) {
-				#err(#UsernameNotFound);
+				#err(#UsernameNotFound(true));
 			};
 		};
 	};
