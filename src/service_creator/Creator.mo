@@ -53,13 +53,12 @@ actor Creator = {
 	var snaps : HashMap.HashMap<SnapID, Snap> = HashMap.HashMap(0, Text.equal, Text.hash);
 
 	// ------------------------- Profile -------------------------
-	public query func get_number_of_users() : async Nat {
+	// Get Number Of Users
+	public query func total_users() : async Nat {
 		return profiles.size();
 	};
 
-	// check_user_has_a_username (needs to go to username registry)
-
-	// create_profile
+	// Create Profile
 	public shared ({ caller }) func create_profile(username : Username) : async Result.Result<Username, ErrUsername> {
 		let tags = [("canister_id", CANISTER_ID), ("method", "create_username")];
 		let is_anonymous = Principal.isAnonymous(caller);
@@ -86,7 +85,6 @@ actor Creator = {
 
 		ignore Logger.log_event(tags, "created");
 
-		// create profile
 		let profile : Profile = {
 			avatar = {
 				id = "";
@@ -111,38 +109,115 @@ actor Creator = {
 		return #ok(username);
 	};
 
-	// update_profile_avatar
-	// update_profile_banner
-	// get_profile
+	// Update Profile Avatar
+	public shared ({ caller }) func update_profile_avatar(username : Username) : async Result.Result<Text, Text> {
+		return #ok("");
+	};
 
-	//// Favorite
-	// save_project_as_fav
-	// delete_project_from_favs
-	// get_all_fav_projects
+	// Update Profile Bannner
+	public shared ({ caller }) func update_profile_banner(username : Username) : async Result.Result<Text, Text> {
+		return #ok("");
+	};
 
-	//// Project
-	// create_project
-	// edit_project
-	// delete_projects
-	// delete_snaps_from_project
-	// add_snaps_to_project
-	// update_project_metrics
+	// ------------------------- Favorites -------------------------
+	// Get Number of Favorites
+	public query func total_favorites() : async Nat {
+		return favorites.size();
+	};
 
-	// create_topic
+	// Save Project as Favorite
+	public shared ({ caller }) func save_project_as_fav() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
 
-	// get_projects
-	// owner_check
+	// Delete Project from Favorites
+	public shared ({ caller }) func delete_project_from_favs() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
 
-	//// Snap
-	// create_snap
-	// edit_snap
-	// delete_snaps
-	// delete_images
-	// delete_design_file
-	// get_all_snaps
+	// ------------------------- Projects -------------------------
+	// Get Number of Projects
+	public query func total_projects() : async Nat {
+		return projects.size();
+	};
+
+	// Get Projects
+	public query func get_projects() : async Text {
+		return "";
+	};
+
+	// Get Project Owner Status
+	public query func get_project_owner_status() : async Text {
+		return "";
+	};
+
+	// Create Project
+	public shared ({ caller }) func create_project() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
+
+	// Add Snaps to Project
+	public shared ({ caller }) func add_snaps_to_project() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
+
+	// Create Feedback Topic
+	public shared ({ caller }) func create_feedback_topic() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
+
+	// Update Project
+	public shared ({ caller }) func update_project() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
+
+	// Delete Project
+	public shared ({ caller }) func delete_project() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
+
+	// Delete Snaps from Project
+	public shared ({ caller }) func delete_snaps_from_project() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
+
+	// TODO: project metrics (likes & views)
+
+	// ------------------------- Snaps -------------------------
+	// Get Snaps
+	public query func get_snaps() : async Text {
+		return "";
+	};
+
+	// Create Snap
+	public shared ({ caller }) func create_snap() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
+
+	// Update Snap
+	public shared ({ caller }) func update_snap() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
+
+	// Delete Snaps
+	public shared ({ caller }) func delete_snaps() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
+
+	// Delete Snap Images
+	public shared ({ caller }) func delete_snap_images() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
+
+	// Delete Snap Design File
+	public shared ({ caller }) func delete_snap_design_file() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
 
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
 	};
+
+	// check_user_has_a_username (needs to go to username registry)
 };
