@@ -114,7 +114,7 @@ actor Creator = {
 		return #ok("");
 	};
 
-	// Update Profile Bannner
+	// Update Profile Banner
 	public shared ({ caller }) func update_profile_banner(username : Username) : async Result.Result<Text, Text> {
 		return #ok("");
 	};
