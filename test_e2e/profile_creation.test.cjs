@@ -43,6 +43,13 @@ test('UsernameRegistry[mishicat].version(): => #ok - Version Number', async func
 	t.end();
 });
 
+test('UsernameRegistry[mishicat].initialize_canisters(): => #ok - CanisterId', async function (t) {
+	const canister_id = await username_registry_actor.mishicat.initialize_canisters();
+
+	t.assert(canister_id.length > 2, 'Correct Length');
+	t.end();
+});
+
 test('UsernameRegistry[mishicat].get_username(): with invalid principal => #err - UserPrincipalNotFound', async function (t) {
 	const { ok: _, err: err_username } = await username_registry_actor.mishicat.get_username();
 
@@ -56,7 +63,7 @@ test('UsernameRegistry[mishicat].get_username_info(): with invalid unsername => 
 	t.deepEqual(err_username, { UsernameNotFound: true });
 });
 
-test('UsernameRegistry[anonymous].create_profile(): with anon identity => #err - UsernameNotFound', async function (t) {
+test('UsernameRegistry[anonymous].create_profile(): with anon identity => #err - CallerAnonymous', async function (t) {
 	const { ok: _, err: err_profile } =
 		await username_registry_actor.anonymous.create_profile('mishicat');
 
@@ -68,4 +75,18 @@ test('UsernameRegistry[mishicat].create_profile(): with invalid username => #err
 		await username_registry_actor.mishicat.create_profile('Mishicat');
 
 	t.deepEqual(err_profile, { UsernameInvalid: true });
+});
+
+test('UsernameRegistry[mishicat].create_profile(): with valid username => #ok - Created Profile', async function (t) {
+	const { ok: username, err: err_profile } =
+		await username_registry_actor.mishicat.create_profile('mishicat');
+
+	t.assert(username.length > 2, 'Created Profile');
+});
+
+test('UsernameRegistry[mishicat].create_profile(): with taken username => #ok - UsernameTaken', async function (t) {
+	const { ok: _, err: err_profile } =
+		await username_registry_actor.mishicat.create_profile('mishicat');
+
+	t.deepEqual(err_profile, { UsernameTaken: true });
 });

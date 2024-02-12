@@ -97,10 +97,15 @@
 			"type": "motoko",
 			"dependencies": ["explore", "logger", "profile"]
 		},
+		"creator": {
+			"main": "src/actor_creator/Creator.mo",
+			"type": "motoko",
+			"dependencies": ["logger"]
+		},
 		"username_registry": {
 			"main": "src/actor_username_registry/UsernameRegistry.mo",
 			"type": "motoko",
-			"dependencies": []
+			"dependencies": ["logger"]
 		}
 	},
 	"defaults": {

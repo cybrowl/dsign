@@ -8,7 +8,7 @@ import Logger "canister:logger";
 
 import Types "./types";
 
-actor Creator = {
+actor class Creator(username_registry : Principal) = this {
 	type ErrProfile = Types.ErrProfile;
 	type Profile = Types.Profile;
 	type Project = Types.Project;
@@ -26,7 +26,7 @@ actor Creator = {
 	// ------------------------- Variables -------------------------
 	let VERSION : Nat = 1; // The Version in Production
 	let CANISTER_ID : Text = "";
-	let USERNAME_REGISTRY_ID : Text = "";
+	let USERNAME_REGISTRY_ID : Text = Principal.toText(username_registry);
 	let MAX_USERS : Nat = 100;
 
 	stable var users : Nat = 0;
@@ -62,7 +62,7 @@ actor Creator = {
 	public shared ({ caller }) func create_profile(username : Username) : async Result.Result<Username, ErrProfile> {
 		let tags = [("canister_id", CANISTER_ID), ("method", "create_profile")];
 
-		if (Principal.toText(caller) != USERNAME_REGISTRY_ID) {
+		if (Principal.equal(caller, username_registry) == false) {
 			return #err(#NotAuthorizedCaller);
 		};
 

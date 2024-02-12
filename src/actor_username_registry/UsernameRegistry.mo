@@ -1,3 +1,4 @@
+import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
@@ -5,7 +6,12 @@ import Text "mo:base/Text";
 
 import CreatorTypes "../actor_creator/types";
 
+import Creator "../actor_creator/Creator";
+import Logger "canister:logger";
+
 import Utils "./utils";
+
+import { IS_PROD; ENV } "../env/env";
 
 actor UsernameRegistry = {
 	// NOTE:
@@ -32,10 +38,12 @@ actor UsernameRegistry = {
 	let VERSION : Nat = 1; // The Version in Production
 	let MAX_USERS : Nat = 100;
 	let ACTOR_NAME : Text = "UsernameRegistry";
+	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
+
 	var creator_canister_id = "";
 
 	// Username Info
-	var username_info : HashMap.HashMap<Username, UsernameInfo> = HashMap.HashMap(
+	var usernames_info : HashMap.HashMap<Username, UsernameInfo> = HashMap.HashMap(
 		0,
 		Text.equal,
 		Text.hash
@@ -63,7 +71,7 @@ actor UsernameRegistry = {
 
 	// Get Username Info
 	public query ({ caller }) func get_username_info(username : Username) : async Result.Result<UsernameInfo, ErrUsername> {
-		switch (username_info.get(username)) {
+		switch (usernames_info.get(username)) {
 			case (?info) {
 				#ok(info);
 			};
@@ -75,7 +83,7 @@ actor UsernameRegistry = {
 
 	// ------------------------- Profile Creation -------------------------
 	private func username_available(username : Username) : Bool {
-		switch (username_info.get(username)) {
+		switch (usernames_info.get(username)) {
 			case (?owner) {
 				return false;
 			};
@@ -123,15 +131,58 @@ actor UsernameRegistry = {
 				};
 			};
 			case (#ok _) {
-				// On successful profile creation, perform necessary storage operations
-				// TODO: Implement storage logic for username and username_info
+				let username_info : UsernameInfo = {
+					canister_id = creator_canister_id;
+				};
+
+				usernames.put(caller, username);
+				usernames_info.put(username, username_info);
+
 				return #ok(username);
 			};
 		};
 	};
 
+	// TODO: Delete Profile
+
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	private func create_creator_canister(is_prod : Bool) : async () {
+		let username_registry_principal = Principal.fromActor(UsernameRegistry);
+
+		Cycles.add(CYCLE_AMOUNT);
+		let creator_actor = await Creator.Creator(username_registry_principal);
+		let principal = Principal.fromActor(creator_actor);
+
+		creator_canister_id := Principal.toText(principal);
+
+		// let canister_child : CanisterInfo = {
+		//     created = Time.now();
+		//     id = favorite_canister_id;
+		//     name = "favorite";
+		//     parent_name = ACTOR_NAME;
+		//     isProd = is_prod;
+		// };
+
+		// ignore CanisterIdsLedger.save_canister(canister_child);
+	};
+
+	public shared (msg) func initialize_canisters() : async Text {
+		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
+
+		if (creator_canister_id.size() > 1) {
+			ignore Logger.log_event(tags, "exists creator_canister_id: " # creator_canister_id);
+
+			return creator_canister_id;
+		} else {
+			await create_creator_canister(IS_PROD);
+
+			ignore Logger.log_event(tags, "created creator_canister_id: " # creator_canister_id);
+
+			return creator_canister_id;
+		};
 	};
 };
