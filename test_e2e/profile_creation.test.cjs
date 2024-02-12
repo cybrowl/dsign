@@ -43,6 +43,13 @@ test('UsernameRegistry[mishicat].version(): => #ok - Version Number', async func
 	t.end();
 });
 
+test('UsernameRegistry[mishicat].initialize_canisters(): => #ok - CanisterId', async function (t) {
+	const canister_id = await username_registry_actor.mishicat.initialize_canisters();
+
+	t.assert(canister_id.length > 2, 'Correct Length');
+	t.end();
+});
+
 test('UsernameRegistry[mishicat].delete_profile(): with valid principal => #ok - Deleted', async function (t) {
 	// Setup: Ensure there's a profile to delete
 	await username_registry_actor.mishicat.create_profile('mishicat');
@@ -51,13 +58,6 @@ test('UsernameRegistry[mishicat].delete_profile(): with valid principal => #ok -
 
 	t.assert(deleted === true, 'Deleted Profile');
 
-	t.end();
-});
-
-test('UsernameRegistry[mishicat].initialize_canisters(): => #ok - CanisterId', async function (t) {
-	const canister_id = await username_registry_actor.mishicat.initialize_canisters();
-
-	t.assert(canister_id.length > 2, 'Correct Length');
 	t.end();
 });
 

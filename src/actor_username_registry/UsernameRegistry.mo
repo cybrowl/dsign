@@ -115,7 +115,7 @@ actor UsernameRegistry = {
 
 		let creator_actor : CreatorActor = actor (creator_canister_id);
 
-		switch (await creator_actor.create_profile(username)) {
+		switch (await creator_actor.create_profile(username, caller)) {
 			case (#err err) {
 				switch (err) {
 					case (#MaxUsersExceeded) {

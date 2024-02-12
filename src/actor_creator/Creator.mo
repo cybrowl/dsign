@@ -59,7 +59,7 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Create Profile
-	public shared ({ caller }) func create_profile(username : Username) : async Result.Result<Username, ErrProfile> {
+	public shared ({ caller }) func create_profile(username : Username, owner : UserPrincipal) : async Result.Result<Username, ErrProfile> {
 		let tags = [("canister_id", CANISTER_ID), ("method", "create_profile")];
 
 		if (Principal.equal(caller, username_registry) == false) {
@@ -89,7 +89,7 @@ actor class Creator(username_registry : Principal) = this {
 			username = username;
 		};
 
-		profiles.put(caller, profile);
+		profiles.put(owner, profile);
 
 		ignore Logger.log_event(tags, "profile_created");
 
