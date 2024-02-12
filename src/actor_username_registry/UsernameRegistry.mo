@@ -143,7 +143,22 @@ actor UsernameRegistry = {
 		};
 	};
 
-	// TODO: Delete Profile
+	// Delete Profile
+	public shared ({ caller }) func delete_profile() : async Result.Result<Bool, ErrUsername> {
+		switch (usernames.get(caller)) {
+			case (?username) {
+
+				usernames.delete(caller);
+
+				usernames_info.delete(username);
+
+				return #ok(true);
+			};
+			case (_) {
+				return #err(#UserPrincipalNotFound(true));
+			};
+		};
+	};
 
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
