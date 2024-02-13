@@ -138,3 +138,18 @@ test('Creator[mishicat].get_profile(): => #ok - Profile', async function (t) {
 	t.ok(profile.banner.exists === false, 'Banner exists flag matches expected');
 	t.equal(profile.banner.url, '/default_profile_banner.png', 'Banner URL matches expected');
 });
+
+test('Creator[anonymous].get_profile(): => #err - ProfileNotFound', async function (t) {
+	const { ok: username_info, err: _ } =
+		await username_registry_actor.mishicat.get_username_info('mishicat');
+
+	const creator_actor_anonymous = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		anonymous_identity
+	);
+
+	const { ok: _ok, err: err_profile } = await creator_actor_anonymous.get_profile();
+
+	t.deepEqual(err_profile, { ProfileNotFound: true });
+});
