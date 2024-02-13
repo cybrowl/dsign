@@ -20,7 +20,8 @@ const envOptions = {
 const config = {
 	build: {
 		brotliSize: true,
-		cssCodeSplit: true
+		cssCodeSplit: true,
+		minify: isProduction
 	},
 	server: {
 		fs: {
