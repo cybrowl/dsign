@@ -111,6 +111,11 @@ actor class Creator(username_registry : Principal) = this {
 		return #ok(username);
 	};
 
+	// TODO: WARNING
+	// Assets need to be handled, it is needed for avatars, banners, snaps (images and files)
+	// E2E integration is important with the UI, who knows what lurks in the unknown.
+	// Test profile creation & rendering before moving forward.
+
 	// Update Profile Avatar
 	public shared ({ caller }) func update_profile_avatar(username : Username) : async Result.Result<Text, Text> {
 		return #ok("");
