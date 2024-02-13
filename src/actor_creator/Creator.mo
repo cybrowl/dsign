@@ -137,6 +137,11 @@ actor class Creator(username_registry : Principal) = this {
 		return "";
 	};
 
+	// Get Project Metrics
+	public query func get_project_metrics() : async Text {
+		return "";
+	};
+
 	// Create Project
 	public shared ({ caller }) func create_project() : async Result.Result<Text, Text> {
 		return #ok("");
@@ -166,8 +171,6 @@ actor class Creator(username_registry : Principal) = this {
 	public shared ({ caller }) func delete_snaps_from_project() : async Result.Result<Text, Text> {
 		return #ok("");
 	};
-
-	// TODO: project metrics (likes & views)
 
 	// ------------------------- Snaps -------------------------
 	// Get Snaps
@@ -220,6 +223,4 @@ actor class Creator(username_registry : Principal) = this {
 	public query func version() : async Nat {
 		return VERSION;
 	};
-
-	// check_user_has_a_username (needs to go to username registry)
 };
