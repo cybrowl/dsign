@@ -17,6 +17,8 @@ const { parseIdentity } = require('../test-utils/identities/identity.cjs');
 
 let mishicat_identity = parseIdentity(process.env.MISHICAT_IDENTITY);
 let anonymous_identity = null;
+// let motoko_identity = parseIdentity(process.env.MOTOKO_IDENTITY);
+// let default_identity = parseIdentity(process.env.DEFAULT_IDENTITY);
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');

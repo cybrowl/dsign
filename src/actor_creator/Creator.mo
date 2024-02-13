@@ -10,6 +10,7 @@ import Types "./types";
 
 actor class Creator(username_registry : Principal) = this {
 	type ErrProfile = Types.ErrProfile;
+	type FavoriteID = Types.FavoriteID;
 	type Profile = Types.Profile;
 	type Project = Types.Project;
 	type ProjectID = Types.ProjectID;
@@ -40,10 +41,11 @@ actor class Creator(username_registry : Principal) = this {
 	);
 
 	// favorites (only lives within profile)
-	var favorites : HashMap.HashMap<UserPrincipal, ProjectRef> = HashMap.HashMap(
+	// NOTE: the data is cached, cron job runs every N time
+	var favorites : HashMap.HashMap<FavoriteID, Project> = HashMap.HashMap(
 		0,
-		Principal.equal,
-		Principal.hash
+		Text.equal,
+		Text.hash
 	);
 
 	// projects
@@ -98,6 +100,7 @@ actor class Creator(username_registry : Principal) = this {
 			created = Time.now();
 			storage_mb_used = 0;
 			projects = [];
+			favorites = [];
 			username = username;
 		};
 

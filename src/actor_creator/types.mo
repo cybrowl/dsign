@@ -6,9 +6,13 @@ import ImgAssetTypes "../service_assets_img/types";
 import AssetTypes "../service_assets/types";
 
 module {
+	public type CanisterID = Text;
+	public type ProjectID = Text;
+	public type FavoriteID = Text;
+	public type SnapID = Text;
+	public type Time = Int;
 	public type Username = Text;
 	public type UserPrincipal = Principal;
-	public type Time = Int;
 
 	// public type ICInterface = ICInterfaceTypes.Self;
 	// public type ImageAssetsActor = ImgAssetTypes.ImageAssetsActor;
@@ -23,13 +27,13 @@ module {
 	public type Profile = {
 		avatar : {
 			id : Text;
-			canister_id : Text;
+			canister_id : CanisterID;
 			url : Text;
 			exists : Bool;
 		};
 		banner : {
 			id : Text;
-			canister_id : Text;
+			canister_id : CanisterID;
 			url : Text;
 			exists : Bool;
 		};
@@ -37,6 +41,7 @@ module {
 		storage_mb_used : Nat;
 		username : Username;
 		projects : [ProjectID];
+		favorites : [FavoriteID];
 	};
 
 	public type ErrProfile = {
@@ -45,14 +50,6 @@ module {
 		#ProfileNotFound : Bool;
 		#InvalidProfileArguments : Bool;
 		#UsernamePrincipalNotFound;
-	};
-
-	// Project
-	public type ProjectID = Text;
-
-	public type ProjectRef = {
-		id : Text;
-		canister_id : Text;
 	};
 
 	type File = {
@@ -81,14 +78,15 @@ module {
 		topics : [Topic];
 	};
 
+	// Project
 	public type Project = {
-		id : Text;
-		canister_id : Text;
+		id : ProjectID;
+		canister_id : CanisterID;
 		created : Time;
+		name : Text;
 		description : ?Text;
 		username : Text;
 		owner : UserPrincipal;
-		name : Text;
 		snaps : [SnapID];
 		feedback : ?Feedback;
 		metrics : {
@@ -97,30 +95,33 @@ module {
 		};
 	};
 
-	// Snap
-	public type SnapID = Text;
-
-	public type SnapRef = {
-		id : Text;
-		canister_id : Text;
+	public type ProjectRef = {
+		id : ProjectID;
+		canister_id : CanisterID;
 	};
 
+	// Snap
 	public type Snap = {
-		canister_id : Text;
-		created : Time;
-		file_asset : AssetRef;
 		id : SnapID;
-		image_cover_location : Nat8;
-		images : [ImageRef];
-		project_ref : ?ProjectRef;
+		canister_id : CanisterID;
+		created : Time;
 		title : Text;
 		tags : [Text];
 		username : Username;
-		owner : ?Principal;
+		owner : Principal;
+		file_asset : AssetRef;
+		image_cover_location : Nat8;
+		images : [ImageRef];
+		project_ref : ProjectRef;
 		metrics : {
 			likes : Nat;
 			views : Nat;
 		};
+	};
+
+	public type SnapRef = {
+		id : SnapID;
+		canister_id : CanisterID;
 	};
 
 	// Actor Interface
