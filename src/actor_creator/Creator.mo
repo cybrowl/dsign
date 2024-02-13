@@ -98,10 +98,10 @@ actor class Creator(username_registry : Principal) = this {
 				exists = false;
 			};
 			created = Time.now();
-			storage_mb_used = 0;
-			projects = [];
-			favorites = [];
 			username = username;
+			favorites = [];
+			projects = [];
+			storage = null;
 		};
 
 		profiles.put(owner, profile);

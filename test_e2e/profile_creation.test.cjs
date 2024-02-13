@@ -135,8 +135,9 @@ test('Creator[mishicat].get_profile(): => #ok - Profile', async function (t) {
 	const { ok: profile, err: _err } = await creator_actor_mishicat.get_profile();
 
 	t.equal(profile.username, 'mishicat', 'Username matches expected');
-	t.equal(profile.storage_mb_used, 0n, 'Storage used matches expected');
+	t.deepEqual(profile.storage, [], 'Storage used matches expected');
 	t.deepEqual(profile.projects, [], 'Projects array is empty as expected');
+	t.deepEqual(profile.favorites, [], 'Favorites array is empty as expected');
 	t.ok(profile.banner.exists === false, 'Banner exists flag matches expected');
 	t.equal(profile.banner.url, '/default_profile_banner.png', 'Banner URL matches expected');
 });

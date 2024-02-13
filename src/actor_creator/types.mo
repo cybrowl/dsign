@@ -38,10 +38,10 @@ module {
 			exists : Bool;
 		};
 		created : Int;
-		storage_mb_used : Nat;
 		username : Username;
 		projects : [ProjectID];
 		favorites : [FavoriteID];
+		storage : ?Storage;
 	};
 
 	public type ErrProfile = {
@@ -50,6 +50,13 @@ module {
 		#ProfileNotFound : Bool;
 		#InvalidProfileArguments : Bool;
 		#UsernamePrincipalNotFound;
+	};
+
+	type Storage = {
+		text : Nat;
+		images : Nat;
+		files : Nat;
+		total : Nat;
 	};
 
 	type File = {
