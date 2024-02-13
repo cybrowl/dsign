@@ -36,4 +36,5 @@ function convertResponseToJson(response) {
 }
 
 const jsonOutput = convertResponseToJson(response);
+
 console.log(JSON.stringify(jsonOutput, null, 2));
