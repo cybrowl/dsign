@@ -23,4 +23,4 @@ else
 fi
 
 # Deploy
-dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} dsign_assets
+dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} ui

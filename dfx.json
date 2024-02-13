@@ -11,7 +11,7 @@
 				}
 			}
 		},
-		"dsign_assets": {
+		"ui": {
 			"dependencies": [],
 			"frontend": {
 				"entrypoint": "build/index.html"

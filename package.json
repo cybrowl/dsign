@@ -1,10 +1,10 @@
 {
 	"private": true,
 	"name": "dsign",
-	"version": "0.9.1",
+	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
-		"build:css": "tailwindcss build src/dsign_assets/app.css -o src/dsign_assets/assets/output.css",
+		"build:css": "tailwindcss build src/ui/app.css -o src/ui/assets/output.css",
 		"build": "npm run build:css && vite build",
 		"boot": "sh ./scripts/install-local.sh",
 		"format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",

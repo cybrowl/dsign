@@ -33,8 +33,8 @@ dfx deploy favorite_main
 # explore
 dfx deploy explore
 
-# front end
-dfx deploy dsign_assets
+# user interface
+dfx deploy ui
 
 export EXPLORE_PRINCIPAL=$(dfx canister id explore)
 export FAVORITE_MAIN_PRINCIPAL=$(dfx canister id favorite_main)

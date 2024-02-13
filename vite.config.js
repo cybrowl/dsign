@@ -30,10 +30,10 @@ const config = {
 	resolve: {
 		alias: {
 			...envOptions.aliases,
-			$components_ref: resolve('./src/dsign_assets/components/'),
-			$modals_ref: resolve('./src/dsign_assets/modals/'),
-			$stores_ref: resolve('./src/dsign_assets/store/'),
-			$utils: resolve('./src/dsign_assets/utils'),
+			$components_ref: resolve('./src/ui/components/'),
+			$modals_ref: resolve('./src/ui/modals/'),
+			$stores_ref: resolve('./src/ui/store/'),
+			$utils: resolve('./src/ui/utils'),
 			environment: envOptions.environment
 		},
 		dedupe: ['svelte']

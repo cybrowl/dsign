@@ -1,4 +1,8 @@
 {
+	"ui": {
+		"ic": "kqlfj-siaaa-aaaag-aaawq-cai",
+		"staging": "crpmm-6yaaa-aaaag-abqrq-cai"
+	},
 	"assets_file_staging": {
 		"ic": "jfpyd-maaaa-aaaag-aatxq-cai",
 		"staging": "euext-7yaaa-aaaag-abqhq-cai"
@@ -10,10 +14,6 @@
 	"canister_ids_ledger": {
 		"ic": "k25dy-3yaaa-aaaag-abcpa-cai",
 		"staging": "etfrh-saaaa-aaaag-abqha-cai"
-	},
-	"dsign_assets": {
-		"ic": "kqlfj-siaaa-aaaag-aaawq-cai",
-		"staging": "crpmm-6yaaa-aaaag-abqrq-cai"
 	},
 	"explore": {
 		"ic": "72zia-7aaaa-aaaag-aa37a-cai",

@@ -13,19 +13,11 @@ const config = {
 
 	kit: {
 		files: {
-			assets: 'src/dsign_assets/assets',
-			// hooks: {
-			// 	server: 'src/dsign_assets/hooks',
-			// 	client: 'src/dsign_assets/hooks'
-			// },
-			lib: 'src/dsign_assets/lib',
-			routes: 'src/dsign_assets/routes',
-			appTemplate: 'src/dsign_assets/app.html'
+			assets: 'src/ui/assets',
+			lib: 'src/ui/lib',
+			routes: 'src/ui/routes',
+			appTemplate: 'src/ui/app.html'
 		},
-		// paths: {
-		// 	assets: '',
-		// 	base: ''
-		// },
 		adapter: adapter({
 			pages: 'build',
 			assets: 'build',
