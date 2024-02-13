@@ -39,6 +39,13 @@ actor class Creator(username_registry : Principal) = this {
 		Principal.hash
 	);
 
+	// username to principal ref
+	var usernames : HashMap.HashMap<Username, UserPrincipal> = HashMap.HashMap(
+		0,
+		Text.equal,
+		Text.hash
+	);
+
 	// favorites (only lives within profile)
 	// NOTE: the data is cached, cron job runs every N time
 	var favorites : HashMap.HashMap<FavoriteID, Project> = HashMap.HashMap(
@@ -67,6 +74,25 @@ actor class Creator(username_registry : Principal) = this {
 			};
 			case (?profile) {
 				return #ok(profile);
+			};
+		};
+	};
+
+	// Get Profile by Username
+	public query func get_profile_by_username(username : Username) : async Result.Result<Profile, ErrProfile> {
+		switch (usernames.get(username)) {
+			case (null) {
+				return #err(#ProfileNotFound(true));
+			};
+			case (?creator_principal) {
+				switch (profiles.get(creator_principal)) {
+					case (null) {
+						return #err(#ProfileNotFound(true));
+					};
+					case (?profile) {
+						return #ok(profile);
+					};
+				};
 			};
 		};
 	};
@@ -104,6 +130,7 @@ actor class Creator(username_registry : Principal) = this {
 		};
 
 		profiles.put(owner, profile);
+		usernames.put(username, owner);
 
 		ignore Logger.log_event(tags, "profile_created");
 

@@ -156,3 +156,46 @@ test('Creator[anonymous].get_profile(): => #err - ProfileNotFound', async functi
 
 	t.deepEqual(err_profile, { ProfileNotFound: true });
 });
+
+test('Creator[mishicat].get_profile_by_username(): with valid username => #ok - Profile', async function (t) {
+	const { ok: username_info, err: _ } =
+		await username_registry_actor.mishicat.get_username_info('mishicat');
+
+	// Assuming 'mishicat' is a valid username that was previously created
+	const validUsername = 'mishicat';
+	const creator_actor = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const { ok: profile, err: errProfile } =
+		await creator_actor.get_profile_by_username(validUsername);
+
+	t.ok(profile, 'Successfully retrieved profile by username');
+	t.equal(profile.username, validUsername, 'Retrieved profile username matches expected');
+	t.notOk(errProfile, 'No error when retrieving profile by valid username');
+	t.end();
+});
+
+test('Creator[mishicat].get_profile_by_username(): with invalid username => #err - ProfileNotFound', async function (t) {
+	const { ok: username_info, err: _err } =
+		await username_registry_actor.mishicat.get_username_info('mishicat');
+
+	// Assuming 'nonexistentuser' is a username that does not exist
+	const invalidUsername = 'nonexistentuser';
+	const creator_actor = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const { ok: _, err: errProfile } = await creator_actor.get_profile_by_username(invalidUsername);
+
+	t.deepEqual(
+		errProfile,
+		{ ProfileNotFound: true },
+		'Expected error when retrieving profile by invalid username'
+	);
+	t.end();
+});
