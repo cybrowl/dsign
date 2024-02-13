@@ -14,7 +14,6 @@ actor class Creator(username_registry : Principal) = this {
 	type Profile = Types.Profile;
 	type Project = Types.Project;
 	type ProjectID = Types.ProjectID;
-	type ProjectRef = Types.ProjectRef;
 	type Snap = Types.Snap;
 	type SnapID = Types.SnapID;
 	type Username = Types.Username;
