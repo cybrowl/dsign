@@ -58,6 +58,18 @@ actor class Creator(username_registry : Principal) = this {
 		return profiles.size();
 	};
 
+	// Get Profile by User Principal
+	public query ({ caller }) func get_profile() : async Result.Result<Profile, ErrProfile> {
+		switch (profiles.get(caller)) {
+			case (null) {
+				return #err(#ProfileNotFound(true));
+			};
+			case (?profile) {
+				return #ok(profile);
+			};
+		};
+	};
+
 	// Create Profile
 	public shared ({ caller }) func create_profile(username : Username, owner : UserPrincipal) : async Result.Result<Username, ErrProfile> {
 		let tags = [("canister_id", CANISTER_ID), ("method", "create_profile")];

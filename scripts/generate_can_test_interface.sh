@@ -16,7 +16,8 @@ canisters=(
 "test_assets"
 "test_image_assets"
 "test_project"
-"test_snap",
+"test_snap"
+"creator"
 "username_registry"
 )
 

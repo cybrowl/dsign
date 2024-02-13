@@ -15,6 +15,7 @@
 		"deploy_profile": "sh ./scripts/deploy/profile.sh && node ./scripts/deploy/profile.cjs",
 		"deploy_projects": "sh ./scripts/deploy/projects.sh && node ./scripts/deploy/projects.cjs",
 		"deploy_snaps": "sh ./scripts/deploy/snaps.sh && node ./scripts/deploy/snaps.cjs",
+		"deploy_v2": "sh ./scripts/setup_local.sh",
 		"user_interface": "sh ./scripts/deploy/user_interface.sh",
 		"deploy_all": "npm run deploy_favorites && npm run deploy_profile && npm run deploy_projects && npm run deploy_snaps && npm run user_interface",
 		"test-all": "bash ./scripts/test-all.sh",

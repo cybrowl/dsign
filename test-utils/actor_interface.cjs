@@ -15,5 +15,6 @@ module.exports = {
 	test_assets_interface: getInterface('test_assets'),
 	test_image_assets_interface: getInterface('test_image_assets'),
 	test_project_interface: getInterface('test_project'),
+	creator_interface: getInterface('creator'),
 	username_registry_interface: getInterface('username_registry')
 };
