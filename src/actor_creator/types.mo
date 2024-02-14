@@ -44,6 +44,28 @@ module {
 		storage : ?Storage;
 	};
 
+	// Profile Public
+	public type ProfilePublic = {
+		avatar : {
+			id : Text;
+			canister_id : CanisterID;
+			url : Text;
+			exists : Bool;
+		};
+		banner : {
+			id : Text;
+			canister_id : CanisterID;
+			url : Text;
+			exists : Bool;
+		};
+		created : Int;
+		username : Username;
+		is_owner : Bool;
+		projects : [Project];
+		favorites : [Project];
+		storage : ?Storage;
+	};
+
 	public type ErrProfile = {
 		#NotAuthorizedCaller;
 		#MaxUsersExceeded;
@@ -115,7 +137,7 @@ module {
 		title : Text;
 		tags : [Text];
 		username : Username;
-		owner : Principal;
+		owner : UserPrincipal;
 		file_asset : AssetRef;
 		image_cover_location : Nat8;
 		images : [ImageRef];

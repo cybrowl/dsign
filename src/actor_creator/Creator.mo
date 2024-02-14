@@ -158,11 +158,6 @@ actor class Creator(username_registry : Principal) = this {
 		return projects.size();
 	};
 
-	// Get Projects
-	public query func get_projects() : async Text {
-		return "";
-	};
-
 	// Get Project Owner Status
 	public query func get_project_owner_status() : async Text {
 		return "";
@@ -173,18 +168,13 @@ actor class Creator(username_registry : Principal) = this {
 		return "";
 	};
 
+	// Get Project
+	public query func get_project(id : ProjectID) : async Text {
+		return "";
+	};
+
 	// Create Project
 	public shared ({ caller }) func create_project() : async Result.Result<Text, Text> {
-		return #ok("");
-	};
-
-	// Add Snaps to Project
-	public shared ({ caller }) func add_snaps_to_project() : async Result.Result<Text, Text> {
-		return #ok("");
-	};
-
-	// Create Feedback Topic
-	public shared ({ caller }) func create_feedback_topic() : async Result.Result<Text, Text> {
 		return #ok("");
 	};
 
@@ -198,14 +188,14 @@ actor class Creator(username_registry : Principal) = this {
 		return #ok("");
 	};
 
-	// Delete Snaps from Project
-	public shared ({ caller }) func delete_snaps_from_project() : async Result.Result<Text, Text> {
+	// Create Feedback Topic
+	public shared ({ caller }) func create_feedback_topic() : async Result.Result<Text, Text> {
 		return #ok("");
 	};
 
 	// ------------------------- Snaps -------------------------
-	// Get Snaps
-	public query func get_snaps() : async Text {
+	// Get Snap
+	public query func get_snap(id : SnapID) : async Text {
 		return "";
 	};
 
@@ -220,7 +210,7 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Delete Snaps
-	public shared ({ caller }) func delete_snaps() : async Result.Result<Text, Text> {
+	public shared ({ caller }) func delete_snaps(ids : [SnapID]) : async Result.Result<Text, Text> {
 		return #ok("");
 	};
 
