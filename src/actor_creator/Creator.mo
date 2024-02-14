@@ -1,3 +1,4 @@
+import Array "mo:base/Array";
 import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
@@ -12,6 +13,7 @@ actor class Creator(username_registry : Principal) = this {
 	type ErrProfile = Types.ErrProfile;
 	type FavoriteID = Types.FavoriteID;
 	type Profile = Types.Profile;
+	type ProfilePublic = Types.ProfilePublic;
 	type Project = Types.Project;
 	type ProjectID = Types.ProjectID;
 	type Snap = Types.Snap;
@@ -66,20 +68,8 @@ actor class Creator(username_registry : Principal) = this {
 		return profiles.size();
 	};
 
-	// Get Profile by User Principal
-	public query ({ caller }) func get_profile() : async Result.Result<Profile, ErrProfile> {
-		switch (profiles.get(caller)) {
-			case (null) {
-				return #err(#ProfileNotFound(true));
-			};
-			case (?profile) {
-				return #ok(profile);
-			};
-		};
-	};
-
 	// Get Profile by Username
-	public query func get_profile_by_username(username : Username) : async Result.Result<Profile, ErrProfile> {
+	public query ({ caller }) func get_profile_by_username(username : Username) : async Result.Result<ProfilePublic, ErrProfile> {
 		switch (usernames.get(username)) {
 			case (null) {
 				return #err(#ProfileNotFound(true));
@@ -90,7 +80,45 @@ actor class Creator(username_registry : Principal) = this {
 						return #err(#ProfileNotFound(true));
 					};
 					case (?profile) {
-						return #ok(profile);
+
+						let projects_public : [Project] = Array.mapFilter<ProjectID, Project>(
+							profile.projects,
+							func(id : ProjectID) : ?Project {
+								switch (projects.get(id)) {
+									case (null) {
+										return null;
+									};
+									case (?project) {
+										return ?project;
+									};
+								};
+							}
+						);
+
+						let favorites_public : [Project] = Array.mapFilter<FavoriteID, Project>(
+							profile.favorites,
+							func(id : FavoriteID) : ?Project {
+								switch (projects.get(id)) {
+									case (null) {
+										return null;
+									};
+									case (?project) {
+										return ?project;
+									};
+								};
+							}
+						);
+
+						return #ok({
+							avatar = profile.avatar;
+							banner = profile.banner;
+							created = profile.created;
+							username = profile.username;
+							is_owner = Principal.equal(caller, profile.owner);
+							projects = projects_public;
+							favorites = favorites_public;
+							storage = profile.storage;
+						});
 					};
 				};
 			};
@@ -124,6 +152,7 @@ actor class Creator(username_registry : Principal) = this {
 			};
 			created = Time.now();
 			username = username;
+			owner = owner;
 			favorites = [];
 			projects = [];
 			storage = null;

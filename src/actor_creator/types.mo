@@ -39,6 +39,7 @@ module {
 		};
 		created : Int;
 		username : Username;
+		owner : UserPrincipal;
 		projects : [ProjectID];
 		favorites : [FavoriteID];
 		storage : ?Storage;
