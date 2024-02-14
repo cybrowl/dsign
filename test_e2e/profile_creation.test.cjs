@@ -199,3 +199,42 @@ test('Creator[mishicat].get_profile_by_username(): with invalid username => #err
 	);
 	t.end();
 });
+
+test('Creator[mishicat].get_canister_id(): => #ok - Canister ID', async function (t) {
+	const { ok: username_info, err: _err } =
+		await username_registry_actor.mishicat.get_username_info('mishicat');
+
+	const creator_actor_mishicat = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const canisterId = await creator_actor_mishicat.get_canister_id();
+
+	t.ok(
+		typeof canisterId === 'string' && canisterId.length > 0,
+		'Successfully retrieved non-empty canister ID'
+	);
+	t.end();
+});
+
+test('Creator[mishicat].get_canister_id(): => #ok - Format Check', async function (t) {
+	const { ok: username_info, err: _err } =
+		await username_registry_actor.mishicat.get_username_info('mishicat');
+
+	const creator_actor_mishicat = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const canisterId = await creator_actor_mishicat.get_canister_id();
+
+	// Example regex for basic validation, adjust according to your expected format
+	const pattern = /^[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[cai]{3}$/;
+	const isValidFormat = pattern.test(canisterId);
+
+	t.ok(isValidFormat, `Canister ID "${canisterId}" matches the expected format`);
+	t.end();
+});

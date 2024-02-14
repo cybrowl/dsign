@@ -25,11 +25,11 @@ actor class Creator(username_registry : Principal) = this {
 
 	// ------------------------- Variables -------------------------
 	let VERSION : Nat = 1; // The Version in Production
-	let CANISTER_ID : Text = "";
 	let USERNAME_REGISTRY_ID : Text = Principal.toText(username_registry);
 	let MAX_USERS : Nat = 100;
 
 	stable var users : Nat = 0;
+	stable var canister_id : Text = "";
 
 	// ------------------------- Storage Data -------------------------
 	// profiles
@@ -99,7 +99,7 @@ actor class Creator(username_registry : Principal) = this {
 
 	// Create Profile
 	public shared ({ caller }) func create_profile(username : Username, owner : UserPrincipal) : async Result.Result<Username, ErrProfile> {
-		let tags = [("canister_id", CANISTER_ID), ("method", "create_profile")];
+		let tags = [("canister_id", canister_id), ("method", "create_profile")];
 
 		if (Principal.equal(caller, username_registry) == false) {
 			return #err(#NotAuthorizedCaller);
@@ -251,7 +251,16 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// ------------------------- Canister Management -------------------------
+	// Get Version
 	public query func version() : async Nat {
 		return VERSION;
 	};
+
+	// Get CanisterId
+	public query func get_canister_id() : async Text {
+		return Principal.toText(Principal.fromActor(this));
+	};
+
+	// Post Upgrade
+	system func postupgrade() {};
 };
