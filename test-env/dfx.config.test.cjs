@@ -31,7 +31,10 @@ test('DFX Config: generateCanisterAliases()', async function (t) {
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_image_assets/service.did.js',
 		$IDLtest_project:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_project/service.did.js',
-		$IDLtest_snap: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_snap/service.did.js'
+		$IDLtest_snap: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_snap/service.did.js',
+		$IDLcreator: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/creator/service.did.js',
+		$IDLusername_registry:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/username_registry/service.did.js'
 	};
 
 	t.deepEqual(aliases, expected);

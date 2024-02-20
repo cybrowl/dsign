@@ -16,8 +16,8 @@ const { username_registry_canister_id } = require('../test-utils/actor_canister_
 const { parseIdentity } = require('../test-utils/identities/identity.cjs');
 
 let mishicat_identity = parseIdentity(process.env.MISHICAT_IDENTITY);
+let motoko_identity = parseIdentity(process.env.MOTOKO_IDENTITY);
 let anonymous_identity = null;
-// let motoko_identity = parseIdentity(process.env.MOTOKO_IDENTITY);
 // let default_identity = parseIdentity(process.env.DEFAULT_IDENTITY);
 
 // Utils
@@ -33,6 +33,11 @@ test('Setup Actors', async function () {
 		username_registry_canister_id,
 		username_registry_interface,
 		mishicat_identity
+	);
+	username_registry_actor.motoko = await get_actor(
+		username_registry_canister_id,
+		username_registry_interface,
+		motoko_identity
 	);
 	username_registry_actor.anonymous = await get_actor(
 		username_registry_canister_id,
@@ -60,6 +65,17 @@ test('UsernameRegistry[mishicat].delete_profile(): with valid principal => #ok -
 	await username_registry_actor.mishicat.create_profile('mishicat');
 
 	const { ok: deleted, err: _ } = await username_registry_actor.mishicat.delete_profile();
+
+	t.assert(deleted === true, 'Deleted Profile');
+
+	t.end();
+});
+
+test('UsernameRegistry[motoko].delete_profile(): with valid principal => #ok - Deleted', async function (t) {
+	// Setup: Ensure there's a profile to delete
+	await username_registry_actor.mishicat.create_profile('motoko');
+
+	const { ok: deleted, err: _ } = await username_registry_actor.motoko.delete_profile();
 
 	t.assert(deleted === true, 'Deleted Profile');
 
@@ -100,6 +116,12 @@ test('UsernameRegistry[mishicat].create_profile(): with valid username => #ok - 
 	t.assert(username.length > 2, 'Created Profile');
 });
 
+test('UsernameRegistry[motoko].create_profile(): with valid username => #ok - Created Profile', async function (t) {
+	const { ok: username, err: _ } = await username_registry_actor.motoko.create_profile('motoko');
+
+	t.assert(username.length > 2, 'Created Profile');
+});
+
 test('UsernameRegistry[mishicat].create_profile(): with taken username => #ok - UsernameTaken', async function (t) {
 	const { ok: _, err: err_profile } =
 		await username_registry_actor.mishicat.create_profile('mishicat');
@@ -122,42 +144,7 @@ test('Creator[mishicat].total_users(): => #ok - NumberOfUsers', async function (
 	t.assert(users_total > 0, 'Has Created User');
 });
 
-test('Creator[mishicat].get_profile(): => #ok - Profile', async function (t) {
-	const { ok: username_info, err: _ } =
-		await username_registry_actor.mishicat.get_username_info('mishicat');
-
-	const creator_actor_mishicat = await get_actor(
-		username_info.canister_id,
-		creator_interface,
-		mishicat_identity
-	);
-
-	const { ok: profile, err: _err } = await creator_actor_mishicat.get_profile();
-
-	t.equal(profile.username, 'mishicat', 'Username matches expected');
-	t.deepEqual(profile.storage, [], 'Storage used matches expected');
-	t.deepEqual(profile.projects, [], 'Projects array is empty as expected');
-	t.deepEqual(profile.favorites, [], 'Favorites array is empty as expected');
-	t.ok(profile.banner.exists === false, 'Banner exists flag matches expected');
-	t.equal(profile.banner.url, '/default_profile_banner.png', 'Banner URL matches expected');
-});
-
-test('Creator[anonymous].get_profile(): => #err - ProfileNotFound', async function (t) {
-	const { ok: username_info, err: _ } =
-		await username_registry_actor.mishicat.get_username_info('mishicat');
-
-	const creator_actor_anonymous = await get_actor(
-		username_info.canister_id,
-		creator_interface,
-		anonymous_identity
-	);
-
-	const { ok: _ok, err: err_profile } = await creator_actor_anonymous.get_profile();
-
-	t.deepEqual(err_profile, { ProfileNotFound: true });
-});
-
-test('Creator[mishicat].get_profile_by_username(): with valid username => #ok - Profile', async function (t) {
+test('Creator[mishicat].get_profile_by_username(): with valid username & owner => #ok - Profile', async function (t) {
 	const { ok: username_info, err: _ } =
 		await username_registry_actor.mishicat.get_username_info('mishicat');
 
@@ -174,6 +161,57 @@ test('Creator[mishicat].get_profile_by_username(): with valid username => #ok - 
 
 	t.ok(profile, 'Successfully retrieved profile by username');
 	t.equal(profile.username, validUsername, 'Retrieved profile username matches expected');
+	t.equal(profile.is_owner, true, 'Owner of profile');
+	t.deepEqual(profile.favorites, [], 'Favorites array is empty as expected');
+	t.deepEqual(profile.projects, [], 'Projects array is empty as expected');
+	t.deepEqual(profile.storage, [], 'Storage array is empty as expected');
+	t.deepEqual(
+		profile.banner,
+		{ id: '', url: '/default_profile_banner.png', canister_id: '', exists: false },
+		'Banner matches expected'
+	);
+	t.deepEqual(
+		profile.avatar,
+		{ id: '', url: '', canister_id: '', exists: false },
+		'Avatar matches expected'
+	);
+	t.notOk(errProfile, 'No error when retrieving profile by valid username');
+	t.end();
+});
+
+test('Creator[mishicat].get_profile_by_username(): with valid username & NOT owner => #ok - Profile', async function (t) {
+	const { ok: username_info, err: _ } =
+		await username_registry_actor.mishicat.get_username_info('mishicat');
+
+	// Switch the identity to simulate a different user (not owner)
+	// For this example, assume `mishicat_identity` represents the owner
+	// and another identity is used for the "not owner" scenario.
+	const validUsername = 'motoko';
+	const creator_actor = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const { ok: profile, err: errProfile } =
+		await creator_actor.get_profile_by_username(validUsername);
+
+	t.ok(profile, 'Successfully retrieved profile by username');
+	t.equal(profile.username, validUsername, 'Retrieved profile username matches expected');
+	t.equal(profile.is_owner, false, 'NOT Owner of profile');
+	t.deepEqual(profile.favorites, [], 'Favorites array is empty as expected');
+	t.deepEqual(profile.projects, [], 'Projects array is empty as expected');
+	t.deepEqual(profile.storage, [], 'Storage array is empty as expected');
+	t.deepEqual(
+		profile.banner,
+		{ id: '', url: '/default_profile_banner.png', canister_id: '', exists: false },
+		'Banner matches expected'
+	);
+	t.deepEqual(
+		profile.avatar,
+		{ id: '', url: '', canister_id: '', exists: false },
+		'Avatar matches expected'
+	);
 	t.notOk(errProfile, 'No error when retrieving profile by valid username');
 	t.end();
 });
