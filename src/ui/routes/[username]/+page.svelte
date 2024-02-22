@@ -22,7 +22,9 @@
 		actor_assets_img_staging,
 		actor_favorite_main,
 		actor_profile,
-		actor_project_main
+		actor_project_main,
+		actor_creator,
+		actor_username_registry
 	} from '$stores_ref/actors';
 	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { profileTabsState, disable_project_store_reset } from '$stores_ref/page_state';
@@ -43,7 +45,6 @@
 		snaps: []
 	};
 
-	let is_owner = false;
 	let profile = {};
 
 	disable_project_store_reset.set(true);
@@ -53,81 +54,41 @@
 
 	async function get_profile() {
 		try {
-			const { ok: public_profile_, err: err_public_profile } =
-				await $actor_profile.actor.get_profile_public($page.params.username);
+			await auth.username_registry();
+			const { ok: username_info } = await $actor_username_registry.actor.get_info_by_username(
+				$page.params.username
+			);
 
-			profile = public_profile_;
+			await auth.creator(username_info.canister_id);
+			const { ok: profile_res, err: err_profile } =
+				await $actor_creator.actor.get_profile_by_username($page.params.username);
 
-			if ($actor_profile.loggedIn) {
-				const { ok: auth_profile_, err: err_auth_profile } =
-					await $actor_profile.actor.get_profile();
+			profile = profile_res;
 
-				const username = get(auth_profile_, 'username', 'x');
-				is_owner = username === $page.params.username;
-			}
+			console.log('profile_res: ', profile_res);
+
+			const projects = profile_res.projects || [];
+			const favorites = profile_res.favorites || [];
+
+			project_store.set({ isFetching: false, projects: [...projects] });
+			local_storage_projects.set({ all_projects_count: projects.length || 1 });
+
+			favorite_store.set({ isFetching: false, projects: [...favorites] });
+			local_storage_favorites.set({ all_favorites_count: favorites.length || 1 });
 		} catch (error) {
 			console.log('error call profile: ', error);
-		}
-	}
-
-	async function get_all_projects() {
-		try {
-			const [favorites, projects] = await Promise.all([
-				$actor_favorite_main.actor.get_all_projects([$page.params.username]),
-				$actor_project_main.actor.get_all_projects([$page.params.username])
-			]);
-
-			const { ok: all_favs, err: err_get_all_favs } = favorites;
-			const { ok: all_projects, err: err_all_projects } = projects;
-
-			console.log('all_projects: ', all_projects);
-			console.log('err_all_projects: ', err_all_projects);
-
-			if (all_favs) {
-				favorite_store.set({ isFetching: false, projects: [...all_favs] });
-				local_storage_favorites.set({ all_favorites_count: all_favs.length || 1 });
-			}
-
-			if (err_get_all_favs) {
-				favorite_store.set({ isFetching: false, projects: [] });
-
-				if (err_get_all_favs['UserNotFound'] === true) {
-					await $actor_favorite_main.actor.create_user_favorite_storage();
-				}
-			}
-
-			if (all_projects) {
-				project_store.set({ isFetching: false, projects: [...all_projects] });
-				local_storage_projects.set({ all_projects_count: all_projects.length || 1 });
-			} else {
-				project_store.set({ isFetching: false, projects: [] });
-
-				if (err_all_projects['UserNotFound'] === true) {
-					await $actor_project_main.actor.create_user_project_storage();
-				}
-			}
-		} catch (error) {
-			console.log('error call projects: ', error);
 		}
 	}
 
 	$: if (profile.username && profile.username !== $page.params.username) {
 		project_store_fetching();
 		get_profile();
-		get_all_projects();
 	}
 
 	onMount(async () => {
 		await init_auth();
-		await Promise.all([
-			auth.assets_img_staging(),
-			auth.profile(),
-			auth.project_main(),
-			auth.favorite_main()
-		]);
 
 		await get_profile();
-		await get_all_projects();
 	});
 
 	onDestroy(() => {
@@ -254,7 +215,7 @@
 	<div class="profile_info_layout">
 		<ProfileInfo
 			avatar={get(profile, 'avatar.url', '')}
-			{is_owner}
+			is_owner={profile.is_owner}
 			username={get(profile, 'username', '')}
 			on:editProfile={openAccountSettingsModal}
 		/>
@@ -263,7 +224,7 @@
 	<!-- ProfileBanner -->
 	<div class="profile_banner_layout">
 		<ProfileBanner
-			{is_owner}
+			is_owner={profile.is_owner}
 			profile_banner_url={get(profile, 'banner.url', '')}
 			on:profileBannerChange={handleProfileBannerChange}
 		/>
@@ -290,7 +251,7 @@
 
 			<!-- No Projects Found -->
 			{#if $project_store.isFetching === false && $project_store.projects.length === 0}
-				{#if is_owner}
+				{#if profile.is_owner}
 					<ProjectCardCreate on:createProject={handleProjectCreateModalOpen} />
 				{:else}
 					<CardEmpty
@@ -306,14 +267,14 @@
 				{#each $project_store.projects as project}
 					<ProjectCard
 						{project}
-						showOptionsPopover={is_owner ? true : false}
+						showOptionsPopover={profile.is_owner ? true : false}
 						optionsPopover={{ edit: true, delete: true }}
 						on:clickProject={handleProjectClick}
 						on:editProject={handleProjectEditModalOpen}
 						on:deleteProject={handleProjectDeleteModalOpen}
 					/>
 				{/each}
-				{#if is_owner}
+				{#if profile.is_owner}
 					<ProjectCardCreate on:createProject={handleProjectCreateModalOpen} />
 				{/if}
 			{/if}
@@ -344,7 +305,7 @@
 						{project}
 						hideSnapsCount={true}
 						showUsername={true}
-						showOptionsPopover={is_owner ? true : false}
+						showOptionsPopover={profile.is_owner ? true : false}
 						optionsPopover={{
 							edit: false,
 							delete: true

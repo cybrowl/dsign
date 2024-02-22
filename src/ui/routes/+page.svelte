@@ -17,25 +17,25 @@
 
 	disable_project_store_reset.set(true);
 
-	onMount(async () => {
-		try {
-			await init_auth();
+	// onMount(async () => {
+	// 	try {
+	// 		await init_auth();
 
-			const all_projects = await $actor_explore.actor.get_all_projects();
+	// 		// const all_projects = await $actor_explore.actor.get_all_projects();
 
-			if (all_projects) {
-				explore_store.update(({ project }) => {
-					return {
-						isFetching: false,
-						projects: all_projects,
-						project: project
-					};
-				});
-			}
-		} catch (error) {
-			console.error('error: call', error);
-		}
-	});
+	// 		// if (all_projects) {
+	// 		// 	explore_store.update(({ project }) => {
+	// 		// 		return {
+	// 		// 			isFetching: false,
+	// 		// 			projects: all_projects,
+	// 		// 			project: project
+	// 		// 		};
+	// 		// 	});
+	// 		// }
+	// 	} catch (error) {
+	// 		console.error('error: call', error);
+	// 	}
+	// });
 
 	function handleProjectClick(e) {
 		let project = get(e, 'detail');
