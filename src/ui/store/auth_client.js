@@ -8,6 +8,8 @@ import {
 	actor_profile,
 	actor_project_main,
 	actor_snap_main,
+	actor_creator,
+	actor_username_registry,
 	createActor
 } from '$stores_ref/actors';
 
@@ -22,19 +24,20 @@ const authActors = [
 	{ name: 'favorite_main', actor: actor_favorite_main },
 	{ name: 'profile', actor: actor_profile },
 	{ name: 'project_main', actor: actor_project_main },
-	{ name: 'snap_main', actor: actor_snap_main }
+	{ name: 'snap_main', actor: actor_snap_main },
+	{ name: 'username_registry', actor: actor_username_registry },
+	{ name: 'creator', actor: actor_creator }
 ];
 
-const authenticate_actor = async (actor_name, actor, authClient) => {
+const authenticate_actor = async (actor_name, actor, authClient, canister_id) => {
 	const isAuthenticated = await authClient.isAuthenticated();
-
-	console.log('isAuthenticated: ', isAuthenticated);
 
 	if (isAuthenticated) {
 		actor.update(() => ({
 			loggedIn: true,
 			actor: createActor({
 				actor_name,
+				canister_id,
 				identity: authClient.getIdentity()
 			})
 		}));
@@ -52,7 +55,7 @@ export async function init_auth() {
 	auth_client.set(authClient);
 
 	authActors.forEach(({ name, actor }) => {
-		auth[name] = () => authenticate_actor(name, actor, authClient);
+		auth[name] = (canister_id) => authenticate_actor(name, actor, authClient, canister_id);
 	});
 }
 
