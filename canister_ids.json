@@ -1,8 +1,4 @@
 {
-	"ui": {
-		"ic": "kqlfj-siaaa-aaaag-aaawq-cai",
-		"staging": "crpmm-6yaaa-aaaag-abqrq-cai"
-	},
 	"assets_file_staging": {
 		"ic": "jfpyd-maaaa-aaaag-aatxq-cai",
 		"staging": "euext-7yaaa-aaaag-abqhq-cai"
@@ -14,6 +10,9 @@
 	"canister_ids_ledger": {
 		"ic": "k25dy-3yaaa-aaaag-abcpa-cai",
 		"staging": "etfrh-saaaa-aaaag-abqha-cai"
+	},
+	"creator": {
+		"ic": "g5iz5-syaaa-aaaag-ahk6a-cai"
 	},
 	"explore": {
 		"ic": "72zia-7aaaa-aaaag-aa37a-cai",
@@ -61,5 +60,12 @@
 	"test_snap": {
 		"ic": "nakl5-yaaaa-aaaag-aay5a-cai",
 		"staging": "hex5v-dyaaa-aaaag-abqpq-cai"
+	},
+	"ui": {
+		"ic": "kqlfj-siaaa-aaaag-aaawq-cai",
+		"staging": "crpmm-6yaaa-aaaag-abqrq-cai"
+	},
+	"username_registry": {
+		"ic": "gipiq-tqaaa-aaaag-ahk5q-cai"
 	}
 }
