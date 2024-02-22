@@ -21,7 +21,7 @@ import Types "./types";
 
 import Utils "./utils";
 
-actor class FileStorage(is_prod : Bool) = this {
+actor class FileStorage(is_prod : Bool, port : Text) = this {
 	type Asset = Types.Asset;
 	type Asset_ID = Types.Asset_ID;
 	type AssetChunk = Types.AssetChunk;
@@ -33,7 +33,7 @@ actor class FileStorage(is_prod : Bool) = this {
 	type Health = Types.Health;
 
 	let ACTOR_NAME : Text = "FileStorage";
-	let VERSION : Nat = 4;
+	let VERSION : Nat = 1;
 	stable var timer_id : Nat = 0;
 
 	let { nhash; thash } = Map;
@@ -155,6 +155,7 @@ actor class FileStorage(is_prod : Bool) = this {
 				asset_id = asset_id;
 				canister_id = canister_id;
 				is_prod = is_prod;
+				port = port;
 			});
 			owner = Principal.toText(caller);
 		};
@@ -334,7 +335,6 @@ actor class FileStorage(is_prod : Bool) = this {
 	system func preupgrade() {
 		assets_stable_storage := Iter.toArray(Map.entries(assets));
 		chunks_stable_storage := Iter.toArray(Map.entries(chunks));
-
 	};
 
 	system func postupgrade() {

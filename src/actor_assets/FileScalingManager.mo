@@ -11,7 +11,7 @@ import Types "./types";
 import TypesIC "./types_ic";
 import Utils "./utils";
 
-actor class FileScalingManager(is_prod : Bool) = this {
+actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	let ACTOR_NAME : Text = "FileScalingManager";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
 	let VERSION : Nat = 3;
@@ -33,7 +33,7 @@ actor class FileScalingManager(is_prod : Bool) = this {
 
 	private func create_file_storage_canister() : async () {
 		Cycles.add(CYCLE_AMOUNT);
-		let file_storage_actor = await FileStorage.FileStorage(is_prod);
+		let file_storage_actor = await FileStorage.FileStorage(is_prod, port);
 
 		let principal = Principal.fromActor(file_storage_actor);
 		file_storage_canister_id := Principal.toText(principal);

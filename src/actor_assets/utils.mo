@@ -23,6 +23,7 @@ module {
 		asset_id : Text;
 		canister_id : Text;
 		is_prod : Bool;
+		port : Text;
 	};
 
 	let { hashNat } = Map;
@@ -44,7 +45,7 @@ module {
 		if (args.is_prod == false) {
 			url := Text.join(
 				"",
-				(["http://", args.canister_id, ".localhost:8080/asset/", args.asset_id].vals())
+				(["http://", args.canister_id, ".localhost:", args.port, "/asset/", args.asset_id].vals())
 			);
 		};
 
