@@ -73,7 +73,7 @@ test('UsernameRegistry[mishicat].delete_profile(): with valid principal => #ok -
 
 test('UsernameRegistry[motoko].delete_profile(): with valid principal => #ok - Deleted', async function (t) {
 	// Setup: Ensure there's a profile to delete
-	await username_registry_actor.mishicat.create_profile('motoko');
+	await username_registry_actor.motoko.create_profile('motoko');
 
 	const { ok: deleted, err: _ } = await username_registry_actor.motoko.delete_profile();
 
