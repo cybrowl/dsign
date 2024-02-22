@@ -1,16 +1,13 @@
 <script>
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 
 	import { AccountCreation, AccountCreationSuccess, Modal } from 'dsign-components';
-
-	import {
-		actor_favorite_main,
-		actor_profile,
-		actor_project_main,
-		actor_snap_main
-	} from '$stores_ref/actors';
+	import { actor_username_registry } from '$stores_ref/actors';
 	import { auth, init_auth } from '$stores_ref/auth_client';
-	let username_input_err_msgs = {
+
+	const usernameInputErrorMessages = {
+		CallerAnonymous: 'Something wrong with identity, Anon!',
 		UsernameInvalid: 'Use lower case letters and numbers only, 2 - 20 characters in length',
 		UsernameTaken: 'Username already taken'
 	};
@@ -18,75 +15,63 @@
 	let createdAccount = false;
 	let hasError = false;
 	let isCreatingAccount = false;
-	let username_input_err = '';
+	let usernameInputError = '';
 
-	onMount(async () => {
-		await init_auth();
-		await Promise.all([
-			auth.profile(),
-			auth.project_main(),
-			auth.snap_main(),
-			auth.favorite_main()
-		]);
+	onMount(() => {
+		initializeAuthentication();
 	});
 
-	async function handleAccountCreation(e) {
-		if ($actor_profile.loggedIn) {
-			try {
-				hasError = false;
-				username_input_err = '';
-				isCreatingAccount = true;
+	async function initializeAuthentication() {
+		try {
+			await init_auth();
+			await auth.username_registry();
 
-				let { ok: username, err: err_create_username } = await $actor_profile.actor.create_username(
-					e.detail.username
-				);
-
-				if (err_create_username) {
-					hasError = true;
-					isCreatingAccount = false;
-					let err_create_username_key = Object.keys(err_create_username)[0];
-					username_input_err = username_input_err_msgs[err_create_username_key];
-
-					return;
-				}
-
-				if (username) {
-					createdAccount = true;
-
-					if (
-						$actor_favorite_main.loggedIn &&
-						$actor_project_main.loggedIn &&
-						$actor_snap_main.loggedIn
-					) {
-						await Promise.all([
-							$actor_favorite_main.actor.create_user_favorite_storage(),
-							$actor_project_main.actor.create_user_project_storage(),
-							$actor_snap_main.actor.create_user_snap_storage()
-						]);
-					}
-
-					setTimeout(function () {
-						location.replace(`/${username}`);
-					}, 2000);
-				}
-			} catch (error) {
-				hasError = true;
-				isCreatingAccount = false;
-
-				//TODO: add notification err
-				username_input_err = 'Failed calling create profile';
+			const { ok: usernameInfo } = await $actor_username_registry.actor.get_info();
+			if (usernameInfo?.username) {
+				goto(`/${usernameInfo.username}`);
 			}
+		} catch (error) {
+			console.error('Error during authentication initialization: ', error);
+			// Consider handling this error or notifying the user
+		}
+	}
+
+	async function handleAccountCreation(event) {
+		if (!$actor_username_registry.loggedIn) return;
+
+		isCreatingAccount = true;
+		try {
+			const { ok: username, err: error } = await $actor_username_registry.actor.create_profile(
+				event.detail.username
+			);
+
+			if (error) {
+				let errorKey = Object.keys(error)[0];
+				usernameInputError = usernameInputErrorMessages[errorKey] || 'An unexpected error occurred';
+				throw new Error(usernameInputError); // Using throw to skip to catch block
+			}
+
+			createdAccount = true;
+			setTimeout(() => {
+				goto(`/${username}`);
+			}, 2000);
+		} catch (error) {
+			console.error('Account creation error: ', error.message);
+			hasError = true;
+			usernameInputError = error.message || 'Failed calling create profile';
+		} finally {
+			isCreatingAccount = false;
 		}
 	}
 </script>
 
-<Modal isModalLocked={true}>
+<Modal isModalLocked={true} modalHeaderVisible={false}>
 	{#if createdAccount}
 		<AccountCreationSuccess />
 	{:else}
 		<AccountCreation
 			on:click={handleAccountCreation}
-			errorMessage={username_input_err}
+			errorMessage={usernameInputError}
 			{hasError}
 			{isCreatingAccount}
 		/>
