@@ -20,14 +20,6 @@
 		"deploy_all": "npm run deploy_favorites && npm run deploy_profile && npm run deploy_projects && npm run deploy_snaps && npm run user_interface",
 		"test-all": "bash ./scripts/test-all.sh",
 		"test-config": "tape test-env/dfx.config.test.cjs",
-		"test-ac": "npm run generate_test_interface && tape test-canisters/account_creation.test.cjs",
-		"test-cl": "npm run generate_test_interface && tape test-canisters/canister_ids_ledger.test.cjs",
-		"test-ex": "npm run generate_test_interface && tape test-canisters/explore.test.cjs",
-		"test-lg": "npm run generate_test_interface && tape test-canisters/logger.test.cjs",
-		"test-sm": "npm run generate_test_interface && tape test-canisters/snap_main.test.cjs",
-		"test-p": "npm run generate_test_interface && tape test-canisters/profile.test.cjs",
-		"test-pm": "npm run generate_test_interface && tape test-canisters/project_main.test.cjs",
-		"test-pt": "npm run generate_test_interface && tape test-canisters/project_topic.test.cjs",
 		"test-pc": "npm run generate_test_interface && tape test_e2e/profile_creation.test.cjs"
 	},
 	"dependencies": {
