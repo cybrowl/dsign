@@ -7,7 +7,7 @@
 
 	import { Avatar, Button, Icon } from 'dsign-components';
 
-	import { actor_profile } from '$stores_ref/actors';
+	import { actor_username_registry, actor_creator } from '$stores_ref/actors';
 	import { auth_client, auth, init_auth } from '$stores_ref/auth_client';
 	import { local_storage_profile } from '$stores_ref/local_storage';
 	import modal_update from '$stores_ref/modal';
@@ -21,39 +21,58 @@
 
 	onMount(async () => {
 		await init_auth();
+		await auth.username_registry();
 
-		await auth.profile();
+		if ($actor_username_registry.loggedIn) {
+			const { ok: username_info, err: err_username } =
+				await $actor_username_registry.actor.get_info();
 
-		if ($actor_profile.loggedIn) {
-			try {
-				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
+			if (username_info === undefined) {
+				goto('/account_creation');
+			}
 
-				if (profile) {
-					local_storage_profile.set({
-						avatar_url: get(profile, 'avatar.url', ''),
-						username: get(profile, 'username', '')
-					});
-				}
+			if (username_info) {
+				await auth.creator(username_info.canister_id);
 
-				if (err_profile) {
-					if (err_profile['ProfileNotFound'] === true) {
-						goto('/account_creation');
+				if ($actor_creator.loggedIn) {
+					try {
+						const { ok: profile, err: err_profile } =
+							await $actor_creator.actor.get_profile_by_username(username_info.username);
+
+						console.log('err_profile: ', err_profile);
+
+						if (profile) {
+							local_storage_profile.set({
+								avatar_url: get(profile, 'avatar.url', ''),
+								username: get(profile, 'username', '')
+							});
+						}
+						if (err_profile) {
+							if (err_profile['ProfileNotFound'] === true) {
+								goto('/account_creation');
+							}
+						}
+					} catch (error) {
+						location.replace('/');
 					}
 				}
-			} catch (error) {
-				location.replace('/');
 			}
 		}
 	});
 
 	async function handleAuth() {
-		console.log('auth triggered after creation: ');
+		await auth.username_registry();
+		const { ok: username_info } = await $actor_username_registry.actor.get_username_info(
+			$page.params.username
+		);
 
-		await auth.profile();
+		await auth.creator(username_info.canister_id);
 
+		console.log('$actor_creator.loggedIn: ', $actor_creator.loggedIn);
 		try {
-			if ($actor_profile.loggedIn) {
-				let { ok: profile, err: err_profile } = await $actor_profile.actor.get_profile();
+			if ($actor_creator.loggedIn) {
+				const { ok: profile, err: err_profile } =
+					await $actor_creator.actor.get_profile_by_username($page.params.username);
 
 				if (profile) {
 					local_storage_profile.set({
@@ -98,7 +117,7 @@
 </script>
 
 <span>
-	{#if $actor_profile.loggedIn}
+	{#if $actor_username_registry.loggedIn}
 		<span class="flex gap-x-3 cursor-pointer">
 			<Avatar
 				avatar={$local_storage_profile.avatar_url}
