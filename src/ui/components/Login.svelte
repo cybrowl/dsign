@@ -12,96 +12,63 @@
 	import { local_storage_profile } from '$stores_ref/local_storage';
 	import modal_update from '$stores_ref/modal';
 
-	const env = environment();
-	let isProd = false;
+	const isProd = ['ic', 'staging'].includes(environment()['DFX_NETWORK']);
 
-	if (env['DFX_NETWORK'] === 'ic' || env['DFX_NETWORK'] === 'staging') {
-		isProd = true;
-	}
-
-	onMount(async () => {
-		await init_auth();
-		await auth.username_registry();
-
-		if ($actor_username_registry.loggedIn) {
-			const { ok: username_info, err: err_username } =
-				await $actor_username_registry.actor.get_info();
-
-			if (username_info === undefined) {
-				goto('/account_creation');
-			}
-
-			if (username_info) {
-				await auth.creator(username_info.canister_id);
-
-				if ($actor_creator.loggedIn) {
-					try {
-						const { ok: profile, err: err_profile } =
-							await $actor_creator.actor.get_profile_by_username(username_info.username);
-
-						console.log('err_profile: ', err_profile);
-
-						if (profile) {
-							local_storage_profile.set({
-								avatar_url: get(profile, 'avatar.url', ''),
-								username: get(profile, 'username', '')
-							});
-						}
-						if (err_profile) {
-							if (err_profile['ProfileNotFound'] === true) {
-								goto('/account_creation');
-							}
-						}
-					} catch (error) {
-						location.replace('/');
-					}
-				}
-			}
-		}
+	onMount(() => {
+		initializeAuthenticationAndFetchProfile();
 	});
 
-	async function handleAuth() {
+	async function initializeAuthenticationAndFetchProfile() {
+		try {
+			await init_auth();
+			await fetchAndSetProfile();
+		} catch (error) {
+			console.error('Initialization or Profile Fetch Failed: ', error);
+			goto('/');
+		}
+	}
+
+	async function fetchAndSetProfile() {
 		await auth.username_registry();
-		const { ok: username_info } = await $actor_username_registry.actor.get_username_info(
-			$page.params.username
-		);
+
+		if (!$actor_username_registry.loggedIn) return;
+
+		const { ok: username_info, err: err_username } =
+			await $actor_username_registry.actor.get_info();
+		if (!username_info) return goto('/account_creation');
 
 		await auth.creator(username_info.canister_id);
+		if (!$actor_creator.loggedIn) return;
 
-		console.log('$actor_creator.loggedIn: ', $actor_creator.loggedIn);
+		const { ok: profile, err: err_profile } = await $actor_creator.actor.get_profile_by_username(
+			username_info.username
+		);
+		if (profile) {
+			local_storage_profile.set({
+				avatar_url: get(profile, 'avatar.url', ''),
+				username: get(profile, 'username', '')
+			});
+		} else if (err_profile && err_profile['ProfileNotFound']) {
+			goto('/account_creation');
+		}
+	}
+
+	async function handleAuth() {
 		try {
-			if ($actor_creator.loggedIn) {
-				const { ok: profile, err: err_profile } =
-					await $actor_creator.actor.get_profile_by_username($page.params.username);
-
-				if (profile) {
-					local_storage_profile.set({
-						avatar_url: get(profile, 'avatar.url', ''),
-						username: get(profile, 'username', '')
-					});
-
-					await goto('/loading');
-
-					const path = get($page, 'url.pathname', `/${profile.username}`);
-					await goto(path);
-				}
-
-				if (err_profile) {
-					if (err_profile['ProfileNotFound'] === true) {
-						goto('/account_creation');
-					}
-				}
-			}
+			await fetchAndSetProfile();
+			goto(`/${$local_storage_profile.username}`);
 		} catch (error) {
-			console.log('error: ', error);
+			console.error('Auth Handle Error: ', error);
+			goto('/account_creation');
 		}
 	}
 
 	function login() {
+		const identityProviderUrl = isProd
+			? 'https://identity.ic0.app/#authorize'
+			: 'http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:8080/';
 		$auth_client.login({
-			identityProvider: isProd
-				? 'https://identity.ic0.app/#authorize'
-				: 'http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:8080/',
+			identityProvider: identityProviderUrl,
 			maxTimeToLive: BigInt(30 * 24 * 60 * 60 * 1000 * 1000 * 1000 * 1000),
 			onSuccess: handleAuth
 		});
