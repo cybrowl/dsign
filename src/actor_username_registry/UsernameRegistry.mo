@@ -22,6 +22,7 @@ actor UsernameRegistry = {
 	type Username = Text;
 	type UsernameInfo = {
 		canister_id : Text;
+		username : Text;
 	};
 	type ErrUsername = {
 		#CallerAnonymous : Bool;
@@ -69,8 +70,27 @@ actor UsernameRegistry = {
 		};
 	};
 
-	// Get Username Info
-	public query ({ caller }) func get_username_info(username : Username) : async Result.Result<UsernameInfo, ErrUsername> {
+	// Get Info
+	public query ({ caller }) func get_info() : async Result.Result<UsernameInfo, ErrUsername> {
+		switch (usernames.get(caller)) {
+			case (?username) {
+				switch (usernames_info.get(username)) {
+					case (?info) {
+						#ok(info);
+					};
+					case (_) {
+						#err(#UsernameNotFound(true));
+					};
+				};
+			};
+			case (_) {
+				#err(#UserPrincipalNotFound(true));
+			};
+		};
+	};
+
+	// Get Info by Username
+	public query ({ caller }) func get_info_by_username(username : Username) : async Result.Result<UsernameInfo, ErrUsername> {
 		switch (usernames_info.get(username)) {
 			case (?info) {
 				#ok(info);
@@ -133,6 +153,7 @@ actor UsernameRegistry = {
 			case (#ok _) {
 				let username_info : UsernameInfo = {
 					canister_id = creator_canister_id;
+					username = username;
 				};
 
 				usernames.put(caller, username);

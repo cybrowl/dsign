@@ -88,9 +88,9 @@ test('UsernameRegistry[mishicat].get_username(): with invalid principal => #err 
 	t.deepEqual(err_username, { UserPrincipalNotFound: true });
 });
 
-test('UsernameRegistry[mishicat].get_username_info(): with invalid unsername => #err - UsernameNotFound', async function (t) {
+test('UsernameRegistry[mishicat].get_info_by_username(): with invalid unsername => #err - UsernameNotFound', async function (t) {
 	const { ok: _, err: err_username } =
-		await username_registry_actor.mishicat.get_username_info('mishicat');
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
 
 	t.deepEqual(err_username, { UsernameNotFound: true });
 });
@@ -131,7 +131,7 @@ test('UsernameRegistry[mishicat].create_profile(): with taken username => #ok - 
 
 test('Creator[mishicat].total_users(): => #ok - NumberOfUsers', async function (t) {
 	const { ok: username_info, err: _ } =
-		await username_registry_actor.mishicat.get_username_info('mishicat');
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
 
 	const creator_actor_mishicat = await get_actor(
 		username_info.canister_id,
@@ -146,7 +146,7 @@ test('Creator[mishicat].total_users(): => #ok - NumberOfUsers', async function (
 
 test('Creator[mishicat].get_profile_by_username(): with valid username & owner => #ok - Profile', async function (t) {
 	const { ok: username_info, err: _ } =
-		await username_registry_actor.mishicat.get_username_info('mishicat');
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
 
 	// Assuming 'mishicat' is a valid username that was previously created
 	const validUsername = 'mishicat';
@@ -181,7 +181,7 @@ test('Creator[mishicat].get_profile_by_username(): with valid username & owner =
 
 test('Creator[mishicat].get_profile_by_username(): with valid username & NOT owner => #ok - Profile', async function (t) {
 	const { ok: username_info, err: _ } =
-		await username_registry_actor.mishicat.get_username_info('mishicat');
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
 
 	// Switch the identity to simulate a different user (not owner)
 	// For this example, assume `mishicat_identity` represents the owner
@@ -218,7 +218,7 @@ test('Creator[mishicat].get_profile_by_username(): with valid username & NOT own
 
 test('Creator[mishicat].get_profile_by_username(): with invalid username => #err - ProfileNotFound', async function (t) {
 	const { ok: username_info, err: _err } =
-		await username_registry_actor.mishicat.get_username_info('mishicat');
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
 
 	// Assuming 'nonexistentuser' is a username that does not exist
 	const invalidUsername = 'nonexistentuser';
@@ -240,7 +240,7 @@ test('Creator[mishicat].get_profile_by_username(): with invalid username => #err
 
 test('Creator[mishicat].get_canister_id(): => #ok - Canister ID', async function (t) {
 	const { ok: username_info, err: _err } =
-		await username_registry_actor.mishicat.get_username_info('mishicat');
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
 
 	const creator_actor_mishicat = await get_actor(
 		username_info.canister_id,
@@ -259,7 +259,7 @@ test('Creator[mishicat].get_canister_id(): => #ok - Canister ID', async function
 
 test('Creator[mishicat].get_canister_id(): => #ok - Format Check', async function (t) {
 	const { ok: username_info, err: _err } =
-		await username_registry_actor.mishicat.get_username_info('mishicat');
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
 
 	const creator_actor_mishicat = await get_actor(
 		username_info.canister_id,
