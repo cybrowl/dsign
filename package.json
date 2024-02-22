@@ -19,7 +19,7 @@
 		"user_interface": "sh ./scripts/deploy/user_interface.sh",
 		"deploy_all": "npm run deploy_favorites && npm run deploy_profile && npm run deploy_projects && npm run deploy_snaps && npm run user_interface",
 		"test-all": "bash ./scripts/test-all.sh",
-		"test-config": "tape test-env/dfx.config.test.cjs",
+		"test-config": "tape test_e2e/dfx.config.test.cjs",
 		"test-pc": "npm run generate_test_interface && tape test_e2e/profile_creation.test.cjs"
 	},
 	"dependencies": {
