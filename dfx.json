@@ -106,6 +106,16 @@
 			"main": "src/actor_username_registry/UsernameRegistry.mo",
 			"type": "motoko",
 			"dependencies": ["logger"]
+		},
+		"file_storage": {
+			"main": "src/actor_file_storage/FileStorage.mo",
+			"type": "motoko",
+			"dependencies": ["logger"]
+		},
+		"file_scaling_manager": {
+			"main": "src/actor_file_storage/FileScalingManager.mo",
+			"type": "motoko",
+			"dependencies": ["logger"]
 		}
 	},
 	"defaults": {
