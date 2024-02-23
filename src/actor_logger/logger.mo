@@ -11,15 +11,14 @@ import Time "mo:base/Time";
 import Timer "mo:base/Timer";
 import Result "mo:base/Result";
 
-import CanisterIdsLedger "canister:canister_ids_ledger";
-import CanisterLedgerTypes "../types/canidster_ids_ledger.types";
+import Types "./types";
 
-import UtilsShared "../utils/utils";
+import Health "../libs/health";
 
 actor Logger {
 	public type Tags = [(Text, Text)];
 	public type Message = Text;
-	type CanisterInfo = CanisterLedgerTypes.CanisterInfo;
+	type CanisterInfo = Types.CanisterInfo;
 
 	type AuthorizationError = { #NotAuthorized : Bool };
 
@@ -58,11 +57,7 @@ actor Logger {
 	};
 
 	public shared ({ caller }) func log_event(tags : Tags, message : Message) : async () {
-		let authorized = await CanisterIdsLedger.canister_exists(Principal.toText(caller));
-
-		if (authorized == false) {
-			return ();
-		};
+		//TODO: gate this func with some auth
 
 		let logger_principal = Principal.fromActor(Logger);
 
@@ -134,9 +129,9 @@ actor Logger {
 			("method", "health"),
 			("logs_pending_size", Int.toText(logs_pending.size())),
 			("logs_storage_size", Int.toText(logs_storage.size())),
-			("cycles_balance", Int.toText(UtilsShared.get_cycles_balance())),
-			("memory_in_mb", Int.toText(UtilsShared.get_memory_in_mb())),
-			("heap_in_mb", Int.toText(UtilsShared.get_heap_in_mb()))
+			("cycles_balance", Int.toText(Health.get_cycles_balance())),
+			("memory_in_mb", Int.toText(Health.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(Health.get_heap_in_mb()))
 		];
 
 		ignore log_event(
@@ -148,7 +143,7 @@ actor Logger {
 	};
 
 	public query func cycles_low() : async Bool {
-		return UtilsShared.get_cycles_low();
+		return Health.get_cycles_low();
 	};
 
 	// ------------------------- System Methods -------------------------

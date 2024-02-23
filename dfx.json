@@ -21,19 +21,15 @@
 			"optimize": "cycles",
 			"type": "assets"
 		},
-		"canister_ids_ledger": {
-			"main": "src/service_canister_ids_ledger/CanisterIdsLedger.mo",
-			"type": "motoko"
-		},
 		"explore": {
-			"main": "src/service_explore/Explore.mo",
+			"main": "src/actor_explore/Explore.mo",
 			"type": "motoko",
-			"dependencies": ["logger", "canister_ids_ledger"]
+			"dependencies": ["logger"]
 		},
 		"logger": {
-			"main": "src/service_logger/logger.mo",
+			"main": "src/actor_logger/logger.mo",
 			"type": "motoko",
-			"dependencies": ["canister_ids_ledger"]
+			"dependencies": []
 		},
 		"creator": {
 			"main": "src/actor_creator/Creator.mo",
