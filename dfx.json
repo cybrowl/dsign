@@ -21,16 +21,6 @@
 			"optimize": "cycles",
 			"type": "assets"
 		},
-		"assets_file_staging": {
-			"main": "src/service_assets/FileAssetChunksStaging.mo",
-			"type": "motoko",
-			"dependencies": ["logger", "canister_ids_ledger"]
-		},
-		"assets_img_staging": {
-			"main": "src/service_assets_img/ImageAssetStaging.mo",
-			"type": "motoko",
-			"dependencies": ["logger"]
-		},
 		"canister_ids_ledger": {
 			"main": "src/service_canister_ids_ledger/CanisterIdsLedger.mo",
 			"type": "motoko"
@@ -40,62 +30,10 @@
 			"type": "motoko",
 			"dependencies": ["logger", "canister_ids_ledger"]
 		},
-		"favorite_main": {
-			"main": "src/service_favorites/FavoriteMain.mo",
-			"type": "motoko",
-			"dependencies": ["canister_ids_ledger", "logger", "profile"]
-		},
-		"profile": {
-			"main": "src/service_profile/Profile.mo",
-			"type": "motoko",
-			"dependencies": ["assets_img_staging", "canister_ids_ledger", "logger"]
-		},
-		"project_main": {
-			"main": "src/service_projects/ProjectMain.mo",
-			"type": "motoko",
-			"dependencies": ["explore", "canister_ids_ledger", "logger", "profile"]
-		},
-		"snap_main": {
-			"main": "src/service_snaps/SnapMain.mo",
-			"type": "motoko",
-			"dependencies": [
-				"assets_file_staging",
-				"assets_img_staging",
-				"canister_ids_ledger",
-				"explore",
-				"logger",
-				"profile"
-			]
-		},
 		"logger": {
 			"main": "src/service_logger/logger.mo",
 			"type": "motoko",
 			"dependencies": ["canister_ids_ledger"]
-		},
-		"test_assets": {
-			"main": "src/service_assets/Assets.mo",
-			"type": "motoko",
-			"dependencies": ["logger", "assets_file_staging"]
-		},
-		"test_favorite": {
-			"main": "src/service_favorites/Favorite.mo",
-			"type": "motoko",
-			"dependencies": ["logger"]
-		},
-		"test_image_assets": {
-			"main": "src/service_assets_img/ImageAssets.mo",
-			"type": "motoko",
-			"dependencies": ["logger", "assets_img_staging"]
-		},
-		"test_project": {
-			"main": "src/service_projects/Project.mo",
-			"type": "motoko",
-			"dependencies": ["explore", "logger", "profile"]
-		},
-		"test_snap": {
-			"main": "src/service_snaps/Snap.mo",
-			"type": "motoko",
-			"dependencies": ["explore", "logger", "profile"]
 		},
 		"creator": {
 			"main": "src/actor_creator/Creator.mo",
@@ -130,6 +68,6 @@
 			"type": "persistent"
 		}
 	},
-	"dfx": "0.15.1",
+	"dfx": "0.17.0",
 	"version": 1
 }

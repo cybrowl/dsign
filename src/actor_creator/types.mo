@@ -2,8 +2,6 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 
 // import ICInterfaceTypes "../types/ic.types";
-import ImgAssetTypes "../service_assets_img/types";
-import AssetTypes "../service_assets/types";
 
 module {
 	public type CanisterID = Text;
@@ -15,13 +13,6 @@ module {
 	public type UserPrincipal = Principal;
 
 	// public type ICInterface = ICInterfaceTypes.Self;
-	// public type ImageAssetsActor = ImgAssetTypes.ImageAssetsActor;
-
-	// Asset
-	public type AssetRef = AssetTypes.AssetRef;
-
-	// Images
-	public type ImageRef = ImgAssetTypes.ImageRef;
 
 	// Profile
 	public type Profile = {
@@ -139,9 +130,9 @@ module {
 		tags : [Text];
 		username : Username;
 		owner : UserPrincipal;
-		file_asset : AssetRef;
+		file_asset : Bool;
 		image_cover_location : Nat8;
-		images : [ImageRef];
+		images : [Bool];
 		project_ref : ProjectRef;
 		metrics : {
 			likes : Nat;

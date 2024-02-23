@@ -1,16 +1,4 @@
 {
-	"assets_file_staging": {
-		"ic": "jfpyd-maaaa-aaaag-aatxq-cai",
-		"staging": "euext-7yaaa-aaaag-abqhq-cai"
-	},
-	"assets_img_staging": {
-		"ic": "jlnvl-xqaaa-aaaag-aatwq-cai",
-		"staging": "gh3ut-xaaaa-aaaag-abqja-cai"
-	},
-	"canister_ids_ledger": {
-		"ic": "k25dy-3yaaa-aaaag-abcpa-cai",
-		"staging": "etfrh-saaaa-aaaag-abqha-cai"
-	},
 	"creator": {
 		"ic": "g5iz5-syaaa-aaaag-ahk6a-cai"
 	},
@@ -18,48 +6,12 @@
 		"ic": "72zia-7aaaa-aaaag-aa37a-cai",
 		"staging": "ga2sh-2yaaa-aaaag-abqjq-cai"
 	},
-	"favorite_main": {
-		"ic": "a7b5k-xiaaa-aaaag-aa6ja-cai",
-		"staging": "gv5dk-3qaaa-aaaag-abqka-cai"
-	},
 	"internet_identity": {
 		"staging": "7cyr3-vaaaa-aaaag-acjpa-cai"
 	},
 	"logger": {
 		"ic": "jaypp-oiaaa-aaaag-aaa6q-cai",
 		"staging": "goy7p-biaaa-aaaag-abqiq-cai"
-	},
-	"profile": {
-		"ic": "kxkd5-7qaaa-aaaag-aaawa-cai",
-		"staging": "gs4f6-wiaaa-aaaag-abqkq-cai"
-	},
-	"project_main": {
-		"ic": "nhlnj-vyaaa-aaaag-aay5q-cai",
-		"staging": "g37oc-aaaaa-aaaag-abqla-cai"
-	},
-	"snap_main": {
-		"ic": "lyswl-7iaaa-aaaag-aatya-cai",
-		"staging": "g46iw-nyaaa-aaaag-abqlq-cai"
-	},
-	"test_assets": {
-		"ic": "k367n-lqaaa-aaaag-aat6q-cai",
-		"staging": "hdw3b-oaaaa-aaaag-abqpa-cai"
-	},
-	"test_favorite": {
-		"ic": "mjsqf-ciaaa-aaaag-aa7ha-cai",
-		"staging": "h7sbq-zaaaa-aaaag-abqna-cai"
-	},
-	"test_image_assets": {
-		"ic": "k47zz-giaaa-aaaag-aat6a-cai",
-		"staging": "hrqmy-cqaaa-aaaag-abqma-cai"
-	},
-	"test_project": {
-		"ic": "75you-syaaa-aaaag-aa37q-cai",
-		"staging": "hnuwj-vqaaa-aaaag-abqoa-cai"
-	},
-	"test_snap": {
-		"ic": "nakl5-yaaaa-aaaag-aay5a-cai",
-		"staging": "hex5v-dyaaa-aaaag-abqpq-cai"
 	},
 	"ui": {
 		"ic": "kqlfj-siaaa-aaaag-aaawq-cai",
