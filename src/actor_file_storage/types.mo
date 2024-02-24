@@ -44,7 +44,7 @@ module {
 		url : Text;
 	};
 
-	public type Health = {
+	public type Status = {
 		cycles : Int;
 		memory_mb : Int;
 		heap_mb : Int;
@@ -56,7 +56,7 @@ module {
 		id : Text;
 		name : Text;
 		parent_name : Text;
-		health : ?Health;
+		status : ?Status;
 	};
 
 	type HeaderField = (Text, Text);
@@ -112,6 +112,6 @@ module {
 
 	public type FileStorageActor = actor {
 		is_full : shared () -> async Bool;
-		get_health : query () -> async Health;
+		get_status : query () -> async Status;
 	};
 };

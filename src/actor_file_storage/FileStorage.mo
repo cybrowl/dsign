@@ -30,7 +30,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	type ChunkInfo = Types.ChunkInfo;
 	type ErrCommitBatch = Types.ErrCommitBatch;
 	type ErrDeleteAsset = Types.ErrDeleteAsset;
-	type Health = Types.Health;
+	type Status = Types.Status;
 
 	let ACTOR_NAME : Text = "FileStorage";
 	let VERSION : Nat = 1;
@@ -210,8 +210,8 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		};
 	};
 
-	public query func get_health() : async Health {
-		let health : Health = {
+	public query func get_status() : async Status {
+		let health : Status = {
 			cycles = Utils.get_cycles_balance();
 			memory_mb = Utils.get_memory_in_mb();
 			heap_mb = Utils.get_heap_in_mb();
