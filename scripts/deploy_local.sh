@@ -31,6 +31,3 @@ dfx deploy file_storage --argument='(false, "8080")'
 # File Scaling
 dfx deploy file_scaling_manager --argument='(false, "8080")'
 
-# UI
-# dfx deploy ui
-
