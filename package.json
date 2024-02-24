@@ -12,12 +12,10 @@
 		"lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
 		"logs": "npm run idl_for_testing && tape test-utils/debug/debug.test.cjs",
 		"deploy": "sh ./scripts/deploy_local.sh",
-		"user_interface": "sh ./scripts/deploy/user_interface.sh",
-		"deploy_all": "npm run deploy_favorites && npm run deploy_profile && npm run deploy_projects && npm run deploy_snaps && npm run user_interface",
 		"test-all": "bash ./scripts/test-all.sh",
 		"test-config": "tape test_e2e/dfx.config.test.cjs",
 		"test-pc": "npm run idl_for_testing && tape test_e2e/profile_creation.test.cjs",
-		"test-im": "npm run idl_for_testing && tape test_e2e/profile_images.test.cjs"
+		"test-pi": "npm run idl_for_testing && tape test_e2e/profile_images.test.cjs"
 	},
 	"dependencies": {
 		"dotenv": "^16.0.3",

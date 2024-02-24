@@ -2,6 +2,7 @@ import Cycles "mo:base/ExperimentalCycles";
 import Iter "mo:base/Iter";
 import Map "mo:map/Map";
 import Principal "mo:base/Principal";
+import Result "mo:base/Result";
 import Time "mo:base/Time";
 import Timer "mo:base/Timer";
 
@@ -15,6 +16,7 @@ import Utils "./utils";
 actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	type CanisterInfo = Types.CanisterInfo;
 	type Status = Types.Status;
+	type ErrInit = Types.ErrInit;
 
 	type FileStorageActor = Types.FileStorageActor;
 	type ManagementActor = TypesIC.Self;
@@ -54,31 +56,19 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 		};
 	};
 
-	public shared ({ caller }) func init() : async Text {
-		if (file_storage_canister_id == "") {
-			await create_file_storage_canister();
-
-			let settings = {
-				controllers = ?[caller, Principal.fromActor(this)];
-				freezing_threshold = ?2_592_000;
-				memory_allocation = ?0;
-				compute_allocation = ?0;
-			};
-
-			ignore management_actor.update_settings({
-				canister_id = Principal.fromText(file_storage_canister_id);
-				settings = settings;
-			});
-
-			return "Created: " # file_storage_canister_id;
-		};
-
-		return "Exists: " # file_storage_canister_id;
-	};
-
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	public shared ({ caller }) func init() : async Result.Result<Text, ErrInit> {
+		if (file_storage_canister_id.size() > 3) {
+			#err(#FileStorageCanisterIdExists(true));
+		} else {
+			await create_file_storage_canister();
+
+			return #ok(file_storage_canister_id);
+		};
 	};
 
 	// ------------------------- Private Methods -------------------------

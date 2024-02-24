@@ -105,6 +105,10 @@ module {
 		#ChecksumInvalid : Bool;
 	};
 
+	public type ErrInit = {
+		#FileStorageCanisterIdExists : Bool;
+	};
+
 	public type ErrDeleteFile = {
 		#FileNotFound : Bool;
 		#NotAuthorized : Bool;
