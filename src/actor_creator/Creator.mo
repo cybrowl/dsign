@@ -167,7 +167,7 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// TODO: WARNING
-	// Assets need to be handled, it is needed for avatars, banners, snaps (images and files)
+	// File Storage needs to be handled, it is needed for avatars, banners, snaps (images and files)
 
 	// Update Profile Avatar
 	public shared ({ caller }) func update_profile_avatar(username : Username) : async Result.Result<Text, Text> {

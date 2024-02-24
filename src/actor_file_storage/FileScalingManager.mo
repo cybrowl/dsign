@@ -14,7 +14,7 @@ import Utils "./utils";
 actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	let ACTOR_NAME : Text = "FileScalingManager";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 3;
+	let VERSION : Nat = 1;
 
 	type CanisterInfo = Types.CanisterInfo;
 	type FileStorageActor = Types.FileStorageActor;
