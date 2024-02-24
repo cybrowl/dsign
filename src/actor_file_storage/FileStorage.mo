@@ -22,56 +22,37 @@ import Types "./types";
 import Utils "./utils";
 
 actor class FileStorage(is_prod : Bool, port : Text) = this {
-	type Asset = Types.Asset;
-	type Asset_ID = Types.Asset_ID;
-	type AssetChunk = Types.AssetChunk;
-	type AssetProperties = Types.AssetProperties;
+	let { thash; nhash } = Map;
 	type Chunk_ID = Types.Chunk_ID;
 	type ChunkInfo = Types.ChunkInfo;
-	type ErrCommitBatch = Types.ErrCommitBatch;
-	type ErrDeleteAsset = Types.ErrDeleteAsset;
+	type ErrCreateFile = Types.ErrCreateFile;
+	type ErrDeleteFile = Types.ErrDeleteFile;
+	type File = Types.File;
+	type File_ID = Types.File_ID;
+	type FileChunk = Types.FileChunk;
+	type FileProperties = Types.FileProperties;
 	type Status = Types.Status;
 
+	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "FileStorage";
 	let VERSION : Nat = 1;
 	stable var timer_id : Nat = 0;
-
-	let { thash; nhash } = Map;
-
-	private var assets = Map.new<Asset_ID, Asset>();
-	private var chunks = Map.new<Chunk_ID, AssetChunk>();
-
-	stable var assets_stable_storage : [(Asset_ID, Asset)] = [];
-	stable var chunks_stable_storage : [(Chunk_ID, AssetChunk)] = [];
-
 	private var chunk_id_count : Chunk_ID = 0;
 
-	private func clear_expired_chunks() : async () {
-		let currentTime = Time.now();
-		let fiveMinutes = 5 * 60 * 1000000000; // Convert 5 minutes to nanoseconds
+	// ------------------------- Storage Data -------------------------
+	private var chunks = Map.new<Chunk_ID, FileChunk>();
+	stable var chunks_stable_storage : [(Chunk_ID, FileChunk)] = [];
 
-		let filteredChunks = Map.mapFilter<Chunk_ID, AssetChunk, AssetChunk>(
-			chunks,
-			nhash,
-			func(key : Chunk_ID, assetChunk : AssetChunk) : ?AssetChunk {
-				let age = currentTime - assetChunk.created;
-				if (age <= fiveMinutes) {
-					return ?assetChunk;
-				} else {
-					return null;
-				};
-			}
-		);
+	private var files = Map.new<File_ID, File>();
+	stable var files_stable_storage : [(File_ID, File)] = [];
 
-		chunks := filteredChunks;
-	};
-
+	// ------------------------- Files -------------------------
 	public shared ({ caller }) func create_chunk(content : Blob, order : Nat) : async Nat {
 		chunk_id_count := chunk_id_count + 1;
 
 		let checksum = Nat32.toNat(ofBlob(content));
 
-		let asset_chunk : AssetChunk = {
+		let file_chunk : FileChunk = {
 			checksum = checksum;
 			content = content;
 			created = Time.now();
@@ -81,13 +62,13 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 			owner = caller;
 		};
 
-		ignore Map.put(chunks, nhash, chunk_id_count, asset_chunk);
+		ignore Map.put(chunks, nhash, chunk_id_count, file_chunk);
 
 		return chunk_id_count;
 	};
 
-	public shared ({ caller }) func commit_batch(chunk_ids : [Nat], asset_properties : AssetProperties) : async Result.Result<Asset_ID, ErrCommitBatch> {
-		let asset_id = Utils.generate_uuid();
+	public shared ({ caller }) func create_file_from_chunks(chunk_ids : [Nat], properties : FileProperties) : async Result.Result<File_ID, ErrCreateFile> {
+		let file_id = Utils.generate_uuid();
 		let canister_id = Principal.toText(Principal.fromActor(this));
 
 		var chunks_to_commit = Buffer<ChunkInfo>(0);
@@ -108,8 +89,8 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		chunks_to_commit.sort(Utils.compare);
 
 		let modulo_value : Nat = 400_000_000;
-		var asset_content = Buffer<Blob>(0);
-		var asset_checksum : Nat = 0;
+		var file_content = Buffer<Blob>(0);
+		var file_checksum : Nat = 0;
 		var content_size = 0;
 
 		// Accumulate content and compute checksum
@@ -119,8 +100,8 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 					if (chunk.owner != caller) {
 						return #err(#ChunkOwnerInvalid(true));
 					} else {
-						asset_content.add(chunk.content);
-						asset_checksum := (asset_checksum + chunk.checksum) % modulo_value;
+						file_content.add(chunk.content);
+						file_checksum := (file_checksum + chunk.checksum) % modulo_value;
 						content_size := content_size + chunk.content.size();
 					};
 				};
@@ -131,7 +112,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		};
 
 		// Verify checksum
-		if (Nat.notEqual(asset_checksum, asset_properties.checksum)) {
+		if (Nat.notEqual(file_checksum, properties.checksum)) {
 			return #err(#ChecksumInvalid(true));
 		};
 
@@ -140,19 +121,19 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 			Map.delete(chunks, nhash, id);
 		};
 
-		// Create and insert new asset
-		let asset : Types.Asset = {
+		// Create and insert new file
+		let file : Types.File = {
 			canister_id = canister_id;
-			chunks_size = asset_content.size();
-			content = Option.make(toArray(asset_content));
-			content_encoding = asset_properties.content_encoding;
+			chunks_size = file_content.size();
+			content = Option.make(toArray(file_content));
+			content_encoding = properties.content_encoding;
 			content_size = content_size;
-			content_type = asset_properties.content_type;
+			content_type = properties.content_type;
 			created = Time.now();
-			filename = asset_properties.filename;
-			id = asset_id;
-			url = Utils.generate_asset_url({
-				asset_id = asset_id;
+			filename = properties.filename;
+			id = file_id;
+			url = Utils.generate_file_url({
+				file_id = file_id;
 				canister_id = canister_id;
 				is_prod = is_prod;
 				port = port;
@@ -160,65 +141,65 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 			owner = Principal.toText(caller);
 		};
 
-		ignore Map.put(assets, thash, asset_id, asset);
-		return #ok(asset.id);
+		ignore Map.put(files, thash, file_id, file);
+		return #ok(file.id);
 	};
 
-	public shared ({ caller }) func delete_asset(id : Asset_ID) : async Result.Result<Text, ErrDeleteAsset> {
-		switch (Map.get(assets, thash, id)) {
-			case (?asset) {
-				if (asset.owner == Principal.toText(caller)) {
-					Map.delete(assets, thash, id);
+	public shared ({ caller }) func delete_file(id : File_ID) : async Result.Result<Text, ErrDeleteFile> {
+		switch (Map.get(files, thash, id)) {
+			case (?file) {
+				if (file.owner == Principal.toText(caller)) {
+					Map.delete(files, thash, id);
 
-					return #ok("Deleted Asset");
+					return #ok("Deleted File");
 				} else {
 					return #err(#NotAuthorized(true));
 				};
 			};
 			case (_) {
-				return #err(#AssetNotFound(true));
+				return #err(#FileNotFound(true));
 			};
 		};
 	};
 
-	public query func get_all_assets() : async [Asset] {
-		var assets_list = Buffer<Asset>(0);
+	public query func get_all_files() : async [File] {
+		var files_updated = Buffer<File>(0);
 
-		for (asset in Map.vals(assets)) {
-			let asset_without_content : Asset = {
-				asset with content = null;
+		for (file in Map.vals(files)) {
+			let file_without_content : File = {
+				file with content = null;
 			};
 
-			assets_list.add(asset_without_content);
+			files_updated.add(file_without_content);
 		};
 
-		return toArray(assets_list);
+		return toArray(files_updated);
 	};
 
-	public query func get(id : Asset_ID) : async Result.Result<Asset, Text> {
-		switch (Map.get(assets, thash, id)) {
-			case (?asset) {
-				let asset_without_content : Asset = {
-					asset with content = null;
+	public query func get(id : File_ID) : async Result.Result<File, Text> {
+		switch (Map.get(files, thash, id)) {
+			case (?file) {
+				let file_without_content : File = {
+					file with content = null;
 				};
 
-				return #ok(asset_without_content);
+				return #ok(file_without_content);
 			};
 			case (_) {
-				return #err("Asset Not Found");
+				return #err("File Not Found");
 			};
 		};
 	};
 
 	public query func get_status() : async Status {
-		let health : Status = {
+		let status : Status = {
 			cycles = Utils.get_cycles_balance();
 			memory_mb = Utils.get_memory_in_mb();
 			heap_mb = Utils.get_heap_in_mb();
-			assets_size = Map.size(assets);
+			files_size = Map.size(files);
 		};
 
-		return health;
+		return status;
 	};
 
 	public query func chunks_size() : async Nat {
@@ -239,29 +220,29 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		};
 	};
 
-	// ------------------------- Get Asset HTTP -------------------------
+	// ------------------------- Get File HTTP -------------------------
 	public shared query ({ caller }) func http_request(request : Types.HttpRequest) : async Types.HttpResponse {
-		let NOT_FOUND : [Nat8] = Blob.toArray(Text.encodeUtf8("Asset Not Found"));
+		let NOT_FOUND : [Nat8] = Blob.toArray(Text.encodeUtf8("File Not Found"));
 
-		let asset_id = Utils.get_asset_id(request.url);
+		let file_id = Utils.get_file_id(request.url);
 
-		switch (Map.get(assets, thash, asset_id)) {
-			case (?asset) {
-				let filename = Text.concat("attachment; filename=", asset.filename);
+		switch (Map.get(files, thash, file_id)) {
+			case (?file) {
+				let filename = Text.concat("attachment; filename=", file.filename);
 
 				return {
-					body = Blob.toArray(Option.get(asset.content, [])[0]);
+					body = Blob.toArray(Option.get(file.content, [])[0]);
 					headers = [
-						("Content-Type", asset.content_type),
+						("Content-Type", file.content_type),
 						("accept-ranges", "bytes"),
 						("Content-Disposition", filename),
 						("cache-control", "private, max-age=0")
 					];
 					status_code = 200;
 					streaming_strategy = create_strategy({
-						asset_id = asset_id;
+						file_id = file_id;
 						chunk_index = 0;
-						data_chunks_size = asset.chunks_size;
+						data_chunks_size = file.chunks_size;
 					});
 				};
 			};
@@ -299,7 +280,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 			return null;
 		} else {
 			let token = {
-				asset_id = args.asset_id;
+				file_id = args.file_id;
 				chunk_index = args.chunk_index + 1;
 				content_encoding = "gzip";
 			};
@@ -311,16 +292,16 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	public shared query ({ caller }) func http_request_streaming_callback(
 		st : Types.StreamingCallbackToken
 	) : async Types.StreamingCallbackHttpResponse {
-		switch (Map.get(assets, thash, st.asset_id)) {
-			case (null) throw Error.reject("asset_id not found: " # st.asset_id);
-			case (?asset) {
+		switch (Map.get(files, thash, st.file_id)) {
+			case (null) throw Error.reject("file_id not found: " # st.file_id);
+			case (?file) {
 				return {
 					token = create_token({
-						asset_id = st.asset_id;
+						file_id = st.file_id;
 						chunk_index = st.chunk_index;
-						data_chunks_size = asset.chunks_size;
+						data_chunks_size = file.chunks_size;
 					});
-					body = Option.get(asset.content, [])[st.chunk_index];
+					body = Option.get(file.content, [])[st.chunk_index];
 				};
 			};
 		};
@@ -331,17 +312,38 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		return VERSION;
 	};
 
+	// ------------------------- Private Methods -------------------------
+	private func clear_expired_chunks() : async () {
+		let current_time = Time.now();
+		let five_minutes = 5 * 60 * 1000000000; // Convert 5 minutes to nanoseconds
+
+		let filtered_chunks = Map.mapFilter<Chunk_ID, FileChunk, FileChunk>(
+			chunks,
+			nhash,
+			func(key : Chunk_ID, file_chunk : FileChunk) : ?FileChunk {
+				let age = current_time - file_chunk.created;
+				if (age <= five_minutes) {
+					return ?file_chunk;
+				} else {
+					return null;
+				};
+			}
+		);
+
+		chunks := filtered_chunks;
+	};
+
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
-		assets_stable_storage := Iter.toArray(Map.entries(assets));
+		files_stable_storage := Iter.toArray(Map.entries(files));
 		chunks_stable_storage := Iter.toArray(Map.entries(chunks));
 	};
 
 	system func postupgrade() {
-		assets := Map.fromIter<Asset_ID, Asset>(assets_stable_storage.vals(), thash);
+		files := Map.fromIter<File_ID, File>(files_stable_storage.vals(), thash);
 
 		ignore Timer.recurringTimer(#seconds(300), clear_expired_chunks);
 
-		assets_stable_storage := [];
+		files_stable_storage := [];
 	};
 };

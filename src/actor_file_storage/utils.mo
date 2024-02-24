@@ -20,7 +20,7 @@ module {
 	type ChunkInfo = Types.ChunkInfo;
 
 	private type GenerateAssetUrlArgs = {
-		asset_id : Text;
+		file_id : Text;
 		canister_id : Text;
 		is_prod : Bool;
 		port : Text;
@@ -28,7 +28,7 @@ module {
 
 	let { hashNat } = Map;
 
-	public func get_asset_id(url : Text) : Text {
+	public func get_file_id(url : Text) : Text {
 		let urlSplitByPath : [Text] = Iter.toArray(Text.tokens(url, #char '/'));
 		let lastElem : Text = urlSplitByPath[urlSplitByPath.size() - 1];
 		let filterByQueryString : [Text] = Iter.toArray(Text.tokens(lastElem, #char '?'));
@@ -36,16 +36,16 @@ module {
 		return filterByQueryString[0];
 	};
 
-	public func generate_asset_url(args : GenerateAssetUrlArgs) : Text {
+	public func generate_file_url(args : GenerateAssetUrlArgs) : Text {
 		var url = Text.join(
 			"",
-			(["https://", args.canister_id, ".raw.icp0.io", "/asset/", args.asset_id].vals())
+			(["https://", args.canister_id, ".raw.icp0.io", "/file/", args.file_id].vals())
 		);
 
 		if (args.is_prod == false) {
 			url := Text.join(
 				"",
-				(["http://", args.canister_id, ".localhost:", args.port, "/asset/", args.asset_id].vals())
+				(["http://", args.canister_id, ".localhost:", args.port, "/file/", args.file_id].vals())
 			);
 		};
 

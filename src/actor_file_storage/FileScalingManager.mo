@@ -128,7 +128,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 						cycles = health.cycles;
 						memory_mb = health.memory_mb;
 						heap_mb = health.heap_mb;
-						assets_size = health.assets_size;
+						files_size = health.files_size;
 					};
 
 					let canister_record_updated : CanisterInfo = {

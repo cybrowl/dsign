@@ -3,10 +3,10 @@ import Result "mo:base/Result";
 import Nat "mo:base/Nat";
 
 module {
-	public type Asset_ID = Text;
+	public type File_ID = Text;
 	public type Chunk_ID = Nat;
 
-	public type AssetChunk = {
+	public type FileChunk = {
 		checksum : Nat;
 		content : Blob;
 		created : Int;
@@ -23,14 +23,14 @@ module {
 		#GZIP;
 	};
 
-	public type AssetProperties = {
+	public type FileProperties = {
 		content_encoding : ContentEncoding;
 		content_type : Text;
 		filename : Text;
 		checksum : Nat;
 	};
 
-	public type Asset = {
+	public type File = {
 		canister_id : Text;
 		chunks_size : Nat;
 		content : ?[Blob];
@@ -48,7 +48,7 @@ module {
 		cycles : Int;
 		memory_mb : Int;
 		heap_mb : Int;
-		assets_size : Int;
+		files_size : Int;
 	};
 
 	public type CanisterInfo = {
@@ -76,13 +76,13 @@ module {
 	};
 
 	public type CreateStrategyArgs = {
-		asset_id : Text;
+		file_id : File_ID;
 		chunk_index : Nat;
 		data_chunks_size : Nat;
 	};
 
 	public type StreamingCallbackToken = {
-		asset_id : Text;
+		file_id : File_ID;
 		chunk_index : Nat;
 		content_encoding : Text;
 	};
@@ -99,14 +99,14 @@ module {
 		token : ?StreamingCallbackToken;
 	};
 
-	public type ErrCommitBatch = {
+	public type ErrCreateFile = {
 		#ChunkOwnerInvalid : Bool;
 		#ChunkNotFound : Bool;
 		#ChecksumInvalid : Bool;
 	};
 
-	public type ErrDeleteAsset = {
-		#AssetNotFound : Bool;
+	public type ErrDeleteFile = {
+		#FileNotFound : Bool;
 		#NotAuthorized : Bool;
 	};
 
