@@ -1,13 +1,6 @@
-import Arr "mo:array/Array";
-import Array "mo:base/Array";
-import Buffer "mo:base/Buffer";
-import Debug "mo:base/Debug";
 import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Float "mo:base/Float";
-import HashMap "mo:base/HashMap";
-import Iter "mo:base/Iter";
 import Prim "mo:⛔";
-import Text "mo:base/Text";
 
 module {
 	public func get_memory_in_mb() : Int {

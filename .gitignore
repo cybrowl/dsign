@@ -28,3 +28,5 @@ package-lock.json
 # debug
 npm-debug.log*
 
+
+.mops

@@ -54,8 +54,7 @@
 	},
 	"defaults": {
 		"build": {
-			"args": "",
-			"packtool": "vessel sources"
+			"packtool": "mops sources"
 		}
 	},
 	"networks": {

@@ -25,6 +25,12 @@ export USERNAME_REGISTRY_PRINCIPAL=$(dfx canister id username_registry)
 # Creator
 dfx deploy creator --argument='(principal "'${USERNAME_REGISTRY_PRINCIPAL}'")'
 
+# File Storage
+dfx deploy file_storage --argument='(false, "8080")'
+
+# File Scaling
+dfx deploy file_scaling_manager --argument='(false, "8080")'
+
 # UI
-dfx deploy ui
+# dfx deploy ui
 

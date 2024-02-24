@@ -1,4 +1,4 @@
-actor Logger {
+actor Explore {
 	let VERSION = 1;
 
 	// ------------------------- Canister Management -------------------------
