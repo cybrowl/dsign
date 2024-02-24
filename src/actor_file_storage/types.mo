@@ -51,7 +51,7 @@ module {
 		files_size : Int;
 	};
 
-	public type CanisterInfo = {
+	public type FileStorageInfo = {
 		created : Int;
 		id : Text;
 		name : Text;

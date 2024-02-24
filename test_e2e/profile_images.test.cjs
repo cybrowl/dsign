@@ -92,8 +92,19 @@ test('FileScalingManager[mishicat].init(): => #err - FileStorageCanisterIdExists
 	t.end();
 });
 
-test('FileScalingManager[mishicat].get_file_storage_canister_id(): => #ok - CanisterId', async function (t) {
-	const canister_id = await file_scaling_manager_actor.mishicat.get_file_storage_canister_id();
+test('FileScalingManager[mishicat].get_current_canister_id(): => #ok - CanisterId', async function (t) {
+	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
+
+	// Example regex for basic validation, adjust according to your expected format
+	const pattern = /^[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[cai]{3}$/;
+	const isValidFormat = pattern.test(canister_id);
+
+	t.ok(isValidFormat, `Canister ID "${canister_id}" matches the expected format`);
+	t.end();
+});
+
+test('FileScalingManager[mishicat].get_current_canister_id(): => #ok - CanisterId', async function (t) {
+	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
 
 	// Example regex for basic validation, adjust according to your expected format
 	const pattern = /^[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[cai]{3}$/;

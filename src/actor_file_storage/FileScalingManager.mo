@@ -14,7 +14,7 @@ import TypesIC "../c_types/ic";
 import Utils "./utils";
 
 actor class FileScalingManager(is_prod : Bool, port : Text) = this {
-	type CanisterInfo = Types.CanisterInfo;
+	type FileStorageInfo = Types.FileStorageInfo;
 	type Status = Types.Status;
 	type ErrInit = Types.ErrInit;
 
@@ -30,23 +30,27 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	stable var file_storage_canister_id : Text = "";
 
 	// ------------------------- Storage Data -------------------------
-	private var canister_records = Map.new<Text, CanisterInfo>();
-	stable var canister_records_stable_storage : [(Text, CanisterInfo)] = [];
+	private var file_storage_registry = Map.new<Text, FileStorageInfo>();
+	stable var file_storage_registry_stable_storage : [(Text, FileStorageInfo)] = [];
 
 	// ------------------------- Actor -------------------------
 	private let management_actor : ManagementActor = actor "aaaaa-aa";
 
-	// ------------------------- Canister Records -------------------------
-	public query func get_file_storage_canister_id() : async Text {
+	// ------------------------- File Storage Registry -------------------------
+	public query func get_file_storage_registry() : async [FileStorageInfo] {
+		return Iter.toArray(Map.vals(file_storage_registry));
+	};
+
+	public query func get_file_storage_registry_size() : async Nat {
+		return Map.size(file_storage_registry);
+	};
+
+	public query func get_current_canister_id() : async Text {
 		return file_storage_canister_id;
 	};
 
-	public query func get_canister_records() : async [CanisterInfo] {
-		return Iter.toArray(Map.vals(canister_records));
-	};
-
-	public query func get_current_canister() : async ?CanisterInfo {
-		switch (Map.get(canister_records, thash, file_storage_canister_id)) {
+	public query func get_current_canister() : async ?FileStorageInfo {
+		switch (Map.get(file_storage_registry, thash, file_storage_canister_id)) {
 			case (?canister) {
 				return ?canister;
 			};
@@ -79,7 +83,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 		let principal = Principal.fromActor(file_storage_actor);
 		file_storage_canister_id := Principal.toText(principal);
 
-		let canister_child : CanisterInfo = {
+		let canister_child : FileStorageInfo = {
 			created = Time.now();
 			id = file_storage_canister_id;
 			name = "file_storage";
@@ -87,7 +91,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 			status = null;
 		};
 
-		ignore Map.put(canister_records, thash, file_storage_canister_id, canister_child);
+		ignore Map.put(file_storage_registry, thash, file_storage_canister_id, canister_child);
 	};
 
 	private func check_canister_is_full() : async () {
@@ -106,9 +110,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	};
 
 	private func update_health() : async () {
-		let canister_entries = Map.entries(canister_records);
-
-		for ((canister_id, canister) in canister_entries) {
+		for ((canister_id, canister) in Map.entries(file_storage_registry)) {
 			let file_storage_actor = actor (canister_id) : FileStorageActor;
 
 			switch (await file_storage_actor.get_status()) {
@@ -121,12 +123,12 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 						files_size = health.files_size;
 					};
 
-					let canister_record_updated : CanisterInfo = {
+					let info_updated : FileStorageInfo = {
 						canister with
 						status = ?health_updated;
 					};
 
-					ignore Map.put(canister_records, thash, canister_id, canister_record_updated);
+					ignore Map.put(file_storage_registry, thash, canister_id, info_updated);
 				};
 			};
 		};
@@ -136,15 +138,15 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
-		canister_records_stable_storage := Iter.toArray(Map.entries(canister_records));
+		file_storage_registry_stable_storage := Iter.toArray(Map.entries(file_storage_registry));
 	};
 
 	system func postupgrade() {
-		canister_records := Map.fromIter<Text, CanisterInfo>(canister_records_stable_storage.vals(), thash);
+		file_storage_registry := Map.fromIter<Text, FileStorageInfo>(file_storage_registry_stable_storage.vals(), thash);
 
 		ignore Timer.recurringTimer(#seconds(600), check_canister_is_full);
 		ignore Timer.recurringTimer(#seconds(600), update_health);
 
-		canister_records_stable_storage := [];
+		file_storage_registry_stable_storage := [];
 	};
 };
