@@ -8,9 +8,9 @@
 		"build": "npm run build:css && vite build",
 		"boot": "sh ./scripts/install-local.sh",
 		"format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
-		"generate_test_interface": "bash ./scripts/generate_can_test_interface.sh",
+		"idl_for_testing": "bash ./canister_refs/convert_idl_for_testing.sh",
 		"lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
-		"logs": "npm run generate_test_interface && tape test-utils/debug/debug.test.cjs",
+		"logs": "npm run idl_for_testing && tape test-utils/debug/debug.test.cjs",
 		"deploy_favorites": "sh ./scripts/deploy/favorites.sh && node ./scripts/deploy/favorites.cjs",
 		"deploy_profile": "sh ./scripts/deploy/profile.sh && node ./scripts/deploy/profile.cjs",
 		"deploy_projects": "sh ./scripts/deploy/projects.sh && node ./scripts/deploy/projects.cjs",
@@ -20,8 +20,8 @@
 		"deploy_all": "npm run deploy_favorites && npm run deploy_profile && npm run deploy_projects && npm run deploy_snaps && npm run user_interface",
 		"test-all": "bash ./scripts/test-all.sh",
 		"test-config": "tape test_e2e/dfx.config.test.cjs",
-		"test-pc": "npm run generate_test_interface && tape test_e2e/profile_creation.test.cjs",
-		"test-im": "npm run generate_test_interface && tape test_e2e/profile_images.test.cjs"
+		"test-pc": "npm run idl_for_testing && tape test_e2e/profile_creation.test.cjs",
+		"test-im": "npm run idl_for_testing && tape test_e2e/profile_images.test.cjs"
 	},
 	"dependencies": {
 		"dotenv": "^16.0.3",

@@ -8,6 +8,8 @@ canisters=(
 "logger"
 "creator"
 "username_registry"
+"file_storage"
+"file_scaling_manager"
 )
 
 for canister in ${canisters[@]}; do

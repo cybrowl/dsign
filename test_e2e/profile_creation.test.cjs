@@ -7,10 +7,10 @@ config();
 const {
 	creator_interface,
 	username_registry_interface
-} = require('../test-utils/actor_interface.cjs');
+} = require('../canister_refs/actor_interface.cjs');
 
 // Canister Ids
-const { username_registry_canister_id } = require('../test-utils/actor_canister_ids.cjs');
+const { username_registry_canister_id } = require('../canister_refs/actor_canister_ids.cjs');
 
 // Identities
 const { parseIdentity } = require('../test-utils/identities/identity.cjs');

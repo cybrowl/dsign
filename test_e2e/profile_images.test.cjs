@@ -7,10 +7,10 @@ config();
 const {
 	creator_interface,
 	username_registry_interface
-} = require('../test-utils/actor_interface.cjs');
+} = require('../canister_refs/actor_interface.cjs');
 
 // Canister Ids
-const { username_registry_canister_id } = require('../test-utils/actor_canister_ids.cjs');
+const { username_registry_canister_id } = require('../canister_refs/actor_canister_ids.cjs');
 
 // Identities
 const { parseIdentity } = require('../test-utils/identities/identity.cjs');
@@ -25,7 +25,7 @@ const { getActor: get_actor } = require('../test-utils/actor.cjs');
 let username_registry_actor = {};
 
 test('Setup Actors', async function () {
-	console.log('=========== Profile Creation ===========');
+	console.log('=========== Profile Update Images ===========');
 
 	// Username Registry
 	username_registry_actor.mishicat = await get_actor(
