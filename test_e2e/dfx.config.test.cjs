@@ -9,32 +9,15 @@ test('DFX Config: generateCanisterAliases()', async function (t) {
 		$IDLinternet_identity:
 			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/internet_identity/service.did.js',
 		$IDLui: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/ui/service.did.js',
-		$IDLassets_file_staging:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/assets_file_staging/service.did.js',
-		$IDLassets_img_staging:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/assets_img_staging/service.did.js',
-		$IDLcanister_ids_ledger:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/canister_ids_ledger/service.did.js',
 		$IDLexplore: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/explore/service.did.js',
-		$IDLfavorite_main:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/favorite_main/service.did.js',
-		$IDLprofile: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/profile/service.did.js',
-		$IDLproject_main:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/project_main/service.did.js',
-		$IDLsnap_main: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/snap_main/service.did.js',
 		$IDLlogger: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/logger/service.did.js',
-		$IDLtest_assets:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_assets/service.did.js',
-		$IDLtest_favorite:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_favorite/service.did.js',
-		$IDLtest_image_assets:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_image_assets/service.did.js',
-		$IDLtest_project:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_project/service.did.js',
-		$IDLtest_snap: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/test_snap/service.did.js',
 		$IDLcreator: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/creator/service.did.js',
 		$IDLusername_registry:
-			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/username_registry/service.did.js'
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/username_registry/service.did.js',
+		$IDLfile_storage:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/file_storage/service.did.js',
+		$IDLfile_scaling_manager:
+			'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/file_scaling_manager/service.did.js'
 	};
 
 	t.deepEqual(aliases, expected);

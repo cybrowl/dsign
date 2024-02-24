@@ -3,17 +3,6 @@
 # config
 npm run test-config
 
-# profile
-npm run test-p
+# profile creation
+npm run test-pc
 
-# snaps
-npm run test-sm
-
-# projects
-npm run test-pm
-
-# logger
-# npm run test-lg
-
-# canister_ids ledger
-# npm run test-cl

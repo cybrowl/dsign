@@ -25,3 +25,6 @@ export USERNAME_REGISTRY_PRINCIPAL=$(dfx canister id username_registry)
 # Creator
 dfx deploy creator --argument='(principal "'${USERNAME_REGISTRY_PRINCIPAL}'")'
 
+# UI
+dfx deploy ui
+

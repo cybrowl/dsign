@@ -4,19 +4,8 @@
 # NOTE: update file OSX ONLY (Linux remove '')
 
 canisters=(
-"assets_file_staging"
-"assets_img_staging"
-"canister_ids_ledger"
 "explore"
-"favorite_main"
 "logger"
-"profile"
-"project_main"
-"snap_main"
-"test_assets"
-"test_image_assets"
-"test_project"
-"test_snap"
 "creator"
 "username_registry"
 )
