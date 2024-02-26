@@ -27,7 +27,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	let ACTOR_NAME : Text = "FileScalingManager";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
 	let VERSION : Nat = 1;
-	stable var file_storage_canister_id : Text = "";
+	var file_storage_canister_id : Text = "";
 
 	// ------------------------- Storage Data -------------------------
 	private var file_storage_registry = Map.new<Text, FileStorageInfo>();
@@ -91,7 +91,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 			status = null;
 		};
 
-		ignore Map.put(file_storage_registry, thash, file_storage_canister_id, canister_child);
+		ignore Map.add(file_storage_registry, thash, file_storage_canister_id, canister_child);
 	};
 
 	private func check_canister_is_full() : async () {

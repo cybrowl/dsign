@@ -1,5 +1,6 @@
 const test = require('tape');
 const { config } = require('dotenv');
+const assert = require('assert');
 
 config();
 
@@ -101,6 +102,41 @@ test('FileScalingManager[mishicat].get_current_canister_id(): => #ok - CanisterI
 
 	t.ok(isValidFormat, `Canister ID "${canister_id}" matches the expected format`);
 	t.end();
+});
+
+test('FileScalingManager[mishicat].get_current_canister(): => #ok - canister', async function (t) {
+	const canister = await file_scaling_manager_actor.mishicat.get_current_canister();
+
+	assert(
+		Array.isArray(canister) && canister.length > 0,
+		'Canister should be an array with at least one element.'
+	);
+
+	const actualCanister = canister[0];
+
+	assert(typeof actualCanister.id === 'string', 'Canister ID should be a string.');
+	assert(Array.isArray(actualCanister.status), 'Canister status should be an array.');
+	assert(
+		typeof actualCanister.created === 'bigint',
+		'Canister creation timestamp should be a bigint.'
+	);
+	assert.strictEqual(
+		actualCanister.name,
+		'file_storage',
+		'Canister name does not match expected value.'
+	);
+	assert.strictEqual(
+		actualCanister.parent_name,
+		'FileScalingManager',
+		'Canister parent name does not match expected value.'
+	);
+	t.end();
+});
+
+test('FileScalingManager[mishicat].get_file_storage_registry_size(): => #ok - size', async function (t) {
+	const size = await file_scaling_manager_actor.mishicat.get_file_storage_registry_size();
+
+	t.assert(size === 1n, 'file storage registry size');
 });
 
 test('UsernameRegistry[mishicat].delete_profile(): with valid principal => #ok - Deleted', async function (t) {
