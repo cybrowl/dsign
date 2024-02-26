@@ -103,17 +103,6 @@ test('FileScalingManager[mishicat].get_current_canister_id(): => #ok - CanisterI
 	t.end();
 });
 
-test('FileScalingManager[mishicat].get_current_canister_id(): => #ok - CanisterId', async function (t) {
-	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
-
-	// Example regex for basic validation, adjust according to your expected format
-	const pattern = /^[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[cai]{3}$/;
-	const isValidFormat = pattern.test(canister_id);
-
-	t.ok(isValidFormat, `Canister ID "${canister_id}" matches the expected format`);
-	t.end();
-});
-
 test('UsernameRegistry[mishicat].delete_profile(): with valid principal => #ok - Deleted', async function (t) {
 	// Setup: Ensure there's a profile to delete
 	await username_registry_actor.mishicat.create_profile('mishicat');
