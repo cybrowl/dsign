@@ -1,4 +1,4 @@
-export function replacer(key, value) {
+export function replacer(value) {
 	if (typeof value === 'bigint') {
 		return value.toString(); // convert BigInt to string
 	} else {
@@ -6,7 +6,7 @@ export function replacer(key, value) {
 	}
 }
 
-export function reviver(key, value) {
+export function reviver(value) {
 	if (/^\d+$/.test(value)) {
 		return BigInt(value); // convert string to BigInt
 	} else {

@@ -1,14 +1,17 @@
 const test = require('tape');
 const { config } = require('dotenv');
 const assert = require('assert');
+// const path = require('path');
+// const fs = require('fs');
+// import mime from 'mime';
 
 config();
 
 // Actor Interface
 const {
-	creator_interface,
 	username_registry_interface,
-	file_scaling_manager_interface
+	file_scaling_manager_interface,
+	file_storage_interface
 } = require('../canister_refs/actor_interface.cjs');
 
 // Canister Ids
@@ -26,6 +29,7 @@ let anonymous_identity = null;
 
 // Utils
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
+const { FileStorage } = require('../src/ui/utils/file_storage.cjs');
 
 let username_registry_actor = {};
 let file_scaling_manager_actor = {};
@@ -156,3 +160,58 @@ test('UsernameRegistry[mishicat].create_profile(): with valid username => #ok - 
 
 	t.assert(username.length > 2, 'Created Profile');
 });
+
+test('FileStorage[mishicat].version(): => #ok - Version Number', async function (t) {
+	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
+	const file_storage_actor = await get_actor(
+		canister_id,
+		file_storage_interface,
+		mishicat_identity
+	);
+	const file_storage = new FileStorage(file_storage_actor);
+
+	const version_num = await file_storage.version();
+	t.assert(version_num === 1n, 'Correct Version');
+	t.end();
+});
+
+// test('FileStorage[mishicat].create_chunk & create_file_from_chunks(): => #ok - File Stored', async function (t) {
+// 	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
+// 	const file_storage_actor = await get_actor(
+// 		canister_id,
+// 		file_storage_interface,
+// 		mishicat_identity
+// 	);
+// 	const file_storage = new FileStorage(file_storage_actor);
+
+// 	// Image
+// 	const file_path = path.join(__dirname, 'images', 'size', '3mb_japan.jpg');
+// 	const file_buffer = fs.readFileSync(file_path);
+// 	const file_unit8Array = new Uint8Array(file_buffer);
+// 	const file_name = path.basename(file_path);
+// 	const file_content_type = mime.getType(file_path);
+
+// 	let progressReceived = [];
+
+// 	const response = await file_storage.store(
+// 		file_unit8Array,
+// 		{
+// 			filename: file_name,
+// 			content_type: file_content_type
+// 		},
+// 		(progress) => {
+// 			if (progressReceived.length === 0) {
+// 				t.equal(progress, 0, 'Initial progress should be 0');
+// 			} else {
+// 				t.ok(progress > progressReceived[progressReceived.length - 1], 'Progress should increase');
+// 			}
+
+// 			progressReceived.push(progress);
+// 		}
+// 	);
+
+// 	console.log('response: ', response);
+
+// 	t.equal(progressReceived[progressReceived.length - 1], 1, 'Final progress should be 1');
+// 	t.end();
+// });

@@ -176,7 +176,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		return toArray(files_updated);
 	};
 
-	public query func get(id : File_ID) : async Result.Result<File, Text> {
+	public query func get_file(id : File_ID) : async Result.Result<File, Text> {
 		switch (Map.get(files, thash, id)) {
 			case (?file) {
 				let file_without_content : File = {

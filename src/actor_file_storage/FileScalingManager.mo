@@ -114,18 +114,18 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 			let file_storage_actor = actor (canister_id) : FileStorageActor;
 
 			switch (await file_storage_actor.get_status()) {
-				case (health) {
+				case (status) {
 
-					let health_updated : Status = {
-						cycles = health.cycles;
-						memory_mb = health.memory_mb;
-						heap_mb = health.heap_mb;
-						files_size = health.files_size;
+					let status_updated : Status = {
+						cycles = status.cycles;
+						memory_mb = status.memory_mb;
+						heap_mb = status.heap_mb;
+						files_size = status.files_size;
 					};
 
 					let info_updated : FileStorageInfo = {
 						canister with
-						status = ?health_updated;
+						status = ?status_updated;
 					};
 
 					ignore Map.put(file_storage_registry, thash, canister_id, info_updated);
@@ -144,8 +144,8 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	system func postupgrade() {
 		file_storage_registry := Map.fromIter<Text, FileStorageInfo>(file_storage_registry_stable_storage.vals(), thash);
 
-		ignore Timer.recurringTimer(#seconds(600), check_canister_is_full);
-		ignore Timer.recurringTimer(#seconds(600), update_health);
+		ignore Timer.recurringTimer(#seconds(60), check_canister_is_full);
+		ignore Timer.recurringTimer(#seconds(60), update_health);
 
 		file_storage_registry_stable_storage := [];
 	};

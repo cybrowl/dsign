@@ -14,22 +14,18 @@ dfx deploy logger
 
 # Username Registry
 dfx deploy username_registry
-
-# Initialize Username Registry
-dfx canister call username_registry initialize_canisters 
+dfx canister call username_registry initialize_canisters # init
 
 # export EXPLORE_PRINCIPAL=$(dfx canister id explore)
 # export LOGGER_PRINCIPAL=$(dfx canister id logger)
 export USERNAME_REGISTRY_PRINCIPAL=$(dfx canister id username_registry)
 
 # Creator
-dfx deploy creator --argument='(principal "'${USERNAME_REGISTRY_PRINCIPAL}'")'
+dfx deploy creator --argument='(principal "'${USERNAME_REGISTRY_PRINCIPAL}'")' --mode=reinstall
 
 # File Storage
-dfx deploy file_storage --argument='(false, "8080")'
+dfx deploy file_storage --argument='(false, "8080")' --mode=reinstall
 
 # File Scaling
-dfx deploy file_scaling_manager --argument='(false, "8080")'
-
-# Initialize File Scaling
-dfx canister call file_scaling_manager init 
+dfx deploy file_scaling_manager --argument='(false, "8080")' --mode=reinstall
+dfx canister call file_scaling_manager init  # init

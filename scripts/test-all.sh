@@ -6,3 +6,5 @@ npm run test-config
 # profile creation
 npm run test-pc
 
+# profile images testing
+npm run test-pi

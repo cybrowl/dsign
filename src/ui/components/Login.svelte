@@ -3,7 +3,6 @@
 	import { onMount } from 'svelte';
 	import environment from 'environment';
 	import { get } from 'lodash';
-	import { page } from '$app/stores';
 
 	import { Avatar, Button, Icon } from 'dsign-components';
 
@@ -43,6 +42,7 @@
 		const { ok: profile, err: err_profile } = await $actor_creator.actor.get_profile_by_username(
 			username_info.username
 		);
+
 		if (profile) {
 			local_storage_profile.set({
 				avatar_url: get(profile, 'avatar.url', ''),
