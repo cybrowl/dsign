@@ -9,6 +9,7 @@ config();
 
 // Actor Interface
 const {
+	creator_interface,
 	username_registry_interface,
 	file_scaling_manager_interface,
 	file_storage_interface
@@ -229,5 +230,55 @@ test('FileStorage[mishicat].create_chunk & create_file_from_chunks(): => #ok - F
 	);
 
 	t.equal(progressReceived[progressReceived.length - 1], 1, 'Final progress should be 1');
+	t.end();
+});
+
+test('FileStorage[mishicat].create_chunk & create_file_from_chunks(): => #ok - File Stored', async function (t) {
+	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
+	const file_storage_actor = await get_actor(
+		canister_id,
+		file_storage_interface,
+		mishicat_identity
+	);
+	const file_storage = new FileStorage(file_storage_actor);
+
+	// Image
+	const file_path = path.join(__dirname, 'images', 'size', '3mb_japan.jpg');
+	const file_buffer = fs.readFileSync(file_path);
+	const file_unit8Array = new Uint8Array(file_buffer);
+	const file_name = path.basename(file_path);
+	const file_content_type = getMimeType(file_path);
+
+	let progressReceived = [];
+
+	const { ok: file } = await file_storage.store(
+		file_unit8Array,
+		{
+			filename: file_name,
+			content_type: file_content_type
+		},
+		(progress) => {
+			if (progressReceived.length === 0) {
+				t.equal(progress, 0, 'Initial progress should be 0');
+			} else {
+				t.ok(progress > progressReceived[progressReceived.length - 1], 'Progress should increase');
+			}
+
+			progressReceived.push(progress);
+		}
+	);
+
+	const { ok: username_info, err: _ } = await username_registry_actor.mishicat.get_info();
+
+	const creator_actor = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const { ok: updated_profile, err: err_profile } = await creator_actor.update_profile_avatar();
+	console.log('updated_profile: ', updated_profile);
+	console.log('err_profile: ', err_profile);
+
 	t.end();
 });

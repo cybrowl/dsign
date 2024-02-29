@@ -30,8 +30,8 @@ actor class Creator(username_registry : Principal) = this {
 	let USERNAME_REGISTRY_ID : Text = Principal.toText(username_registry);
 	let MAX_USERS : Nat = 100;
 
-	stable var users : Nat = 0;
-	stable var canister_id : Text = "";
+	var users : Nat = 0;
+	var canister_id : Text = "";
 
 	// ------------------------- Storage Data -------------------------
 	// profiles
@@ -166,16 +166,13 @@ actor class Creator(username_registry : Principal) = this {
 		return #ok(username);
 	};
 
-	// TODO: WARNING
-	// File Storage needs to be handled, it is needed for avatars, banners, snaps (images and files)
-
 	// Update Profile Avatar
-	public shared ({ caller }) func update_profile_avatar(username : Username) : async Result.Result<Text, Text> {
-		return #ok("");
+	public shared ({ caller }) func update_profile_avatar() : async Result.Result<Text, Text> {
+		return #ok("update_profile");
 	};
 
 	// Update Profile Banner
-	public shared ({ caller }) func update_profile_banner(username : Username) : async Result.Result<Text, Text> {
+	public shared ({ caller }) func update_profile_banner() : async Result.Result<Text, Text> {
 		return #ok("");
 	};
 
