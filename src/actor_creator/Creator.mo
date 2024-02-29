@@ -10,6 +10,7 @@ import Logger "canister:logger";
 import Types "./types";
 
 actor class Creator(username_registry : Principal) = this {
+	type ArgsUpdateProfile = Types.ArgsUpdateProfile;
 	type ErrProfile = Types.ErrProfile;
 	type FavoriteID = Types.FavoriteID;
 	type Profile = Types.Profile;
@@ -142,13 +143,11 @@ actor class Creator(username_registry : Principal) = this {
 				id = "";
 				canister_id = "";
 				url = "";
-				exists = false;
 			};
 			banner = {
 				id = "";
 				canister_id = "";
 				url = "/default_profile_banner.png";
-				exists = false;
 			};
 			created = Time.now();
 			username = username;
@@ -167,13 +166,55 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Update Profile Avatar
-	public shared ({ caller }) func update_profile_avatar() : async Result.Result<Text, Text> {
-		return #ok("update_profile");
+	public shared ({ caller }) func update_profile_avatar(args : ArgsUpdateProfile) : async Result.Result<Text, ErrProfile> {
+		switch (profiles.get(caller)) {
+			case (null) {
+				return #err(#ProfileNotFound(true));
+			};
+
+			case (?profile) {
+				let avatar_updated = {
+					id = args.id;
+					canister_id = args.canister_id;
+					url = args.url;
+				};
+
+				let profile_updated = {
+					profile with
+					avatar = avatar_updated;
+				};
+
+				profiles.put(caller, profile_updated);
+
+				return #ok(profile_updated.avatar.url);
+			};
+		};
 	};
 
 	// Update Profile Banner
-	public shared ({ caller }) func update_profile_banner() : async Result.Result<Text, Text> {
-		return #ok("");
+	public shared ({ caller }) func update_profile_banner(args : ArgsUpdateProfile) : async Result.Result<Text, ErrProfile> {
+		switch (profiles.get(caller)) {
+			case (null) {
+				return #err(#ProfileNotFound(true));
+			};
+
+			case (?profile) {
+				let banner_updated = {
+					id = args.id;
+					canister_id = args.canister_id;
+					url = args.url;
+				};
+
+				let profile_updated = {
+					profile with
+					banner = banner_updated;
+				};
+
+				profiles.put(caller, profile_updated);
+
+				return #ok(profile_updated.banner.url);
+			};
+		};
 	};
 
 	// ------------------------- Projects -------------------------

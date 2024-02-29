@@ -215,11 +215,6 @@ test('FileStorage[mishicat].create_chunk & create_file_from_chunks(): => #ok - F
 	t.ok(typeof file.id === 'string', 'File ID should be a string and present');
 	t.ok(file.url.includes(file.id), 'File URL should correctly include the file ID');
 	t.equal(file.chunks_size, 2n, 'The file should be split into 2 chunks');
-	t.equal(
-		file.canister_id,
-		'aax3a-h4aaa-aaaaa-qaahq-cai',
-		'Canister ID should match expected value'
-	);
 	t.equal(file.content_size, 3628429n, 'The content size of the file should match expected value');
 	t.equal(file.content_type, 'image/jpeg', 'Content type should be "image/jpeg"');
 	t.equal(file.filename, '3mb_japan.jpg', 'Filename should match the uploaded file');
@@ -233,7 +228,7 @@ test('FileStorage[mishicat].create_chunk & create_file_from_chunks(): => #ok - F
 	t.end();
 });
 
-test('FileStorage[mishicat].create_chunk & create_file_from_chunks(): => #ok - File Stored', async function (t) {
+test('Creator[mishicat].update_profile_avatars(): => #ok - Updated Avatar', async function (t) {
 	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
 	const file_storage_actor = await get_actor(
 		canister_id,
@@ -276,9 +271,87 @@ test('FileStorage[mishicat].create_chunk & create_file_from_chunks(): => #ok - F
 		mishicat_identity
 	);
 
-	const { ok: updated_profile, err: err_profile } = await creator_actor.update_profile_avatar();
-	console.log('updated_profile: ', updated_profile);
-	console.log('err_profile: ', err_profile);
+	const { ok: updated_profile, err: err_profile } = await creator_actor.update_profile_avatar({
+		id: file.id,
+		canister_id: file.canister_id,
+		url: file.url
+	});
+
+	const { ok: profile } = await creator_actor.get_profile_by_username(username_info.username);
+
+	t.equal(profile.avatar.id, file.id, 'Avatar ID should match the file ID');
+	t.equal(
+		profile.avatar.canister_id,
+		file.canister_id,
+		'Avatar canister_id should match the file canister_id'
+	);
+	t.equal(profile.avatar.url, file.url, 'Avatar URL should match the file URL');
+	t.ok(profile.avatar.url.startsWith('http://'), 'Avatar URL should start with http://');
+	t.ok(new URL(profile.avatar.url), 'Avatar URL should be a valid URL');
+
+	t.end();
+});
+
+test('Creator[mishicat].update_profile_banner(): => #ok - Updated Banner', async function (t) {
+	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
+	const file_storage_actor = await get_actor(
+		canister_id,
+		file_storage_interface,
+		mishicat_identity
+	);
+	const file_storage = new FileStorage(file_storage_actor);
+
+	// Image
+	const file_path = path.join(__dirname, 'images', 'size', '3mb_japan.jpg');
+	const file_buffer = fs.readFileSync(file_path);
+	const file_unit8Array = new Uint8Array(file_buffer);
+	const file_name = path.basename(file_path);
+	const file_content_type = getMimeType(file_path);
+
+	let progressReceived = [];
+
+	const { ok: file } = await file_storage.store(
+		file_unit8Array,
+		{
+			filename: file_name,
+			content_type: file_content_type
+		},
+		(progress) => {
+			if (progressReceived.length === 0) {
+				t.equal(progress, 0, 'Initial progress should be 0');
+			} else {
+				t.ok(progress > progressReceived[progressReceived.length - 1], 'Progress should increase');
+			}
+
+			progressReceived.push(progress);
+		}
+	);
+
+	const { ok: username_info, err: _ } = await username_registry_actor.mishicat.get_info();
+
+	const creator_actor = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const { ok: updated_profile, err: err_profile } = await creator_actor.update_profile_banner({
+		id: file.id,
+		canister_id: file.canister_id,
+		url: file.url
+	});
+
+	const { ok: profile } = await creator_actor.get_profile_by_username(username_info.username);
+
+	t.equal(profile.banner.id, file.id, 'Banner ID should match the file ID');
+	t.equal(
+		profile.banner.canister_id,
+		file.canister_id,
+		'Banner canister_id should match the file canister_id'
+	);
+	t.equal(profile.banner.url, file.url, 'Banner URL should match the file URL');
+	t.ok(profile.banner.url.startsWith('http://'), 'Banner URL should start with http://');
+	t.ok(new URL(profile.banner.url), 'Banner URL should be a valid URL');
 
 	t.end();
 });

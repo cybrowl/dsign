@@ -15,18 +15,22 @@ module {
 	// public type ICInterface = ICInterfaceTypes.Self;
 
 	// Profile
+	public type ArgsUpdateProfile = {
+		id : Text;
+		canister_id : Text;
+		url : Text;
+	};
+
 	public type Profile = {
 		avatar : {
 			id : Text;
 			canister_id : CanisterID;
 			url : Text;
-			exists : Bool;
 		};
 		banner : {
 			id : Text;
 			canister_id : CanisterID;
 			url : Text;
-			exists : Bool;
 		};
 		created : Int;
 		username : Username;
@@ -42,13 +46,11 @@ module {
 			id : Text;
 			canister_id : CanisterID;
 			url : Text;
-			exists : Bool;
 		};
 		banner : {
 			id : Text;
 			canister_id : CanisterID;
 			url : Text;
-			exists : Bool;
 		};
 		created : Int;
 		username : Username;
