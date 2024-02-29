@@ -23,15 +23,23 @@ import Utils "./utils";
 
 actor class FileStorage(is_prod : Bool, port : Text) = this {
 	let { thash; nhash } = Map;
+
 	type Chunk_ID = Types.Chunk_ID;
 	type ChunkInfo = Types.ChunkInfo;
+	type CreateStrategyArgs = Types.CreateStrategyArgs;
 	type ErrCreateFile = Types.ErrCreateFile;
 	type ErrDeleteFile = Types.ErrDeleteFile;
 	type File = Types.File;
 	type File_ID = Types.File_ID;
 	type FileChunk = Types.FileChunk;
 	type FileProperties = Types.FileProperties;
+	type FilePublic = Types.FilePublic;
+	type HttpRequest = Types.HttpRequest;
+	type HttpResponse = Types.HttpResponse;
 	type Status = Types.Status;
+	type StreamingCallbackHttpResponse = Types.StreamingCallbackHttpResponse;
+	type StreamingCallbackToken = Types.StreamingCallbackToken;
+	type StreamingStrategy = Types.StreamingStrategy;
 
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "FileStorage";
@@ -67,7 +75,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		return chunk_id_count;
 	};
 
-	public shared ({ caller }) func create_file_from_chunks(chunk_ids : [Nat], properties : FileProperties) : async Result.Result<File_ID, ErrCreateFile> {
+	public shared ({ caller }) func create_file_from_chunks(chunk_ids : [Nat], properties : FileProperties) : async Result.Result<FilePublic, ErrCreateFile> {
 		let file_id = Utils.generate_uuid();
 		let canister_id = Principal.toText(Principal.fromActor(this));
 
@@ -122,7 +130,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		};
 
 		// Create and insert new file
-		let file : Types.File = {
+		let file : File = {
 			canister_id = canister_id;
 			chunks_size = file_content.size();
 			content = Option.make(toArray(file_content));
@@ -142,7 +150,24 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		};
 
 		ignore Map.put(files, thash, file_id, file);
-		return #ok(file.id);
+
+		let file_public : FilePublic = {
+			canister_id = canister_id;
+			chunks_size = file_content.size();
+			content_encoding = properties.content_encoding;
+			content_size = content_size;
+			content_type = properties.content_type;
+			filename = properties.filename;
+			id = file_id;
+			url = Utils.generate_file_url({
+				file_id = file_id;
+				canister_id = canister_id;
+				is_prod = is_prod;
+				port = port;
+			});
+		};
+
+		return #ok(file_public);
 	};
 
 	public shared ({ caller }) func delete_file(id : File_ID) : async Result.Result<Text, ErrDeleteFile> {
@@ -221,7 +246,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	};
 
 	// ------------------------- Get File HTTP -------------------------
-	public shared query ({ caller }) func http_request(request : Types.HttpRequest) : async Types.HttpResponse {
+	public shared query ({ caller }) func http_request(request : HttpRequest) : async HttpResponse {
 		let NOT_FOUND : [Nat8] = Blob.toArray(Text.encodeUtf8("File Not Found"));
 
 		let file_id = Utils.get_file_id(request.url);
@@ -257,7 +282,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		};
 	};
 
-	private func create_strategy(args : Types.CreateStrategyArgs) : ?Types.StreamingStrategy {
+	private func create_strategy(args : CreateStrategyArgs) : ?StreamingStrategy {
 		switch (create_token(args)) {
 			case (null) { null };
 			case (?token) {
@@ -275,7 +300,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		};
 	};
 
-	private func create_token(args : Types.CreateStrategyArgs) : ?Types.StreamingCallbackToken {
+	private func create_token(args : CreateStrategyArgs) : ?StreamingCallbackToken {
 		if (args.chunk_index + 1 >= args.data_chunks_size) {
 			return null;
 		} else {
@@ -290,8 +315,8 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	};
 
 	public shared query ({ caller }) func http_request_streaming_callback(
-		st : Types.StreamingCallbackToken
-	) : async Types.StreamingCallbackHttpResponse {
+		st : StreamingCallbackToken
+	) : async StreamingCallbackHttpResponse {
 		switch (Map.get(files, thash, st.file_id)) {
 			case (null) throw Error.reject("file_id not found: " # st.file_id);
 			case (?file) {

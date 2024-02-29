@@ -44,6 +44,17 @@ module {
 		url : Text;
 	};
 
+	public type FilePublic = {
+		canister_id : Text;
+		chunks_size : Nat;
+		content_encoding : ContentEncoding;
+		content_size : Nat;
+		content_type : Text;
+		filename : Text;
+		id : Text;
+		url : Text;
+	};
+
 	public type Status = {
 		cycles : Int;
 		memory_mb : Int;

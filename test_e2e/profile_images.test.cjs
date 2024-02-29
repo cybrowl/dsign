@@ -1,9 +1,9 @@
 const test = require('tape');
 const { config } = require('dotenv');
 const assert = require('assert');
-// const path = require('path');
-// const fs = require('fs');
-// import mime from 'mime';
+const path = require('path');
+const fs = require('fs');
+const { getMimeType } = require('../src/ui/utils/mime.cjs');
 
 config();
 
@@ -175,43 +175,59 @@ test('FileStorage[mishicat].version(): => #ok - Version Number', async function 
 	t.end();
 });
 
-// test('FileStorage[mishicat].create_chunk & create_file_from_chunks(): => #ok - File Stored', async function (t) {
-// 	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
-// 	const file_storage_actor = await get_actor(
-// 		canister_id,
-// 		file_storage_interface,
-// 		mishicat_identity
-// 	);
-// 	const file_storage = new FileStorage(file_storage_actor);
+test('FileStorage[mishicat].create_chunk & create_file_from_chunks(): => #ok - File Stored', async function (t) {
+	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
+	const file_storage_actor = await get_actor(
+		canister_id,
+		file_storage_interface,
+		mishicat_identity
+	);
+	const file_storage = new FileStorage(file_storage_actor);
 
-// 	// Image
-// 	const file_path = path.join(__dirname, 'images', 'size', '3mb_japan.jpg');
-// 	const file_buffer = fs.readFileSync(file_path);
-// 	const file_unit8Array = new Uint8Array(file_buffer);
-// 	const file_name = path.basename(file_path);
-// 	const file_content_type = mime.getType(file_path);
+	// Image
+	const file_path = path.join(__dirname, 'images', 'size', '3mb_japan.jpg');
+	const file_buffer = fs.readFileSync(file_path);
+	const file_unit8Array = new Uint8Array(file_buffer);
+	const file_name = path.basename(file_path);
+	const file_content_type = getMimeType(file_path);
 
-// 	let progressReceived = [];
+	let progressReceived = [];
 
-// 	const response = await file_storage.store(
-// 		file_unit8Array,
-// 		{
-// 			filename: file_name,
-// 			content_type: file_content_type
-// 		},
-// 		(progress) => {
-// 			if (progressReceived.length === 0) {
-// 				t.equal(progress, 0, 'Initial progress should be 0');
-// 			} else {
-// 				t.ok(progress > progressReceived[progressReceived.length - 1], 'Progress should increase');
-// 			}
+	const { ok: file } = await file_storage.store(
+		file_unit8Array,
+		{
+			filename: file_name,
+			content_type: file_content_type
+		},
+		(progress) => {
+			if (progressReceived.length === 0) {
+				t.equal(progress, 0, 'Initial progress should be 0');
+			} else {
+				t.ok(progress > progressReceived[progressReceived.length - 1], 'Progress should increase');
+			}
 
-// 			progressReceived.push(progress);
-// 		}
-// 	);
+			progressReceived.push(progress);
+		}
+	);
 
-// 	console.log('response: ', response);
+	// Validate the dynamic and static aspects of the file
+	t.ok(typeof file.id === 'string', 'File ID should be a string and present');
+	t.ok(file.url.includes(file.id), 'File URL should correctly include the file ID');
+	t.equal(file.chunks_size, 2n, 'The file should be split into 2 chunks');
+	t.equal(
+		file.canister_id,
+		'aax3a-h4aaa-aaaaa-qaahq-cai',
+		'Canister ID should match expected value'
+	);
+	t.equal(file.content_size, 3628429n, 'The content size of the file should match expected value');
+	t.equal(file.content_type, 'image/jpeg', 'Content type should be "image/jpeg"');
+	t.equal(file.filename, '3mb_japan.jpg', 'Filename should match the uploaded file');
+	t.deepEqual(
+		file.content_encoding,
+		{ Identity: null },
+		'Content encoding should be correctly set to Identity'
+	);
 
-// 	t.equal(progressReceived[progressReceived.length - 1], 1, 'Final progress should be 1');
-// 	t.end();
-// });
+	t.equal(progressReceived[progressReceived.length - 1], 1, 'Final progress should be 1');
+	t.end();
+});
