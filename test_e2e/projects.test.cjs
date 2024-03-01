@@ -145,3 +145,28 @@ test('Creator[mishicat].get_project(): with valid id => #ok - ProjectPublic', as
 	t.deepEqual(project.description, ['first project'], 'Project description should match');
 	t.end();
 });
+
+test('Creator[mishicat].get_profile_by_username(): with valid username => #ok - ProfilePublic', async function (t) {
+	const { ok: username_info, err: _ } =
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
+
+	const creator_actor_mishicat = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const { ok: profile } = await creator_actor_mishicat.get_profile_by_username(
+		username_info.username
+	);
+
+	t.ok(profile.projects.length > 0, 'Profile should have at least one project');
+	t.equal(profile.projects[0].name, 'Project One', 'The project name should match expected value');
+	t.equal(
+		profile.projects[0].canister_id,
+		'a4tbr-q4aaa-aaaaa-qaafq-cai',
+		'Project canister ID should match expected value'
+	);
+	t.ok(profile.is_owner, 'Profile should indicate ownership');
+	t.end();
+});
