@@ -4,7 +4,7 @@ echo "env: dev"
 cp ./src/env/env_local.mo ./src/env/env.mo
 
 # Cycles
-# dfx ledger fabricate-cycles --all
+dfx ledger fabricate-cycles --all
 
 # II
 dfx deploy internet_identity
@@ -24,11 +24,11 @@ dfx canister call username_registry init # init
 export USERNAME_REGISTRY_PRINCIPAL=$(dfx canister id username_registry)
 
 # Creator
-dfx deploy creator --argument='(principal "'${USERNAME_REGISTRY_PRINCIPAL}'")' 
+dfx deploy creator --argument='(principal "'${USERNAME_REGISTRY_PRINCIPAL}'")'
 
 # File Storage
-dfx deploy file_storage --argument='(false, "8080")' 
+dfx deploy file_storage --argument='(false, "8080")'
 
 # File Scaling
-dfx deploy file_scaling_manager --argument='(false, "8080")' 
+dfx deploy file_scaling_manager --argument='(false, "8080")'
 dfx canister call file_scaling_manager init  # init

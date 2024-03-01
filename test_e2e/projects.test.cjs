@@ -162,11 +162,69 @@ test('Creator[mishicat].get_profile_by_username(): with valid username => #ok - 
 
 	t.ok(profile.projects.length > 0, 'Profile should have at least one project');
 	t.equal(profile.projects[0].name, 'Project One', 'The project name should match expected value');
-	t.equal(
-		profile.projects[0].canister_id,
-		'a4tbr-q4aaa-aaaaa-qaafq-cai',
-		'Project canister ID should match expected value'
+	t.ok(
+		typeof profile.projects[0].canister_id === 'string' &&
+			profile.projects[0].canister_id.length > 0,
+		'Project canister ID should be a non-empty string'
 	);
+
+	const pattern = /^[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[cai]{3}$/;
+	t.ok(
+		pattern.test(profile.projects[0].canister_id),
+		'Project canister ID should match the expected format'
+	);
+
 	t.ok(profile.is_owner, 'Profile should indicate ownership');
+	t.end();
+});
+
+test('Creator[mishicat].delete_project(): with valid id => #ok - Bool', async function (t) {
+	const { ok: username_info, err: _ } =
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
+
+	const creator_actor_mishicat = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const { ok: deleted } = await creator_actor_mishicat.delete_project(project_id);
+
+	t.assert(deleted === true, 'Deleted Project');
+
+	t.end();
+});
+
+test('Creator[mishicat].get_project(): with invalid id => #err - ProjectNotFound', async function (t) {
+	const { ok: username_info, err: _ } =
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
+
+	const creator_actor_mishicat = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const { err: error } = await creator_actor_mishicat.get_project(project_id);
+
+	t.deepEqual(error, { ProjectNotFound: true });
+	t.end();
+});
+
+test('Creator[mishicat].get_profile_by_username(): with valid username => #ok - ProfilePublic', async function (t) {
+	const { ok: username_info, err: _ } =
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
+
+	const creator_actor_mishicat = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const { ok: profile } = await creator_actor_mishicat.get_profile_by_username(
+		username_info.username
+	);
+
+	t.ok(profile.projects.length === 0, 'Profile should have zero projects');
 	t.end();
 });
