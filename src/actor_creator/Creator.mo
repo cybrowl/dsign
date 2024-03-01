@@ -4,6 +4,7 @@ import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
+import Option "mo:base/Option";
 import Time "mo:base/Time";
 
 import Logger "canister:logger";
@@ -14,14 +15,15 @@ import UUID "../libs/uuid";
 actor class Creator(username_registry : Principal) = this {
 	type ArgsCreateProject = Types.ArgsCreateProject;
 	type ArgsUpdateProfile = Types.ArgsUpdateProfile;
+	type ArgsUpdateProject = Types.ArgsUpdateProject;
 	type ErrProfile = Types.ErrProfile;
 	type ErrProject = Types.ErrProject;
 	type FavoriteID = Types.FavoriteID;
 	type Profile = Types.Profile;
 	type ProfilePublic = Types.ProfilePublic;
 	type Project = Types.Project;
-	type ProjectPublic = Types.ProjectPublic;
 	type ProjectID = Types.ProjectID;
+	type ProjectPublic = Types.ProjectPublic;
 	type Snap = Types.Snap;
 	type SnapID = Types.SnapID;
 	type Username = Types.Username;
@@ -30,6 +32,7 @@ actor class Creator(username_registry : Principal) = this {
 	//NOTE: This canister will only hold 100 users, each using 20MB each around 2GB
 	// Once 100 users is reached it will create another instace of itself.
 	// Images and Files will be stored in scalable storage units.
+	// TODO: There needs to be an upgrade method that allows a user to move their data to a 4GB canister
 
 	// ------------------------- Variables -------------------------
 	let VERSION : Nat = 1; // The Version in Production
@@ -298,8 +301,44 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Update Project
-	public shared ({ caller }) func update_project() : async Result.Result<Text, Text> {
-		return #ok("");
+	public shared ({ caller }) func update_project(args : ArgsUpdateProject) : async Result.Result<ProjectPublic, ErrProject> {
+		switch (profiles.get(caller)) {
+			case (null) {
+				return #err(#ProfileNotFound(true));
+			};
+			case (?profile) {
+				switch (projects.get(args.id)) {
+					case (null) {
+						return #err(#ProjectNotFound(true));
+					};
+					case (?project) {
+						if (Principal.notEqual(project.owner, caller)) {
+							return #err(#NotOwner(true));
+						};
+
+						let description : Text = switch (args.description) {
+							case (null) { Option.get(project.description, "") };
+							case (?description) { description };
+						};
+
+						let project_updated : Project = {
+							project with
+							name = Option.get(args.name, project.name);
+							description = ?description;
+						};
+
+						projects.put(args.id, project_updated);
+
+						let project_public : ProjectPublic = {
+							project_updated with
+							owner = null;
+						};
+
+						return #ok(project_public);
+					};
+				};
+			};
+		};
 	};
 
 	// Delete Project

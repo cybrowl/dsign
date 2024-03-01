@@ -112,6 +112,12 @@ module {
 		description : ?Text;
 	};
 
+	public type ArgsUpdateProject = {
+		id : ProjectID;
+		name : ?Text;
+		description : ?Text;
+	};
+
 	public type Project = {
 		id : ProjectID;
 		canister_id : CanisterID;
