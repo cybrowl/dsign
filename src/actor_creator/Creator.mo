@@ -1,4 +1,5 @@
 import Array "mo:base/Array";
+import Buffer "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
@@ -244,35 +245,45 @@ actor class Creator(username_registry : Principal) = this {
 
 		let id : ProjectID = UUID.generate_uuid();
 
-		var username = "";
 		switch (profiles.get(caller)) {
 			case (null) {
 				return #err(#ProfileNotFound(true));
 			};
 			case (?profile) {
-				username := profile.username;
+
+				// Add Project
+				let project : Project = {
+					id = id;
+					canister_id = Principal.toText(Principal.fromActor(this));
+					created = Time.now();
+					name = args.name;
+					description = args.description;
+					username = profile.username;
+					owner = caller;
+					snaps = [];
+					feedback = null;
+					metrics = {
+						likes = 0;
+						views = 0;
+					};
+				};
+
+				projects.put(id, project);
+
+				// Add Project to Profile
+				let profile_projects : Buffer.Buffer<ProjectID> = Buffer.fromArray(profile.projects);
+				let projects_updated = profile_projects.add(id);
+
+				let profile_updated : Profile = {
+					profile with
+					project = projects_updated;
+				};
+
+				profiles.put(caller, profile_updated);
+
+				return #ok(project);
 			};
 		};
-
-		let project : Project = {
-			id = id;
-			canister_id = Principal.toText(Principal.fromActor(this));
-			created = Time.now();
-			name = args.name;
-			description = args.description;
-			username = username;
-			owner = caller;
-			snaps = [];
-			feedback = null;
-			metrics = {
-				likes = 0;
-				views = 0;
-			};
-		};
-
-		projects.put(id, project);
-
-		return #ok(project);
 	};
 
 	// Update Project
