@@ -146,6 +146,7 @@ module {
 	public type ErrProject = {
 		#ProfileNotFound : Bool;
 		#ProjectNotFound : Bool;
+		#NotOwner : Bool;
 	};
 
 	// Snap

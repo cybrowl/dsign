@@ -309,25 +309,36 @@ actor class Creator(username_registry : Principal) = this {
 				return #err(#ProfileNotFound(true));
 			};
 			case (?profile) {
-				let profile_projects : Buffer.Buffer<ProjectID> = Buffer.fromArray(profile.projects);
+				switch (projects.get(id)) {
+					case (null) {
+						return #err(#ProjectNotFound(true));
+					};
+					case (?project) {
+						if (Principal.notEqual(project.owner, caller)) {
+							return #err(#NotOwner(true));
+						};
 
-				// Filter out the project ID to be deleted
-				profile_projects.filterEntries(
-					func(idx : Nat, projId : ProjectID) : Bool {
-						return projId != id;
-					}
-				);
+						let profile_projects : Buffer.Buffer<ProjectID> = Buffer.fromArray(profile.projects);
 
-				projects.delete(id);
+						// Filter out the project ID to be deleted
+						profile_projects.filterEntries(
+							func(idx : Nat, projId : ProjectID) : Bool {
+								return projId != id;
+							}
+						);
 
-				let profile_updated : Profile = {
-					profile with
-					projects = Buffer.toArray(profile_projects);
+						projects.delete(id);
+
+						let profile_updated : Profile = {
+							profile with
+							projects = Buffer.toArray(profile_projects);
+						};
+
+						profiles.put(caller, profile_updated);
+
+						return #ok(true);
+					};
 				};
-
-				profiles.put(caller, profile_updated);
-
-				return #ok(true);
 			};
 		};
 	};
