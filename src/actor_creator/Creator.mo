@@ -8,10 +8,13 @@ import Time "mo:base/Time";
 import Logger "canister:logger";
 
 import Types "./types";
+import UUID "../c_types/uuid";
 
 actor class Creator(username_registry : Principal) = this {
+	type ArgsCreateProject = Types.ArgsCreateProject;
 	type ArgsUpdateProfile = Types.ArgsUpdateProfile;
 	type ErrProfile = Types.ErrProfile;
+	type ErrProject = Types.ErrProject;
 	type FavoriteID = Types.FavoriteID;
 	type Profile = Types.Profile;
 	type ProfilePublic = Types.ProfilePublic;
@@ -223,24 +226,53 @@ actor class Creator(username_registry : Principal) = this {
 		return projects.size();
 	};
 
-	// Get Project Owner Status
-	public query func get_project_owner_status() : async Text {
-		return "";
-	};
-
-	// Get Project Metrics
-	public query func get_project_metrics() : async Text {
-		return "";
-	};
-
 	// Get Project
-	public query func get_project(id : ProjectID) : async Text {
-		return "";
+	public query func get_project(id : ProjectID) : async Result.Result<Project, ErrProject> {
+		switch (projects.get(id)) {
+			case (null) {
+				return #err(#ProjectNotFound(true));
+			};
+			case (?project) {
+				return #ok(project);
+			};
+		};
 	};
 
 	// Create Project
-	public shared ({ caller }) func create_project() : async Result.Result<Text, Text> {
-		return #ok("");
+	public shared ({ caller }) func create_project(args : ArgsCreateProject) : async Result.Result<Project, ErrProject> {
+		//TODO: sanitize the args
+
+		let id : ProjectID = UUID.generate_uuid();
+
+		var username = "";
+		switch (profiles.get(caller)) {
+			case (null) {
+				return #err(#ProfileNotFound(true));
+			};
+			case (?profile) {
+				username := profile.username;
+			};
+		};
+
+		let project : Project = {
+			id = id;
+			canister_id = Principal.toText(Principal.fromActor(this));
+			created = Time.now();
+			name = args.name;
+			description = args.description;
+			username = username;
+			owner = caller;
+			snaps = [];
+			feedback = null;
+			metrics = {
+				likes = 0;
+				views = 0;
+			};
+		};
+
+		projects.put(id, project);
+
+		return #ok(project);
 	};
 
 	// Update Project

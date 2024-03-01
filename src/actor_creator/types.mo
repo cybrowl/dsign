@@ -101,7 +101,17 @@ module {
 		topics : [Topic];
 	};
 
+	public type Metrics = {
+		likes : Nat;
+		views : Nat;
+	};
+
 	// Project
+	public type ArgsCreateProject = {
+		name : Text;
+		description : ?Text;
+	};
+
 	public type Project = {
 		id : ProjectID;
 		canister_id : CanisterID;
@@ -112,15 +122,17 @@ module {
 		owner : UserPrincipal;
 		snaps : [SnapID];
 		feedback : ?Feedback;
-		metrics : {
-			likes : Nat;
-			views : Nat;
-		};
+		metrics : Metrics;
 	};
 
 	public type ProjectRef = {
 		id : ProjectID;
 		canister_id : CanisterID;
+	};
+
+	public type ErrProject = {
+		#ProfileNotFound : Bool;
+		#ProjectNotFound : Bool;
 	};
 
 	// Snap
