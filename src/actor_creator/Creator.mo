@@ -272,11 +272,11 @@ actor class Creator(username_registry : Principal) = this {
 
 				// Add Project to Profile
 				let profile_projects : Buffer.Buffer<ProjectID> = Buffer.fromArray(profile.projects);
-				let projects_updated = profile_projects.add(id);
+				profile_projects.add(id);
 
 				let profile_updated : Profile = {
 					profile with
-					project = projects_updated;
+					projects = Buffer.toArray(profile_projects);
 				};
 
 				profiles.put(caller, profile_updated);
