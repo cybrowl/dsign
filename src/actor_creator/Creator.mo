@@ -303,8 +303,33 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Delete Project
-	public shared ({ caller }) func delete_project() : async Result.Result<Text, Text> {
-		return #ok("");
+	public shared ({ caller }) func delete_project(id : ProjectID) : async Result.Result<Bool, ErrProject> {
+		switch (profiles.get(caller)) {
+			case (null) {
+				return #err(#ProfileNotFound(true));
+			};
+			case (?profile) {
+				let profile_projects : Buffer.Buffer<ProjectID> = Buffer.fromArray(profile.projects);
+
+				// Filter out the project ID to be deleted
+				profile_projects.filterEntries(
+					func(idx : Nat, projId : ProjectID) : Bool {
+						return projId != id;
+					}
+				);
+
+				projects.delete(id);
+
+				let profile_updated : Profile = {
+					profile with
+					projects = Buffer.toArray(profile_projects);
+				};
+
+				profiles.put(caller, profile_updated);
+
+				return #ok(true);
+			};
+		};
 	};
 
 	// Create Feedback Topic
