@@ -244,7 +244,7 @@ actor class Creator(username_registry : Principal) = this {
 	public shared ({ caller }) func create_project(args : ArgsCreateProject) : async Result.Result<ProjectPublic, ErrProject> {
 		//TODO: sanitize the args
 
-		let id : ProjectID = UUID.generate_uuid();
+		let id : ProjectID = UUID.generate();
 
 		switch (profiles.get(caller)) {
 			case (null) {

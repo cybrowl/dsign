@@ -79,6 +79,7 @@ test('UsernameRegistry[mishicat].create_profile(): with valid username => #ok - 
 		await username_registry_actor.mishicat.create_profile('mishicat');
 
 	t.assert(username.length > 2, 'Created Profile');
+	t.end();
 });
 
 test('UsernameRegistry[motoko].create_profile(): with valid username => #ok - Created Profile', async function (t) {
@@ -100,6 +101,7 @@ test('Creator[mishicat].total_users(): => #ok - NumberOfUsers', async function (
 	const users_total = await creator_actor_mishicat.total_users();
 
 	t.assert(users_total > 0, 'Has Created User');
+	t.end();
 });
 
 test('Creator[mishicat].create_project(): => #ok - NumberOfUsers', async function (t) {
@@ -117,7 +119,8 @@ test('Creator[mishicat].create_project(): => #ok - NumberOfUsers', async functio
 		description: ['first project']
 	});
 
-	console.log('response: ', response);
-
-	// t.assert(users_total > 0, 'Has Created User');
+	t.ok(response.ok, 'Project creation response should be ok');
+	t.equal(response.ok.name, 'Project One', 'Project name should match');
+	t.deepEqual(response.ok.description, ['first project'], 'Project description should match');
+	t.end();
 });

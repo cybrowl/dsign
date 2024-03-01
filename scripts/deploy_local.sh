@@ -4,7 +4,7 @@ echo "env: dev"
 cp ./src/env/env_local.mo ./src/env/env.mo
 
 # Cycles
-dfx ledger fabricate-cycles --all
+# dfx ledger fabricate-cycles --all
 
 # II
 dfx deploy internet_identity
