@@ -52,8 +52,8 @@ test('UsernameRegistry[mishicat].version(): => #ok - Version Number', async func
 	t.end();
 });
 
-test('UsernameRegistry[mishicat].initialize_canisters(): => #ok - CanisterId', async function (t) {
-	const canister_id = await username_registry_actor.mishicat.initialize_canisters();
+test('UsernameRegistry[mishicat].init(): => #ok - CanisterId', async function (t) {
+	const canister_id = await username_registry_actor.mishicat.init();
 
 	t.assert(canister_id.length > 2, 'Correct Length');
 	t.end();

@@ -20,6 +20,7 @@ actor class Creator(username_registry : Principal) = this {
 	type Profile = Types.Profile;
 	type ProfilePublic = Types.ProfilePublic;
 	type Project = Types.Project;
+	type ProjectPublic = Types.ProjectPublic;
 	type ProjectID = Types.ProjectID;
 	type Snap = Types.Snap;
 	type SnapID = Types.SnapID;
@@ -240,7 +241,7 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Create Project
-	public shared ({ caller }) func create_project(args : ArgsCreateProject) : async Result.Result<Project, ErrProject> {
+	public shared ({ caller }) func create_project(args : ArgsCreateProject) : async Result.Result<ProjectPublic, ErrProject> {
 		//TODO: sanitize the args
 
 		let id : ProjectID = UUID.generate_uuid();
@@ -281,7 +282,12 @@ actor class Creator(username_registry : Principal) = this {
 
 				profiles.put(caller, profile_updated);
 
-				return #ok(project);
+				let project_public : ProjectPublic = {
+					project with
+					owner = null;
+				};
+
+				return #ok(project_public);
 			};
 		};
 	};
@@ -297,6 +303,7 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Create Feedback Topic
+	// TODO: skip until I fix everthing we have in UI
 	public shared ({ caller }) func create_feedback_topic() : async Result.Result<Text, Text> {
 		return #ok("");
 	};

@@ -125,6 +125,19 @@ module {
 		metrics : Metrics;
 	};
 
+	public type ProjectPublic = {
+		id : ProjectID;
+		canister_id : CanisterID;
+		created : Time;
+		name : Text;
+		description : ?Text;
+		username : Text;
+		owner : ?UserPrincipal;
+		snaps : [SnapID];
+		feedback : ?Feedback;
+		metrics : Metrics;
+	};
+
 	public type ProjectRef = {
 		id : ProjectID;
 		canister_id : CanisterID;

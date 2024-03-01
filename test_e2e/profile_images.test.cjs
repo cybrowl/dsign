@@ -87,14 +87,10 @@ test('FileScalingManager[mishicat].version(): => #ok - Version Number', async fu
 	t.end();
 });
 
-test('FileScalingManager[mishicat].init(): => #err - FileStorageCanisterIdExists', async function (t) {
-	const { ok: canister_id, err: error } = await file_scaling_manager_actor.mishicat.init();
+test('FileScalingManager[mishicat].init(): => #ok - CanisterId', async function (t) {
+	const canister_id = await file_scaling_manager_actor.mishicat.init();
 
-	if (canister_id) {
-		console.log('please run `npm run deploy or call init func in file_scaling_manager_actor`');
-	}
-
-	t.deepEqual(error, { FileStorageCanisterIdExists: true });
+	t.assert(canister_id.length > 2, 'Correct Length');
 	t.end();
 });
 

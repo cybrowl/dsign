@@ -208,8 +208,8 @@ actor UsernameRegistry = {
 		// ignore CanisterIdsLedger.save_canister(canister_child);
 	};
 
-	public shared (msg) func initialize_canisters() : async Text {
-		let tags = [("actor_name", ACTOR_NAME), ("method", "initialize_canisters")];
+	public shared (msg) func init() : async Text {
+		let tags = [("actor_name", ACTOR_NAME), ("method", "init")];
 
 		if (creator_canister_id.size() > 1) {
 			ignore Logger.log_event(tags, "exists creator_canister_id: " # creator_canister_id);

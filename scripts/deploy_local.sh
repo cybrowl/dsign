@@ -3,6 +3,9 @@
 echo "env: dev"
 cp ./src/env/env_local.mo ./src/env/env.mo
 
+# Cycles
+dfx ledger fabricate-cycles --all
+
 # II
 dfx deploy internet_identity
 
@@ -14,7 +17,7 @@ dfx deploy logger
 
 # Username Registry
 dfx deploy username_registry
-dfx canister call username_registry initialize_canisters # init
+dfx canister call username_registry init # init
 
 # export EXPLORE_PRINCIPAL=$(dfx canister id explore)
 # export LOGGER_PRINCIPAL=$(dfx canister id logger)
