@@ -178,6 +178,72 @@ test('Creator[mishicat].get_profile_by_username(): with valid username => #ok - 
 	t.end();
 });
 
+test('Creator[mishicat].update_project(): with no optional args => #ok - ProjectPublic', async function (t) {
+	const { ok: username_info, err: _ } =
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
+
+	const creator_actor_mishicat = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const { ok: project } = await creator_actor_mishicat.update_project({
+		id: project_id,
+		name: [],
+		description: []
+	});
+
+	t.ok(project, 'Project creation response should be ok');
+	t.equal(project.name, 'Project One', 'Project name should match');
+	t.deepEqual(project.description, ['first project'], 'Project description should match');
+	t.end();
+});
+
+test('Creator[mishicat].update_project(): with name only => #ok - ProjectPublic', async function (t) {
+	const { ok: username_info, err: _ } =
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
+
+	const creator_actor_mishicat = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const { ok: project } = await creator_actor_mishicat.update_project({
+		id: project_id,
+		name: ['Project One Updated'],
+		description: []
+	});
+
+	t.ok(project, 'Project creation response should be ok');
+	t.equal(project.name, 'Project One Updated', 'Project name should match');
+	t.deepEqual(project.description, ['first project'], 'Project description should match');
+	t.end();
+});
+
+test('Creator[mishicat].update_project(): with description only => #ok - ProjectPublic', async function (t) {
+	const { ok: username_info, err: _ } =
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
+
+	const creator_actor_mishicat = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const { ok: project } = await creator_actor_mishicat.update_project({
+		id: project_id,
+		name: [],
+		description: ['first project updated']
+	});
+
+	t.ok(project, 'Project creation response should be ok');
+	t.equal(project.name, 'Project One Updated', 'Project name should match');
+	t.deepEqual(project.description, ['first project updated'], 'Project description should match');
+	t.end();
+});
+
 test('Creator[mishicat].delete_project(): with valid id => #ok - Bool', async function (t) {
 	const { ok: username_info, err: _ } =
 		await username_registry_actor.mishicat.get_info_by_username('mishicat');
