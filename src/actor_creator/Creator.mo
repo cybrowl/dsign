@@ -229,13 +229,18 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Get Project
-	public query func get_project(id : ProjectID) : async Result.Result<Project, ErrProject> {
+	public query func get_project(id : ProjectID) : async Result.Result<ProjectPublic, ErrProject> {
 		switch (projects.get(id)) {
 			case (null) {
 				return #err(#ProjectNotFound(true));
 			};
 			case (?project) {
-				return #ok(project);
+				let project_public : ProjectPublic = {
+					project with
+					owner = null;
+				};
+
+				return #ok(project_public);
 			};
 		};
 	};

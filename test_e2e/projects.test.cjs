@@ -23,6 +23,7 @@ let anonymous_identity = null;
 const { getActor: get_actor } = require('../test-utils/actor.cjs');
 
 let username_registry_actor = {};
+let project_id = '';
 
 test('Setup Actors', async function () {
 	console.log('=========== Profile Creation ===========');
@@ -45,14 +46,14 @@ test('Setup Actors', async function () {
 	);
 });
 
-test('UsernameRegistry[mishicat].version(): => #ok - Version Number', async function (t) {
+test('UsernameRegistry[mishicat].version(): => #ok - Nat', async function (t) {
 	const version_num = await username_registry_actor.mishicat.version();
 
 	t.assert(version_num === 1n, 'Correct Version');
 	t.end();
 });
 
-test('UsernameRegistry[mishicat].delete_profile(): with valid principal => #ok - Deleted', async function (t) {
+test('UsernameRegistry[mishicat].delete_profile(): with valid principal => #ok - Bool', async function (t) {
 	// Setup: Ensure there's a profile to delete
 	await username_registry_actor.mishicat.create_profile('mishicat');
 
@@ -63,7 +64,7 @@ test('UsernameRegistry[mishicat].delete_profile(): with valid principal => #ok -
 	t.end();
 });
 
-test('UsernameRegistry[motoko].delete_profile(): with valid principal => #ok - Deleted', async function (t) {
+test('UsernameRegistry[motoko].delete_profile(): with valid principal => #ok - Bool', async function (t) {
 	// Setup: Ensure there's a profile to delete
 	await username_registry_actor.motoko.create_profile('motoko');
 
@@ -74,7 +75,7 @@ test('UsernameRegistry[motoko].delete_profile(): with valid principal => #ok - D
 	t.end();
 });
 
-test('UsernameRegistry[mishicat].create_profile(): with valid username => #ok - Created Profile', async function (t) {
+test('UsernameRegistry[mishicat].create_profile(): with valid username => #ok - Username', async function (t) {
 	const { ok: username, err: _ } =
 		await username_registry_actor.mishicat.create_profile('mishicat');
 
@@ -82,7 +83,7 @@ test('UsernameRegistry[mishicat].create_profile(): with valid username => #ok - 
 	t.end();
 });
 
-test('UsernameRegistry[motoko].create_profile(): with valid username => #ok - Created Profile', async function (t) {
+test('UsernameRegistry[motoko].create_profile(): with valid username => #ok - Username', async function (t) {
 	const { ok: username, err: _ } = await username_registry_actor.motoko.create_profile('motoko');
 
 	t.assert(username.length > 2, 'Created Profile');
@@ -104,7 +105,7 @@ test('Creator[mishicat].total_users(): => #ok - NumberOfUsers', async function (
 	t.end();
 });
 
-test('Creator[mishicat].create_project(): => #ok - NumberOfUsers', async function (t) {
+test('Creator[mishicat].create_project(): with valid args => #ok - ProjectPublic', async function (t) {
 	const { ok: username_info, err: _ } =
 		await username_registry_actor.mishicat.get_info_by_username('mishicat');
 
@@ -114,13 +115,33 @@ test('Creator[mishicat].create_project(): => #ok - NumberOfUsers', async functio
 		mishicat_identity
 	);
 
-	const response = await creator_actor_mishicat.create_project({
+	const { ok: project } = await creator_actor_mishicat.create_project({
 		name: 'Project One',
 		description: ['first project']
 	});
 
-	t.ok(response.ok, 'Project creation response should be ok');
-	t.equal(response.ok.name, 'Project One', 'Project name should match');
-	t.deepEqual(response.ok.description, ['first project'], 'Project description should match');
+	project_id = project.id;
+
+	t.ok(project, 'Project creation response should be ok');
+	t.equal(project.name, 'Project One', 'Project name should match');
+	t.deepEqual(project.description, ['first project'], 'Project description should match');
+	t.end();
+});
+
+test('Creator[mishicat].get_project(): with valid id => #ok - ProjectPublic', async function (t) {
+	const { ok: username_info, err: _ } =
+		await username_registry_actor.mishicat.get_info_by_username('mishicat');
+
+	const creator_actor_mishicat = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		mishicat_identity
+	);
+
+	const { ok: project } = await creator_actor_mishicat.get_project(project_id);
+
+	t.ok(project, 'Project creation response should be ok');
+	t.equal(project.name, 'Project One', 'Project name should match');
+	t.deepEqual(project.description, ['first project'], 'Project description should match');
 	t.end();
 });
