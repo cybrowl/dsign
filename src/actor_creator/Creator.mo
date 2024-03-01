@@ -8,7 +8,7 @@ import Time "mo:base/Time";
 import Logger "canister:logger";
 
 import Types "./types";
-import UUID "../c_types/uuid";
+import UUID "../libs/uuid";
 
 actor class Creator(username_registry : Principal) = this {
 	type ArgsCreateProject = Types.ArgsCreateProject;
