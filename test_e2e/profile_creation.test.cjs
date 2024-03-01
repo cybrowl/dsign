@@ -166,14 +166,10 @@ test('Creator[mishicat].get_profile_by_username(): with valid username & owner =
 	t.deepEqual(profile.storage, [], 'Storage array is empty as expected');
 	t.deepEqual(
 		profile.banner,
-		{ id: '', url: '/default_profile_banner.png', canister_id: '', exists: false },
+		{ id: '', url: '/default_profile_banner.png', canister_id: '' },
 		'Banner matches expected'
 	);
-	t.deepEqual(
-		profile.avatar,
-		{ id: '', url: '', canister_id: '', exists: false },
-		'Avatar matches expected'
-	);
+	t.deepEqual(profile.avatar, { id: '', url: '', canister_id: '' }, 'Avatar matches expected');
 	t.notOk(errProfile, 'No error when retrieving profile by valid username');
 	t.end();
 });
@@ -203,14 +199,10 @@ test('Creator[mishicat].get_profile_by_username(): with valid username & NOT own
 	t.deepEqual(profile.storage, [], 'Storage array is empty as expected');
 	t.deepEqual(
 		profile.banner,
-		{ id: '', url: '/default_profile_banner.png', canister_id: '', exists: false },
+		{ id: '', url: '/default_profile_banner.png', canister_id: '' },
 		'Banner matches expected'
 	);
-	t.deepEqual(
-		profile.avatar,
-		{ id: '', url: '', canister_id: '', exists: false },
-		'Avatar matches expected'
-	);
+	t.deepEqual(profile.avatar, { id: '', url: '', canister_id: '' }, 'Avatar matches expected');
 	t.notOk(errProfile, 'No error when retrieving profile by valid username');
 	t.end();
 });
