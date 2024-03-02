@@ -14,11 +14,40 @@ module {
 
 	// public type ICInterface = ICInterfaceTypes.Self;
 
+	public type Metrics = {
+		likes : Nat;
+		views : Nat;
+	};
+
+	// File Asset
+	type ContentEncoding = {
+		#Identity;
+		#GZIP;
+	};
+
+	public type FileAsset = {
+		id : Text;
+		canister_id : Text;
+		chunks_size : Nat;
+		content_encoding : ContentEncoding;
+		content_size : Nat;
+		content_type : Text;
+		filename : Text;
+		url : Text;
+	};
+
 	// Profile
 	public type ArgsUpdateProfile = {
 		id : Text;
 		canister_id : Text;
 		url : Text;
+	};
+
+	type StorageMetrics = {
+		text : Nat;
+		images : Nat;
+		files : Nat;
+		total : Nat;
 	};
 
 	public type Profile = {
@@ -37,7 +66,7 @@ module {
 		owner : UserPrincipal;
 		projects : [ProjectID];
 		favorites : [FavoriteID];
-		storage : ?Storage;
+		storage_metrics : ?StorageMetrics;
 	};
 
 	public type ProfilePublic = {
@@ -56,7 +85,7 @@ module {
 		is_owner : Bool;
 		projects : [Project];
 		favorites : [Project];
-		storage : ?Storage;
+		storage_metrics : ?StorageMetrics;
 	};
 
 	public type ErrProfile = {
@@ -65,44 +94,6 @@ module {
 		#ProfileNotFound : Bool;
 		#InvalidProfileArguments : Bool;
 		#UsernamePrincipalNotFound;
-	};
-
-	type Storage = {
-		text : Nat;
-		images : Nat;
-		files : Nat;
-		total : Nat;
-	};
-
-	type File = {
-		created : Time;
-		name : Text;
-		size : Nat;
-		url : Text;
-	};
-
-	type Message = {
-		created : Time;
-		content : Text;
-		username : Text;
-	};
-
-	public type Topic = {
-		id : Text;
-		snap_ref : SnapRef;
-		snap_name : Text;
-		name : Text;
-		file : ?File;
-		messages : [Message];
-	};
-
-	public type Feedback = {
-		topics : [Topic];
-	};
-
-	public type Metrics = {
-		likes : Nat;
-		views : Nat;
 	};
 
 	// Project
@@ -154,6 +145,26 @@ module {
 		#NotOwner : Bool;
 	};
 
+	// Project Feedback
+	type Message = {
+		created : Time;
+		content : Text;
+		username : Text;
+	};
+
+	public type Topic = {
+		id : Text;
+		snap_ref : SnapRef;
+		snap_name : Text;
+		name : Text;
+		design_file : ?FileAsset;
+		messages : [Message];
+	};
+
+	public type Feedback = {
+		topics : [Topic];
+	};
+
 	// Snap
 	public type ArgsCreateSnap = {
 		name : Text;
@@ -161,15 +172,6 @@ module {
 		design_file : ?FileAsset;
 		images : [FileAsset];
 		image_cover_location : ?Nat8;
-	};
-
-	public type FileAsset = {
-		id : Text;
-		canister_id : Text;
-		filename : Text;
-		url : Text;
-		content_size : Nat;
-		content_type : Text;
 	};
 
 	public type Snap = {
@@ -184,10 +186,7 @@ module {
 		image_cover_location : Nat8;
 		images : [FileAsset];
 		project_ref : ProjectRef;
-		metrics : {
-			likes : Nat;
-			views : Nat;
-		};
+		metrics : Metrics;
 	};
 
 	public type SnapPublic = {
@@ -202,10 +201,7 @@ module {
 		image_cover_location : Nat8;
 		images : [FileAsset];
 		project_ref : ProjectRef;
-		metrics : {
-			likes : Nat;
-			views : Nat;
-		};
+		metrics : Metrics;
 	};
 
 	public type SnapRef = {

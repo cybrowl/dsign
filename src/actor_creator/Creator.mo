@@ -128,7 +128,7 @@ actor class Creator(username_registry : Principal) = this {
 							is_owner = Principal.equal(caller, profile.owner);
 							projects = projects_public;
 							favorites = favorites_public;
-							storage = profile.storage;
+							storage_metrics = profile.storage_metrics;
 						});
 					};
 				};
@@ -164,7 +164,7 @@ actor class Creator(username_registry : Principal) = this {
 			owner = owner;
 			favorites = [];
 			projects = [];
-			storage = null;
+			storage_metrics = null;
 		};
 
 		profiles.put(owner, profile);
