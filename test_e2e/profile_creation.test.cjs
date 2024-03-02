@@ -163,7 +163,7 @@ test('Creator[mishicat].get_profile_by_username(): with valid username & owner =
 	t.equal(profile.is_owner, true, 'Owner of profile');
 	t.deepEqual(profile.favorites, [], 'Favorites array is empty as expected');
 	t.deepEqual(profile.projects, [], 'Projects array is empty as expected');
-	t.deepEqual(profile.storage, [], 'Storage array is empty as expected');
+	t.deepEqual(profile.storage_metrics, [], 'Storage array is empty as expected');
 	t.deepEqual(
 		profile.banner,
 		{ id: '', url: '/default_profile_banner.png', canister_id: '' },
@@ -196,7 +196,7 @@ test('Creator[mishicat].get_profile_by_username(): with valid username & NOT own
 	t.equal(profile.is_owner, false, 'NOT Owner of profile');
 	t.deepEqual(profile.favorites, [], 'Favorites array is empty as expected');
 	t.deepEqual(profile.projects, [], 'Projects array is empty as expected');
-	t.deepEqual(profile.storage, [], 'Storage array is empty as expected');
+	t.deepEqual(profile.storage_metrics, [], 'Storage array is empty as expected');
 	t.deepEqual(
 		profile.banner,
 		{ id: '', url: '/default_profile_banner.png', canister_id: '' },
