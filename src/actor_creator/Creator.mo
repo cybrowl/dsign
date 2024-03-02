@@ -1,10 +1,10 @@
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
+import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
-import Option "mo:base/Option";
 import Time "mo:base/Time";
 
 import Logger "canister:logger";
@@ -14,6 +14,7 @@ import UUID "../libs/uuid";
 
 actor class Creator(username_registry : Principal) = this {
 	type ArgsCreateProject = Types.ArgsCreateProject;
+	type ArgsCreateSnap = Types.ArgsCreateSnap;
 	type ArgsUpdateProfile = Types.ArgsUpdateProfile;
 	type ArgsUpdateProject = Types.ArgsUpdateProject;
 	type ErrProfile = Types.ErrProfile;
@@ -409,8 +410,64 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Create Snap
-	public shared ({ caller }) func create_snap() : async Result.Result<Text, Text> {
-		return #ok("");
+	public shared ({ caller }) func create_snap(args : ArgsCreateSnap) : async Result.Result<SnapPublic, ErrSnap> {
+		switch (profiles.get(caller)) {
+			case (null) {
+				return #err(#ProfileNotFound(true));
+			};
+			case (?profile) {
+				switch (projects.get(args.project_id)) {
+					case (null) {
+						return #err(#ProjectNotFound(true));
+					};
+					case (?project) {
+						if (Principal.notEqual(project.owner, caller)) {
+							return #err(#NotOwner(true));
+						};
+
+						let id : SnapID = UUID.generate();
+
+						let snap : Snap = {
+							id = id;
+							project_id = args.project_id;
+							canister_id = Principal.toText(Principal.fromActor(this));
+							created = Time.now();
+							name = args.name;
+							tags = Option.get(args.tags, []);
+							username = profile.username;
+							owner = caller;
+							design_file = args.design_file;
+							images = args.images;
+							image_cover_location = args.image_cover_location;
+							metrics = {
+								likes = 0;
+								views = 0;
+							};
+						};
+
+						snaps.put(id, snap);
+
+						// Add Snap to Project
+						let project_snaps : Buffer.Buffer<SnapID> = Buffer.fromArray(project.snaps);
+						project_snaps.add(id);
+
+						let project_updated : Project = {
+							project with
+							snaps = Buffer.toArray(project_snaps);
+						};
+
+						projects.put(args.project_id, project_updated);
+
+						let snap_public : SnapPublic = {
+							snap with
+							owner = null;
+						};
+
+						return #ok(snap_public);
+					};
+				};
+			};
+		};
 	};
 
 	// Update Snap
@@ -429,7 +486,7 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Delete Snap Design File
-	public shared ({ caller }) func delete_snap_design_file() : async Result.Result<Text, Text> {
+	public shared ({ caller }) func delete_snap_design_file(id : SnapID) : async Result.Result<Text, Text> {
 		return #ok("");
 	};
 

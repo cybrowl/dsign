@@ -167,40 +167,41 @@ module {
 
 	// Snap
 	public type ArgsCreateSnap = {
+		project_id : ProjectID;
 		name : Text;
 		tags : ?[Text];
 		design_file : ?FileAsset;
 		images : [FileAsset];
-		image_cover_location : ?Nat8;
+		image_cover_location : Nat8;
 	};
 
 	public type Snap = {
 		id : SnapID;
+		project_id : ProjectID;
 		canister_id : CanisterID;
 		created : Time;
 		name : Text;
 		tags : [Text];
 		username : Username;
 		owner : UserPrincipal;
-		design_file : FileAsset;
+		design_file : ?FileAsset;
 		image_cover_location : Nat8;
 		images : [FileAsset];
-		project_ref : ProjectRef;
 		metrics : Metrics;
 	};
 
 	public type SnapPublic = {
 		id : SnapID;
+		project_id : ProjectID;
 		canister_id : CanisterID;
 		created : Time;
 		name : Text;
 		tags : [Text];
 		username : Username;
 		owner : ?UserPrincipal;
-		design_file : FileAsset;
+		design_file : ?FileAsset;
 		image_cover_location : Nat8;
 		images : [FileAsset];
-		project_ref : ProjectRef;
 		metrics : Metrics;
 	};
 
@@ -211,6 +212,7 @@ module {
 
 	public type ErrSnap = {
 		#ProfileNotFound : Bool;
+		#ProjectNotFound : Bool;
 		#SnapNotFound : Bool;
 		#NotOwner : Bool;
 	};
