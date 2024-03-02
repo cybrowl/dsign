@@ -40,7 +40,6 @@ module {
 		storage : ?Storage;
 	};
 
-	// Profile Public
 	public type ProfilePublic = {
 		avatar : {
 			id : Text;
@@ -156,11 +155,17 @@ module {
 	};
 
 	// Snap
+	public type ArgsCreateSnap = {
+		name : Text;
+		tags : ?[Text];
+		images : ?[Bool];
+	};
+
 	public type Snap = {
 		id : SnapID;
 		canister_id : CanisterID;
 		created : Time;
-		title : Text;
+		name : Text;
 		tags : [Text];
 		username : Username;
 		owner : UserPrincipal;
@@ -178,7 +183,7 @@ module {
 		id : SnapID;
 		canister_id : CanisterID;
 		created : Time;
-		title : Text;
+		name : Text;
 		tags : [Text];
 		username : Username;
 		owner : ?UserPrincipal;
