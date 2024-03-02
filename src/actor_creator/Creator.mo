@@ -371,6 +371,8 @@ actor class Creator(username_registry : Principal) = this {
 
 						projects.delete(id);
 
+						//TODO: needs to delete snaps as well
+
 						let profile_updated : Profile = {
 							profile with
 							projects = Buffer.toArray(profile_projects);

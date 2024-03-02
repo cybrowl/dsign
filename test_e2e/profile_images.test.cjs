@@ -36,7 +36,7 @@ let username_registry_actor = {};
 let file_scaling_manager_actor = {};
 
 test('Setup Actors', async function () {
-	console.log('=========== Profile Update Images ===========');
+	console.log('=========== Profile Images ===========');
 
 	// Username Registry
 	username_registry_actor.nova = await get_actor(

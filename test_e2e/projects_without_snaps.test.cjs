@@ -26,7 +26,7 @@ let username_registry_actor = {};
 let project_id = '';
 
 test('Setup Actors', async function () {
-	console.log('=========== Profile Creation ===========');
+	console.log('=========== Projects Without Snaps ===========');
 
 	// Username Registry
 	username_registry_actor.owl = await get_actor(

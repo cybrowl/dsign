@@ -16,7 +16,8 @@
 		"test-config": "tape test_e2e/dfx.config.test.cjs",
 		"test-pc": "npm run idl_for_testing && tape test_e2e/profile_creation.test.cjs",
 		"test-pi": "npm run idl_for_testing && tape test_e2e/profile_images.test.cjs",
-		"test-p": "npm run idl_for_testing && tape test_e2e/projects.test.cjs"
+		"test-p": "npm run idl_for_testing && tape test_e2e/projects_without_snaps.test.cjs",
+		"test-ps": "npm run idl_for_testing && tape test_e2e/projects_with_snaps.test.cjs"
 	},
 	"dependencies": {
 		"crc-32": "^1.2.2",
