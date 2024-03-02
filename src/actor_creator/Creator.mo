@@ -18,6 +18,7 @@ actor class Creator(username_registry : Principal) = this {
 	type ArgsUpdateProject = Types.ArgsUpdateProject;
 	type ErrProfile = Types.ErrProfile;
 	type ErrProject = Types.ErrProject;
+	type ErrSnap = Types.ErrSnap;
 	type FavoriteID = Types.FavoriteID;
 	type Profile = Types.Profile;
 	type ProfilePublic = Types.ProfilePublic;
@@ -26,6 +27,7 @@ actor class Creator(username_registry : Principal) = this {
 	type ProjectPublic = Types.ProjectPublic;
 	type Snap = Types.Snap;
 	type SnapID = Types.SnapID;
+	type SnapPublic = Types.SnapPublic;
 	type Username = Types.Username;
 	type UserPrincipal = Types.UserPrincipal;
 
@@ -390,8 +392,20 @@ actor class Creator(username_registry : Principal) = this {
 
 	// ------------------------- Snaps -------------------------
 	// Get Snap
-	public query func get_snap(id : SnapID) : async Text {
-		return "";
+	public query func get_snap(id : SnapID) : async Result.Result<SnapPublic, ErrSnap> {
+		switch (snaps.get(id)) {
+			case (null) {
+				return #err(#SnapNotFound(true));
+			};
+			case (?snap) {
+				let snap_public : SnapPublic = {
+					snap with
+					owner = null;
+				};
+
+				return #ok(snap_public);
+			};
+		};
 	};
 
 	// Create Snap

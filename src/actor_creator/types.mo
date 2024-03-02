@@ -174,9 +174,33 @@ module {
 		};
 	};
 
+	public type SnapPublic = {
+		id : SnapID;
+		canister_id : CanisterID;
+		created : Time;
+		title : Text;
+		tags : [Text];
+		username : Username;
+		owner : ?UserPrincipal;
+		file_asset : Bool;
+		image_cover_location : Nat8;
+		images : [Bool];
+		project_ref : ProjectRef;
+		metrics : {
+			likes : Nat;
+			views : Nat;
+		};
+	};
+
 	public type SnapRef = {
 		id : SnapID;
 		canister_id : CanisterID;
+	};
+
+	public type ErrSnap = {
+		#ProfileNotFound : Bool;
+		#SnapNotFound : Bool;
+		#NotOwner : Bool;
 	};
 
 	// Actor Interface
