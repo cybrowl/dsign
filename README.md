@@ -9,20 +9,12 @@ https://github.com/cybrowl/dsign-components
 ## Getting Started
 
 ```
-npm run boot
-```
-
-## Unit Testing
-
-```
-make
+npm run deploy
 ```
 
 ## Canister Testing
 
 ```
-run `npm run test-ac` once to create accounts
-
 npm run test-all
 ```
 
@@ -31,11 +23,11 @@ npm run test-all
 create .env file
 
 ```
-DEFAULT_IDENTITY=
 MOTOKO_IDENTITY=
 MISHICAT_IDENTITY=
-DEPLOY_ENV=dev
-ADMIN_IDENTITY=
-TEST_IDENTITY=
-LOGGER_IDENTITY=
+NOVA_IDENTITY=
+DAPHNE_IDENTITY=
+OWL_IDENTITY=
+DOMINIC_IDENTITY=
+NIKOLA_IDENTITY=
 ```

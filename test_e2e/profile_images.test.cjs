@@ -24,8 +24,8 @@ const {
 // Identities
 const { parseIdentity } = require('../test-utils/identities/identity.cjs');
 
-let mishicat_identity = parseIdentity(process.env.MISHICAT_IDENTITY);
-let motoko_identity = parseIdentity(process.env.MOTOKO_IDENTITY);
+let nova_identity = parseIdentity(process.env.NOVA_IDENTITY);
+let daphne_identity = parseIdentity(process.env.DAPHNE_IDENTITY);
 let anonymous_identity = null;
 
 // Utils
@@ -39,15 +39,15 @@ test('Setup Actors', async function () {
 	console.log('=========== Profile Update Images ===========');
 
 	// Username Registry
-	username_registry_actor.mishicat = await get_actor(
+	username_registry_actor.nova = await get_actor(
 		username_registry_canister_id,
 		username_registry_interface,
-		mishicat_identity
+		nova_identity
 	);
-	username_registry_actor.motoko = await get_actor(
+	username_registry_actor.daphne = await get_actor(
 		username_registry_canister_id,
 		username_registry_interface,
-		motoko_identity
+		daphne_identity
 	);
 	username_registry_actor.anonymous = await get_actor(
 		username_registry_canister_id,
@@ -56,15 +56,15 @@ test('Setup Actors', async function () {
 	);
 
 	// File Scaling Manager
-	file_scaling_manager_actor.mishicat = await get_actor(
+	file_scaling_manager_actor.nova = await get_actor(
 		file_scaling_manager_canister_id,
 		file_scaling_manager_interface,
-		mishicat_identity
+		nova_identity
 	);
-	file_scaling_manager_actor.motoko = await get_actor(
+	file_scaling_manager_actor.daphne = await get_actor(
 		file_scaling_manager_canister_id,
 		file_scaling_manager_interface,
-		motoko_identity
+		daphne_identity
 	);
 	file_scaling_manager_actor.anonymous = await get_actor(
 		file_scaling_manager_canister_id,
@@ -73,29 +73,29 @@ test('Setup Actors', async function () {
 	);
 });
 
-test('UsernameRegistry[mishicat].version(): => #ok - Version Number', async function (t) {
-	const version_num = await username_registry_actor.mishicat.version();
+test('UsernameRegistry[nova].version(): => #ok - Version Number', async function (t) {
+	const version_num = await username_registry_actor.nova.version();
 
 	t.assert(version_num === 1n, 'Correct Version');
 	t.end();
 });
 
-test('FileScalingManager[mishicat].version(): => #ok - Version Number', async function (t) {
-	const version_num = await file_scaling_manager_actor.mishicat.version();
+test('FileScalingManager[nova].version(): => #ok - Version Number', async function (t) {
+	const version_num = await file_scaling_manager_actor.nova.version();
 
 	t.assert(version_num === 1n, 'Correct Version');
 	t.end();
 });
 
-test('FileScalingManager[mishicat].init(): => #ok - CanisterId', async function (t) {
-	const canister_id = await file_scaling_manager_actor.mishicat.init();
+test('FileScalingManager[nova].init(): => #ok - CanisterId', async function (t) {
+	const canister_id = await file_scaling_manager_actor.nova.init();
 
 	t.assert(canister_id.length > 2, 'Correct Length');
 	t.end();
 });
 
-test('FileScalingManager[mishicat].get_current_canister_id(): => #ok - CanisterId', async function (t) {
-	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
+test('FileScalingManager[nova].get_current_canister_id(): => #ok - CanisterId', async function (t) {
+	const canister_id = await file_scaling_manager_actor.nova.get_current_canister_id();
 
 	// Example regex for basic validation, adjust according to your expected format
 	const pattern = /^[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[cai]{3}$/;
@@ -105,8 +105,8 @@ test('FileScalingManager[mishicat].get_current_canister_id(): => #ok - CanisterI
 	t.end();
 });
 
-test('FileScalingManager[mishicat].get_current_canister(): => #ok - canister', async function (t) {
-	const canister = await file_scaling_manager_actor.mishicat.get_current_canister();
+test('FileScalingManager[nova].get_current_canister(): => #ok - canister', async function (t) {
+	const canister = await file_scaling_manager_actor.nova.get_current_canister();
 
 	assert(
 		Array.isArray(canister) && canister.length > 0,
@@ -134,37 +134,32 @@ test('FileScalingManager[mishicat].get_current_canister(): => #ok - canister', a
 	t.end();
 });
 
-test('FileScalingManager[mishicat].get_file_storage_registry_size(): => #ok - size', async function (t) {
-	const size = await file_scaling_manager_actor.mishicat.get_file_storage_registry_size();
+test('FileScalingManager[nova].get_file_storage_registry_size(): => #ok - size', async function (t) {
+	const size = await file_scaling_manager_actor.nova.get_file_storage_registry_size();
 
 	t.assert(size === 1n, 'file storage registry size');
 });
 
-test('UsernameRegistry[mishicat].delete_profile(): with valid principal => #ok - Deleted', async function (t) {
+test('UsernameRegistry[nova].delete_profile(): with valid principal => #ok - Deleted', async function (t) {
 	// Setup: Ensure there's a profile to delete
-	await username_registry_actor.mishicat.create_profile('mishicat');
+	await username_registry_actor.nova.create_profile('nova');
 
-	const { ok: deleted, err: _ } = await username_registry_actor.mishicat.delete_profile();
+	const { ok: deleted, err: _ } = await username_registry_actor.nova.delete_profile();
 
 	t.assert(deleted === true, 'Deleted Profile');
 
 	t.end();
 });
 
-test('UsernameRegistry[mishicat].create_profile(): with valid username => #ok - Created Profile', async function (t) {
-	const { ok: username, err: _ } =
-		await username_registry_actor.mishicat.create_profile('mishicat');
+test('UsernameRegistry[nova].create_profile(): with valid username => #ok - Created Profile', async function (t) {
+	const { ok: username, err: _ } = await username_registry_actor.nova.create_profile('nova');
 
 	t.assert(username.length > 2, 'Created Profile');
 });
 
-test('FileStorage[mishicat].version(): => #ok - Version Number', async function (t) {
-	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
-	const file_storage_actor = await get_actor(
-		canister_id,
-		file_storage_interface,
-		mishicat_identity
-	);
+test('FileStorage[nova].version(): => #ok - Version Number', async function (t) {
+	const canister_id = await file_scaling_manager_actor.nova.get_current_canister_id();
+	const file_storage_actor = await get_actor(canister_id, file_storage_interface, nova_identity);
 	const file_storage = new FileStorage(file_storage_actor);
 
 	const version_num = await file_storage.version();
@@ -172,13 +167,9 @@ test('FileStorage[mishicat].version(): => #ok - Version Number', async function 
 	t.end();
 });
 
-test('FileStorage[mishicat].create_chunk & create_file_from_chunks(): => #ok - File Stored', async function (t) {
-	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
-	const file_storage_actor = await get_actor(
-		canister_id,
-		file_storage_interface,
-		mishicat_identity
-	);
+test('FileStorage[nova].create_chunk & create_file_from_chunks(): => #ok - File Stored', async function (t) {
+	const canister_id = await file_scaling_manager_actor.nova.get_current_canister_id();
+	const file_storage_actor = await get_actor(canister_id, file_storage_interface, nova_identity);
 	const file_storage = new FileStorage(file_storage_actor);
 
 	// Image
@@ -224,13 +215,9 @@ test('FileStorage[mishicat].create_chunk & create_file_from_chunks(): => #ok - F
 	t.end();
 });
 
-test('Creator[mishicat].update_profile_avatars(): => #ok - Updated Avatar', async function (t) {
-	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
-	const file_storage_actor = await get_actor(
-		canister_id,
-		file_storage_interface,
-		mishicat_identity
-	);
+test('Creator[nova].update_profile_avatars(): => #ok - Updated Avatar', async function (t) {
+	const canister_id = await file_scaling_manager_actor.nova.get_current_canister_id();
+	const file_storage_actor = await get_actor(canister_id, file_storage_interface, nova_identity);
 	const file_storage = new FileStorage(file_storage_actor);
 
 	// Image
@@ -259,12 +246,12 @@ test('Creator[mishicat].update_profile_avatars(): => #ok - Updated Avatar', asyn
 		}
 	);
 
-	const { ok: username_info, err: _ } = await username_registry_actor.mishicat.get_info();
+	const { ok: username_info, err: _ } = await username_registry_actor.nova.get_info();
 
 	const creator_actor = await get_actor(
 		username_info.canister_id,
 		creator_interface,
-		mishicat_identity
+		nova_identity
 	);
 
 	const { ok: updated_profile, err: err_profile } = await creator_actor.update_profile_avatar({
@@ -288,13 +275,9 @@ test('Creator[mishicat].update_profile_avatars(): => #ok - Updated Avatar', asyn
 	t.end();
 });
 
-test('Creator[mishicat].update_profile_banner(): => #ok - Updated Banner', async function (t) {
-	const canister_id = await file_scaling_manager_actor.mishicat.get_current_canister_id();
-	const file_storage_actor = await get_actor(
-		canister_id,
-		file_storage_interface,
-		mishicat_identity
-	);
+test('Creator[nova].update_profile_banner(): => #ok - Updated Banner', async function (t) {
+	const canister_id = await file_scaling_manager_actor.nova.get_current_canister_id();
+	const file_storage_actor = await get_actor(canister_id, file_storage_interface, nova_identity);
 	const file_storage = new FileStorage(file_storage_actor);
 
 	// Image
@@ -323,12 +306,12 @@ test('Creator[mishicat].update_profile_banner(): => #ok - Updated Banner', async
 		}
 	);
 
-	const { ok: username_info, err: _ } = await username_registry_actor.mishicat.get_info();
+	const { ok: username_info, err: _ } = await username_registry_actor.nova.get_info();
 
 	const creator_actor = await get_actor(
 		username_info.canister_id,
 		creator_interface,
-		mishicat_identity
+		nova_identity
 	);
 
 	const { ok: updated_profile, err: err_profile } = await creator_actor.update_profile_banner({

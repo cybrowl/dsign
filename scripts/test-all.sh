@@ -1,13 +1,10 @@
 #!/bin/bash
 
-# config
-npm run test-config
+# Start tasks in background
+npm run test-config &
+npm run test-pc &
+npm run test-pi &
+npm run test-p &
 
-# profile creation
-npm run test-pc
-
-# profile images testing
-npm run test-pi
-
-# projects
-npm run test-p
+# Wait for all background tasks to finish
+wait
