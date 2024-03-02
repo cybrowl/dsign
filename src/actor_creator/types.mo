@@ -158,7 +158,18 @@ module {
 	public type ArgsCreateSnap = {
 		name : Text;
 		tags : ?[Text];
-		images : ?[Bool];
+		design_file : ?FileAsset;
+		images : [FileAsset];
+		image_cover_location : ?Nat8;
+	};
+
+	public type FileAsset = {
+		id : Text;
+		canister_id : Text;
+		filename : Text;
+		url : Text;
+		content_size : Nat;
+		content_type : Text;
 	};
 
 	public type Snap = {
@@ -169,9 +180,9 @@ module {
 		tags : [Text];
 		username : Username;
 		owner : UserPrincipal;
-		file_asset : Bool;
+		design_file : FileAsset;
 		image_cover_location : Nat8;
-		images : [Bool];
+		images : [FileAsset];
 		project_ref : ProjectRef;
 		metrics : {
 			likes : Nat;
@@ -187,9 +198,9 @@ module {
 		tags : [Text];
 		username : Username;
 		owner : ?UserPrincipal;
-		file_asset : Bool;
+		design_file : FileAsset;
 		image_cover_location : Nat8;
-		images : [Bool];
+		images : [FileAsset];
 		project_ref : ProjectRef;
 		metrics : {
 			likes : Nat;

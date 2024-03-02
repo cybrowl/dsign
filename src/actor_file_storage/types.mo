@@ -45,13 +45,13 @@ module {
 	};
 
 	public type FilePublic = {
+		id : Text;
 		canister_id : Text;
 		chunks_size : Nat;
 		content_encoding : ContentEncoding;
 		content_size : Nat;
 		content_type : Text;
 		filename : Text;
-		id : Text;
 		url : Text;
 	};
 
