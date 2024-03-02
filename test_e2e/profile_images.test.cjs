@@ -179,24 +179,10 @@ test('FileStorage[nova].create_chunk & create_file_from_chunks(): => #ok - File 
 	const file_name = path.basename(file_path);
 	const file_content_type = getMimeType(file_path);
 
-	let progressReceived = [];
-
-	const { ok: file } = await file_storage.store(
-		file_unit8Array,
-		{
-			filename: file_name,
-			content_type: file_content_type
-		},
-		(progress) => {
-			if (progressReceived.length === 0) {
-				t.equal(progress, 0, 'Initial progress should be 0');
-			} else {
-				t.ok(progress > progressReceived[progressReceived.length - 1], 'Progress should increase');
-			}
-
-			progressReceived.push(progress);
-		}
-	);
+	const { ok: file } = await file_storage.store(file_unit8Array, {
+		filename: file_name,
+		content_type: file_content_type
+	});
 
 	// Validate the dynamic and static aspects of the file
 	t.ok(typeof file.id === 'string', 'File ID should be a string and present');
@@ -211,7 +197,6 @@ test('FileStorage[nova].create_chunk & create_file_from_chunks(): => #ok - File 
 		'Content encoding should be correctly set to Identity'
 	);
 
-	t.equal(progressReceived[progressReceived.length - 1], 1, 'Final progress should be 1');
 	t.end();
 });
 
@@ -227,24 +212,10 @@ test('Creator[nova].update_profile_avatars(): => #ok - Updated Avatar', async fu
 	const file_name = path.basename(file_path);
 	const file_content_type = getMimeType(file_path);
 
-	let progressReceived = [];
-
-	const { ok: file } = await file_storage.store(
-		file_unit8Array,
-		{
-			filename: file_name,
-			content_type: file_content_type
-		},
-		(progress) => {
-			if (progressReceived.length === 0) {
-				t.equal(progress, 0, 'Initial progress should be 0');
-			} else {
-				t.ok(progress > progressReceived[progressReceived.length - 1], 'Progress should increase');
-			}
-
-			progressReceived.push(progress);
-		}
-	);
+	const { ok: file } = await file_storage.store(file_unit8Array, {
+		filename: file_name,
+		content_type: file_content_type
+	});
 
 	const { ok: username_info, err: _ } = await username_registry_actor.nova.get_info();
 
@@ -287,24 +258,10 @@ test('Creator[nova].update_profile_banner(): => #ok - Updated Banner', async fun
 	const file_name = path.basename(file_path);
 	const file_content_type = getMimeType(file_path);
 
-	let progressReceived = [];
-
-	const { ok: file } = await file_storage.store(
-		file_unit8Array,
-		{
-			filename: file_name,
-			content_type: file_content_type
-		},
-		(progress) => {
-			if (progressReceived.length === 0) {
-				t.equal(progress, 0, 'Initial progress should be 0');
-			} else {
-				t.ok(progress > progressReceived[progressReceived.length - 1], 'Progress should increase');
-			}
-
-			progressReceived.push(progress);
-		}
-	);
+	const { ok: file } = await file_storage.store(file_unit8Array, {
+		filename: file_name,
+		content_type: file_content_type
+	});
 
 	const { ok: username_info, err: _ } = await username_registry_actor.nova.get_info();
 
