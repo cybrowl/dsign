@@ -22,14 +22,14 @@ const {
 } = require('../canister_refs/actor_canister_ids.cjs');
 
 // Identities
-const { parseIdentity } = require('../test-utils/identities/identity.cjs');
+const { parseIdentity } = require('./actor_identity.cjs');
 
 let nova_identity = parseIdentity(process.env.NOVA_IDENTITY);
 let daphne_identity = parseIdentity(process.env.DAPHNE_IDENTITY);
 let anonymous_identity = null;
 
 // Utils
-const { getActor: get_actor } = require('../test-utils/actor.cjs');
+const { getActor: get_actor } = require('./actor.cjs');
 const { FileStorage } = require('../src/ui/utils/file_storage.cjs');
 
 let username_registry_actor = {};

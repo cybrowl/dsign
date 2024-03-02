@@ -13,14 +13,14 @@ const {
 const { username_registry_canister_id } = require('../canister_refs/actor_canister_ids.cjs');
 
 // Identities
-const { parseIdentity } = require('../test-utils/identities/identity.cjs');
+const { parseIdentity } = require('./actor_identity.cjs');
 
 let owl_identity = parseIdentity(process.env.OWL_IDENTITY);
 let dominic_identity = parseIdentity(process.env.DOMINIC_IDENTITY);
 let anonymous_identity = null;
 
 // Utils
-const { getActor: get_actor } = require('../test-utils/actor.cjs');
+const { getActor: get_actor } = require('./actor.cjs');
 
 let username_registry_actor = {};
 let project_id = '';
