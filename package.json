@@ -6,7 +6,6 @@
 	"scripts": {
 		"build:css": "tailwindcss build src/ui/app.css -o src/ui/assets/output.css",
 		"build": "npm run build:css && vite build",
-		"boot": "sh ./scripts/install-local.sh",
 		"format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
 		"idl_for_testing": "bash ./canister_refs/convert_idl_for_testing.sh",
 		"lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",

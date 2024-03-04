@@ -30,11 +30,13 @@ let anonymous_identity = null;
 // Utils
 const { getActor: get_actor } = require('./actor.cjs');
 const { FileStorage } = require('../src/ui/utils/file_storage.cjs');
+const { requestResource } = require('./libs/http.cjs');
 
 let username_registry_actor = {};
 let file_scaling_manager_actor = {};
 
 let project_id = '';
+let snap_id = '';
 
 test('Setup Actors', async function () {
 	console.log('=========== Project With Snaps ===========');
@@ -191,6 +193,8 @@ test('Creator[nikola].create_snap(): with valid project_id, name, images and img
 	});
 
 	if (snap) {
+		snap_id = snap.id;
+
 		// Assertions for snap properties
 		t.equal(snap.name, 'First Snap', 'Snap name should match');
 		t.deepEqual(snap.tags, [], 'Snap tags should match');
@@ -198,6 +202,42 @@ test('Creator[nikola].create_snap(): with valid project_id, name, images and img
 
 		// Assertions for the uploaded image
 		const uploadedImage = snap.images[0];
+		t.equal(uploadedImage.filename, '3mb_japan.jpg', 'Uploaded image filename should match');
+		t.equal(uploadedImage.content_type, 'image/jpeg', 'Uploaded image content type should match');
+		t.ok(uploadedImage.content_size > 0n, 'Uploaded image should have a content size');
+		t.equal(
+			uploadedImage.url.startsWith('http://'),
+			true,
+			'Uploaded image URL should start with http://'
+		);
+	}
+
+	t.end();
+});
+
+test('Creator[nikola].get_snap(): with valid project_id => #ok - SnapPublic', async function (t) {
+	const { ok: username_info, err: _ } =
+		await username_registry_actor.nikola.get_info_by_username('nikola');
+
+	const creator_actor_nikola = await get_actor(
+		username_info.canister_id,
+		creator_interface,
+		nikola_identity
+	);
+
+	const { ok: snap } = await creator_actor_nikola.get_snap(snap_id);
+
+	if (snap) {
+		// Assertions for snap properties
+		t.equal(snap.name, 'First Snap', 'Snap name should match');
+		t.deepEqual(snap.tags, [], 'Snap tags should match');
+		t.equal(snap.images.length, 1, 'Should have one image uploaded');
+
+		// Assertions for the uploaded image
+		const uploadedImage = snap.images[0];
+		const img_http_response = await requestResource(uploadedImage.url);
+
+		t.equal(200, img_http_response.statusCode, 'Status code 200 should match');
 		t.equal(uploadedImage.filename, '3mb_japan.jpg', 'Uploaded image filename should match');
 		t.equal(uploadedImage.content_type, 'image/jpeg', 'Uploaded image content type should match');
 		t.ok(uploadedImage.content_size > 0n, 'Uploaded image should have a content size');
