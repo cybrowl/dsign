@@ -1,13 +1,7 @@
 import { writable } from 'svelte/store';
 import { AuthClient } from '@dfinity/auth-client';
 import {
-	actor_assets_file_staging,
-	actor_assets_img_staging,
 	actor_explore,
-	actor_favorite_main,
-	actor_profile,
-	actor_project_main,
-	actor_snap_main,
 	actor_creator,
 	actor_username_registry,
 	createActor
@@ -18,13 +12,7 @@ export const auth = {};
 
 // Init Auth
 const authActors = [
-	{ name: 'assets_file_staging', actor: actor_assets_file_staging },
-	{ name: 'assets_img_staging', actor: actor_assets_img_staging },
 	{ name: 'explore', actor: actor_explore },
-	{ name: 'favorite_main', actor: actor_favorite_main },
-	{ name: 'profile', actor: actor_profile },
-	{ name: 'project_main', actor: actor_project_main },
-	{ name: 'snap_main', actor: actor_snap_main },
 	{ name: 'username_registry', actor: actor_username_registry },
 	{ name: 'creator', actor: actor_creator }
 ];
