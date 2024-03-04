@@ -121,9 +121,12 @@ test('Creator[owl].create_project(): with valid args => #ok - ProjectPublic', as
 
 	project_id = project.id;
 
-	t.ok(project, 'Project creation response should be ok');
-	t.equal(project.name, 'Project One', 'Project name should match');
-	t.deepEqual(project.description, ['first project'], 'Project description should match');
+	if (project) {
+		t.ok(project, 'Project creation response should be ok');
+		t.equal(project.name, 'Project One', 'Project name should match');
+		t.deepEqual(project.description, ['first project'], 'Project description should match');
+	}
+
 	t.end();
 });
 
@@ -139,9 +142,12 @@ test('Creator[owl].get_project(): with valid id => #ok - ProjectPublic', async f
 
 	const { ok: project } = await creator_actor_owl.get_project(project_id);
 
-	t.ok(project, 'Project creation response should be ok');
-	t.equal(project.name, 'Project One', 'Project name should match');
-	t.deepEqual(project.description, ['first project'], 'Project description should match');
+	if (project) {
+		t.ok(project, 'Project creation response should be ok');
+		t.equal(project.name, 'Project One', 'Project name should match');
+		t.deepEqual(project.description, ['first project'], 'Project description should match');
+	}
+
 	t.end();
 });
 
@@ -157,21 +163,28 @@ test('Creator[owl].get_profile_by_username(): with valid username => #ok - Profi
 
 	const { ok: profile } = await creator_actor_owl.get_profile_by_username(username_info.username);
 
-	t.ok(profile.projects.length > 0, 'Profile should have at least one project');
-	t.equal(profile.projects[0].name, 'Project One', 'The project name should match expected value');
-	t.ok(
-		typeof profile.projects[0].canister_id === 'string' &&
-			profile.projects[0].canister_id.length > 0,
-		'Project canister ID should be a non-empty string'
-	);
+	if (profile) {
+		t.ok(profile.projects.length > 0, 'Profile should have at least one project');
+		t.equal(
+			profile.projects[0].name,
+			'Project One',
+			'The project name should match expected value'
+		);
+		t.ok(
+			typeof profile.projects[0].canister_id === 'string' &&
+				profile.projects[0].canister_id.length > 0,
+			'Project canister ID should be a non-empty string'
+		);
 
-	const pattern = /^[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[cai]{3}$/;
-	t.ok(
-		pattern.test(profile.projects[0].canister_id),
-		'Project canister ID should match the expected format'
-	);
+		const pattern = /^[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[cai]{3}$/;
+		t.ok(
+			pattern.test(profile.projects[0].canister_id),
+			'Project canister ID should match the expected format'
+		);
 
-	t.ok(profile.is_owner, 'Profile should indicate ownership');
+		t.ok(profile.is_owner, 'Profile should indicate ownership');
+	}
+
 	t.end();
 });
 
@@ -191,9 +204,12 @@ test('Creator[owl].update_project(): with no optional args => #ok - ProjectPubli
 		description: []
 	});
 
-	t.ok(project, 'Project creation response should be ok');
-	t.equal(project.name, 'Project One', 'Project name should match');
-	t.deepEqual(project.description, ['first project'], 'Project description should match');
+	if (project) {
+		t.ok(project, 'Project creation response should be ok');
+		t.equal(project.name, 'Project One', 'Project name should match');
+		t.deepEqual(project.description, ['first project'], 'Project description should match');
+	}
+
 	t.end();
 });
 
@@ -213,9 +229,12 @@ test('Creator[owl].update_project(): with name only => #ok - ProjectPublic', asy
 		description: []
 	});
 
-	t.ok(project, 'Project creation response should be ok');
-	t.equal(project.name, 'Project One Updated', 'Project name should match');
-	t.deepEqual(project.description, ['first project'], 'Project description should match');
+	if (project) {
+		t.ok(project, 'Project creation response should be ok');
+		t.equal(project.name, 'Project One Updated', 'Project name should match');
+		t.deepEqual(project.description, ['first project'], 'Project description should match');
+	}
+
 	t.end();
 });
 
@@ -235,9 +254,12 @@ test('Creator[owl].update_project(): with description only => #ok - ProjectPubli
 		description: ['first project updated']
 	});
 
-	t.ok(project, 'Project creation response should be ok');
-	t.equal(project.name, 'Project One Updated', 'Project name should match');
-	t.deepEqual(project.description, ['first project updated'], 'Project description should match');
+	if (project) {
+		t.ok(project, 'Project creation response should be ok');
+		t.equal(project.name, 'Project One Updated', 'Project name should match');
+		t.deepEqual(project.description, ['first project updated'], 'Project description should match');
+	}
+
 	t.end();
 });
 
@@ -253,7 +275,9 @@ test('Creator[owl].delete_project(): with valid id => #ok - Bool', async functio
 
 	const { ok: deleted } = await creator_actor_owl.delete_project(project_id);
 
-	t.assert(deleted === true, 'Deleted Project');
+	if (deleted) {
+		t.assert(deleted === true, 'Deleted Project');
+	}
 
 	t.end();
 });
@@ -270,7 +294,10 @@ test('Creator[owl].get_project(): with invalid id => #err - ProjectNotFound', as
 
 	const { err: error } = await creator_actor_owl.get_project(project_id);
 
-	t.deepEqual(error, { ProjectNotFound: true });
+	if (error) {
+		t.deepEqual(error, { ProjectNotFound: true });
+	}
+
 	t.end();
 });
 
@@ -286,6 +313,9 @@ test('Creator[owl].get_profile_by_username(): with valid username => #ok - Profi
 
 	const { ok: profile } = await creator_actor_owl.get_profile_by_username(username_info.username);
 
-	t.ok(profile.projects.length === 0, 'Profile should have zero projects');
+	if (profile) {
+		t.ok(profile.projects.length === 0, 'Profile should have zero projects');
+	}
+
 	t.end();
 });

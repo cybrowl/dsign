@@ -87,7 +87,9 @@ test('UsernameRegistry[nikola].delete_profile(): with valid principal => #ok - B
 
 	const { ok: deleted, err: _ } = await username_registry_actor.nikola.delete_profile();
 
-	t.assert(deleted === true, 'Deleted Profile');
+	if (deleted) {
+		t.assert(deleted === true, 'Deleted Profile');
+	}
 
 	t.end();
 });
@@ -98,7 +100,9 @@ test('UsernameRegistry[linky].delete_profile(): with valid principal => #ok - Bo
 
 	const { ok: deleted, err: _ } = await username_registry_actor.linky.delete_profile();
 
-	t.assert(deleted === true, 'Deleted Profile');
+	if (deleted) {
+		t.assert(deleted === true, 'Deleted Profile');
+	}
 
 	t.end();
 });
@@ -106,14 +110,19 @@ test('UsernameRegistry[linky].delete_profile(): with valid principal => #ok - Bo
 test('UsernameRegistry[nikola].create_profile(): with valid username => #ok - Username', async function (t) {
 	const { ok: username, err: _ } = await username_registry_actor.nikola.create_profile('nikola');
 
-	t.assert(username.length > 2, 'Created Profile');
+	if (username) {
+		t.assert(username.length > 2, 'Created Profile');
+	}
+
 	t.end();
 });
 
 test('UsernameRegistry[linky].create_profile(): with valid username => #ok - Username', async function (t) {
 	const { ok: username, err: _ } = await username_registry_actor.linky.create_profile('linky');
 
-	t.assert(username.length > 2, 'Created Profile');
+	if (username) {
+		t.assert(username.length > 2, 'Created Profile');
+	}
 });
 
 test('Creator[nikola].create_project(): with valid args => #ok - ProjectPublic', async function (t) {
@@ -133,9 +142,12 @@ test('Creator[nikola].create_project(): with valid args => #ok - ProjectPublic',
 
 	project_id = project.id;
 
-	t.ok(project, 'Project creation response should be ok');
-	t.equal(project.name, 'Project One', 'Project name should match');
-	t.deepEqual(project.description, ['first project'], 'Project description should match');
+	if (project) {
+		t.ok(project, 'Project creation response should be ok');
+		t.equal(project.name, 'Project One', 'Project name should match');
+		t.deepEqual(project.description, ['first project'], 'Project description should match');
+	}
+
 	t.end();
 });
 

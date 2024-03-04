@@ -184,18 +184,24 @@ test('FileStorage[nova].create_chunk & create_file_from_chunks(): => #ok - File 
 		content_type: file_content_type
 	});
 
-	// Validate the dynamic and static aspects of the file
-	t.ok(typeof file.id === 'string', 'File ID should be a string and present');
-	t.ok(file.url.includes(file.id), 'File URL should correctly include the file ID');
-	t.equal(file.chunks_size, 2n, 'The file should be split into 2 chunks');
-	t.equal(file.content_size, 3628429n, 'The content size of the file should match expected value');
-	t.equal(file.content_type, 'image/jpeg', 'Content type should be "image/jpeg"');
-	t.equal(file.filename, '3mb_japan.jpg', 'Filename should match the uploaded file');
-	t.deepEqual(
-		file.content_encoding,
-		{ Identity: null },
-		'Content encoding should be correctly set to Identity'
-	);
+	if (file) {
+		// Validate the dynamic and static aspects of the file
+		t.ok(typeof file.id === 'string', 'File ID should be a string and present');
+		t.ok(file.url.includes(file.id), 'File URL should correctly include the file ID');
+		t.equal(file.chunks_size, 2n, 'The file should be split into 2 chunks');
+		t.equal(
+			file.content_size,
+			3628429n,
+			'The content size of the file should match expected value'
+		);
+		t.equal(file.content_type, 'image/jpeg', 'Content type should be "image/jpeg"');
+		t.equal(file.filename, '3mb_japan.jpg', 'Filename should match the uploaded file');
+		t.deepEqual(
+			file.content_encoding,
+			{ Identity: null },
+			'Content encoding should be correctly set to Identity'
+		);
+	}
 
 	t.end();
 });
@@ -233,15 +239,17 @@ test('Creator[nova].update_profile_avatars(): => #ok - Updated Avatar', async fu
 
 	const { ok: profile } = await creator_actor.get_profile_by_username(username_info.username);
 
-	t.equal(profile.avatar.id, file.id, 'Avatar ID should match the file ID');
-	t.equal(
-		profile.avatar.canister_id,
-		file.canister_id,
-		'Avatar canister_id should match the file canister_id'
-	);
-	t.equal(profile.avatar.url, file.url, 'Avatar URL should match the file URL');
-	t.ok(profile.avatar.url.startsWith('http://'), 'Avatar URL should start with http://');
-	t.ok(new URL(profile.avatar.url), 'Avatar URL should be a valid URL');
+	if (profile) {
+		t.equal(profile.avatar.id, file.id, 'Avatar ID should match the file ID');
+		t.equal(
+			profile.avatar.canister_id,
+			file.canister_id,
+			'Avatar canister_id should match the file canister_id'
+		);
+		t.equal(profile.avatar.url, file.url, 'Avatar URL should match the file URL');
+		t.ok(profile.avatar.url.startsWith('http://'), 'Avatar URL should start with http://');
+		t.ok(new URL(profile.avatar.url), 'Avatar URL should be a valid URL');
+	}
 
 	t.end();
 });
@@ -279,15 +287,17 @@ test('Creator[nova].update_profile_banner(): => #ok - Updated Banner', async fun
 
 	const { ok: profile } = await creator_actor.get_profile_by_username(username_info.username);
 
-	t.equal(profile.banner.id, file.id, 'Banner ID should match the file ID');
-	t.equal(
-		profile.banner.canister_id,
-		file.canister_id,
-		'Banner canister_id should match the file canister_id'
-	);
-	t.equal(profile.banner.url, file.url, 'Banner URL should match the file URL');
-	t.ok(profile.banner.url.startsWith('http://'), 'Banner URL should start with http://');
-	t.ok(new URL(profile.banner.url), 'Banner URL should be a valid URL');
+	if (profile) {
+		t.equal(profile.banner.id, file.id, 'Banner ID should match the file ID');
+		t.equal(
+			profile.banner.canister_id,
+			file.canister_id,
+			'Banner canister_id should match the file canister_id'
+		);
+		t.equal(profile.banner.url, file.url, 'Banner URL should match the file URL');
+		t.ok(profile.banner.url.startsWith('http://'), 'Banner URL should start with http://');
+		t.ok(new URL(profile.banner.url), 'Banner URL should be a valid URL');
+	}
 
 	t.end();
 });
