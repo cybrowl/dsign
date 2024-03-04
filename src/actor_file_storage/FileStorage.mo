@@ -337,6 +337,11 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		return VERSION;
 	};
 
+	// Get CanisterId
+	public query func get_canister_id() : async Text {
+		return Principal.toText(Principal.fromActor(this));
+	};
+
 	// ------------------------- Private Methods -------------------------
 	private func clear_expired_chunks() : async () {
 		let current_time = Time.now();

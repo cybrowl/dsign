@@ -32,3 +32,6 @@ dfx deploy file_storage --argument='(false, "8080")'
 # File Scaling
 dfx deploy file_scaling_manager --argument='(false, "8080")'
 dfx canister call file_scaling_manager init  # init
+
+# Test All
+npm run test-all

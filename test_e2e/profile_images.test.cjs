@@ -160,7 +160,10 @@ test('UsernameRegistry[nova].create_profile(): with valid username => #ok - Crea
 test('FileStorage[nova].version(): => #ok - Version Number', async function (t) {
 	const canister_id = await file_scaling_manager_actor.nova.get_current_canister_id();
 	const file_storage_actor = await get_actor(canister_id, file_storage_interface, nova_identity);
+	console.log('file_storage_actor: ', file_storage_actor);
+
 	const file_storage = new FileStorage(file_storage_actor);
+	console.log('file_storage: ', file_storage);
 
 	const version_num = await file_storage.version();
 	t.assert(version_num === 1n, 'Correct Version');

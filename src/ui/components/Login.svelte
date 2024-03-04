@@ -37,6 +37,7 @@
 		if (!username_info) return goto('/account_creation');
 
 		await auth.creator(username_info.canister_id);
+
 		if (!$actor_creator.loggedIn) return;
 
 		const { ok: profile, err: err_profile } = await $actor_creator.actor.get_profile_by_username(

@@ -21,7 +21,7 @@
 	"dependencies": {
 		"crc-32": "^1.2.2",
 		"dotenv": "^16.0.3",
-		"dsign-components": "1.9.4",
+		"dsign-components": "1.9.5",
 		"lodash": "^4.17.21",
 		"luxon": "^3.2.1",
 		"svelte-local-storage-store": "0.6.0"

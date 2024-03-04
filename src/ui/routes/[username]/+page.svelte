@@ -18,7 +18,12 @@
 	import ProjectUpsertModal from '$modals_ref/ProjectUpsertModal.svelte';
 	import ProjectDeleteModal from '$modals_ref/ProjectDeleteModal.svelte';
 
-	import { actor_creator, actor_username_registry } from '$stores_ref/actors';
+	import {
+		actor_creator,
+		actor_file_scaling_manager,
+		actor_file_storage,
+		actor_username_registry
+	} from '$stores_ref/actors';
 	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { profileTabsState, disable_project_store_reset } from '$stores_ref/page_state';
 	import {
@@ -109,6 +114,57 @@
 
 	async function handleProfileBannerChange(event) {
 		let file = event.detail;
+		const file_unit8 = new Uint8Array(await file.arrayBuffer());
+
+		console.log('file: ', file);
+
+		//TODO: rename to say something about storage canister id and about it being empty
+		const fsm_canister_id = await $actor_file_scaling_manager.actor.get_current_canister_id();
+		console.log('fsm_canister_id: ', fsm_canister_id);
+
+		await auth.creator(profile.canister_id);
+		await auth.file_storage(fsm_canister_id);
+
+		const creator_canister_id = await $actor_creator.actor.get_canister_id();
+		console.log('creator_canister_id: ', creator_canister_id);
+
+		console.log('$actor_file_storage: ', $actor_file_storage.actor);
+
+		// const file_storage_actor = await get_actor(
+		// 	fsm_canister_id,
+		// 	file_storage_interface,
+		// 	nova_identity
+		// );
+
+		// const file_storage = new FileStorage(file_storage_actor);
+
+		// // Image
+		// const file_path = path.join(__dirname, 'images', 'size', '3mb_japan.jpg');
+		// const file_buffer = fs.readFileSync(file_path);
+		// const file_unit8Array = new Uint8Array(file_buffer);
+		// const file_name = path.basename(file_path);
+		// const file_content_type = getMimeType(file_path);
+
+		// const { ok: file } = await file_storage.store(file_unit8Array, {
+		// 	filename: file_name,
+		// 	content_type: file_content_type
+		// });
+
+		// const { ok: username_info, err: _ } = await username_registry_actor.nova.get_info();
+
+		// const creator_actor = await get_actor(
+		// 	username_info.canister_id,
+		// 	creator_interface,
+		// 	nova_identity
+		// );
+
+		// const { ok: updated_profile, err: err_profile } = await creator_actor.update_profile_avatar({
+		// 	id: file.id,
+		// 	canister_id: file.canister_id,
+		// 	url: file.url
+		// });
+
+		// const { ok: profile } = await creator_actor.get_profile_by_username(username_info.username);
 
 		//TODO: create image for file_storage
 		//TODO: update profile banner for creator

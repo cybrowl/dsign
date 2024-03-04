@@ -17,4 +17,3 @@ for canister in ${canisters[@]}; do
     sed -i '' 's/export//g' .dfx/local/canisters/${canister}/service.did.test.cjs
     echo "module.exports = { idlFactory };" >> .dfx/local/canisters/${canister}/service.did.test.cjs
 done
-

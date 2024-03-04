@@ -2,9 +2,11 @@ import { Actor, HttpAgent } from '@dfinity/agent';
 import { writable } from 'svelte/store';
 import environment from 'environment';
 
-import { idlFactory as idl_explore } from '$IDLexplore';
-import { idlFactory as idl_username_registry } from '$IDLusername_registry';
 import { idlFactory as idl_creator } from '$IDLcreator';
+import { idlFactory as idl_explore } from '$IDLexplore';
+import { idlFactory as idl_file_scaling_manager } from '$IDLfile_scaling_manager';
+import { idlFactory as idl_file_storage } from '$IDLfile_storage';
+import { idlFactory as idl_username_registry } from '$IDLusername_registry';
 
 const env = environment();
 
@@ -23,8 +25,10 @@ export function createActor(options) {
 	const agentOptions = { host };
 
 	const idl_reference = {
-		explore: idl_explore,
 		creator: idl_creator,
+		explore: idl_explore,
+		file_scaling_manager: idl_file_scaling_manager,
+		file_storage: idl_file_storage,
 		username_registry: idl_username_registry
 	};
 
@@ -54,12 +58,22 @@ export const actor_explore = writable({
 	actor: createActor({ actor_name: 'explore' })
 });
 
-export const actor_username_registry = writable({
-	loggedIn: false,
-	actor: createActor({ actor_name: 'username_registry' })
-});
-
 export const actor_creator = writable({
 	loggedIn: false,
 	actor: createActor({ actor_name: 'creator' })
+});
+
+export const actor_file_scaling_manager = writable({
+	loggedIn: false,
+	actor: createActor({ actor_name: 'file_scaling_manager' })
+});
+
+export const actor_file_storage = writable({
+	loggedIn: false,
+	actor: createActor({ actor_name: 'file_storage' })
+});
+
+export const actor_username_registry = writable({
+	loggedIn: false,
+	actor: createActor({ actor_name: 'username_registry' })
 });

@@ -1,8 +1,10 @@
 import { writable } from 'svelte/store';
 import { AuthClient } from '@dfinity/auth-client';
 import {
-	actor_explore,
 	actor_creator,
+	actor_explore,
+	actor_file_scaling_manager,
+	actor_file_storage,
 	actor_username_registry,
 	createActor
 } from '$stores_ref/actors';
@@ -12,9 +14,11 @@ export const auth = {};
 
 // Init Auth
 const authActors = [
+	{ name: 'creator', actor: actor_creator },
 	{ name: 'explore', actor: actor_explore },
-	{ name: 'username_registry', actor: actor_username_registry },
-	{ name: 'creator', actor: actor_creator }
+	{ name: 'file_scaling_manager', actor: actor_file_scaling_manager },
+	{ name: 'file_storage', actor: actor_file_storage },
+	{ name: 'username_registry', actor: actor_username_registry }
 ];
 
 const authenticate_actor = async (actor_name, actor, authClient, canister_id) => {
