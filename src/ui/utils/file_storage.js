@@ -1,8 +1,8 @@
-const CRC32 = require('crc-32');
-const { Buffer } = require('buffer');
+import CRC32 from 'crc-32';
+import { Buffer } from 'buffer';
 
 //TODO: This can be refactored into a npm pkg
-class FileStorage {
+export class FileStorage {
 	constructor(actor_) {
 		this.actor = actor_;
 	}
@@ -145,5 +145,3 @@ class FileStorage {
 		return this.actor.version();
 	}
 }
-
-module.exports = { FileStorage };

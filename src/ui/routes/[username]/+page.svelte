@@ -35,8 +35,14 @@
 		projects_update
 	} from '$stores_ref/fetch_store';
 	import modal_update, { modal_visible, modal_mode } from '$stores_ref/modal';
-	import { local_storage_projects, local_storage_favorites } from '$stores_ref/local_storage';
+	import {
+		local_storage_profile,
+		local_storage_projects,
+		local_storage_favorites
+	} from '$stores_ref/local_storage';
 	import { page_navigation } from '$stores_ref/page_navigation';
+
+	import { FileStorage } from '$utils/file_storage';
 
 	let project = {
 		name: '',
@@ -116,59 +122,33 @@
 		let file = event.detail;
 		const file_unit8 = new Uint8Array(await file.arrayBuffer());
 
-		console.log('file: ', file);
-
 		//TODO: rename to say something about storage canister id and about it being empty
-		const fsm_canister_id = await $actor_file_scaling_manager.actor.get_current_canister_id();
-		console.log('fsm_canister_id: ', fsm_canister_id);
+		const storage_canister_id_alloc =
+			await $actor_file_scaling_manager.actor.get_current_canister_id();
 
 		await auth.creator(profile.canister_id);
-		await auth.file_storage(fsm_canister_id);
+		await auth.file_storage(storage_canister_id_alloc);
 
-		const creator_canister_id = await $actor_creator.actor.get_canister_id();
-		console.log('creator_canister_id: ', creator_canister_id);
+		const file_storage = new FileStorage($actor_file_storage.actor);
 
-		console.log('$actor_file_storage: ', $actor_file_storage.actor);
+		const { ok: file_public } = await file_storage.store(file_unit8, {
+			filename: file.name,
+			content_type: file.type
+		});
 
-		// const file_storage_actor = await get_actor(
-		// 	fsm_canister_id,
-		// 	file_storage_interface,
-		// 	nova_identity
-		// );
+		const { ok: profile_updated, err: err_profile } =
+			await $actor_creator.actor.update_profile_banner({
+				id: file_public.id,
+				canister_id: file_public.canister_id,
+				url: file_public.url
+			});
 
-		// const file_storage = new FileStorage(file_storage_actor);
+		local_storage_profile.set({
+			avatar_url: get(profile_updated, 'avatar.url', ''),
+			username: get(profile_updated, 'username', '')
+		});
 
-		// // Image
-		// const file_path = path.join(__dirname, 'images', 'size', '3mb_japan.jpg');
-		// const file_buffer = fs.readFileSync(file_path);
-		// const file_unit8Array = new Uint8Array(file_buffer);
-		// const file_name = path.basename(file_path);
-		// const file_content_type = getMimeType(file_path);
-
-		// const { ok: file } = await file_storage.store(file_unit8Array, {
-		// 	filename: file_name,
-		// 	content_type: file_content_type
-		// });
-
-		// const { ok: username_info, err: _ } = await username_registry_actor.nova.get_info();
-
-		// const creator_actor = await get_actor(
-		// 	username_info.canister_id,
-		// 	creator_interface,
-		// 	nova_identity
-		// );
-
-		// const { ok: updated_profile, err: err_profile } = await creator_actor.update_profile_avatar({
-		// 	id: file.id,
-		// 	canister_id: file.canister_id,
-		// 	url: file.url
-		// });
-
-		// const { ok: profile } = await creator_actor.get_profile_by_username(username_info.username);
-
-		//TODO: create image for file_storage
-		//TODO: update profile banner for creator
-		//TODO: delete image from file_storage
+		//TODO: update data store svelte
 	}
 
 	function handleProjectCreateModalOpen() {
