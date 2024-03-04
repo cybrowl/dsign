@@ -8,11 +8,7 @@
 	import { ImagesEmpty, Images, PageNavigation, SnapUpsertActions } from 'dsign-components';
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
-	import {
-		actor_assets_file_staging,
-		actor_assets_img_staging,
-		actor_snap_main
-	} from '$stores_ref/actors';
+	import {} from '$stores_ref/actors';
 	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 	import { local_snap_creation_design_file } from '$stores_ref/local_storage';
@@ -29,7 +25,7 @@
 	onMount(async () => {
 		await init_auth();
 
-		await Promise.all([auth.assets_file_staging(), auth.assets_img_staging(), auth.snap_main()]);
+		await Promise.all([]);
 
 		mode = $page.url.searchParams.get('mode');
 
@@ -75,12 +71,7 @@
 		$snap_creation.file_asset.file_name = file_name;
 		$snap_creation.file_asset.file_unit8 = file_array_buffer;
 
-		const uploadChunk = async ({ chunk, file_name }) => {
-			return $actor_assets_file_staging.actor.create_chunk({
-				data: [...chunk],
-				file_name: file_name
-			});
-		};
+		//TODO: upload chunk
 
 		for (let start = 0; start < file_array_buffer.length; start += chunkSize) {
 			const chunk = file_array_buffer.slice(start, start + chunkSize);
@@ -109,11 +100,9 @@
 			return [];
 		}
 
-		if (
-			!$actor_assets_file_staging.loggedIn ||
-			!$actor_assets_img_staging.loggedIn ||
-			!$actor_snap_main.loggedIn
-		) {
+		const creator_logged_in = false;
+
+		if (creator_logged_in === false) {
 			console.error('Not logged in');
 			return [];
 		}
@@ -122,10 +111,7 @@
 
 		let promises = validImages.map(async function (image) {
 			try {
-				return await $actor_assets_img_staging.actor.create_asset({
-					data: image.data,
-					file_format: image.mimeType
-				});
+				//TODO: create asset
 			} catch (error) {
 				console.error('Error creating asset:', error);
 			}
@@ -178,10 +164,7 @@
 				url: image_removed.url
 			};
 
-			const { ok: deleted_images } = await $actor_snap_main.actor.delete_images(
-				[image_ref],
-				snap_ref
-			);
+			//TODO: delete images
 		}
 	}
 
@@ -220,9 +203,7 @@
 				canister_id: $snap_creation.canister_id
 			};
 
-			const { ok: deleted, err: err_delete } = await $actor_snap_main.actor.delete_design_file(
-				snap_ref
-			);
+			//TODO: delete designer file
 		}
 	}
 
@@ -293,26 +274,19 @@
 				file_asset: isEmpty(file_chunks) ? [] : [file_asset]
 			};
 
-			console.log('mode: ', mode);
-			console.log('create_snap_args: ', create_snap_args);
-			console.log('edit_snap_args: ', edit_snap_args);
+			const creator_logged_in = false;
 
-			console.log('$actor_snap_main.loggedIn: ', $actor_snap_main.loggedIn);
-
-			if ($actor_snap_main.loggedIn) {
+			if (creator_logged_in) {
 				if (mode === 'edit') {
 					console.log('edit');
 
-					const { ok: edited_snap, err: err_edit_snap } = await $actor_snap_main.actor.edit_snap(
-						edit_snap_args
-					);
+					//TODO: edit snap
 
 					goto(`/project/${project_id}?canister_id=${canister_id}`);
 				} else {
 					console.log('create');
 
-					const { ok: created_snap, err: err_snap_creation } =
-						await $actor_snap_main.actor.create_snap(create_snap_args);
+					//TODO: create snap
 
 					goto(`/project/${project_id}?canister_id=${canister_id}`);
 				}

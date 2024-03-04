@@ -8,7 +8,7 @@
 	import { SnapActionsBar, PageNavigation, SnapInfo } from 'dsign-components';
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
-	import { actor_snap_main, actor_profile } from '$stores_ref/actors';
+	import {} from '$stores_ref/actors';
 	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 	import { modal_visible } from '$stores_ref/modal';
@@ -23,25 +23,14 @@
 		const snap_id = last(get($page, 'url.pathname', '').split('/'));
 
 		await init_auth();
-		await Promise.all([auth.snap_main(), auth.profile()]);
+		await Promise.all([]);
 
 		try {
-			if ($snap_preview.id === undefined) {
-				const { ok: snap } = await $actor_snap_main.actor.get_snap(snap_id, canister_id);
+			const creator_logged_in = false;
 
-				snap_preview.update(() => ({
-					...snap
-				}));
-			}
-
-			if ($actor_profile.loggedIn) {
-				const { ok: profile } = await $actor_profile.actor.get_profile();
-				const username = get(profile, 'username', 'x');
-				let snap_username = get($snap_preview, 'username', '');
-
-				if (snap_username === username) {
-					is_owner = true;
-				}
+			if (creator_logged_in) {
+				//TODO: get snap
+				//TODO: get profile
 			}
 		} catch (error) {
 			console.log('error snap preview: ', error);

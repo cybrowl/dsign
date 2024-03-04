@@ -18,12 +18,7 @@
 	} from 'dsign-components';
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
-	import {
-		actor_favorite_main,
-		actor_profile,
-		actor_project_main,
-		actor_snap_main
-	} from '$stores_ref/actors';
+	import {} from '$stores_ref/actors';
 	import { project_store, project_store_fetching, projects_update } from '$stores_ref/fetch_store';
 	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { modal_visible } from '$stores_ref/modal';
@@ -50,12 +45,7 @@
 
 	onMount(async () => {
 		await init_auth();
-		await Promise.all([
-			auth.favorite_main(),
-			auth.profile(),
-			auth.project_main(),
-			auth.snap_main()
-		]);
+		await Promise.all([]);
 
 		local_snap_creation_design_file.set({ file_name: '', file_type: '', chunk_ids: [] });
 
@@ -63,25 +53,18 @@
 		const project_id = last(get($page, 'url.pathname', '').split('/'));
 		let username = '';
 
-		if ($actor_profile.loggedIn) {
+		const creator_logged_in = false;
+
+		if (creator_logged_in) {
 			try {
-				const { ok: auth_profile } = await $actor_profile.actor.get_profile();
-				const project_username = get($project_store, 'project.username', 'x');
-
-				username = get(auth_profile, 'username', 'x');
-
-				isProjectOwner = username === project_username;
+				//TODO: get profile
 			} catch (error) {
 				console.log('error: ', error);
 			}
 		}
 
 		if (isEmpty($project_store.project)) {
-			const { ok: project } = await $actor_project_main.actor.get_project(project_id, canister_id);
-
-			isProjectOwner = username === project.username;
-
-			projects_update.update_project(project);
+			//TODO: get project
 		}
 	});
 
@@ -93,13 +76,10 @@
 			id: project_liked.id
 		};
 
-		if ($actor_favorite_main.loggedIn) {
+		const creator_logged_in = false;
+		if (creator_logged_in) {
 			try {
-				const { ok: all_favs, err: err_get_all_favs } =
-					await $actor_favorite_main.actor.save_project(project_ref);
-
-				console.log('err_get_all_favs: ', err_get_all_favs);
-				console.log('all_favs: ', all_favs);
+				// TODO: save project to favorites
 			} catch (error) {
 				console.log('error: call', error);
 			}
@@ -133,19 +113,9 @@
 
 		projects_update.delete_snaps_from_project(snaps_kept);
 
-		if ($actor_snap_main.loggedIn) {
-			const { ok: res, err: error } = await $actor_snap_main.actor.delete_snaps(
-				selected_snaps_ids,
-				{
-					id: project_id,
-					canister_id: project_canister_id
-				}
-			);
-
-			const { ok: project } = await $actor_project_main.actor.get_project(
-				project_id,
-				project_canister_id
-			);
+		const creator_logged_in = false;
+		if (creator_logged_in) {
+			// TODO: delete snaps
 
 			projects_update.update_project(project);
 		} else {

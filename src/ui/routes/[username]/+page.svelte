@@ -18,14 +18,7 @@
 	import ProjectUpsertModal from '$modals_ref/ProjectUpsertModal.svelte';
 	import ProjectDeleteModal from '$modals_ref/ProjectDeleteModal.svelte';
 
-	import {
-		actor_assets_img_staging,
-		actor_favorite_main,
-		actor_profile,
-		actor_project_main,
-		actor_creator,
-		actor_username_registry
-	} from '$stores_ref/actors';
+	import { actor_creator, actor_username_registry } from '$stores_ref/actors';
 	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { profileTabsState, disable_project_store_reset } from '$stores_ref/page_state';
 	import {
@@ -117,31 +110,9 @@
 	async function handleProfileBannerChange(event) {
 		let file = event.detail;
 
-		if ($actor_assets_img_staging.loggedIn && $actor_profile.loggedIn) {
-			const selectedFile = file;
-
-			const imageAsUnit8ArrayBuffer = new Uint8Array(await selectedFile.arrayBuffer());
-			const create_asset_args = {
-				data: [...imageAsUnit8ArrayBuffer],
-				file_format: selectedFile.type
-			};
-
-			console.log('create_asset_args: ', create_asset_args);
-
-			try {
-				let img_asset_id = await $actor_assets_img_staging.actor.create_asset(create_asset_args);
-				const { ok: update_profie, err: err_update_profile_banner } =
-					await $actor_profile.actor.update_profile_banner([img_asset_id]);
-
-				let { ok: profile_ } = await $actor_profile.actor.get_profile();
-
-				const randomNumber = Math.floor(Math.random() * 1000);
-				profile = profile_;
-				profile.banner.url = profile_.banner.url + '&' + randomNumber;
-			} catch (error) {
-				console.log('error', error);
-			}
-		}
+		//TODO: create image for file_storage
+		//TODO: update profile banner for creator
+		//TODO: delete image from file_storage
 	}
 
 	function handleProjectCreateModalOpen() {
@@ -168,15 +139,7 @@
 			canister_id: selected_project.canister_id
 		};
 
-		if ($actor_favorite_main.loggedIn) {
-			try {
-				favorites_update.delete_favorite(project_ref);
-
-				await $actor_favorite_main.actor.delete_project(project_ref);
-			} catch (error) {
-				console.log('error: call', error);
-			}
-		}
+		//TODO: delete favorite project
 	}
 </script>
 

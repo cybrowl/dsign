@@ -45,7 +45,7 @@ module {
 		if (args.is_prod == false) {
 			url := Text.join(
 				"",
-				(["http://", args.canister_id, ".localhost:", args.port, "/file/", args.file_id].vals())
+				(["http://", "127.0.0.1:", args.port, "/file/", args.file_id, "?canisterId=", args.canister_id].vals())
 			);
 		};
 

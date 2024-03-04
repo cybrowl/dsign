@@ -5,7 +5,7 @@
 
 	import { ProjectUpsert, Modal } from 'dsign-components';
 
-	import { actor_project_main } from '$stores_ref/actors';
+	import {} from '$stores_ref/actors';
 	import { auth } from '$stores_ref/auth_client';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 	import { navigate_to_home_with_notification } from '$stores_ref/page_navigation';
@@ -45,19 +45,14 @@
 		try {
 			disable_project_store_reset.set(false);
 
-			const { ok: created_project, err: err_create_project } =
-				await $actor_project_main.actor.create_project({
-					name: project_name,
-					description: project_description,
-					snaps: []
-				});
+			//TODO: create project
 
-			const id = get(created_project, 'id', null);
-			const canister_id = get(created_project, 'canister_id', null);
+			// const id = get(created_project, 'id', null);
+			// const canister_id = get(created_project, 'canister_id', null);
 
-			if (id && canister_id) {
-				goto(`/project/${id}?canister_id=${canister_id}`);
-			}
+			// if (id && canister_id) {
+			// 	goto(`/project/${id}?canister_id=${canister_id}`);
+			// }
 
 			modal_update.change_visibility('project_upsert');
 		} catch (error) {
@@ -76,14 +71,7 @@
 				canister_id: $modal_mode.project.canister_id
 			};
 
-			let { ok: updated_project, err: err_update_project_details } =
-				await $actor_project_main.actor.edit_project(
-					{ name: [project_name], description: [project_description] },
-					project_ref
-				);
-
-			const { ok: all_projects, err: err_get_all_projects } =
-				await $actor_project_main.actor.get_all_projects([]);
+			//TODO: edit project
 
 			if (all_projects) {
 				project_store.set({ isFetching: false, projects: [...all_projects] });
@@ -96,7 +84,9 @@
 	function handleSubmit(e) {
 		const { project_name, project_description } = e.detail;
 
-		if ($actor_project_main.loggedIn) {
+		const creator_logged_in = false;
+
+		if (creator_logged_in) {
 			if ($modal_mode.project_create) {
 				is_sending = !is_sending;
 

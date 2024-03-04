@@ -4,13 +4,13 @@
 
 	import { AccountSettings, Modal } from 'dsign-components';
 
-	import { actor_assets_img_staging, actor_profile } from '$stores_ref/actors';
+	import {} from '$stores_ref/actors';
 	import { auth, auth_client, auth_logout_all } from '$stores_ref/auth_client';
 	import { local_storage_profile, local_storage_remove_all } from '$stores_ref/local_storage';
 	import modal_update from '$stores_ref/modal';
 
 	onMount(async () => {
-		await Promise.all([auth.profile(), auth.assets_img_staging()]);
+		await Promise.all([]);
 	});
 
 	function handleCloseModal() {
@@ -28,20 +28,18 @@
 			file_format: selectedFile.type
 		};
 
-		if ($actor_assets_img_staging.loggedIn && $actor_profile.loggedIn) {
-			try {
-				// commit img asset to staging
-				let img_asset_id = await $actor_assets_img_staging.actor.create_asset(create_asset_args);
+		const creator_logged_in = false;
 
-				// update profile avatar
-				const { ok: avatar_url, err: err_update_avatar } =
-					await $actor_profile.actor.update_profile_avatar([img_asset_id]);
+		if (creator_logged_in) {
+			try {
+				//TODO: store image
+				//TODO: update profile avatar
 
 				if (err_update_avatar) {
 					//TODO: add notification
 				}
 
-				let { ok: profile } = await $actor_profile.actor.get_profile();
+				//TODO: get profile
 
 				const randomNumber = Math.floor(Math.random() * 1000);
 				local_storage_profile.set({
