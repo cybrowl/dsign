@@ -62,6 +62,7 @@ module {
 			url : Text;
 		};
 		created : Int;
+		canister_id : CanisterID;
 		username : Username;
 		owner : UserPrincipal;
 		projects : [ProjectID];
@@ -81,6 +82,7 @@ module {
 			url : Text;
 		};
 		created : Int;
+		canister_id : CanisterID;
 		username : Username;
 		is_owner : Bool;
 		projects : [Project];

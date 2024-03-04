@@ -125,6 +125,7 @@ actor class Creator(username_registry : Principal) = this {
 							avatar = profile.avatar;
 							banner = profile.banner;
 							created = profile.created;
+							canister_id = Principal.toText(Principal.fromActor(this));
 							username = profile.username;
 							is_owner = Principal.equal(caller, profile.owner);
 							projects = projects_public;
@@ -161,6 +162,7 @@ actor class Creator(username_registry : Principal) = this {
 				url = "/default_profile_banner.png";
 			};
 			created = Time.now();
+			canister_id = Principal.toText(Principal.fromActor(this));
 			username = username;
 			owner = owner;
 			favorites = [];
