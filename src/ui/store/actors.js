@@ -1,16 +1,10 @@
 import { Actor, HttpAgent } from '@dfinity/agent';
-import { idlFactory as idl_assets_file_staging } from '$IDLassets_file_staging';
-import { idlFactory as idl_assets_img_staging } from '$IDLassets_img_staging';
-import { idlFactory as idl_explore } from '$IDLexplore';
-import { idlFactory as idl_favorite_main } from '$IDLfavorite_main';
-import { idlFactory as idl_profile } from '$IDLprofile';
-import { idlFactory as idl_project_main } from '$IDLproject_main';
-import { idlFactory as idl_snap_main } from '$IDLsnap_main';
-import { idlFactory as idl_username_registry } from '$IDLusername_registry';
-import { idlFactory as idl_creator } from '$IDLcreator';
-
 import { writable } from 'svelte/store';
 import environment from 'environment';
+
+import { idlFactory as idl_explore } from '$IDLexplore';
+import { idlFactory as idl_username_registry } from '$IDLusername_registry';
+import { idlFactory as idl_creator } from '$IDLcreator';
 
 const env = environment();
 
@@ -29,13 +23,7 @@ export function createActor(options) {
 	const agentOptions = { host };
 
 	const idl_reference = {
-		assets_file_staging: idl_assets_file_staging,
-		assets_img_staging: idl_assets_img_staging,
 		explore: idl_explore,
-		favorite_main: idl_favorite_main,
-		profile: idl_profile,
-		project_main: idl_project_main,
-		snap_main: idl_snap_main,
 		creator: idl_creator,
 		username_registry: idl_username_registry
 	};
@@ -61,39 +49,9 @@ export function createActor(options) {
 	});
 }
 
-export const actor_assets_file_staging = writable({
-	loggedIn: false,
-	actor: createActor({ actor_name: 'assets_file_staging' })
-});
-
-export const actor_assets_img_staging = writable({
-	loggedIn: false,
-	actor: createActor({ actor_name: 'assets_img_staging' })
-});
-
 export const actor_explore = writable({
 	loggedIn: false,
 	actor: createActor({ actor_name: 'explore' })
-});
-
-export const actor_favorite_main = writable({
-	loggedIn: false,
-	actor: createActor({ actor_name: 'favorite_main' })
-});
-
-export const actor_profile = writable({
-	loggedIn: false,
-	actor: createActor({ actor_name: 'profile' })
-});
-
-export const actor_project_main = writable({
-	loggedIn: false,
-	actor: createActor({ actor_name: 'project_main' })
-});
-
-export const actor_snap_main = writable({
-	loggedIn: false,
-	actor: createActor({ actor_name: 'snap_main' })
 });
 
 export const actor_username_registry = writable({
