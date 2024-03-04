@@ -47,6 +47,7 @@
 		if (profile) {
 			local_storage_profile.set({
 				avatar_url: get(profile, 'avatar.url', ''),
+				banner_url: get(profile, 'banner.url', ''),
 				username: get(profile, 'username', '')
 			});
 		} else if (err_profile && err_profile['ProfileNotFound']) {

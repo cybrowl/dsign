@@ -136,16 +136,20 @@
 			content_type: file.type
 		});
 
-		const { ok: profile_updated, err: err_profile } =
+		const { ok: banner_url, err: err_banner_update } =
 			await $actor_creator.actor.update_profile_banner({
 				id: file_public.id,
 				canister_id: file_public.canister_id,
 				url: file_public.url
 			});
 
-		local_storage_profile.set({
-			avatar_url: get(profile_updated, 'avatar.url', ''),
-			username: get(profile_updated, 'username', '')
+		console.log('banner_url: ', banner_url);
+
+		local_storage_profile.update((currentValues) => {
+			return {
+				...currentValues,
+				banner_url: banner_url
+			};
 		});
 
 		//TODO: update data store svelte
@@ -224,7 +228,7 @@
 	<div class="profile_banner_layout">
 		<ProfileBanner
 			is_owner={profile.is_owner}
-			profile_banner_url={get(profile, 'banner.url', '')}
+			profile_banner_url={$local_storage_profile.banner_url}
 			on:profileBannerChange={handleProfileBannerChange}
 		/>
 	</div>
