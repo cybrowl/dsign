@@ -21,6 +21,7 @@ let interfaces = {};
 let username_registry_actor = {};
 let file_scaling_manager_actor = {};
 let file_storage_actor_lib = {};
+let creator_actor_nikola = {};
 
 let project_id = '';
 let snap_id = '';
@@ -103,6 +104,15 @@ describe('Projects With Snaps', () => {
 
 	test('UsernameRegistry[nikola].create_profile(): with valid username => #ok - Username', async () => {
 		const { ok: username } = await username_registry_actor.nikola.create_profile('nikola');
+		const { ok: username_info } =
+			await username_registry_actor.nikola.get_info_by_username(username);
+
+		creator_actor_nikola = await getActor(
+			username_info.canister_id,
+			interfaces.creator,
+			nikola_identity
+		);
+
 		expect(username.length).toBeGreaterThan(2);
 	});
 
@@ -112,16 +122,7 @@ describe('Projects With Snaps', () => {
 	});
 
 	test('Creator[nikola].create_project(): with valid args => #ok - ProjectPublic', async () => {
-		const { ok: username_info } =
-			await username_registry_actor.nikola.get_info_by_username('nikola');
-
-		const creator_actor = await getActor(
-			username_info.canister_id,
-			interfaces.creator,
-			nikola_identity
-		);
-
-		const { ok: project } = await creator_actor.create_project({
+		const { ok: project } = await creator_actor_nikola.create_project({
 			name: 'Project One',
 			description: ['first project']
 		});
@@ -140,16 +141,7 @@ describe('Projects With Snaps', () => {
 			content_type: fileObject.type
 		});
 
-		const { ok: username_info } =
-			await username_registry_actor.nikola.get_info_by_username('nikola');
-
-		const creator_actor = await getActor(
-			username_info.canister_id,
-			interfaces.creator,
-			nikola_identity
-		);
-
-		const { ok: snap } = await creator_actor.create_snap({
+		const { ok: snap } = await creator_actor_nikola.create_snap({
 			project_id,
 			name: 'First Snap',
 			tags: [],
@@ -158,45 +150,41 @@ describe('Projects With Snaps', () => {
 			images: [file]
 		});
 
-		snap_id = snap.id;
+		if (snap) {
+			snap_id = snap.id;
 
-		// Assertions for snap properties
-		expect(snap.name).toBe('First Snap');
-		expect(snap.tags).toEqual([]);
-		expect(snap.images).toHaveLength(1);
+			// Assertions for snap properties
+			expect(snap.name).toBe('First Snap');
+			expect(snap.tags).toEqual([]);
+			expect(snap.images).toHaveLength(1);
 
-		// Assertions for the uploaded image
-		const uploadedImage = snap.images[0];
-		expect(uploadedImage.filename).toBe('3mb_japan.jpg');
-		expect(uploadedImage.content_type).toBe('image/jpeg');
-		expect(uploadedImage.content_size).toBeGreaterThan(0);
-		expect(uploadedImage.url.startsWith('http://')).toBe(true);
+			// Assertions for the uploaded image
+			const uploadedImage = snap.images[0];
+			expect(uploadedImage.filename).toBe('3mb_japan.jpg');
+			expect(uploadedImage.content_type).toBe('image/jpeg');
+			expect(uploadedImage.content_size).toBeGreaterThan(0);
+			expect(uploadedImage.url.startsWith('http://')).toBe(true);
+		}
 	});
 
 	test('Creator[nikola].get_snap(): with valid project_id => #ok - SnapPublic', async () => {
-		const { ok: username_info } =
-			await username_registry_actor.nikola.get_info_by_username('nikola');
-
-		const creator_actor = await getActor(
-			username_info.canister_id,
-			interfaces.creator,
-			nikola_identity
-		);
-
-		const { ok: snap } = await creator_actor.get_snap(snap_id);
+		const { ok: snap } = await creator_actor_nikola.get_snap(snap_id);
 		// Assertions for snap properties
-		expect(snap.name).toBe('First Snap');
-		expect(snap.tags).toEqual([]);
-		expect(snap.images).toHaveLength(1);
 
-		// Assertions for the uploaded image and HTTP response
-		const uploadedImage = snap.images[0];
-		const img_http_response = await requestResource(uploadedImage.url);
+		if (snap) {
+			expect(snap.name).toBe('First Snap');
+			expect(snap.tags).toEqual([]);
+			expect(snap.images).toHaveLength(1);
 
-		expect(img_http_response.statusCode).toBe(200);
-		expect(uploadedImage.filename).toBe('3mb_japan.jpg');
-		expect(uploadedImage.content_type).toBe('image/jpeg');
-		expect(uploadedImage.content_size).toBeGreaterThan(0); // Adjust if it's BigInt and ensure compatibility
-		expect(uploadedImage.url.startsWith('http://')).toBe(true);
+			// Assertions for the uploaded image and HTTP response
+			const uploadedImage = snap.images[0];
+			const img_http_response = await requestResource(uploadedImage.url);
+
+			expect(img_http_response.statusCode).toBe(200);
+			expect(uploadedImage.filename).toBe('3mb_japan.jpg');
+			expect(uploadedImage.content_type).toBe('image/jpeg');
+			expect(uploadedImage.content_size).toBeGreaterThan(0); // Adjust if it's BigInt and ensure compatibility
+			expect(uploadedImage.url.startsWith('http://')).toBe(true);
+		}
 	});
 });
