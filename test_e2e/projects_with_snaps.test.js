@@ -1,9 +1,11 @@
 import { describe, test, expect, beforeAll } from 'vitest';
 import { config } from 'dotenv';
+import path from 'path';
 import { canister_ids, getInterfaces } from '../config/actor_refs';
 import { parseIdentity } from './actor_identity.cjs';
 import { getActor } from './actor.cjs';
-
+import { createFileObject } from './libs/file';
+import { requestResource } from './libs/http.cjs';
 import { FileStorage } from '../src/ui/utils/file_storage';
 
 // Configure environment variables
@@ -19,6 +21,9 @@ let interfaces = {};
 let username_registry_actor = {};
 let file_scaling_manager_actor = {};
 let file_storage_actor_lib = {};
+
+let project_id = '';
+let snap_id = '';
 
 // Helper function to mimic the File Web API object in Node.js
 
@@ -74,5 +79,124 @@ describe('Projects With Snaps', () => {
 	test('UsernameRegistry[nikola].version(): => #ok - Version Number', async () => {
 		const version_num = await username_registry_actor.nikola.version();
 		expect(version_num).toBe(1n);
+	});
+
+	test('UsernameRegistry[nikola].delete_profile(): with valid principal => #ok - Bool', async () => {
+		// Setup: Ensure there's a profile to delete
+		await username_registry_actor.nikola.create_profile('nikola');
+
+		const { ok: deleted } = await username_registry_actor.nikola.delete_profile();
+
+		// Directly expect 'deleted' to be true
+		expect(deleted).toBe(true);
+	});
+
+	test('UsernameRegistry[linky].delete_profile(): with valid principal => #ok - Bool', async () => {
+		// Setup: Ensure there's a profile to delete
+		await username_registry_actor.linky.create_profile('linky');
+
+		const { ok: deleted } = await username_registry_actor.linky.delete_profile();
+
+		// Directly expect 'deleted' to be true
+		expect(deleted).toBe(true);
+	});
+
+	test('UsernameRegistry[nikola].create_profile(): with valid username => #ok - Username', async () => {
+		const { ok: username } = await username_registry_actor.nikola.create_profile('nikola');
+		expect(username.length).toBeGreaterThan(2);
+	});
+
+	test('UsernameRegistry[linky].create_profile(): with valid username => #ok - Username', async () => {
+		const { ok: username } = await username_registry_actor.linky.create_profile('linky');
+		expect(username.length).toBeGreaterThan(2);
+	});
+
+	test('Creator[nikola].create_project(): with valid args => #ok - ProjectPublic', async () => {
+		const { ok: username_info } =
+			await username_registry_actor.nikola.get_info_by_username('nikola');
+
+		const creator_actor = await getActor(
+			username_info.canister_id,
+			interfaces.creator,
+			nikola_identity
+		);
+
+		const { ok: project } = await creator_actor.create_project({
+			name: 'Project One',
+			description: ['first project']
+		});
+
+		project_id = project.id;
+
+		expect(project).toBeTruthy();
+		expect(project.name).toBe('Project One');
+		expect(project.description).toEqual(['first project']);
+	});
+
+	test('Creator[nikola].create_snap(): with valid project_id, name, images, and img_location => #ok - SnapPublic', async () => {
+		const fileObject = createFileObject(path.join(__dirname, 'images', 'size', '3mb_japan.jpg'));
+		const { ok: file } = await file_storage_actor_lib.nikola.store(fileObject.content, {
+			filename: fileObject.name,
+			content_type: fileObject.type
+		});
+
+		const { ok: username_info } =
+			await username_registry_actor.nikola.get_info_by_username('nikola');
+
+		const creator_actor = await getActor(
+			username_info.canister_id,
+			interfaces.creator,
+			nikola_identity
+		);
+
+		const { ok: snap } = await creator_actor.create_snap({
+			project_id,
+			name: 'First Snap',
+			tags: [],
+			design_file: [],
+			image_cover_location: 0,
+			images: [file]
+		});
+
+		snap_id = snap.id;
+
+		// Assertions for snap properties
+		expect(snap.name).toBe('First Snap');
+		expect(snap.tags).toEqual([]);
+		expect(snap.images).toHaveLength(1);
+
+		// Assertions for the uploaded image
+		const uploadedImage = snap.images[0];
+		expect(uploadedImage.filename).toBe('3mb_japan.jpg');
+		expect(uploadedImage.content_type).toBe('image/jpeg');
+		expect(uploadedImage.content_size).toBeGreaterThan(0);
+		expect(uploadedImage.url.startsWith('http://')).toBe(true);
+	});
+
+	test('Creator[nikola].get_snap(): with valid project_id => #ok - SnapPublic', async () => {
+		const { ok: username_info } =
+			await username_registry_actor.nikola.get_info_by_username('nikola');
+
+		const creator_actor = await getActor(
+			username_info.canister_id,
+			interfaces.creator,
+			nikola_identity
+		);
+
+		const { ok: snap } = await creator_actor.get_snap(snap_id);
+		// Assertions for snap properties
+		expect(snap.name).toBe('First Snap');
+		expect(snap.tags).toEqual([]);
+		expect(snap.images).toHaveLength(1);
+
+		// Assertions for the uploaded image and HTTP response
+		const uploadedImage = snap.images[0];
+		const img_http_response = await requestResource(uploadedImage.url);
+
+		expect(img_http_response.statusCode).toBe(200);
+		expect(uploadedImage.filename).toBe('3mb_japan.jpg');
+		expect(uploadedImage.content_type).toBe('image/jpeg');
+		expect(uploadedImage.content_size).toBeGreaterThan(0); // Adjust if it's BigInt and ensure compatibility
+		expect(uploadedImage.url.startsWith('http://')).toBe(true);
 	});
 });

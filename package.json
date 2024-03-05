@@ -13,7 +13,8 @@
 		"test": "vitest run",
 		"test:config": "vitest test_e2e/dfx.config.test.js",
 		"test:profile_create": "vitest test_e2e/profile_creation.test.js",
-		"test:profile_images": "vitest test_e2e/profile_images.test.js"
+		"test:profile_images": "vitest test_e2e/profile_images.test.js",
+		"test:projects_with_snaps": "vitest test_e2e/projects_with_snaps.test.js"
 	},
 	"dependencies": {
 		"crc-32": "^1.2.2",
