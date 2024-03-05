@@ -193,7 +193,7 @@ describe('Profile Images Tests', () => {
 		expect(() => new URL(profile.avatar.url)).not.toThrow();
 		expect(updated_profile.ok).toBeTruthy();
 		expect(updated_profile.err).toBeFalsy();
-	}, 10000);
+	});
 
 	test('Creator[nova].update_profile_banner(): => #ok - Updated Banner', async () => {
 		const filePath = path.join(__dirname, 'images', 'size', '3mb_japan.jpg');
@@ -226,5 +226,5 @@ describe('Profile Images Tests', () => {
 		expect(() => new URL(profile.banner.url)).not.toThrow();
 		expect(updated_profile.ok).toBeTruthy();
 		expect(updated_profile.err).toBeFalsy();
-	}, 10000);
+	});
 });
