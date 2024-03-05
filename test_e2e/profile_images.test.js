@@ -1,12 +1,13 @@
 import { describe, test, expect, beforeAll } from 'vitest';
 import { config } from 'dotenv';
+import path from 'path';
+
 import { canister_ids, getInterfaces } from '../config/actor_refs';
 import { parseIdentity } from './actor_identity.cjs';
 import { getActor } from './actor.cjs';
-import fs from 'fs';
-import path from 'path';
-import { getMimeType } from '../src/ui/utils/mime.cjs';
+
 import { FileStorage } from '../src/ui/utils/file_storage';
+import { createFileObject } from './libs/file';
 
 // Configure environment variables
 config();
@@ -22,21 +23,7 @@ let username_registry_actor = {};
 let file_scaling_manager_actor = {};
 let file_storage_actor_lib = {};
 
-// Helper function to mimic the File Web API object in Node.js
-function createFileObject(filePath) {
-	const stats = fs.statSync(filePath); // Get file stats to access modification time
-	const buffer = fs.readFileSync(filePath);
-	const content = new Uint8Array(buffer);
-	return {
-		name: path.basename(filePath),
-		type: getMimeType(filePath),
-		content,
-		size: buffer.length, // Size in bytes
-		lastModified: stats.mtimeMs // Last modified time in milliseconds
-	};
-}
-
-describe('Actor Setup and File Management Tests', () => {
+describe('Profile Images Tests', () => {
 	beforeAll(async () => {
 		interfaces = await getInterfaces();
 

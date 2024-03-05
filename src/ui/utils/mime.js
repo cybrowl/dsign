@@ -1,4 +1,4 @@
-function getMimeType(filePath) {
+const getMimeType = (filePath) => {
 	const extensionToMimeType = {
 		'.txt': 'text/plain',
 		'.html': 'text/html',
@@ -12,11 +12,8 @@ function getMimeType(filePath) {
 		// Add more mappings as needed
 	};
 
-	// Extract the file extension from the file path
 	const extension = filePath.slice(filePath.lastIndexOf('.'));
-
-	// Return the corresponding MIME type or a default/fallback type
 	return extensionToMimeType[extension] || 'application/octet-stream';
-}
+};
 
-module.exports = { getMimeType };
+export { getMimeType };

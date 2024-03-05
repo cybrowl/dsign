@@ -17,7 +17,7 @@ const anonymous_identity = null; // Assuming this means using an anonymous ident
 let username_registry_actor = {};
 let interfaces = {};
 
-describe('Username Registry Actor Tests', () => {
+describe('Profile Creation Tests', () => {
 	beforeAll(async () => {
 		const interfaces_ = await getInterfaces();
 		interfaces = interfaces_;
