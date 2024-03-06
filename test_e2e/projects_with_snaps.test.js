@@ -271,8 +271,6 @@ describe('Projects With Snaps', () => {
 
 	test('Creator[nikola].delete_snap_images(): with valid images => #ok - Bool', async () => {
 		if (snap_current.images) {
-			console.log('snap_current.images: ', snap_current.images);
-
 			const snap_images_ids = getRandomSubsetIds(snap_current.images, 1);
 
 			const { ok: images_deleted } = await creator_actor_nikola.delete_snap_images(
