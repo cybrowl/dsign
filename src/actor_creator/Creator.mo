@@ -558,7 +558,21 @@ actor class Creator(username_registry : Principal) = this {
 					// Proceed to delete the snap
 					snaps.delete(id);
 
-					// TODO: Additional cleanup could be performed here, such as removing the snap ID from any projects it belongs to
+					switch (projects.get(snap.project_id)) {
+						case (null) {
+							return #err(#ProfileNotFound(true));
+						};
+						case (?project) {
+							// Filter out the deleted snap ID from the project's snaps array
+							let snaps_updated = Array.filter<SnapID>(project.snaps, func(s) { s != id });
+							let project_updated = {
+								project with
+								snaps = snaps_updated;
+							};
+
+							projects.put(snap.project_id, project_updated);
+						};
+					};
 				};
 			};
 		};
@@ -605,8 +619,26 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Delete Snap Design File
-	public shared ({ caller }) func delete_snap_design_file(id : SnapID) : async Result.Result<Text, Text> {
-		return #ok("");
+	public shared ({ caller }) func delete_snap_design_file(id : SnapID) : async Result.Result<Bool, ErrSnap> {
+		switch (snaps.get(id)) {
+			case (null) {
+				return #err(#SnapNotFound(true));
+			};
+			case (?snap) {
+				if (Principal.notEqual(snap.owner, caller)) {
+					return #err(#NotOwner(true));
+				};
+
+				let snap_updated = {
+					snap with
+					design_file = null;
+				};
+
+				snaps.put(id, snap_updated);
+
+				return #ok(true);
+			};
+		};
 	};
 
 	// ------------------------- Favorites -------------------------
