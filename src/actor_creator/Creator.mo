@@ -11,6 +11,7 @@ import Logger "canister:logger";
 
 import Types "./types";
 import UUID "../libs/uuid";
+import Arr "../libs/array";
 
 actor class Creator(username_registry : Principal) = this {
 	type ArgsCreateProject = Types.ArgsCreateProject;
@@ -662,7 +663,7 @@ actor class Creator(username_registry : Principal) = this {
 					return #ok(false);
 				} else {
 
-					let favorites_updated = Array.append<FavoriteID>(profile.favorites, [project_id]);
+					let favorites_updated = Arr.append<FavoriteID>(profile.favorites, [project_id]);
 					let profile_updated = {
 						profile with
 						favorites = favorites_updated
