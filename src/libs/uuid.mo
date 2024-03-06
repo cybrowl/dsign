@@ -1,49 +1,46 @@
-import { Buffer; toArray } "mo:base/Buffer";
+import Buffer "mo:base/Buffer";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
-import Map "mo:map/Map";
 import Nat "mo:base/Nat";
-import Nat32 "mo:base/Nat32";
+import Nat8 "mo:base/Nat8";
+import Random "mo:base/Random";
 import Text "mo:base/Text";
-import Time "mo:base/Time";
 
 module {
-	let { hashNat } = Map;
-	// Hexadecimal characters for converting numbers to hex.
-	let HEX_CHARS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
-	let UUID_LENGTH = 31;
+	func digit_to_hext(digit : Nat) : Text {
+		let hexChars : [Text] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"];
 
-	// Generates a sequence of natural numbers based on time-derived randomness.
-	public func random_from_time() : [Nat] {
-		var randomness = Buffer<Nat>(0);
-		// Seed based on the current time, hashed for initial randomness.
-		let seed = Nat32.toNat(hashNat(Int.abs(Time.now())));
-
-		// Initialize the randomness buffer with the seed.
-		randomness.add(seed);
-		// Generate subsequent numbers based on hashing the previous value.
-		for (i in Iter.range(1, UUID_LENGTH)) {
-			// Adjusted range to generate 32 elements in total.
-			let prev = randomness.get(i - 1);
-			randomness.add(Nat32.toNat(hashNat(prev)));
-		};
-
-		return toArray(randomness);
+		return hexChars[digit];
 	};
 
-	// Generates a UUID-like string without hyphens.
-	public func generate() : Text {
-		var uuid = Buffer<Char>(0);
-		// Generate randomness based on the current time.
-		let randomness = random_from_time();
+	public func generate_random_hex(len : Nat) : async Text {
+		let entropy_blob = await Random.blob();
+		let random = Random.Finite(entropy_blob);
 
-		// Convert each piece of randomness into a hexadecimal character.
-		for (i in Iter.range(0, UUID_LENGTH)) {
-			// Adjusted range to match the number of generated elements.
-			uuid.add(HEX_CHARS[randomness[i] % 16]);
+		let hex_buffer = Buffer.Buffer<Text>(0);
+
+		for (_ in Iter.range(0, Int.sub(len, 1))) {
+			switch (random.byte()) {
+				case (?b) {
+					let high = Nat8.toNat(b) / 16;
+					let low = Nat8.toNat(b) % 16;
+
+					// Add hex characters to the buffer
+					hex_buffer.add(digit_to_hext(high));
+					hex_buffer.add(digit_to_hext(low));
+				};
+				case null {};
+			};
 		};
 
-		// Convert the buffer to an array and then to a string.
-		return Text.fromIter(toArray(uuid).vals());
+		let hex_array = Buffer.toArray(hex_buffer);
+
+		return Text.join("", hex_array.vals());
+	};
+
+	public func generate() : async Text {
+		let random_hex = await generate_random_hex(12);
+
+		return random_hex;
 	};
 };

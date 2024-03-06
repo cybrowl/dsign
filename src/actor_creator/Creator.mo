@@ -260,7 +260,7 @@ actor class Creator(username_registry : Principal) = this {
 	public shared ({ caller }) func create_project(args : ArgsCreateProject) : async Result.Result<ProjectPublic, ErrProject> {
 		//TODO: sanitize the args
 
-		let id : ProjectID = UUID.generate();
+		let id : ProjectID = await UUID.generate();
 
 		switch (profiles.get(caller)) {
 			case (null) {
@@ -432,7 +432,7 @@ actor class Creator(username_registry : Principal) = this {
 							return #err(#NotOwner(true));
 						};
 
-						let id : SnapID = UUID.generate();
+						let id : SnapID = await UUID.generate();
 
 						let snap : Snap = {
 							id = id;

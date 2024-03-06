@@ -78,7 +78,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	};
 
 	public shared ({ caller }) func create_file_from_chunks(chunk_ids : [Nat], properties : FileProperties) : async Result.Result<FilePublic, ErrCreateFile> {
-		let file_id = UUID.generate();
+		let file_id = await UUID.generate();
 		let canister_id = Principal.toText(Principal.fromActor(this));
 
 		var chunks_to_commit = Buffer<ChunkInfo>(0);

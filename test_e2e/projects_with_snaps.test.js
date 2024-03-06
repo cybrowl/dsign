@@ -271,6 +271,8 @@ describe('Projects With Snaps', () => {
 
 	test('Creator[nikola].delete_snap_images(): with valid images => #ok - Bool', async () => {
 		if (snap_current.images) {
+			console.log('snap_current.images: ', snap_current.images);
+
 			const snap_images_ids = getRandomSubsetIds(snap_current.images, 1);
 
 			const { ok: images_deleted } = await creator_actor_nikola.delete_snap_images(
@@ -283,8 +285,6 @@ describe('Projects With Snaps', () => {
 			const { ok: snap } = await creator_actor_nikola.get_snap(snap_id);
 
 			if (snap) {
-				console.log('snap.images: ', snap.images);
-
 				expect(snap.name).toBe('First Snap Updated');
 				expect(snap.tags).toEqual(['ocean']);
 				expect(snap.images).toHaveLength(1);
