@@ -5,8 +5,9 @@ import Result "mo:base/Result";
 
 module {
 	public type CanisterID = Text;
-	public type ProjectID = Text;
 	public type FavoriteID = Text;
+	public type FileAssetID = Text;
+	public type ProjectID = Text;
 	public type SnapID = Text;
 	public type Time = Int;
 	public type Username = Text;
@@ -26,7 +27,7 @@ module {
 	};
 
 	public type FileAsset = {
-		id : Text;
+		id : FileAssetID;
 		canister_id : Text;
 		chunks_size : Nat;
 		content_encoding : ContentEncoding;
@@ -177,11 +178,21 @@ module {
 		image_cover_location : Nat8;
 	};
 
+	public type ArgsUpdateSnap = {
+		id : SnapID;
+		name : ?Text;
+		tags : ?[Text];
+		design_file : ?FileAsset;
+		images : ?[FileAsset];
+		image_cover_location : ?Nat8;
+	};
+
 	public type Snap = {
 		id : SnapID;
 		project_id : ProjectID;
 		canister_id : CanisterID;
 		created : Time;
+		updated : Time;
 		name : Text;
 		tags : [Text];
 		username : Username;
@@ -197,6 +208,7 @@ module {
 		project_id : ProjectID;
 		canister_id : CanisterID;
 		created : Time;
+		updated : Time;
 		name : Text;
 		tags : [Text];
 		username : Username;

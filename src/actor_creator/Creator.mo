@@ -17,10 +17,13 @@ actor class Creator(username_registry : Principal) = this {
 	type ArgsCreateSnap = Types.ArgsCreateSnap;
 	type ArgsUpdateProfile = Types.ArgsUpdateProfile;
 	type ArgsUpdateProject = Types.ArgsUpdateProject;
+	type ArgsUpdateSnap = Types.ArgsUpdateSnap;
 	type ErrProfile = Types.ErrProfile;
 	type ErrProject = Types.ErrProject;
 	type ErrSnap = Types.ErrSnap;
 	type FavoriteID = Types.FavoriteID;
+	type FileAsset = Types.FileAsset;
+	type FileAssetID = Types.FileAssetID;
 	type Profile = Types.Profile;
 	type ProfilePublic = Types.ProfilePublic;
 	type Project = Types.Project;
@@ -436,6 +439,7 @@ actor class Creator(username_registry : Principal) = this {
 							project_id = args.project_id;
 							canister_id = creator_canister_id;
 							created = Time.now();
+							updated = Time.now();
 							name = args.name;
 							tags = Option.get(args.tags, []);
 							username = profile.username;
@@ -475,18 +479,129 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Update Snap
-	public shared ({ caller }) func update_snap() : async Result.Result<Text, Text> {
-		return #ok("");
+	public shared ({ caller }) func update_snap(args : ArgsUpdateSnap) : async Result.Result<SnapPublic, ErrSnap> {
+		switch (profiles.get(caller)) {
+			case (null) {
+				return #err(#ProfileNotFound(true));
+			};
+			case (?profile) {
+				switch (snaps.get(args.id)) {
+					case (null) {
+						return #err(#ProjectNotFound(true));
+					};
+					case (?snap) {
+						if (Principal.notEqual(snap.owner, caller)) {
+							return #err(#NotOwner(true));
+						};
+
+						// Update the optional fields only if they are provided
+						let updated_tags = switch (args.tags) {
+							case (null) { snap.tags };
+							case (?tags) { tags };
+						};
+						let updated_design_file = switch (args.design_file) {
+							case (null) { snap.design_file };
+							case (?design_file) { ?design_file };
+						};
+						let updated_images = switch (args.images) {
+							case (null) { snap.images };
+							case (?images) { images };
+						};
+						let updated_image_cover_location = switch (args.image_cover_location) {
+							case (null) { snap.image_cover_location };
+							case (?location) { location };
+						};
+
+						// Update snap
+						let updated_snap : Snap = {
+							id = snap.id;
+							project_id = snap.project_id;
+							canister_id = snap.canister_id;
+							created = snap.created;
+							updated = Time.now();
+							name = Option.get(args.name, snap.name);
+							tags = updated_tags;
+							username = snap.username;
+							owner = snap.owner;
+							design_file = updated_design_file;
+							image_cover_location = updated_image_cover_location;
+							images = updated_images;
+							metrics = snap.metrics;
+						};
+
+						snaps.put(snap.id, updated_snap);
+
+						let snap_public : SnapPublic = {
+							updated_snap with
+							owner = ?caller;
+						};
+
+						return #ok(snap_public);
+					};
+				};
+			};
+		};
 	};
 
 	// Delete Snaps
-	public shared ({ caller }) func delete_snaps(ids : [SnapID]) : async Result.Result<Text, Text> {
-		return #ok("");
+	public shared ({ caller }) func delete_snaps(ids : [SnapID]) : async Result.Result<Bool, ErrSnap> {
+		for (id in ids.vals()) {
+			switch (snaps.get(id)) {
+				case (null) {
+					return #err(#SnapNotFound(true));
+				};
+				case (?snap) {
+					if (Principal.notEqual(snap.owner, caller)) {
+						return #err(#NotOwner(true));
+					};
+
+					// Proceed to delete the snap
+					snaps.delete(id);
+
+					// TODO: Additional cleanup could be performed here, such as removing the snap ID from any projects it belongs to
+				};
+			};
+		};
+
+		return #ok(true);
 	};
 
 	// Delete Snap Images
-	public shared ({ caller }) func delete_snap_images() : async Result.Result<Text, Text> {
-		return #ok("");
+	public shared ({ caller }) func delete_snap_images(snap_id : SnapID, ids : [FileAssetID]) : async Result.Result<Bool, ErrSnap> {
+		switch (snaps.get(snap_id)) {
+			case (null) {
+				return #err(#SnapNotFound(true));
+			};
+			case (?snap) {
+				if (Principal.notEqual(snap.owner, caller)) {
+					return #err(#NotOwner(true));
+				};
+
+				let remaining_images = Array.filter<FileAsset>(
+					snap.images,
+					func(image : FileAsset) : Bool {
+						var is_not_in_ids = true;
+
+						for (id in ids.vals()) {
+							if (id == image.id) {
+								is_not_in_ids := false;
+							};
+						};
+
+						is_not_in_ids;
+					}
+				);
+
+				let snap_updated = {
+					snap with
+					images = remaining_images;
+				};
+
+				snaps.put(snap_id, snap_updated);
+
+				return #ok(true);
+			};
+		};
 	};
 
 	// Delete Snap Design File
