@@ -38,12 +38,12 @@ actor class Creator(username_registry : Principal) = this {
 	// TODO: There needs to be an upgrade method that allows a user to move their data to a 4GB canister
 
 	// ------------------------- Variables -------------------------
-	let VERSION : Nat = 1; // The Version in Production
-	let USERNAME_REGISTRY_ID : Text = Principal.toText(username_registry);
 	let MAX_USERS : Nat = 100;
+	let USERNAME_REGISTRY_ID : Text = Principal.toText(username_registry);
+	let VERSION : Nat = 1; // The Version in Production
 
 	var users : Nat = 0;
-	var canister_id : Text = "";
+	var creator_canister_id = "";
 
 	// ------------------------- Storage Data -------------------------
 	// profiles
@@ -125,7 +125,7 @@ actor class Creator(username_registry : Principal) = this {
 							avatar = profile.avatar;
 							banner = profile.banner;
 							created = profile.created;
-							canister_id = Principal.toText(Principal.fromActor(this));
+							canister_id = creator_canister_id;
 							username = profile.username;
 							is_owner = Principal.equal(caller, profile.owner);
 							projects = projects_public;
@@ -140,7 +140,7 @@ actor class Creator(username_registry : Principal) = this {
 
 	// Create Profile
 	public shared ({ caller }) func create_profile(username : Username, owner : UserPrincipal) : async Result.Result<Username, ErrProfile> {
-		let tags = [("canister_id", canister_id), ("method", "create_profile")];
+		let tags = [("canister_id", creator_canister_id), ("method", "create_profile")];
 
 		if (Principal.equal(caller, username_registry) == false) {
 			return #err(#NotAuthorizedCaller);
@@ -162,7 +162,7 @@ actor class Creator(username_registry : Principal) = this {
 				url = "/default_profile_banner.png";
 			};
 			created = Time.now();
-			canister_id = Principal.toText(Principal.fromActor(this));
+			canister_id = creator_canister_id;
 			username = username;
 			owner = owner;
 			favorites = [];
@@ -268,7 +268,7 @@ actor class Creator(username_registry : Principal) = this {
 				// Add Project
 				let project : Project = {
 					id = id;
-					canister_id = Principal.toText(Principal.fromActor(this));
+					canister_id = creator_canister_id;
 					created = Time.now();
 					name = args.name;
 					description = args.description;
@@ -434,7 +434,7 @@ actor class Creator(username_registry : Principal) = this {
 						let snap : Snap = {
 							id = id;
 							project_id = args.project_id;
-							canister_id = Principal.toText(Principal.fromActor(this));
+							canister_id = creator_canister_id;
 							created = Time.now();
 							name = args.name;
 							tags = Option.get(args.tags, []);
@@ -516,9 +516,15 @@ actor class Creator(username_registry : Principal) = this {
 		return VERSION;
 	};
 
+	public shared func init() : async () {
+		creator_canister_id := Principal.toText(Principal.fromActor(this));
+
+		return ();
+	};
+
 	// Get CanisterId
 	public query func get_canister_id() : async Text {
-		return Principal.toText(Principal.fromActor(this));
+		return creator_canister_id;
 	};
 
 	// Post Upgrade

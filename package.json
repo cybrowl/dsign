@@ -9,7 +9,7 @@
 		"format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. .",
 		"lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
 		"logs": "npm run idl_for_testing && tape test-utils/debug/debug.test.cjs",
-		"deploy": "sh ./scripts/deploy_local.sh",
+		"boot": "sh ./scripts/deploy_local.sh",
 		"test": "vitest run",
 		"test:config": "vitest test_e2e/dfx.config.test.js",
 		"test:profile_create": "vitest test_e2e/profile_creation.test.js",

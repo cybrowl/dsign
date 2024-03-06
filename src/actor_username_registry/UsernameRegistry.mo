@@ -195,17 +195,11 @@ actor UsernameRegistry = {
 		let creator_actor = await Creator.Creator(username_registry_principal);
 		let principal = Principal.fromActor(creator_actor);
 
+		ignore creator_actor.init();
+
 		creator_canister_id := Principal.toText(principal);
 
-		// let canister_child : CanisterInfo = {
-		//     created = Time.now();
-		//     id = favorite_canister_id;
-		//     name = "favorite";
-		//     parent_name = ACTOR_NAME;
-		//     isProd = is_prod;
-		// };
-
-		// ignore CanisterIdsLedger.save_canister(canister_child);
+		//TODO: save canister info to `canister_registry`
 	};
 
 	public shared (msg) func init() : async Text {
