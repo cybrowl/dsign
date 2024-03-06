@@ -159,6 +159,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 			content_encoding = properties.content_encoding;
 			content_size = content_size;
 			content_type = properties.content_type;
+			created = file.created;
 			filename = properties.filename;
 			id = file_id;
 			url = Utils.generate_file_url({

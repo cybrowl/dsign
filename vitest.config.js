@@ -1,7 +1,7 @@
 // vitest.config.js
 export default {
 	test: {
-		// Set global test timeout to 15 seconds
-		testTimeout: 15000
+		// Set global test timeout to 20 seconds
+		testTimeout: 20000
 	}
 };

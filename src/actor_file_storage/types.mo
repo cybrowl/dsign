@@ -51,6 +51,7 @@ module {
 		content_encoding : ContentEncoding;
 		content_size : Nat;
 		content_type : Text;
+		created : Int;
 		filename : Text;
 		url : Text;
 	};
