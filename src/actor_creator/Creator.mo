@@ -65,11 +65,11 @@ actor class Creator(username_registry : Principal) = this {
 
 	// favorites (only lives within profile)
 	// NOTE: the data is cached, cron job runs every N time
-	var favorites : HashMap.HashMap<FavoriteID, Project> = HashMap.HashMap(
-		0,
-		Text.equal,
-		Text.hash
-	);
+	// var favorites : HashMap.HashMap<FavoriteID, Project> = HashMap.HashMap(
+	//     0,
+	//     Text.equal,
+	//     Text.hash
+	// );
 
 	// projects
 	var projects : HashMap.HashMap<ProjectID, Project> = HashMap.HashMap(0, Text.equal, Text.hash);
@@ -643,18 +643,65 @@ actor class Creator(username_registry : Principal) = this {
 
 	// ------------------------- Favorites -------------------------
 	// Get Number of Favorites
-	public query func total_favorites() : async Nat {
-		return favorites.size();
-	};
+	// public query func total_favorites() : async Nat {
+	//     return favorites.size();
+	// };
 
 	// Save Project as Favorite
-	public shared ({ caller }) func save_project_as_fav() : async Result.Result<Text, Text> {
-		return #ok("");
+	public shared ({ caller }) func save_project_as_fav(project_id : ProjectID) : async Result.Result<Bool, ErrProfile> {
+		switch (profiles.get(caller)) {
+			case (null) {
+				return #err(#ProfileNotFound(true));
+			};
+			case (?profile) {
+				if (projects.get(project_id) == null) {
+					return #err(#ProfileNotFound(true));
+				};
+
+				if (Array.find<FavoriteID>(profile.favorites, func(id) { id == project_id }) != null) {
+					return #ok(false);
+				} else {
+
+					let favorites_updated = Array.append<FavoriteID>(profile.favorites, [project_id]);
+					let profile_updated = {
+						profile with
+						favorites = favorites_updated
+					};
+
+					profiles.put(caller, profile_updated);
+
+					return #ok(true);
+				};
+			};
+		};
 	};
 
 	// Delete Project from Favorites
-	public shared ({ caller }) func delete_project_from_favs() : async Result.Result<Text, Text> {
-		return #ok("");
+	public shared ({ caller }) func delete_project_from_favs(project_id : ProjectID) : async Result.Result<Bool, ErrProfile> {
+		switch (profiles.get(caller)) {
+			case (null) {
+				return #err(#ProfileNotFound(true));
+			};
+			case (?profile) {
+				if (Array.find<FavoriteID>(profile.favorites, func(id) { id == project_id }) == null) {
+					return #err(#ProfileNotFound(true));
+				} else {
+					let favorites_updated = Array.filter<FavoriteID>(
+						profile.favorites,
+						func(id) { id != project_id }
+					);
+
+					let profile_updated = {
+						profile with
+						favorites = favorites_updated
+					};
+
+					profiles.put(caller, profile_updated);
+
+					return #ok(true);
+				};
+			};
+		};
 	};
 
 	// ------------------------- Canister Management -------------------------
