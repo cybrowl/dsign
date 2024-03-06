@@ -20,6 +20,8 @@ import { ofBlob } "./CRC32";
 import Types "./types";
 
 import Utils "./utils";
+import UUID "../libs/uuid";
+import Health "../libs/health";
 
 actor class FileStorage(is_prod : Bool, port : Text) = this {
 	let { thash; nhash } = Map;
@@ -76,7 +78,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	};
 
 	public shared ({ caller }) func create_file_from_chunks(chunk_ids : [Nat], properties : FileProperties) : async Result.Result<FilePublic, ErrCreateFile> {
-		let file_id = Utils.generate_uuid();
+		let file_id = UUID.generate();
 		let canister_id = Principal.toText(Principal.fromActor(this));
 
 		var chunks_to_commit = Buffer<ChunkInfo>(0);
@@ -218,9 +220,9 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 
 	public query func get_status() : async Status {
 		let status : Status = {
-			cycles = Utils.get_cycles_balance();
-			memory_mb = Utils.get_memory_in_mb();
-			heap_mb = Utils.get_heap_in_mb();
+			cycles = Health.get_cycles_balance();
+			memory_mb = Health.get_memory_in_mb();
+			heap_mb = Health.get_heap_in_mb();
 			files_size = Map.size(files);
 		};
 

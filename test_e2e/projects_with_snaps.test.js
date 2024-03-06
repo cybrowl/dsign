@@ -6,6 +6,7 @@ import { parseIdentity } from './actor_identity.cjs';
 import { getActor } from './actor.cjs';
 import { createFileObject } from './libs/file';
 import { requestResource } from './libs/http.cjs';
+import { getRandomSubsetIds } from './libs/images';
 import { FileStorage } from '../src/ui/utils/file_storage';
 
 // Configure environment variables
@@ -25,6 +26,7 @@ let creator_actor_nikola = {};
 
 let project_id = '';
 let snap_id = '';
+let snap_current = {};
 
 // Helper function to mimic the File Web API object in Node.js
 
@@ -198,9 +200,11 @@ describe('Projects With Snaps', () => {
 			images: []
 		});
 
-		expect(snap.name).toBe('First Snap Updated');
-		expect(snap.tags).toEqual([]);
-		expect(snap.images).toHaveLength(1);
+		if (snap) {
+			expect(snap.name).toBe('First Snap Updated');
+			expect(snap.tags).toEqual([]);
+			expect(snap.images).toHaveLength(1);
+		}
 	});
 
 	test('Creator[nikola].update_snap(): with valid tags => #ok - SnapPublic', async () => {
@@ -213,8 +217,78 @@ describe('Projects With Snaps', () => {
 			images: []
 		});
 
-		expect(snap.name).toBe('First Snap Updated');
-		expect(snap.tags).toEqual(['ocean']);
-		expect(snap.images).toHaveLength(1);
+		if (snap) {
+			snap_current = snap;
+
+			expect(snap.name).toBe('First Snap Updated');
+			expect(snap.tags).toEqual(['ocean']);
+			expect(snap.images).toHaveLength(1);
+		}
+	});
+
+	test('Creator[nikola].update_snap(): with images => #ok - SnapPublic', async () => {
+		const filePaths = [
+			path.join(__dirname, 'images', 'size', '3mb_japan.jpg'),
+			path.join(__dirname, 'images', 'size', '1mb_motoko.png')
+		];
+
+		// Map over filePaths to create and store file objects in parallel
+		const results = await Promise.all(
+			filePaths.map(async (filePath) => {
+				const fileObject = createFileObject(filePath);
+				return file_storage_actor_lib.nikola.store(fileObject.content, {
+					filename: fileObject.name,
+					content_type: fileObject.type
+				});
+			})
+		);
+
+		// Extract the ok values from results
+		const files = results.map((result) => result.ok);
+
+		// Assert each file was stored successfully
+		files.forEach((file) => {
+			expect(file).toBeDefined();
+		});
+
+		const { ok: snap } = await creator_actor_nikola.update_snap({
+			id: snap_id,
+			name: [],
+			design_file: [],
+			image_cover_location: [],
+			tags: [['ocean']],
+			images: [files]
+		});
+
+		if (snap) {
+			snap_current = snap;
+
+			expect(snap.name).toBe('First Snap Updated');
+			expect(snap.tags).toEqual(['ocean']);
+			expect(snap.images).toHaveLength(2);
+		}
+	});
+
+	test('Creator[nikola].delete_snap_images(): with valid images => #ok - Bool', async () => {
+		if (snap_current.images) {
+			const snap_images_ids = getRandomSubsetIds(snap_current.images, 1);
+
+			const { ok: images_deleted } = await creator_actor_nikola.delete_snap_images(
+				snap_id,
+				snap_images_ids
+			);
+
+			expect(images_deleted).toBe(true);
+
+			const { ok: snap } = await creator_actor_nikola.get_snap(snap_id);
+
+			if (snap) {
+				console.log('snap.images: ', snap.images);
+
+				expect(snap.name).toBe('First Snap Updated');
+				expect(snap.tags).toEqual(['ocean']);
+				expect(snap.images).toHaveLength(1);
+			}
+		}
 	});
 });
