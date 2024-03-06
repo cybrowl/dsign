@@ -226,7 +226,7 @@ describe('Projects With Snaps', () => {
 		}
 	});
 
-	test('Creator[nikola].update_snap(): with images => #ok - SnapPublic', async () => {
+	test('Creator[nikola].update_snap(): with images & image_cover_location => #ok - SnapPublic', async () => {
 		const filePaths = [
 			path.join(__dirname, 'images', 'size', '3mb_japan.jpg'),
 			path.join(__dirname, 'images', 'size', '1mb_motoko.png')
@@ -255,7 +255,7 @@ describe('Projects With Snaps', () => {
 			id: snap_id,
 			name: [],
 			design_file: [],
-			image_cover_location: [],
+			image_cover_location: [1],
 			tags: [['ocean']],
 			images: [files]
 		});
@@ -266,6 +266,7 @@ describe('Projects With Snaps', () => {
 			expect(snap.name).toBe('First Snap Updated');
 			expect(snap.tags).toEqual(['ocean']);
 			expect(snap.images).toHaveLength(2);
+			expect(snap.image_cover_location).toBe(1);
 		}
 	});
 
