@@ -286,7 +286,41 @@ describe('Projects With Snaps', () => {
 				expect(snap.name).toBe('First Snap Updated');
 				expect(snap.tags).toEqual(['ocean']);
 				expect(snap.images).toHaveLength(1);
+				expect(snap.design_file).toHaveLength(0);
 			}
+		}
+	});
+
+	test('Creator[nikola].update_snap(): with file => #ok - SnapPublic', async () => {
+		const fileObject = createFileObject(path.join(__dirname, 'figma_files', '5mb_components.fig'));
+		const { ok: file } = await file_storage_actor_lib.nikola.store(fileObject.content, {
+			filename: fileObject.name,
+			content_type: fileObject.type
+		});
+
+		const { ok: snap } = await creator_actor_nikola.update_snap({
+			id: snap_id,
+			name: [],
+			design_file: [file],
+			image_cover_location: [],
+			tags: [],
+			images: []
+		});
+
+		if (snap) {
+			expect(snap.name).toBe('First Snap Updated');
+			expect(snap.tags).toEqual(['ocean']);
+			expect(snap.images).toHaveLength(1);
+			expect(snap.design_file).toHaveLength(1);
+
+			// Assertions for the uploaded image and HTTP response
+			const uploaded_file = snap.design_file[0];
+			const img_http_response = await requestResource(uploaded_file.url);
+
+			expect(img_http_response.statusCode).toBe(200);
+			expect(uploaded_file.filename).toBe('5mb_components.fig');
+			expect(uploaded_file.content_type).toBe('application/octet-stream');
+			expect(uploaded_file.content_size).toBe(4473449n);
 		}
 	});
 });
