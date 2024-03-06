@@ -187,4 +187,34 @@ describe('Projects With Snaps', () => {
 			expect(uploadedImage.url.startsWith('http://')).toBe(true);
 		}
 	});
+
+	test('Creator[nikola].update_snap(): with valid name => #ok - SnapPublic', async () => {
+		const { ok: snap } = await creator_actor_nikola.update_snap({
+			id: snap_id,
+			name: ['First Snap Updated'],
+			design_file: [],
+			image_cover_location: [],
+			tags: [],
+			images: []
+		});
+
+		expect(snap.name).toBe('First Snap Updated');
+		expect(snap.tags).toEqual([]);
+		expect(snap.images).toHaveLength(1);
+	});
+
+	test('Creator[nikola].update_snap(): with valid tags => #ok - SnapPublic', async () => {
+		const { ok: snap } = await creator_actor_nikola.update_snap({
+			id: snap_id,
+			name: [],
+			design_file: [],
+			image_cover_location: [],
+			tags: [['ocean']],
+			images: []
+		});
+
+		expect(snap.name).toBe('First Snap Updated');
+		expect(snap.tags).toEqual(['ocean']);
+		expect(snap.images).toHaveLength(1);
+	});
 });
