@@ -12,6 +12,7 @@
 	import { auth, auth_client, auth_logout_all } from '$stores_ref/auth_client';
 	import { ls_my_profile, local_storage_remove_all } from '$stores_ref/local_storage';
 	import modal_update from '$stores_ref/modal';
+	import { profile_store, profile_actions } from '$stores_ref/data_profile';
 
 	import { FileStorage } from '$utils/file_storage';
 
@@ -27,6 +28,7 @@
 	// ------------------------- API -------------------------
 	async function update_profile_avatar(event) {
 		let file = event.detail;
+
 		const file_unit8 = new Uint8Array(await file.arrayBuffer());
 
 		//TODO: rename to say something about storage canister id and about it being empty
@@ -43,20 +45,21 @@
 			content_type: file.type
 		});
 
-		const { ok: url, err: err_banner_update } = await $actor_creator.actor.update_profile_avatar({
+		const avatar_file = {
 			id: file_public.id,
 			canister_id: file_public.canister_id,
 			url: file_public.url
-		});
+		};
+
+		profile_actions.update_profile_avatar(avatar_file);
+
+		const { ok: url, err: err_avatar_update } =
+			await $actor_creator.actor.update_profile_avatar(avatar_file);
 
 		ls_my_profile.update((values) => {
 			return {
 				...values,
-				avatar: {
-					id: file_public.id,
-					canister_id: file_public.canister_id,
-					url: url
-				}
+				avatar: avatar_file
 			};
 		});
 	}

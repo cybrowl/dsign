@@ -27,14 +27,14 @@
 		actor_file_storage,
 		actor_username_registry
 	} from '$stores_ref/actors';
+	import { profile_store, profile_actions } from '$stores_ref/data_profile';
 
 	import { profileTabsState, disable_project_store_reset } from '$stores_ref/page_state';
-	import { profile_store, profile_store_fetching } from '$stores_ref/reactive_store';
 	import modal_update, { modal_visible, modal_mode } from '$stores_ref/modal';
 	import { page_navigation } from '$stores_ref/page_navigation';
 	import { ls_my_profile } from '$stores_ref/local_storage';
 
-	profile_store_fetching();
+	profile_actions.fetching();
 
 	let project = {};
 
@@ -114,6 +114,7 @@
 
 	async function update_profile_banner(event) {
 		let file = event.detail;
+
 		const file_unit8 = new Uint8Array(await file.arrayBuffer());
 
 		//TODO: rename to say something about storage canister id and about it being empty
@@ -136,6 +137,8 @@
 			url: file_public.url
 		};
 
+		profile_actions.update_profile_banner(banner_file);
+
 		const { ok: url, err: err_banner_update } =
 			await $actor_creator.actor.update_profile_banner(banner_file);
 
@@ -145,8 +148,6 @@
 				banner: banner_file
 			};
 		});
-
-		//TODO: update `profile_store.profile.avatar` with new state
 	}
 
 	async function delete_project_from_favs(e) {
