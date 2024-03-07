@@ -330,17 +330,22 @@ describe('Projects With Snaps', () => {
 		expect(error).toEqual({ SnapNotFound: true });
 	});
 
-	// test('delete_snap_design_file: Unauthorized deletion attempt', async () => {
-	// 	const { err: error } =
-	// 		await creator_actor_nikola.delete_snap_design_file('337EF5E0EF5CEAB33510XXX');
+	test('Creator[linky].delete_snap_design_file(): with invalid caller => #err - NotOwner', async () => {
+		const { err: error } = await creator_actor_linky.delete_snap_design_file(nikola_snap_a.id);
 
-	// 	expect(error).toEqual({ SnapNotFound: true });
-	// 	console.log('error: ', error);
-	// });
+		expect(error).toEqual({ NotOwner: true });
+	});
 
-	// test('delete_snap_design_file: Successfully deletes design file from snap', async () => {
-	// 	// Setup: Create a snap with a design file
-	// 	// Action: Call delete_snap_design_file on the created snap
-	// 	// Assertion: Check if the design file is successfully removed
-	// });
+	test('Creator[nikola].delete_snap_design_file(): with valid args => #ok - Bool', async () => {
+		const { ok: deleted_file } = await creator_actor_nikola.delete_snap_design_file(
+			nikola_snap_a.id
+		);
+
+		expect(deleted_file).toBe(true);
+
+		const { ok: snap } = await creator_actor_nikola.get_snap(nikola_snap_a.id);
+		if (snap) {
+			expect(snap.design_file).toHaveLength(0);
+		}
+	});
 });
