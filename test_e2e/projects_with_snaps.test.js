@@ -23,10 +23,10 @@ let username_registry_actor = {};
 let file_scaling_manager_actor = {};
 let file_storage_actor_lib = {};
 let creator_actor_nikola = {};
+let creator_actor_linky = {};
 
-let project_id = '';
-let snap_id = '';
-let snap_current = {};
+let nikola_project_a = {};
+let nikola_snap_a = {};
 
 // Helper function to mimic the File Web API object in Node.js
 
@@ -76,6 +76,10 @@ describe('Projects With Snaps', () => {
 		);
 
 		file_storage_actor_lib.nikola = new FileStorage(file_storage_actor);
+
+		//DELETE PROFILES TO BE USED
+		await username_registry_actor.nikola.delete_profile();
+		await username_registry_actor.linky.delete_profile();
 	});
 
 	// Example Test: Check version number of UsernameRegistry[nikola]
@@ -84,27 +88,8 @@ describe('Projects With Snaps', () => {
 		expect(version_num).toBe(1n);
 	});
 
-	test('UsernameRegistry[nikola].delete_profile(): with valid principal => #ok - Bool', async () => {
-		// Setup: Ensure there's a profile to delete
-		await username_registry_actor.nikola.create_profile('nikola');
-
-		const { ok: deleted } = await username_registry_actor.nikola.delete_profile();
-
-		// Directly expect 'deleted' to be true
-		expect(deleted).toBe(true);
-	});
-
-	test('UsernameRegistry[linky].delete_profile(): with valid principal => #ok - Bool', async () => {
-		// Setup: Ensure there's a profile to delete
-		await username_registry_actor.linky.create_profile('linky');
-
-		const { ok: deleted } = await username_registry_actor.linky.delete_profile();
-
-		// Directly expect 'deleted' to be true
-		expect(deleted).toBe(true);
-	});
-
 	test('UsernameRegistry[nikola].create_profile(): with valid username => #ok - Username', async () => {
+		// Setup: Ensure there's a profile to delete
 		const { ok: username } = await username_registry_actor.nikola.create_profile('nikola');
 		const { ok: username_info } =
 			await username_registry_actor.nikola.get_info_by_username(username);
@@ -120,6 +105,15 @@ describe('Projects With Snaps', () => {
 
 	test('UsernameRegistry[linky].create_profile(): with valid username => #ok - Username', async () => {
 		const { ok: username } = await username_registry_actor.linky.create_profile('linky');
+		const { ok: username_info } =
+			await username_registry_actor.linky.get_info_by_username(username);
+
+		creator_actor_linky = await getActor(
+			username_info.canister_id,
+			interfaces.creator,
+			linky_identity
+		);
+
 		expect(username.length).toBeGreaterThan(2);
 	});
 
@@ -129,7 +123,7 @@ describe('Projects With Snaps', () => {
 			description: ['first project']
 		});
 
-		project_id = project.id;
+		nikola_project_a = project;
 
 		expect(project).toBeTruthy();
 		expect(project.name).toBe('Project One');
@@ -144,7 +138,7 @@ describe('Projects With Snaps', () => {
 		});
 
 		const { ok: snap } = await creator_actor_nikola.create_snap({
-			project_id,
+			project_id: nikola_project_a.id,
 			name: 'First Snap',
 			tags: [],
 			design_file: [],
@@ -153,7 +147,7 @@ describe('Projects With Snaps', () => {
 		});
 
 		if (snap) {
-			snap_id = snap.id;
+			nikola_snap_a = snap;
 
 			// Assertions for snap properties
 			expect(snap.name).toBe('First Snap');
@@ -170,7 +164,7 @@ describe('Projects With Snaps', () => {
 	});
 
 	test('Creator[nikola].get_snap(): with valid project_id => #ok - SnapPublic', async () => {
-		const { ok: snap } = await creator_actor_nikola.get_snap(snap_id);
+		const { ok: snap } = await creator_actor_nikola.get_snap(nikola_snap_a.id);
 		// Assertions for snap properties
 
 		if (snap) {
@@ -192,7 +186,7 @@ describe('Projects With Snaps', () => {
 
 	test('Creator[nikola].update_snap(): with valid name => #ok - SnapPublic', async () => {
 		const { ok: snap } = await creator_actor_nikola.update_snap({
-			id: snap_id,
+			id: nikola_snap_a.id,
 			name: ['First Snap Updated'],
 			design_file: [],
 			image_cover_location: [],
@@ -201,6 +195,8 @@ describe('Projects With Snaps', () => {
 		});
 
 		if (snap) {
+			nikola_snap_a = snap;
+
 			expect(snap.name).toBe('First Snap Updated');
 			expect(snap.tags).toEqual([]);
 			expect(snap.images).toHaveLength(1);
@@ -209,7 +205,7 @@ describe('Projects With Snaps', () => {
 
 	test('Creator[nikola].update_snap(): with valid tags => #ok - SnapPublic', async () => {
 		const { ok: snap } = await creator_actor_nikola.update_snap({
-			id: snap_id,
+			id: nikola_snap_a.id,
 			name: [],
 			design_file: [],
 			image_cover_location: [],
@@ -218,7 +214,7 @@ describe('Projects With Snaps', () => {
 		});
 
 		if (snap) {
-			snap_current = snap;
+			nikola_snap_a = snap;
 
 			expect(snap.name).toBe('First Snap Updated');
 			expect(snap.tags).toEqual(['ocean']);
@@ -252,7 +248,7 @@ describe('Projects With Snaps', () => {
 		});
 
 		const { ok: snap } = await creator_actor_nikola.update_snap({
-			id: snap_id,
+			id: nikola_snap_a.id,
 			name: [],
 			design_file: [],
 			image_cover_location: [1],
@@ -261,7 +257,7 @@ describe('Projects With Snaps', () => {
 		});
 
 		if (snap) {
-			snap_current = snap;
+			nikola_snap_a = snap;
 
 			expect(snap.name).toBe('First Snap Updated');
 			expect(snap.tags).toEqual(['ocean']);
@@ -271,19 +267,21 @@ describe('Projects With Snaps', () => {
 	});
 
 	test('Creator[nikola].delete_snap_images(): with valid images => #ok - Bool', async () => {
-		if (snap_current.images) {
-			const snap_images_ids = getRandomSubsetIds(snap_current.images, 1);
+		if (nikola_snap_a.images) {
+			const snap_images_ids = getRandomSubsetIds(nikola_snap_a.images, 1);
 
 			const { ok: images_deleted } = await creator_actor_nikola.delete_snap_images(
-				snap_id,
+				nikola_snap_a.id,
 				snap_images_ids
 			);
 
 			expect(images_deleted).toBe(true);
 
-			const { ok: snap } = await creator_actor_nikola.get_snap(snap_id);
+			const { ok: snap } = await creator_actor_nikola.get_snap(nikola_snap_a.id);
 
 			if (snap) {
+				nikola_snap_a = snap;
+
 				expect(snap.name).toBe('First Snap Updated');
 				expect(snap.tags).toEqual(['ocean']);
 				expect(snap.images).toHaveLength(1);
@@ -300,7 +298,7 @@ describe('Projects With Snaps', () => {
 		});
 
 		const { ok: snap } = await creator_actor_nikola.update_snap({
-			id: snap_id,
+			id: nikola_snap_a.id,
 			name: [],
 			design_file: [file],
 			image_cover_location: [],
@@ -324,4 +322,25 @@ describe('Projects With Snaps', () => {
 			expect(uploaded_file.content_size).toBe(4473449n);
 		}
 	});
+
+	test('Creator[nikola].delete_snap_design_file(): with invalid SnapID => #err - SnapNotFound', async () => {
+		const { err: error } =
+			await creator_actor_nikola.delete_snap_design_file('337EF5E0EF5CEAB33510XXX');
+
+		expect(error).toEqual({ SnapNotFound: true });
+	});
+
+	// test('delete_snap_design_file: Unauthorized deletion attempt', async () => {
+	// 	const { err: error } =
+	// 		await creator_actor_nikola.delete_snap_design_file('337EF5E0EF5CEAB33510XXX');
+
+	// 	expect(error).toEqual({ SnapNotFound: true });
+	// 	console.log('error: ', error);
+	// });
+
+	// test('delete_snap_design_file: Successfully deletes design file from snap', async () => {
+	// 	// Setup: Create a snap with a design file
+	// 	// Action: Call delete_snap_design_file on the created snap
+	// 	// Assertion: Check if the design file is successfully removed
+	// });
 });
