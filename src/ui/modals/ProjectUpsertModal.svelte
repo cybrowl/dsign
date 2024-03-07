@@ -74,9 +74,7 @@
 
 		await auth.creator(get($ls_my_profile, 'canister_id', ''));
 
-		const creator_logged_in = $actor_creator.loggedIn;
-
-		if (creator_logged_in) {
+		if ($actor_creator.loggedIn) {
 			is_sending = !is_sending;
 
 			if ($modal_mode.project_create) {

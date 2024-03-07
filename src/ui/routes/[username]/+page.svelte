@@ -36,8 +36,6 @@
 
 	profile_actions.fetching();
 
-	let project = {};
-
 	$: {
 		// force routing to refresh data
 		$page.params.username;
@@ -83,19 +81,22 @@
 	}
 
 	function modal_open_project_create() {
-		modal_update.change_visibility('project_upsert');
 		modal_mode.set({ project_create: true });
+
+		modal_update.change_visibility('project_upsert');
 	}
 
 	function modal_open_project_edit(e) {
-		project = get(e, 'detail');
+		const project = get(e, 'detail');
+		modal_mode.set({ project_create: false, project });
 
 		modal_update.change_visibility('project_upsert');
-		modal_mode.set({ project_create: false, project });
 	}
 
 	async function modal_open_project_delete(e) {
-		project = get(e, 'detail');
+		const project = get(e, 'detail');
+
+		modal_mode.set({ project_create: false, project });
 		modal_update.change_visibility('project_delete');
 	}
 
@@ -193,7 +194,7 @@
 
 	<!-- ProjectDeleteModal -->
 	{#if $modal_visible.project_delete}
-		<ProjectDeleteModal {project} />
+		<ProjectDeleteModal />
 	{/if}
 
 	<!-- ProfileInfo -->
