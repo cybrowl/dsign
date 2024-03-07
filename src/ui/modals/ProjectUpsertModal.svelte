@@ -6,53 +6,46 @@
 	import { ProjectUpsert, Modal } from 'dsign-components';
 
 	import {} from '$stores_ref/actors';
+	import { profile_store, profile_actions } from '$stores_ref/data_profile';
+
 	import { auth } from '$stores_ref/auth_client';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
 	import { navigate_to_home_with_notification } from '$stores_ref/page_navigation';
 	import { project_store, projects_update } from '$stores_ref/fetch_store';
 	import modal_update, { modal_mode } from '$stores_ref/modal';
 
-	let header = '';
-	let project_name_default = '';
-	let project_description_default = '';
-	let loading_msg = '';
-	let submit_button_label = '';
+	let content = {
+		header: '',
+		project_name: '',
+		project_description: '',
+		submit_button_label: '',
+		loading_msg: ''
+	};
+
 	let is_sending = false;
 
 	if ($modal_mode.project_create) {
-		header = 'Create a Project';
-		loading_msg = 'Creating';
-		submit_button_label = 'Create';
+		content.header = 'Create a Project';
+		content.loading_msg = 'Creating';
+		content.submit_button_label = 'Create';
 	} else {
-		header = 'Edit Project';
-		loading_msg = 'Changing to';
-		project_name_default = $modal_mode.project.name || '';
-		project_description_default = $modal_mode.project.description || '';
-		submit_button_label = 'Done';
+		content.header = 'Edit Project';
+		content.loading_msg = 'Changing to';
+		content.project_name = $modal_mode.project.name || '';
+		content.project_description = $modal_mode.project.description || '';
+		content.submit_button_label = 'Done';
 	}
 
-	onMount(async () => {
-		await auth.project_main();
-	});
-
-	onDestroy(() => (is_sending = false));
-
-	function handleCancel() {
+	function cancel_upsert_project() {
 		modal_update.change_visibility('project_upsert');
 	}
 
-	async function createProject(project_name, project_description) {
+	async function create_project(project_name, project_description) {
 		try {
-			disable_project_store_reset.set(false);
+			//TODO: find project in `profile_store` and update it
 
 			//TODO: create project
-
-			// const id = get(created_project, 'id', null);
-			// const canister_id = get(created_project, 'canister_id', null);
-
-			// if (id && canister_id) {
-			// 	goto(`/project/${id}?canister_id=${canister_id}`);
-			// }
+			//TODO: navigate to project after it is created
 
 			modal_update.change_visibility('project_upsert');
 		} catch (error) {
@@ -60,28 +53,19 @@
 		}
 	}
 
-	async function editProject(project_name, project_description) {
+	async function edit_project(project_name, project_description) {
 		try {
-			projects_update.rename_project($modal_mode.project, project_name);
+			//TODO: find project in `profile_store` and update it
 
 			modal_update.change_visibility('project_upsert');
-
-			let project_ref = {
-				id: $modal_mode.project.id,
-				canister_id: $modal_mode.project.canister_id
-			};
 
 			//TODO: edit project
-
-			if (all_projects) {
-				project_store.set({ isFetching: false, projects: [...all_projects] });
-			}
 		} catch (error) {
 			//TODO: log error
 		}
 	}
 
-	function handleSubmit(e) {
+	function upsert_project(e) {
 		const { project_name, project_description } = e.detail;
 
 		const creator_logged_in = false;
@@ -90,9 +74,9 @@
 			if ($modal_mode.project_create) {
 				is_sending = !is_sending;
 
-				createProject(project_name, project_description);
+				create_project(project_name, project_description);
 			} else {
-				editProject(project_name, project_description);
+				edit_project(project_name, project_description);
 			}
 		} else {
 			navigate_to_home_with_notification();
@@ -100,16 +84,12 @@
 	}
 </script>
 
-<Modal on:closeModal={handleCancel} modalHeaderVisible={false} isModalLocked={is_sending}>
+<Modal on:closeModal={cancel_upsert_project} modalHeaderVisible={false} isModalLocked={is_sending}>
 	<ProjectUpsert
-		{header}
-		{loading_msg}
+		{content}
 		{is_sending}
-		{project_name_default}
-		{project_description_default}
-		{submit_button_label}
-		on:cancel={handleCancel}
-		on:submit={handleSubmit}
+		on:cancel={cancel_upsert_project}
+		on:submit={upsert_project}
 	/>
 </Modal>
 
