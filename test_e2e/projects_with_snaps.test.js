@@ -348,4 +348,18 @@ describe('Projects With Snaps', () => {
 			expect(snap.design_file).toHaveLength(0);
 		}
 	});
+
+	test('Creator[nikola].delete_snaps(): with valid args => #ok - Bool', async () => {
+		const { ok: deleted_snap } = await creator_actor_nikola.delete_snaps([nikola_snap_a.id]);
+		expect(deleted_snap).toBe(true);
+
+		const { err: error } = await creator_actor_nikola.get_snap(nikola_snap_a.id);
+		expect(error).toEqual({ SnapNotFound: true });
+	});
+
+	test('Creator[nikola].get_project(): with valid args => #ok - ProjectPublic', async () => {
+		const { ok: project } = await creator_actor_nikola.get_project(nikola_snap_a.project_id);
+
+		expect(project.snaps).toHaveLength(0);
+	});
 });
