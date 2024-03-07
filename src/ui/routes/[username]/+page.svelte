@@ -40,6 +40,8 @@
 
 	$: {
 		// force routing to refresh data
+		$page.params.username;
+
 		profile_actions.fetching();
 
 		if (isEmpty(auth) === false) {
