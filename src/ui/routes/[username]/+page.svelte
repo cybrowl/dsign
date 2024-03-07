@@ -2,7 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { get } from 'lodash';
+	import { get, isEmpty } from 'lodash';
 
 	import Login from '$components_ref/Login.svelte';
 	import {
@@ -38,10 +38,16 @@
 
 	let project = {};
 
-	// $: if (profile.username && profile.username !== $page.params.username) {
-	// 	profile_store_fetching();
-	// 	get_profile();
-	// }
+	$: {
+		// force routing to refresh data
+		profile_actions.fetching();
+
+		if (isEmpty(auth) === false) {
+			(async () => {
+				await get_profile();
+			})();
+		}
+	}
 
 	onMount(async () => {
 		await init_auth();
