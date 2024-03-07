@@ -1,13 +1,11 @@
 <script>
-	import { onMount, onDestroy } from 'svelte';
-	import { goto } from '$app/navigation';
 	import { get } from 'lodash';
 
 	import { ProjectUpsert, Modal } from 'dsign-components';
 
 	import { actor_creator } from '$stores_ref/actors';
 	import { auth } from '$stores_ref/auth_client';
-	import { profile_store, profile_actions } from '$stores_ref/data_profile';
+	import { profile_actions } from '$stores_ref/data_profile';
 	import { ls_my_profile } from '$stores_ref/local_storage';
 
 	import { navigate_to_home_with_notification } from '$stores_ref/page_navigation';
@@ -31,7 +29,7 @@
 		content.header = 'Edit Project';
 		content.loading_msg = 'Changing to';
 		content.project_name = $modal_mode.project.name || '';
-		content.project_description = $modal_mode.project.description || '';
+		content.project_description = $modal_mode.project.description[0] || '';
 		content.submit_button_label = 'Done';
 	}
 
@@ -56,13 +54,17 @@
 
 	async function edit_project(project_name, project_description) {
 		try {
-			//TODO: find project in `profile_store` and update it
-			// profile_actions.update_project();
+			const { ok: project } = await $actor_creator.actor.update_project({
+				id: get($modal_mode, 'project.id', ''),
+				name: [project_name],
+				description: [project_description]
+			});
+
+			profile_actions.update_project(project.id, project.name, project.description);
 
 			modal_update.change_visibility('project_upsert');
-
-			//TODO: edit project
 		} catch (error) {
+			console.log('error: ', error);
 			//TODO: log error
 		}
 	}
@@ -75,12 +77,12 @@
 		const creator_logged_in = $actor_creator.loggedIn;
 
 		if (creator_logged_in) {
-			if ($modal_mode.project_create) {
-				is_sending = !is_sending;
+			is_sending = !is_sending;
 
-				create_project(project_name, project_description);
+			if ($modal_mode.project_create) {
+				await create_project(project_name, project_description);
 			} else {
-				edit_project(project_name, project_description);
+				await edit_project(project_name, project_description);
 			}
 		} else {
 			navigate_to_home_with_notification();
