@@ -56,8 +56,42 @@ const update_profile_avatar = function (avatar) {
 	});
 };
 
+const update_project = function (projectId, project_name, project_description) {
+	profile_store.update(({ isFetching, profile }) => {
+		const updatedProjects = profile.projects.map((project) => {
+			if (project.id === projectId) {
+				return { ...project, name: project_name, description: project_description };
+			}
+			return project;
+		});
+
+		return {
+			isFetching,
+			profile: {
+				...profile,
+				projects: updatedProjects
+			}
+		};
+	});
+};
+
+const add_project = function (newProject) {
+	profile_store.update(({ isFetching, profile }) => {
+		const newProjects = [...profile.projects, newProject];
+		return {
+			isFetching,
+			profile: {
+				...profile,
+				projects: newProjects
+			}
+		};
+	});
+};
+
 export const profile_actions = {
 	fetching,
 	update_profile_banner,
-	update_profile_avatar
+	update_profile_avatar,
+	update_project,
+	add_project
 };

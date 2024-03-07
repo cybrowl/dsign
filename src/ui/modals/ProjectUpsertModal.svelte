@@ -5,13 +5,12 @@
 
 	import { ProjectUpsert, Modal } from 'dsign-components';
 
-	import {} from '$stores_ref/actors';
-	import { profile_store, profile_actions } from '$stores_ref/data_profile';
-
+	import { actor_creator } from '$stores_ref/actors';
 	import { auth } from '$stores_ref/auth_client';
-	import { disable_project_store_reset } from '$stores_ref/page_state';
+	import { profile_store, profile_actions } from '$stores_ref/data_profile';
+	import { ls_my_profile } from '$stores_ref/local_storage';
+
 	import { navigate_to_home_with_notification } from '$stores_ref/page_navigation';
-	import { project_store, projects_update } from '$stores_ref/fetch_store';
 	import modal_update, { modal_mode } from '$stores_ref/modal';
 
 	let content = {
@@ -42,10 +41,12 @@
 
 	async function create_project(project_name, project_description) {
 		try {
-			//TODO: find project in `profile_store` and update it
+			const { ok: project } = await $actor_creator.actor.create_project({
+				name: project_name,
+				description: [project_description]
+			});
 
-			//TODO: create project
-			//TODO: navigate to project after it is created
+			profile_actions.add_project(project);
 
 			modal_update.change_visibility('project_upsert');
 		} catch (error) {
@@ -56,6 +57,7 @@
 	async function edit_project(project_name, project_description) {
 		try {
 			//TODO: find project in `profile_store` and update it
+			// profile_actions.update_project();
 
 			modal_update.change_visibility('project_upsert');
 
@@ -65,10 +67,12 @@
 		}
 	}
 
-	function upsert_project(e) {
+	async function upsert_project(e) {
 		const { project_name, project_description } = e.detail;
 
-		const creator_logged_in = false;
+		await auth.creator(get($ls_my_profile, 'canister_id', ''));
+
+		const creator_logged_in = $actor_creator.loggedIn;
 
 		if (creator_logged_in) {
 			if ($modal_mode.project_create) {
