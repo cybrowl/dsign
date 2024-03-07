@@ -32,11 +32,66 @@
 	import { profile_store, profile_store_fetching } from '$stores_ref/reactive_store';
 	import modal_update, { modal_visible, modal_mode } from '$stores_ref/modal';
 	import { page_navigation } from '$stores_ref/page_navigation';
+	import { ls_my_profile } from '$stores_ref/local_storage';
 
 	profile_store_fetching();
 
 	let project = {};
 
+	// $: if (profile.username && profile.username !== $page.params.username) {
+	// 	profile_store_fetching();
+	// 	get_profile();
+	// }
+
+	onMount(async () => {
+		await init_auth();
+
+		await get_profile();
+	});
+
+	onDestroy(() => {
+		//TODO: reset profile_store
+
+		profileTabsState.set({
+			isProjectsSelected: true,
+			isFavoritesSelected: false
+		});
+	});
+
+	// ------------------------- Nav -------------------------
+	function go_to_project(e) {
+		project = get(e, 'detail');
+
+		projects_update.update_project(project);
+
+		goto(`/project/${project.id}?canister_id=${project.canister_id}`);
+	}
+
+	// ------------------------- Modals -------------------------
+	function modal_open_account_settings() {
+		if (get($ls_my_profile, 'is_owner', '')) {
+			modal_update.change_visibility('account_settings');
+		}
+	}
+
+	function modal_open_project_create() {
+		modal_update.change_visibility('project_upsert');
+		modal_mode.set({ project_create: true });
+	}
+
+	function modal_open_project_edit(e) {
+		project = get(e, 'detail');
+
+		modal_update.change_visibility('project_upsert');
+		modal_mode.set({ project_create: false, project });
+	}
+
+	async function modal_open_project_delete(e) {
+		project = get(e, 'detail');
+		modal_update.change_visibility('project_delete');
+	}
+
+	// ------------------------- API -------------------------
 	async function get_profile() {
 		try {
 			await auth.username_registry();
@@ -57,42 +112,7 @@
 		}
 	}
 
-	// $: if (profile.username && profile.username !== $page.params.username) {
-	// 	profile_store_fetching();
-	// 	get_profile();
-	// }
-
-	onMount(async () => {
-		console.log('profile_store: ', $profile_store);
-		await init_auth();
-
-		await get_profile();
-	});
-
-	onDestroy(() => {
-		//TODO: reset profile_store
-
-		profileTabsState.set({
-			isProjectsSelected: true,
-			isFavoritesSelected: false
-		});
-	});
-
-	function openAccountSettingsModal() {
-		if (is_owner) {
-			modal_update.change_visibility('account_settings');
-		}
-	}
-
-	function handleProjectClick(e) {
-		project = get(e, 'detail');
-
-		projects_update.update_project(project);
-
-		goto(`/project/${project.id}?canister_id=${project.canister_id}`);
-	}
-
-	async function handleProfileBannerChange(event) {
+	async function update_profile_banner(event) {
 		let file = event.detail;
 		const file_unit8 = new Uint8Array(await file.arrayBuffer());
 
@@ -100,7 +120,7 @@
 		const storage_canister_id_alloc =
 			await $actor_file_scaling_manager.actor.get_current_canister_id();
 
-		await auth.creator(profile.canister_id);
+		await auth.creator(get($ls_my_profile, 'canister_id', ''));
 		await auth.file_storage(storage_canister_id_alloc);
 
 		const file_storage = new FileStorage($actor_file_storage.actor);
@@ -110,46 +130,29 @@
 			content_type: file.type
 		});
 
-		const { ok: banner_url, err: err_banner_update } =
-			await $actor_creator.actor.update_profile_banner({
-				id: file_public.id,
-				canister_id: file_public.canister_id,
-				url: file_public.url
-			});
-
-		ls_profile.update((currentValues) => {
-			return {
-				...currentValues,
-				banner_url: banner_url
-			};
-		});
-	}
-
-	function handleProjectCreateModalOpen() {
-		modal_update.change_visibility('project_upsert');
-		modal_mode.set({ project_create: true });
-	}
-
-	function handleProjectEditModalOpen(e) {
-		project = get(e, 'detail');
-
-		modal_update.change_visibility('project_upsert');
-		modal_mode.set({ project_create: false, project });
-	}
-
-	async function handleProjectDeleteModalOpen(e) {
-		project = get(e, 'detail');
-		modal_update.change_visibility('project_delete');
-	}
-
-	async function handleDeleteFavorite(e) {
-		const selected_project = get(e, 'detail');
-		const project_ref = {
-			id: selected_project.id,
-			canister_id: selected_project.canister_id
+		const banner_file = {
+			id: file_public.id,
+			canister_id: file_public.canister_id,
+			url: file_public.url
 		};
 
-		//TODO: delete favorite project
+		const { ok: url, err: err_banner_update } =
+			await $actor_creator.actor.update_profile_banner(banner_file);
+
+		ls_my_profile.update((values) => {
+			return {
+				...values,
+				banner: banner_file
+			};
+		});
+
+		//TODO: update `profile_store.profile.avatar` with new state
+	}
+
+	async function delete_project_from_favs(e) {
+		const selected_project = get(e, 'detail');
+
+		//TODO: delete project from favs
 	}
 </script>
 
@@ -190,7 +193,7 @@
 			avatar={get($profile_store.profile, 'avatar.url', '')}
 			is_owner={get($profile_store.profile, 'is_owner', '')}
 			username={get($profile_store.profile, 'username', '')}
-			on:editProfile={openAccountSettingsModal}
+			on:editProfile={modal_open_account_settings}
 		/>
 	</div>
 
@@ -199,7 +202,7 @@
 		<ProfileBanner
 			is_owner={get($profile_store.profile, 'is_owner', '')}
 			profile_banner_url={get($profile_store.profile, 'banner.url', '')}
-			on:profileBannerChange={handleProfileBannerChange}
+			on:profileBannerChange={update_profile_banner}
 		/>
 	</div>
 
@@ -226,7 +229,7 @@
 				<!-- No Projects Found -->
 				{#if $profile_store.profile.projects.length === 0}
 					{#if $profile_store.profile.is_owner}
-						<ProjectCardCreate on:createProject={handleProjectCreateModalOpen} />
+						<ProjectCardCreate on:createProject={modal_open_project_create} />
 					{:else}
 						<CardEmpty
 							name="project_empty"
@@ -243,13 +246,13 @@
 							{project}
 							showOptionsPopover={$profile_store.profile.is_owner ? true : false}
 							optionsPopover={{ edit: true, delete: true }}
-							on:clickProject={handleProjectClick}
-							on:editProject={handleProjectEditModalOpen}
-							on:deleteProject={handleProjectDeleteModalOpen}
+							on:clickProject={go_to_project}
+							on:editProject={modal_open_project_edit}
+							on:deleteProject={modal_open_project_delete}
 						/>
 					{/each}
 					{#if $profile_store.profile.is_owner}
-						<ProjectCardCreate on:createProject={handleProjectCreateModalOpen} />
+						<ProjectCardCreate on:createProject={modal_open_project_create} />
 					{/if}
 				{/if}
 			{/if}
@@ -285,8 +288,8 @@
 							edit: false,
 							delete: true
 						}}
-						on:clickProject={handleProjectClick}
-						on:deleteProject={handleDeleteFavorite}
+						on:clickProject={go_to_project}
+						on:deleteProject={delete_project_from_favs}
 					/>
 				{/each}
 			{/if}

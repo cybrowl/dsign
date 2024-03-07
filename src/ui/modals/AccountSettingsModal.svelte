@@ -7,11 +7,10 @@
 	import {
 		actor_creator,
 		actor_file_scaling_manager,
-		actor_file_storage,
-		actor_username_registry
+		actor_file_storage
 	} from '$stores_ref/actors';
 	import { auth, auth_client, auth_logout_all } from '$stores_ref/auth_client';
-	import { local_storage_profile, local_storage_remove_all } from '$stores_ref/local_storage';
+	import { ls_my_profile, local_storage_remove_all } from '$stores_ref/local_storage';
 	import modal_update from '$stores_ref/modal';
 
 	import { FileStorage } from '$utils/file_storage';
@@ -20,11 +19,13 @@
 		await Promise.all([]);
 	});
 
-	function handleCloseModal() {
+	// ------------------------- Modals -------------------------
+	function modal_close_account_settings() {
 		modal_update.change_visibility('account_settings');
 	}
 
-	async function handleAvatarChange(event) {
+	// ------------------------- API -------------------------
+	async function update_profile_avatar(event) {
 		let file = event.detail;
 		const file_unit8 = new Uint8Array(await file.arrayBuffer());
 
@@ -32,7 +33,7 @@
 		const storage_canister_id_alloc =
 			await $actor_file_scaling_manager.actor.get_current_canister_id();
 
-		await auth.creator(profile.canister_id);
+		await auth.creator(get($ls_my_profile, 'canister_id', ''));
 		await auth.file_storage(storage_canister_id_alloc);
 
 		const file_storage = new FileStorage($actor_file_storage.actor);
@@ -42,22 +43,26 @@
 			content_type: file.type
 		});
 
-		const { ok: banner_url, err: err_banner_update } =
-			await $actor_creator.actor.update_profile_banner({
-				id: file_public.id,
-				canister_id: file_public.canister_id,
-				url: file_public.url
-			});
+		const { ok: url, err: err_banner_update } = await $actor_creator.actor.update_profile_avatar({
+			id: file_public.id,
+			canister_id: file_public.canister_id,
+			url: file_public.url
+		});
 
-		local_storage_profile.update((currentValues) => {
+		ls_my_profile.update((values) => {
 			return {
-				...currentValues,
-				banner_url: banner_url
+				...values,
+				avatar: {
+					id: file_public.id,
+					canister_id: file_public.canister_id,
+					url: url
+				}
 			};
 		});
 	}
 
-	async function handleLogOut() {
+	// ------------------------- Logout -------------------------
+	async function logout_auth() {
 		await $auth_client.logout();
 
 		await auth_logout_all();
@@ -68,12 +73,12 @@
 	}
 </script>
 
-<Modal on:closeModal={handleCloseModal}>
+<Modal on:closeModal={modal_close_account_settings}>
 	<AccountSettings
-		avatar={$local_storage_profile.avatar_url}
-		username={$local_storage_profile.username}
-		on:avatarChange={handleAvatarChange}
-		on:clickLogOut={handleLogOut}
+		avatar={get($ls_my_profile, 'avatar.url', '')}
+		username={get($ls_my_profile, 'username', '')}
+		on:avatarChange={update_profile_avatar}
+		on:clickLogOut={logout_auth}
 	/>
 </Modal>
 
