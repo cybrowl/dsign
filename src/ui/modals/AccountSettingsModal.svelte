@@ -4,10 +4,17 @@
 
 	import { AccountSettings, Modal } from 'dsign-components';
 
-	import {} from '$stores_ref/actors';
+	import {
+		actor_creator,
+		actor_file_scaling_manager,
+		actor_file_storage,
+		actor_username_registry
+	} from '$stores_ref/actors';
 	import { auth, auth_client, auth_logout_all } from '$stores_ref/auth_client';
 	import { local_storage_profile, local_storage_remove_all } from '$stores_ref/local_storage';
 	import modal_update from '$stores_ref/modal';
+
+	import { FileStorage } from '$utils/file_storage';
 
 	onMount(async () => {
 		await Promise.all([]);
@@ -18,40 +25,36 @@
 	}
 
 	async function handleAvatarChange(event) {
-		let files = event.detail;
+		let file = event.detail;
+		const file_unit8 = new Uint8Array(await file.arrayBuffer());
 
-		const selectedFile = files[0];
+		//TODO: rename to say something about storage canister id and about it being empty
+		const storage_canister_id_alloc =
+			await $actor_file_scaling_manager.actor.get_current_canister_id();
 
-		const imageAsUnit8ArrayBuffer = new Uint8Array(await selectedFile.arrayBuffer());
-		const create_asset_args = {
-			data: [...imageAsUnit8ArrayBuffer],
-			file_format: selectedFile.type
-		};
+		await auth.creator(profile.canister_id);
+		await auth.file_storage(storage_canister_id_alloc);
 
-		const creator_logged_in = false;
+		const file_storage = new FileStorage($actor_file_storage.actor);
 
-		if (creator_logged_in) {
-			try {
-				//TODO: store image
-				//TODO: update profile avatar
+		const { ok: file_public } = await file_storage.store(file_unit8, {
+			filename: file.name,
+			content_type: file.type
+		});
 
-				if (err_update_avatar) {
-					//TODO: add notification
-				}
+		const { ok: banner_url, err: err_banner_update } =
+			await $actor_creator.actor.update_profile_banner({
+				id: file_public.id,
+				canister_id: file_public.canister_id,
+				url: file_public.url
+			});
 
-				//TODO: get profile
-
-				const randomNumber = Math.floor(Math.random() * 1000);
-				local_storage_profile.set({
-					avatar_url: get(profile, 'avatar.url', '') + '&' + randomNumber,
-					banner_url: get(profile, 'banner.url', '') || '/default_profile_banner.png',
-					username: get(profile, 'username', ''),
-					website: ''
-				});
-			} catch (error) {
-				console.log('error', error);
-			}
-		}
+		local_storage_profile.update((currentValues) => {
+			return {
+				...currentValues,
+				banner_url: banner_url
+			};
+		});
 	}
 
 	async function handleLogOut() {

@@ -18,43 +18,24 @@
 	import ProjectUpsertModal from '$modals_ref/ProjectUpsertModal.svelte';
 	import ProjectDeleteModal from '$modals_ref/ProjectDeleteModal.svelte';
 
+	import { FileStorage } from '$utils/file_storage';
+
+	import { auth, init_auth } from '$stores_ref/auth_client';
 	import {
 		actor_creator,
 		actor_file_scaling_manager,
 		actor_file_storage,
 		actor_username_registry
 	} from '$stores_ref/actors';
-	import { auth, init_auth } from '$stores_ref/auth_client';
+
 	import { profileTabsState, disable_project_store_reset } from '$stores_ref/page_state';
-	import {
-		favorite_store_fetching,
-		favorite_store,
-		favorites_update,
-		project_store_fetching,
-		project_store,
-		projects_update
-	} from '$stores_ref/fetch_store';
+	import { profile_store, profile_store_fetching } from '$stores_ref/reactive_store';
 	import modal_update, { modal_visible, modal_mode } from '$stores_ref/modal';
-	import {
-		local_storage_profile,
-		local_storage_projects,
-		local_storage_favorites
-	} from '$stores_ref/local_storage';
 	import { page_navigation } from '$stores_ref/page_navigation';
 
-	import { FileStorage } from '$utils/file_storage';
+	profile_store_fetching();
 
-	let project = {
-		name: '',
-		snaps: []
-	};
-
-	let profile = {};
-
-	disable_project_store_reset.set(true);
-
-	project_store_fetching();
-	favorite_store_fetching();
+	let project = {};
 
 	async function get_profile() {
 		try {
@@ -64,39 +45,32 @@
 			);
 
 			await auth.creator(username_info.canister_id);
-			const { ok: profile_res, err: err_profile } =
-				await $actor_creator.actor.get_profile_by_username($page.params.username);
+			const { ok: profile, err: err_profile } = await $actor_creator.actor.get_profile_by_username(
+				$page.params.username
+			);
 
-			profile = profile_res;
-
-			console.log('profile_res: ', profile_res);
-
-			const projects = profile_res.projects || [];
-			const favorites = profile_res.favorites || [];
-
-			project_store.set({ isFetching: false, projects: [...projects] });
-			local_storage_projects.set({ all_projects_count: projects.length || 1 });
-
-			favorite_store.set({ isFetching: false, projects: [...favorites] });
-			local_storage_favorites.set({ all_favorites_count: favorites.length || 1 });
+			// TODO: if there is an err
+			profile_store.set({ isFetching: false, profile: profile });
 		} catch (error) {
+			// TODO: log somwhere & error message
 			console.log('error call profile: ', error);
 		}
 	}
 
-	$: if (profile.username && profile.username !== $page.params.username) {
-		project_store_fetching();
-		get_profile();
-	}
+	// $: if (profile.username && profile.username !== $page.params.username) {
+	// 	profile_store_fetching();
+	// 	get_profile();
+	// }
 
 	onMount(async () => {
+		console.log('profile_store: ', $profile_store);
 		await init_auth();
 
 		await get_profile();
 	});
 
 	onDestroy(() => {
-		projects_update.update_projects([]);
+		//TODO: reset profile_store
 
 		profileTabsState.set({
 			isProjectsSelected: true,
@@ -143,16 +117,12 @@
 				url: file_public.url
 			});
 
-		console.log('banner_url: ', banner_url);
-
-		local_storage_profile.update((currentValues) => {
+		ls_profile.update((currentValues) => {
 			return {
 				...currentValues,
 				banner_url: banner_url
 			};
 		});
-
-		//TODO: update data store svelte
 	}
 
 	function handleProjectCreateModalOpen() {
@@ -217,9 +187,9 @@
 	<!-- ProfileInfo -->
 	<div class="profile_info_layout">
 		<ProfileInfo
-			avatar={get(profile, 'avatar.url', '')}
-			is_owner={profile.is_owner}
-			username={get(profile, 'username', '')}
+			avatar={get($profile_store.profile, 'avatar.url', '')}
+			is_owner={get($profile_store.profile, 'is_owner', '')}
+			username={get($profile_store.profile, 'username', '')}
 			on:editProfile={openAccountSettingsModal}
 		/>
 	</div>
@@ -227,8 +197,8 @@
 	<!-- ProfileBanner -->
 	<div class="profile_banner_layout">
 		<ProfileBanner
-			is_owner={profile.is_owner}
-			profile_banner_url={$local_storage_profile.banner_url}
+			is_owner={get($profile_store.profile, 'is_owner', '')}
+			profile_banner_url={get($profile_store.profile, 'banner.url', '')}
 			on:profileBannerChange={handleProfileBannerChange}
 		/>
 	</div>
@@ -247,38 +217,40 @@
 		{#if $profileTabsState.isProjectsSelected}
 			<!-- Fetching Projects -->
 			{#each { length: 1 } as _, i}
-				{#if $project_store.isFetching === true}
+				{#if $profile_store.isFetching === true}
 					<ProjectCard isLoadingProject={true} />
 				{/if}
 			{/each}
 
-			<!-- No Projects Found -->
-			{#if $project_store.isFetching === false && $project_store.projects.length === 0}
-				{#if profile.is_owner}
-					<ProjectCardCreate on:createProject={handleProjectCreateModalOpen} />
-				{:else}
-					<CardEmpty
-						name="project_empty"
-						content="No projects found"
-						view_size={{ width: '92', height: '92' }}
-					/>
+			{#if $profile_store.isFetching === false}
+				<!-- No Projects Found -->
+				{#if $profile_store.profile.projects.length === 0}
+					{#if $profile_store.profile.is_owner}
+						<ProjectCardCreate on:createProject={handleProjectCreateModalOpen} />
+					{:else}
+						<CardEmpty
+							name="project_empty"
+							content="No projects found"
+							view_size={{ width: '92', height: '92' }}
+						/>
+					{/if}
 				{/if}
-			{/if}
 
-			<!-- Project -->
-			{#if $project_store.isFetching === false && $project_store.projects.length > 0}
-				{#each $project_store.projects as project}
-					<ProjectCard
-						{project}
-						showOptionsPopover={profile.is_owner ? true : false}
-						optionsPopover={{ edit: true, delete: true }}
-						on:clickProject={handleProjectClick}
-						on:editProject={handleProjectEditModalOpen}
-						on:deleteProject={handleProjectDeleteModalOpen}
-					/>
-				{/each}
-				{#if profile.is_owner}
-					<ProjectCardCreate on:createProject={handleProjectCreateModalOpen} />
+				<!-- Projects -->
+				{#if $profile_store.profile.projects.length > 0}
+					{#each $profile_store.profile.projects as project}
+						<ProjectCard
+							{project}
+							showOptionsPopover={$profile_store.profile.is_owner ? true : false}
+							optionsPopover={{ edit: true, delete: true }}
+							on:clickProject={handleProjectClick}
+							on:editProject={handleProjectEditModalOpen}
+							on:deleteProject={handleProjectDeleteModalOpen}
+						/>
+					{/each}
+					{#if $profile_store.profile.is_owner}
+						<ProjectCardCreate on:createProject={handleProjectCreateModalOpen} />
+					{/if}
 				{/if}
 			{/if}
 		{/if}
@@ -286,14 +258,14 @@
 		<!-- Favorites -->
 		{#if $profileTabsState.isFavoritesSelected}
 			<!-- Fetching Favorites -->
-			{#each { length: $local_storage_favorites.all_favorites_count } as _, i}
-				{#if $favorite_store.isFetching === true}
+			{#each { length: 1 } as _, i}
+				{#if $profile_store.isFetching === true}
 					<ProjectCard isLoadingProject={true} />
 				{/if}
 			{/each}
 
 			<!-- No Favorites Found -->
-			{#if $favorite_store.projects.length === 0 && $favorite_store.isFetching === false}
+			{#if $profile_store.profile.favorites.length === 0 && $profile_store.profile.isFetching === false}
 				<CardEmpty
 					name="project_empty"
 					content="No favorite projects"
@@ -302,13 +274,13 @@
 			{/if}
 
 			<!-- Favorites -->
-			{#if $favorite_store.projects.length > 0}
-				{#each $favorite_store.projects as project}
+			{#if $profile_store.profile.favorites > 0}
+				{#each $profile_store.profile.favorites as project}
 					<ProjectCard
 						{project}
 						hideSnapsCount={true}
 						showUsername={true}
-						showOptionsPopover={profile.is_owner ? true : false}
+						showOptionsPopover={$profile_store.profile.is_owner ? true : false}
 						optionsPopover={{
 							edit: false,
 							delete: true

@@ -8,26 +8,26 @@
 
 	import { actor_username_registry, actor_creator } from '$stores_ref/actors';
 	import { auth_client, auth, init_auth } from '$stores_ref/auth_client';
-	import { local_storage_profile } from '$stores_ref/local_storage';
+	import { ls_my_profile } from '$stores_ref/local_storage';
 	import modal_update from '$stores_ref/modal';
 
 	const isProd = ['ic', 'staging'].includes(environment()['DFX_NETWORK']);
 
 	onMount(() => {
-		initializeAuthenticationAndFetchProfile();
+		initialize_authentication_and_fetch_profile();
 	});
 
-	async function initializeAuthenticationAndFetchProfile() {
+	async function initialize_authentication_and_fetch_profile() {
 		try {
 			await init_auth();
-			await fetchAndSetProfile();
+			await fetch_and_set_profile();
 		} catch (error) {
 			console.error('Initialization or Profile Fetch Failed: ', error);
 			goto('/');
 		}
 	}
 
-	async function fetchAndSetProfile() {
+	async function fetch_and_set_profile() {
 		await auth.username_registry();
 
 		if (!$actor_username_registry.loggedIn) return;
@@ -45,20 +45,16 @@
 		);
 
 		if (profile) {
-			local_storage_profile.set({
-				avatar_url: get(profile, 'avatar.url', ''),
-				banner_url: get(profile, 'banner.url', ''),
-				username: get(profile, 'username', '')
-			});
+			ls_my_profile.set(profile);
 		} else if (err_profile && err_profile['ProfileNotFound']) {
 			goto('/account_creation');
 		}
 	}
 
-	async function handleAuth() {
+	async function handle_auth() {
 		try {
-			await fetchAndSetProfile();
-			goto(`/${$local_storage_profile.username}`);
+			await fetch_and_set_profile();
+			goto(`/${get($ls_my_profile, 'username', '')}`);
 		} catch (error) {
 			console.error('Auth Handle Error: ', error);
 			goto('/account_creation');
@@ -72,15 +68,15 @@
 		$auth_client.login({
 			identityProvider: identityProviderUrl,
 			maxTimeToLive: BigInt(30 * 24 * 60 * 60 * 1000 * 1000 * 1000 * 1000),
-			onSuccess: handleAuth
+			onSuccess: handle_auth
 		});
 	}
 
-	async function navigateToProfile() {
-		goto(`/${$local_storage_profile.username}`);
+	async function navigate_to_profile() {
+		goto(`/${get($ls_my_profile, 'username', '')}`);
 	}
 
-	async function openSettingsModal() {
+	async function open_settings_modal() {
 		modal_update.change_visibility('account_settings');
 	}
 </script>
@@ -89,15 +85,15 @@
 	{#if $actor_username_registry.loggedIn}
 		<span class="flex gap-x-3 cursor-pointer">
 			<Avatar
-				avatar={$local_storage_profile.avatar_url}
-				username={$local_storage_profile.username}
-				on:click={navigateToProfile}
+				avatar={get($ls_my_profile, 'avatar.url', '')}
+				username={get($ls_my_profile, 'username', '')}
+				on:click={navigate_to_profile}
 			/>
 			<Icon
 				name="settings"
 				size="2.75rem"
 				class="cursor_pointer fill_dark_grey hover_smoky_grey responsive_icon"
-				on:click={openSettingsModal}
+				on:click={open_settings_modal}
 				viewSize={{
 					width: '44',
 					height: '44'
