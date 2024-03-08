@@ -375,9 +375,12 @@ actor class Creator(username_registry : Principal) = this {
 							}
 						);
 
+                        //NOTE: for now all files are deleted in UI but that can be done in separate canister that has authority within FS to delete
+						//TODO: delete all the snaps from the project
+
 						projects.delete(id);
 
-						//TODO: needs to delete snaps as well
+
 
 						let profile_updated : Profile = {
 							profile with

@@ -88,10 +88,24 @@ const add_project = function (newProject) {
 	});
 };
 
+const delete_project = function (projectId) {
+	profile_store.update(({ isFetching, profile }) => {
+		const filteredProjects = profile.projects.filter((project) => project.id !== projectId);
+		return {
+			isFetching,
+			profile: {
+				...profile,
+				projects: filteredProjects
+			}
+		};
+	});
+};
+
 export const profile_actions = {
 	fetching,
 	update_profile_banner,
 	update_profile_avatar,
 	update_project,
-	add_project
+	add_project,
+	delete_project
 };
