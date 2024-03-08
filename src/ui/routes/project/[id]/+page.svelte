@@ -62,37 +62,42 @@
 				console.log('error: ', error);
 			}
 		}
-
-		if (isEmpty($project_store.project.id)) {
-			//TODO: get project
-		}
 	});
 
-	async function handleAddToFavorites(e) {
-		const project_liked = e.detail;
-
-		const project_ref = {
-			canister_id: project_liked.canister_id,
-			id: project_liked.id
-		};
-
-		const creator_logged_in = false;
-		if (creator_logged_in) {
-			try {
-				// TODO: save project to favorites
-			} catch (error) {
-				console.log('error: call', error);
-			}
-		} else {
-			navigate_to_home_with_notification();
-		}
-	}
-
+	// ------------------------- Edit Mode -------------------------
 	function handleToggleEditMode(e) {
 		is_edit_active.set(get(e, 'detail', false));
 
 		projects_update.deselect_snaps_from_project();
 	}
+
+	// ------------------------- Nav -------------------------
+	function handleSnapPreview(e) {
+		const snap = e.detail;
+		const updated_snap = {
+			...snap,
+			project_name: $project_store.project.name,
+			project_ref: [
+				{
+					id: $project_store.project.id,
+					canister_id: $project_store.project.canister_id
+				}
+			]
+		};
+
+		snap_preview.set(updated_snap);
+
+		goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
+	}
+
+	function goToSnapUpsertPage() {
+		const project_id = get($project_store, 'project.id', 'x');
+		const project_canister_id = get($project_store, 'project.canister_id', 'x');
+
+		goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister_id}`);
+	}
+
+	// ------------------------- API -------------------------
 
 	async function handleDeleteSnaps() {
 		const snaps = get($project_store.project, 'snaps', []);
@@ -123,29 +128,24 @@
 		}
 	}
 
-	function handleSnapPreview(e) {
-		const snap = e.detail;
-		const updated_snap = {
-			...snap,
-			project_name: $project_store.project.name,
-			project_ref: [
-				{
-					id: $project_store.project.id,
-					canister_id: $project_store.project.canister_id
-				}
-			]
+	async function handleAddToFavorites(e) {
+		const project_liked = e.detail;
+
+		const project_ref = {
+			canister_id: project_liked.canister_id,
+			id: project_liked.id
 		};
 
-		snap_preview.set(updated_snap);
-
-		goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
-	}
-
-	function goToSnapUpsertPage() {
-		const project_id = get($project_store, 'project.id', 'x');
-		const project_canister_id = get($project_store, 'project.canister_id', 'x');
-
-		goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister_id}`);
+		const creator_logged_in = false;
+		if (creator_logged_in) {
+			try {
+				// TODO: save project to favorites
+			} catch (error) {
+				console.log('error: call', error);
+			}
+		} else {
+			navigate_to_home_with_notification();
+		}
 	}
 </script>
 
