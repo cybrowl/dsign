@@ -39,7 +39,7 @@
 	});
 
 	function go_back_history() {
-		const project = get($snap_project_store.project, 'project', '');
+		const project = get($snap_project_store, 'project', '');
 
 		if (!isEmpty(project)) {
 			goto(`/project/${project.name}?id=${project.id}&cid=${project.canister_id}`);
