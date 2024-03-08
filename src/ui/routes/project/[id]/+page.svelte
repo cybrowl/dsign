@@ -19,7 +19,7 @@
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
 	import { actor_creator, actor_username_registry } from '$stores_ref/actors';
-	import { project_store, project_actions } from '$stores_ref/data_project';
+	import { project_store, is_edit_active, project_actions } from '$stores_ref/data_project';
 
 	import { project_store_fetching, projects_update } from '$stores_ref/fetch_store';
 	import { auth, init_auth } from '$stores_ref/auth_client';
@@ -29,19 +29,14 @@
 		page_navigation,
 		navigate_to_home_with_notification
 	} from '$stores_ref/page_navigation';
-	import {
-		disable_project_store_reset,
-		is_edit_active,
-		projectTabsState
-	} from '$stores_ref/page_state';
-	import { local_snap_creation_design_file } from '$stores_ref/local_storage';
+	import { disable_project_store_reset, projectTabsState } from '$stores_ref/page_state';
 
-	projects_update.deselect_snaps_from_project();
+	// projects_update.deselect_snaps_from_project();
 	is_edit_active.set(false);
 
-	if ($disable_project_store_reset === false) {
-		project_store_fetching();
-	}
+	// if ($disable_project_store_reset === false) {
+	// 	project_store_fetching();
+	// }
 
 	onMount(async () => {
 		await init_auth();
@@ -65,14 +60,14 @@
 	});
 
 	// ------------------------- Edit Mode -------------------------
-	function handleToggleEditMode(e) {
+	function toggle_edit_mode(e) {
 		is_edit_active.set(get(e, 'detail', false));
 
-		projects_update.deselect_snaps_from_project();
+		// projects_update.deselect_snaps_from_project();
 	}
 
 	// ------------------------- Nav -------------------------
-	function handleSnapPreview(e) {
+	function goto_snap_preview(e) {
 		const snap = e.detail;
 		const updated_snap = {
 			...snap,
@@ -90,7 +85,7 @@
 		goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
 	}
 
-	function goToSnapUpsertPage() {
+	function goto_snap_upsert() {
 		const project_id = get($project_store, 'project.id', 'x');
 		const project_canister_id = get($project_store, 'project.canister_id', 'x');
 
@@ -98,7 +93,6 @@
 	}
 
 	// ------------------------- API -------------------------
-
 	async function handleDeleteSnaps() {
 		const snaps = get($project_store.project, 'snaps', []);
 		const project_id = get($project_store, 'project.id', 'x');
@@ -112,7 +106,7 @@
 			return 'Nothing to Delete';
 		}
 
-		handleToggleEditMode({ detail: false });
+		toggle_edit_mode({ detail: false });
 
 		const snaps_kept = snaps.filter((snap) => snap.isSelected === false);
 
@@ -195,7 +189,7 @@
 			{#if $projectTabsState.isSnapsSelected && get($project_store, 'project.is_owner', false)}
 				<ProjectEditActionsBar
 					isEditActive={$is_edit_active}
-					on:toggleEditMode={handleToggleEditMode}
+					on:toggleEditMode={toggle_edit_mode}
 					on:clickRemove={handleDeleteSnaps}
 				/>
 			{/if}
@@ -206,7 +200,7 @@
 				<!-- No Snaps Found -->
 				{#if isEmpty($project_store.project.snaps) && $project_store.isFetching === false}
 					{#if get($project_store, 'project.is_owner', false)}
-						<SnapCardCreate on:clickSnapCardCreate={goToSnapUpsertPage} />
+						<SnapCardCreate on:clickSnapCardCreate={goto_snap_upsert} />
 					{:else}
 						<CardEmpty
 							name="snap_empty"
@@ -219,10 +213,10 @@
 				<!-- Snaps -->
 				{#if $project_store.project.snaps && $project_store.project.snaps.length > 0}
 					{#each $project_store.project.snaps as snap}
-						<SnapCard {snap} showEditMode={$is_edit_active} on:clickCard={handleSnapPreview} />
+						<SnapCard {snap} showEditMode={$is_edit_active} on:clickCard={goto_snap_preview} />
 					{/each}
 					{#if get($project_store, 'project.is_owner', false)}
-						<SnapCardCreate on:clickSnapCardCreate={goToSnapUpsertPage} />
+						<SnapCardCreate on:clickSnapCardCreate={goto_snap_upsert} />
 					{/if}
 				{/if}
 			{/if}

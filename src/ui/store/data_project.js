@@ -18,6 +18,7 @@ const empty_project = {
 };
 
 export const project_store = writable({ isFetching: false, project: empty_project });
+export const is_edit_active = writable(false);
 
 export const fetching = function () {
 	project_store.update(({ project }) => {
