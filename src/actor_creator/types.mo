@@ -87,7 +87,7 @@ module {
 		canister_id : CanisterID;
 		username : Username;
 		is_owner : Bool;
-		projects : [Project];
+		projects : [ProjectPublic];
 		favorites : [Project];
 		storage_metrics : ?StorageMetrics;
 	};

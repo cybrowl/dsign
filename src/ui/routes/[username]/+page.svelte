@@ -28,6 +28,7 @@
 		actor_username_registry
 	} from '$stores_ref/actors';
 	import { profile_store, profile_actions } from '$stores_ref/data_profile';
+	import { project_store } from '$stores_ref/data_project';
 
 	import { profileTabsState, disable_project_store_reset } from '$stores_ref/page_state';
 	import modal_update, { modal_visible, modal_mode } from '$stores_ref/modal';
@@ -68,9 +69,11 @@
 	function go_to_project(e) {
 		const project = get(e, 'detail');
 
-		//TODO: maybe some cashing if we are coming from goto?
+		console.log('project: ', project);
 
-		goto(`/project/${project.id}?canister_id=${project.canister_id}`);
+		project_store.set({ isFetching: false, project });
+
+		goto(`/project/${project.name}?id=${project.id}&cid=${project.canister_id}`);
 	}
 
 	// ------------------------- Modals -------------------------

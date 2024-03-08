@@ -97,15 +97,22 @@ actor class Creator(username_registry : Principal) = this {
 					};
 					case (?profile) {
 
-						let projects_public : [Project] = Array.mapFilter<ProjectID, Project>(
+						let projects_public : [ProjectPublic] = Array.mapFilter<ProjectID, ProjectPublic>(
 							profile.projects,
-							func(id : ProjectID) : ?Project {
+							func(id : ProjectID) : ?ProjectPublic {
 								switch (projects.get(id)) {
 									case (null) {
 										return null;
 									};
 									case (?project) {
-										return ?project;
+
+										let project_public : ProjectPublic = {
+											project with
+											is_owner = Principal.equal(caller, profile.owner);
+											owner = null;
+										};
+
+										return ?project_public;
 									};
 								};
 							}

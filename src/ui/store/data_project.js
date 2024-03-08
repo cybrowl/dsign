@@ -18,3 +18,16 @@ const empty_project = {
 };
 
 export const project_store = writable({ isFetching: false, project: empty_project });
+
+export const fetching = function () {
+	project_store.update(({ project }) => {
+		return {
+			isFetching: true,
+			project: project
+		};
+	});
+};
+
+export const project_actions = {
+	fetching
+};

@@ -18,8 +18,8 @@
 	} from 'dsign-components';
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
-	import {} from '$stores_ref/actors';
-	import { project_store } from '$stores_ref/data_project';
+	import { actor_creator, actor_username_registry } from '$stores_ref/actors';
+	import { project_store, project_actions } from '$stores_ref/data_project';
 
 	import { project_store_fetching, projects_update } from '$stores_ref/fetch_store';
 	import { auth, init_auth } from '$stores_ref/auth_client';
@@ -43,24 +43,21 @@
 		project_store_fetching();
 	}
 
-	let isProjectOwner = false;
-
 	onMount(async () => {
 		await init_auth();
 
-		// local_snap_creation_design_file.set({ file_name: '', file_type: '', chunk_ids: [] });
+		const project_id = $page.url.searchParams.get('id');
+		const canister_id = $page.url.searchParams.get('cid');
 
-		const canister_id = $page.url.searchParams.get('canister_id');
-		console.log('canister_id: ', canister_id);
+		await auth.creator(canister_id);
 
-		const project_id = last(get($page, 'url.pathname', '').split('/'));
-		console.log('project_id: ', project_id);
-
-		const creator_logged_in = false;
-
-		if (creator_logged_in) {
+		if ($actor_creator.loggedIn) {
 			try {
-				//TODO: get profile
+				project_actions.fetching();
+
+				const { ok: project, err: error } = await $actor_creator.actor.get_project(project_id);
+
+				project_store.set({ isFetching: false, project });
 			} catch (error) {
 				console.log('error: ', error);
 			}
@@ -195,7 +192,7 @@
 				on:selectSnapsTab={(e) => projectTabsState.set(e.detail)}
 				on:selectFeedbackTab={(e) => projectTabsState.set(e.detail)}
 			/>
-			{#if $projectTabsState.isSnapsSelected && isProjectOwner}
+			{#if $projectTabsState.isSnapsSelected && get($project_store, 'project.is_owner', false)}
 				<ProjectEditActionsBar
 					isEditActive={$is_edit_active}
 					on:toggleEditMode={handleToggleEditMode}
@@ -208,7 +205,7 @@
 			{#if $projectTabsState.isSnapsSelected}
 				<!-- No Snaps Found -->
 				{#if isEmpty($project_store.project.snaps) && $project_store.isFetching === false}
-					{#if isProjectOwner}
+					{#if get($project_store, 'project.is_owner', false)}
 						<SnapCardCreate on:clickSnapCardCreate={goToSnapUpsertPage} />
 					{:else}
 						<CardEmpty
@@ -224,7 +221,7 @@
 					{#each $project_store.project.snaps as snap}
 						<SnapCard {snap} showEditMode={$is_edit_active} on:clickCard={handleSnapPreview} />
 					{/each}
-					{#if isProjectOwner}
+					{#if get($project_store, 'project.is_owner', false)}
 						<SnapCardCreate on:clickSnapCardCreate={goToSnapUpsertPage} />
 					{/if}
 				{/if}
