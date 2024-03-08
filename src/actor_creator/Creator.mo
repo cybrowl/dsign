@@ -11,6 +11,7 @@ import Logger "canister:logger";
 
 import Types "./types";
 import UUID "../libs/uuid";
+import Utils "./utils";
 import Arr "../libs/array";
 
 actor class Creator(username_registry : Principal) = this {
@@ -96,27 +97,7 @@ actor class Creator(username_registry : Principal) = this {
 						return #err(#ProfileNotFound(true));
 					};
 					case (?profile) {
-
-						let projects_public : [ProjectPublic] = Array.mapFilter<ProjectID, ProjectPublic>(
-							profile.projects,
-							func(id : ProjectID) : ?ProjectPublic {
-								switch (projects.get(id)) {
-									case (null) {
-										return null;
-									};
-									case (?project) {
-
-										let project_public : ProjectPublic = {
-											project with
-											is_owner = Principal.equal(caller, profile.owner);
-											owner = null;
-										};
-
-										return ?project_public;
-									};
-								};
-							}
-						);
+						let projects_public = Utils.projects_to_public(profile.projects, projects, snaps, caller);
 
 						let favorites_public : [Project] = Array.mapFilter<FavoriteID, Project>(
 							profile.favorites,
@@ -254,11 +235,7 @@ actor class Creator(username_registry : Principal) = this {
 				return #err(#ProjectNotFound(true));
 			};
 			case (?project) {
-				let project_public : ProjectPublic = {
-					project with
-					is_owner = Principal.equal(caller, project.owner);
-					owner = null;
-				};
+				let project_public = Utils.project_to_public(project, snaps, caller);
 
 				return #ok(project_public);
 			};
@@ -307,10 +284,13 @@ actor class Creator(username_registry : Principal) = this {
 
 				profiles.put(caller, profile_updated);
 
+				let snaps_public : [SnapPublic] = [];
+
 				let project_public : ProjectPublic = {
 					project with
 					is_owner = true;
 					owner = null;
+					snaps = snaps_public;
 				};
 
 				return #ok(project_public);
@@ -347,11 +327,7 @@ actor class Creator(username_registry : Principal) = this {
 
 						projects.put(args.id, project_updated);
 
-						let project_public : ProjectPublic = {
-							project_updated with
-							is_owner = true;
-							owner = null;
-						};
+						let project_public = Utils.project_to_public(project, snaps, caller);
 
 						return #ok(project_public);
 					};

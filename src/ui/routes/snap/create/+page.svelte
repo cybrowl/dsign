@@ -9,6 +9,7 @@
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
 	import { FileStorage } from '$utils/file_storage';
+	import { extractImages } from '$utils/images';
 
 	import {
 		actor_creator,
@@ -60,14 +61,10 @@
 		let file = get(event, 'detail', {});
 
 		snap_actions.add_design_file(file);
-
-		//TODO: API call to add
 	}
 
 	async function remove_file() {
 		snap_actions.remove_design_file();
-
-		//TODO: API call to remove
 	}
 
 	async function select_cover_image(event) {
@@ -75,35 +72,70 @@
 
 		let image_cover_location = $snap_upsert_store.snap.images.findIndex((img) => img.id === id);
 
-		console.log('image_cover_location: ', image_cover_location);
-
 		snap_actions.select_cover_image(image_cover_location);
-
-		//TODO: edit mode
 	}
 
-	async function publish() {
-		console.log('snap_upsert_store: ', $snap_upsert_store.snap);
+	async function publish(event) {
+		const { snap_name, tags_added } = event.detail;
+		const snap = get($snap_upsert_store, 'snap', {});
+		const project_id = get($snap_project_store, 'project.id', '');
+		const canister_id = get($snap_project_store, 'project.canister_id', '');
+		const file = get(snap, 'design_file[0]', {});
+		const images = get(snap, 'images', []);
 
-		//TODO: remove images from snap for creator
-		//TODO: add images to snap for creator
+		console.log('snap_name: ', snap_name);
+		console.log('tags_added: ', tags_added);
+		console.log('snap_upsert_store: ', snap);
 
-		//TODO: upload everything at the same time in parallel
-		// Upload Images in Parallel
-		// const results = await Promise.all(
-		// 	filePaths.map(async (filePath) => {
-		// 		const fileObject = createFileObject(filePath);
-		// 		return file_storage_actor_lib.nikola.store(fileObject.content, {
-		// 			filename: fileObject.name,
-		// 			content_type: fileObject.type
-		// 		});
-		// 	})
-		// );
+		const storage_canister_id_alloc =
+			await $actor_file_scaling_manager.actor.get_current_canister_id();
+		await auth.file_storage(storage_canister_id_alloc);
+		await auth.creator(canister_id);
+
+		const file_storage = new FileStorage($actor_file_storage.actor);
+
+		// Convert the file to Uint8Array, assume this is done asynchronously
+		//TODO: fix if no file found, UI gives error
+		const file_unit8 = new Uint8Array(await file.arrayBuffer());
+
+		// Create a promise for the file upload
+		const fileUploadPromise = file_storage.store(file_unit8, {
+			filename: file.name,
+			content_type: file.type
+		});
+
+		// Create promises for the image uploads
+		const imageUploadPromises = images.map((image) =>
+			file_storage.store(image.uint8Array, {
+				filename: image.fileName,
+				content_type: image.mimeType
+			})
+		);
+
+		// Use Promise.all to upload the file and images in parallel
+		const [filePublic, ...results] = await Promise.all([fileUploadPromise, ...imageUploadPromises]);
+
+		const images_arr = extractImages(results);
+
+		const snap_args = {
+			project_id,
+			name: snap_name,
+			tags: [tags_added],
+			image_cover_location: snap.image_cover_location,
+			design_file: [filePublic.ok],
+			images: images_arr
+		};
+
+		console.log('snap_args: ', snap_args);
+
+		const { ok: profile, err: err_profile } = await $actor_creator.actor.create_snap(snap_args);
+
+		console.log('profile: ', profile);
 	}
 </script>
 
 <svelte:head>
-	<title>Snap Upsert</title>
+	<title>Snap Create</title>
 </svelte:head>
 
 <main class="grid_layout">

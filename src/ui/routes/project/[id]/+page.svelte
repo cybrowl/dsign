@@ -53,6 +53,8 @@
 
 				const { ok: project, err: error } = await $actor_creator.actor.get_project(project_id);
 
+				console.log('project: ', project);
+
 				project_store.set({ isFetching: false, project });
 			} catch (error) {
 				console.log('error: ', error);
@@ -86,10 +88,10 @@
 		goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
 	}
 
-	function goto_snap_upsert() {
+	function goto_snap_create() {
 		snap_project_store.set({ isFetching: false, mode: 'create', project: $project_store.project });
 
-		goto(`/snap/upsert`);
+		goto(`/snap/create`);
 	}
 
 	// ------------------------- API -------------------------
@@ -200,7 +202,7 @@
 				<!-- No Snaps Found -->
 				{#if isEmpty($project_store.project.snaps) && $project_store.isFetching === false}
 					{#if get($project_store, 'project.is_owner', false)}
-						<SnapCardCreate on:clickSnapCardCreate={goto_snap_upsert} />
+						<SnapCardCreate on:clickSnapCardCreate={goto_snap_create} />
 					{:else}
 						<CardEmpty
 							name="snap_empty"
@@ -216,7 +218,7 @@
 						<SnapCard {snap} showEditMode={$is_edit_active} on:clickCard={goto_snap_preview} />
 					{/each}
 					{#if get($project_store, 'project.is_owner', false)}
-						<SnapCardCreate on:clickSnapCardCreate={goto_snap_upsert} />
+						<SnapCardCreate on:clickSnapCardCreate={goto_snap_create} />
 					{/if}
 				{/if}
 			{/if}

@@ -134,7 +134,7 @@ module {
 		username : Text;
 		owner : ?UserPrincipal;
 		is_owner : Bool;
-		snaps : [SnapID];
+		snaps : [SnapPublic];
 		feedback : ?Feedback;
 		metrics : Metrics;
 	};
