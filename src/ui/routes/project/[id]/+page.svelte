@@ -20,7 +20,7 @@
 
 	import { actor_creator, actor_username_registry } from '$stores_ref/actors';
 	import { project_store, is_edit_active, project_actions } from '$stores_ref/data_project';
-	import { snap_project_store } from '$stores_ref/data_snap';
+	import { snap_project_store, snap_preview_store } from '$stores_ref/data_snap';
 
 	import { project_store_fetching, projects_update } from '$stores_ref/fetch_store';
 	import { auth, init_auth } from '$stores_ref/auth_client';
@@ -72,18 +72,9 @@
 	// ------------------------- Nav -------------------------
 	function goto_snap_preview(e) {
 		const snap = e.detail;
-		const updated_snap = {
-			...snap,
-			project_name: $project_store.project.name,
-			project_ref: [
-				{
-					id: $project_store.project.id,
-					canister_id: $project_store.project.canister_id
-				}
-			]
-		};
 
-		snap_preview.set(updated_snap);
+		snap_project_store.set({ isFetching: false, mode: 'preview', project: $project_store.project });
+		snap_preview_store.set({ isFetching: false, snap: snap });
 
 		goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
 	}

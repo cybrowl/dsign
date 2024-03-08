@@ -30,6 +30,11 @@ export const snap_upsert_store = writable({
 	snap: empty_snap
 });
 
+export const snap_preview_store = writable({
+	isFetching: false,
+	snap: empty_snap
+});
+
 // Writable store for snap project
 export const snap_project_store = writable({ isFetching: false, project: empty_project });
 
