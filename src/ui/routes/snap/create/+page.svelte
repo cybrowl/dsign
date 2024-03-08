@@ -80,12 +80,8 @@
 		const snap = get($snap_upsert_store, 'snap', {});
 		const project_id = get($snap_project_store, 'project.id', '');
 		const canister_id = get($snap_project_store, 'project.canister_id', '');
-		const file = get(snap, 'design_file[0]', {});
+		const file = get(snap, 'design_file[0]', null);
 		const images = get(snap, 'images', []);
-
-		console.log('snap_name: ', snap_name);
-		console.log('tags_added: ', tags_added);
-		console.log('snap_upsert_store: ', snap);
 
 		const storage_canister_id_alloc =
 			await $actor_file_scaling_manager.actor.get_current_canister_id();
@@ -94,35 +90,47 @@
 
 		const file_storage = new FileStorage($actor_file_storage.actor);
 
-		// Convert the file to Uint8Array, assume this is done asynchronously
-		//TODO: fix if no file found, UI gives error
-		const file_unit8 = new Uint8Array(await file.arrayBuffer());
+		// Initialize an array to hold all upload promises
+		const uploadPromises = [];
 
-		// Create a promise for the file upload
-		const fileUploadPromise = file_storage.store(file_unit8, {
-			filename: file.name,
-			content_type: file.type
+		// If a file is present, add its upload promise to the array
+		if (file) {
+			const file_uint8 = new Uint8Array(await file.arrayBuffer());
+			const fileUploadPromise = file_storage
+				.store(file_uint8, {
+					filename: file.name,
+					content_type: file.type
+				})
+				.then((uploadResult) => ({ ...uploadResult, isDesignFile: true }));
+			uploadPromises.push(fileUploadPromise);
+		}
+
+		// Add image upload promises to the array
+		images.forEach((image) => {
+			const imageUploadPromise = file_storage
+				.store(image.uint8Array, {
+					filename: image.fileName,
+					content_type: image.mimeType
+				})
+				.then((uploadResult) => ({ ...uploadResult, isDesignFile: false }));
+			uploadPromises.push(imageUploadPromise);
 		});
 
-		// Create promises for the image uploads
-		const imageUploadPromises = images.map((image) =>
-			file_storage.store(image.uint8Array, {
-				filename: image.fileName,
-				content_type: image.mimeType
-			})
-		);
+		// Perform all uploads in parallel
+		const uploadResults = await Promise.all(uploadPromises);
 
-		// Use Promise.all to upload the file and images in parallel
-		const [filePublic, ...results] = await Promise.all([fileUploadPromise, ...imageUploadPromises]);
-
-		const images_arr = extractImages(results);
+		// Separate file and images from the results
+		const filePublic = uploadResults.find((result) => result.isDesignFile)?.ok;
+		const images_arr = uploadResults
+			.filter((result) => !result.isDesignFile)
+			.map((result) => result.ok);
 
 		const snap_args = {
 			project_id,
 			name: snap_name,
 			tags: [tags_added],
 			image_cover_location: snap.image_cover_location,
-			design_file: [filePublic.ok],
+			design_file: filePublic ? [filePublic] : [],
 			images: images_arr
 		};
 
