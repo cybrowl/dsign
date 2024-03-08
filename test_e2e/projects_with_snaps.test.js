@@ -308,6 +308,8 @@ describe('Projects With Snaps', () => {
 			images: []
 		});
 
+		console.log('snap: ', snap);
+
 		if (snap) {
 			expect(snap.name).toBe('First Snap Updated');
 			expect(snap.tags).toEqual(['ocean']);

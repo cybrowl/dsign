@@ -20,6 +20,7 @@
 
 	import { actor_creator, actor_username_registry } from '$stores_ref/actors';
 	import { project_store, is_edit_active, project_actions } from '$stores_ref/data_project';
+	import { snap_project_store } from '$stores_ref/data_snap';
 
 	import { project_store_fetching, projects_update } from '$stores_ref/fetch_store';
 	import { auth, init_auth } from '$stores_ref/auth_client';
@@ -86,10 +87,9 @@
 	}
 
 	function goto_snap_upsert() {
-		const project_id = get($project_store, 'project.id', 'x');
-		const project_canister_id = get($project_store, 'project.canister_id', 'x');
+		snap_project_store.set({ isFetching: false, mode: 'create', project: $project_store.project });
 
-		goto(`/snap/upsert?project_id=${project_id}&canister_id=${project_canister_id}`);
+		goto(`/snap/upsert`);
 	}
 
 	// ------------------------- API -------------------------

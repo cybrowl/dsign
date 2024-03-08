@@ -10,291 +10,92 @@
 
 	import {} from '$stores_ref/actors';
 	import { auth, init_auth } from '$stores_ref/auth_client';
-	import { disable_project_store_reset } from '$stores_ref/page_state';
-	import { local_snap_creation_design_file } from '$stores_ref/local_storage';
+	import { snap_upsert_store, snap_project_store, snap_actions } from '$stores_ref/data_snap';
+
 	import { modal_visible } from '$stores_ref/modal';
-	import { page_navigation, snap_creation } from '$stores_ref/page_navigation';
 
-	import { replacer, reviver } from '$utils/big_int';
+	let images = [];
 
-	let cover_img = {};
-	let is_publishing = false;
-	let is_uploading_design_file = false;
-	let mode = '';
+	snap_upsert_store.subscribe((store) => {
+		images = store.snap.images.filter((image) => image.status !== 'removed');
+	});
 
 	onMount(async () => {
-		await init_auth();
-
-		await Promise.all([]);
-
-		mode = $page.url.searchParams.get('mode');
-
-		if ($local_snap_creation_design_file.file_name) {
-			snap_creation.update((value) => ({
-				...value,
-				file_asset: {
-					...value.file_asset,
-					file_name: $local_snap_creation_design_file.file_name
-				}
-			}));
+		//TODO: something
+		if (isEmpty($snap_project_store.project)) {
+			goto(`/`);
 		}
 	});
 
 	onDestroy(async () => {
-		$snap_creation = {
-			id: '',
-			images: [],
-			file_asset: {
-				file_name: '',
-				file_unit8: []
-			}
-		};
+		//TODO: something
 	});
 
-	function generateId() {
-		return Math.random().toString(36).substr(2, 9);
+	async function cancel() {
+		const project = $snap_project_store.project;
+
+		goto(`/project/${project.name}?id=${project.id}&cid=${project.canister_id}`);
 	}
 
-	async function commitFileAssetChunksToStaging(file) {
-		if (file.size === 0) {
-			// TODO: error
-			return 'File Empty';
-		}
+	function add_images(event) {
+		let { imageData } = get(event, 'detail', []);
 
-		const promises = [];
-		const chunkSize = 2000000;
+		snap_actions.add_images_to_snap(imageData);
 
-		const file_name = get(file, 'name', '');
-		const file_type = get(file, 'type', '');
-		const file_array_buffer = file && new Uint8Array(await file.arrayBuffer());
-
-		$snap_creation.file_asset.file_name = file_name;
-		$snap_creation.file_asset.file_unit8 = file_array_buffer;
-
-		//TODO: upload chunk
-
-		for (let start = 0; start < file_array_buffer.length; start += chunkSize) {
-			const chunk = file_array_buffer.slice(start, start + chunkSize);
-
-			promises.push(
-				uploadChunk({
-					file_name,
-					chunk
-				})
-			);
-		}
-
-		// TODO: make sure all the chunks succeed
-		let chunk_ids = await Promise.all(promises);
-
-		return {
-			file_name,
-			file_type,
-			chunk_ids
-		};
-	}
-
-	async function commitImgAssetsToStaging(images) {
-		if (!Array.isArray(images)) {
-			console.error('images must be an array');
-			return [];
-		}
-
-		const creator_logged_in = false;
-
-		if (creator_logged_in === false) {
-			console.error('Not logged in');
-			return [];
-		}
-
-		let validImages = images.filter((image) => image.data && image.mimeType);
-
-		let promises = validImages.map(async function (image) {
-			try {
-				//TODO: create asset
-			} catch (error) {
-				console.error('Error creating asset:', error);
-			}
-		});
-
-		try {
-			return await Promise.all(promises);
-		} catch (error) {
-			console.error('Error:', error);
-			return [];
+		if ($snap_project_store.mode === 'edit') {
+			//TODO: add images API call
+			//TODO: edit mode
 		}
 	}
 
-	function handleAddImages(event) {
-		let { img_data_urls, images_unit8Arrays } = event.detail;
+	async function remove_image(event) {
+		let image = get(event, 'detail', {});
 
-		img_data_urls.forEach(({ dataUrl, mimeType }, index) => {
-			let newImage = {
-				canister_id: '',
-				id: generateId(),
-				url: dataUrl,
-				mimeType,
-				data: images_unit8Arrays[index]
-			};
+		snap_actions.remove_image_from_snap(image.id);
 
-			if ($snap_creation.images.length <= 12) {
-				$snap_creation.images = [...$snap_creation.images, newImage];
-			}
-		});
+		//TODO: edit mode
 	}
 
-	function handleSelectCover(event) {
-		cover_img = event.detail;
-	}
-
-	async function handleRemoveImg(event) {
-		const image_removed = event.detail;
-
-		$snap_creation.images = $snap_creation.images.filter((image) => image.id !== image_removed.id);
-
-		if (mode === 'edit') {
-			const snap_ref = {
-				id: $snap_creation.id,
-				canister_id: $snap_creation.canister_id
-			};
-
-			const image_ref = {
-				id: image_removed.id,
-				canister_id: image_removed.canister_id,
-				url: image_removed.url
-			};
-
-			//TODO: delete images
-		}
-	}
-
-	async function handleAttachFile(event) {
+	function attach_file(event) {
 		let file = get(event, 'detail', {});
 
-		is_uploading_design_file = true;
+		snap_actions.replace_design_file(file);
 
-		const design_file_asset = await commitFileAssetChunksToStaging(file);
-
-		const chunk_ids_big_int_replaced = JSON.stringify(design_file_asset.chunk_ids, replacer);
-
-		local_snap_creation_design_file.set({
-			...design_file_asset,
-			chunk_ids: chunk_ids_big_int_replaced
-		});
-
-		is_uploading_design_file = false;
+		//TODO: edit mode
 	}
 
-	async function handleRemoveFile() {
-		$snap_creation.file_asset.file_name = '';
-		$snap_creation.file_asset.file_unit8 = [];
+	async function remove_file() {
+		snap_actions.remove_design_file();
 
-		// delete from local storage
-		local_snap_creation_design_file.set({
-			file_name: '',
-			file_type: '',
-			chunk_ids: []
-		});
-
-		if (mode === 'edit') {
-			// delete from snap
-			const snap_ref = {
-				id: $snap_creation.id,
-				canister_id: $snap_creation.canister_id
-			};
-
-			//TODO: delete designer file
-		}
+		//TODO: edit mode
 	}
 
-	function handleCancel() {
-		disable_project_store_reset.set(true);
+	async function select_cover_image(event) {
+		const { id } = event.detail;
 
-		const project_id = $page.url.searchParams.get('project_id');
-		const canister_id = $page.url.searchParams.get('canister_id');
+		let image_cover_location = $snap_upsert_store.snap.images.findIndex((img) => img.id === id);
 
-		goto(`/project/${project_id}?canister_id=${canister_id}`);
+		console.log('image_cover_location: ', image_cover_location);
+
+		snap_actions.select_cover_image(image_cover_location);
+
+		//TODO: edit mode
 	}
 
-	async function handlePublish(event) {
-		disable_project_store_reset.set(false);
+	async function publish() {
+		console.log('snap_upsert_store: ', $snap_upsert_store.snap);
 
-		const { snap_name, tags_added } = event.detail;
-
-		is_publishing = true;
-
-		const project_id = $page.url.searchParams.get('project_id');
-		const canister_id = $page.url.searchParams.get('canister_id');
-
-		try {
-			const image_ids = await commitImgAssetsToStaging($snap_creation.images);
-
-			let image_cover_location = findIndex(
-				$snap_creation.images,
-				(img) => img.id === get(cover_img, 'id', '')
-			);
-			image_cover_location = image_cover_location === -1 ? 0 : image_cover_location;
-
-			const file_chunks = $local_snap_creation_design_file.chunk_ids;
-			const file_type = $local_snap_creation_design_file.file_type;
-
-			let design_file_chunk_ids = [];
-			if (!isEmpty(file_chunks)) {
-				const parsed = JSON.parse(file_chunks, reviver);
-				design_file_chunk_ids = Array.isArray(parsed) ? parsed : [parsed];
-			}
-
-			console.log('design_file_chunk_ids: ', design_file_chunk_ids);
-
-			const file_asset = {
-				is_public: true,
-				content_type: file_type,
-				chunk_ids: design_file_chunk_ids
-			};
-
-			const create_snap_args = {
-				title: snap_name,
-				image_cover_location: image_cover_location,
-				img_asset_ids: image_ids,
-				project: {
-					id: project_id,
-					canister_id: canister_id
-				},
-				tags: [tags_added],
-				file_asset: isEmpty(file_chunks) ? [] : [file_asset]
-			};
-
-			const edit_snap_args = {
-				title: [snap_name],
-				id: $snap_creation.id,
-				canister_id: $snap_creation.canister_id,
-				image_cover_location: [image_cover_location],
-				img_asset_ids: [image_ids],
-				tags: [tags_added],
-				file_asset: isEmpty(file_chunks) ? [] : [file_asset]
-			};
-
-			const creator_logged_in = false;
-
-			if (creator_logged_in) {
-				if (mode === 'edit') {
-					console.log('edit');
-
-					//TODO: edit snap
-
-					goto(`/project/${project_id}?canister_id=${canister_id}`);
-				} else {
-					console.log('create');
-
-					//TODO: create snap
-
-					goto(`/project/${project_id}?canister_id=${canister_id}`);
-				}
-			}
-		} catch (error) {
-			console.log('error: ', error);
-			is_publishing = false;
-		}
+		//TODO: upload everything at the same time in parallel
+		// Upload Images in Parallel
+		// const results = await Promise.all(
+		// 	filePaths.map(async (filePath) => {
+		// 		const fileObject = createFileObject(filePath);
+		// 		return file_storage_actor_lib.nikola.store(fileObject.content, {
+		// 			filename: fileObject.name,
+		// 			content_type: fileObject.type
+		// 		});
+		// 	})
+		// );
 	}
 </script>
 
@@ -305,7 +106,7 @@
 <main class="grid_layout">
 	<div class="navigation_main_layout">
 		<PageNavigation
-			navigationItems={$page_navigation.navigationItems}
+			navigationItems={[]}
 			on:home={() => {
 				goto('/');
 			}}
@@ -320,27 +121,23 @@
 	{/if}
 
 	<div class="content_layout">
-		{#if isEmpty($snap_creation.images)}
+		{#if isEmpty($snap_upsert_store.snap.images)}
 			<ImagesEmpty content="Please add images" />
 		{:else}
-			<Images
-				on:removeImg={handleRemoveImg}
-				on:selectCover={handleSelectCover}
-				images={$snap_creation.images}
-			/>
+			<Images on:remove={remove_image} on:selectCover={select_cover_image} {images} />
 		{/if}
 	</div>
 
 	<div class="actions_bar_layout">
 		<SnapUpsertActions
-			on:addImages={handleAddImages}
-			on:attachFile={handleAttachFile}
-			on:cancel={handleCancel}
-			on:publish={handlePublish}
-			on:removeFile={handleRemoveFile}
-			snap={$snap_creation}
-			is_publishing={is_uploading_design_file || is_publishing}
-			{is_uploading_design_file}
+			on:addImages={add_images}
+			on:attachFile={attach_file}
+			on:cancel={cancel}
+			on:publish={publish}
+			on:removeFile={remove_file}
+			snap={$snap_upsert_store.snap}
+			is_publishing={false}
+			is_uploading_design_file={false}
 		/>
 	</div>
 </main>
