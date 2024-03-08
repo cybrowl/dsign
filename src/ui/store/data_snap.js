@@ -54,8 +54,8 @@ export const remove_image_from_snap = function (imageId) {
 	});
 };
 
-// Function to replace the design file in the snap
-export const replace_design_file = function (newDesignFile) {
+// Function to add the design file in the snap
+export const add_design_file = function (newDesignFile) {
 	snap_upsert_store.update(({ isFetching, mode, snap }) => {
 		return {
 			isFetching,
@@ -76,7 +76,7 @@ export const remove_design_file = function () {
 			mode,
 			snap: {
 				...snap,
-				design_file: [] // Set the design_file array to empty
+				design_file: []
 			}
 		};
 	});
@@ -105,7 +105,7 @@ export const select_cover_image = function (imageIndex) {
 export const snap_actions = {
 	add_images_to_snap,
 	remove_image_from_snap,
-	replace_design_file,
+	add_design_file,
 	remove_design_file,
 	select_cover_image
 };

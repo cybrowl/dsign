@@ -8,7 +8,14 @@
 	import { ImagesEmpty, Images, PageNavigation, SnapUpsertActions } from 'dsign-components';
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
-	import {} from '$stores_ref/actors';
+	import { FileStorage } from '$utils/file_storage';
+
+	import {
+		actor_creator,
+		actor_file_scaling_manager,
+		actor_file_storage,
+		actor_username_registry
+	} from '$stores_ref/actors';
 	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { snap_upsert_store, snap_project_store, snap_actions } from '$stores_ref/data_snap';
 
@@ -41,33 +48,26 @@
 		let { imageData } = get(event, 'detail', []);
 
 		snap_actions.add_images_to_snap(imageData);
-
-		if ($snap_project_store.mode === 'edit') {
-			//TODO: add images API call
-			//TODO: edit mode
-		}
 	}
 
 	async function remove_image(event) {
 		let image = get(event, 'detail', {});
 
 		snap_actions.remove_image_from_snap(image.id);
-
-		//TODO: edit mode
 	}
 
 	function attach_file(event) {
 		let file = get(event, 'detail', {});
 
-		snap_actions.replace_design_file(file);
+		snap_actions.add_design_file(file);
 
-		//TODO: edit mode
+		//TODO: API call to add
 	}
 
 	async function remove_file() {
 		snap_actions.remove_design_file();
 
-		//TODO: edit mode
+		//TODO: API call to remove
 	}
 
 	async function select_cover_image(event) {
@@ -84,6 +84,9 @@
 
 	async function publish() {
 		console.log('snap_upsert_store: ', $snap_upsert_store.snap);
+
+		//TODO: remove images from snap for creator
+		//TODO: add images to snap for creator
 
 		//TODO: upload everything at the same time in parallel
 		// Upload Images in Parallel
