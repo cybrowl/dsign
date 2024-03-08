@@ -19,7 +19,9 @@
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
 	import {} from '$stores_ref/actors';
-	import { project_store, project_store_fetching, projects_update } from '$stores_ref/fetch_store';
+	import { project_store } from '$stores_ref/data_project';
+
+	import { project_store_fetching, projects_update } from '$stores_ref/fetch_store';
 	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { modal_visible } from '$stores_ref/modal';
 	import {
@@ -45,13 +47,14 @@
 
 	onMount(async () => {
 		await init_auth();
-		await Promise.all([]);
 
-		local_snap_creation_design_file.set({ file_name: '', file_type: '', chunk_ids: [] });
+		// local_snap_creation_design_file.set({ file_name: '', file_type: '', chunk_ids: [] });
 
 		const canister_id = $page.url.searchParams.get('canister_id');
+		console.log('canister_id: ', canister_id);
+
 		const project_id = last(get($page, 'url.pathname', '').split('/'));
-		let username = '';
+		console.log('project_id: ', project_id);
 
 		const creator_logged_in = false;
 
@@ -63,7 +66,7 @@
 			}
 		}
 
-		if (isEmpty($project_store.project)) {
+		if (isEmpty($project_store.project.id)) {
 			//TODO: get project
 		}
 	});

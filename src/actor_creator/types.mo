@@ -133,6 +133,7 @@ module {
 		description : ?Text;
 		username : Text;
 		owner : ?UserPrincipal;
+		is_owner : Bool;
 		snaps : [SnapID];
 		feedback : ?Feedback;
 		metrics : Metrics;

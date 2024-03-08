@@ -43,7 +43,7 @@ actor class Creator(username_registry : Principal) = this {
 
 	// ------------------------- Variables -------------------------
 	let MAX_USERS : Nat = 100;
-	let USERNAME_REGISTRY_ID : Text = Principal.toText(username_registry);
+	// let USERNAME_REGISTRY_ID : Text = Principal.toText(username_registry);
 	let VERSION : Nat = 1; // The Version in Production
 
 	var users : Nat = 0;
@@ -241,7 +241,7 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Get Project
-	public query func get_project(id : ProjectID) : async Result.Result<ProjectPublic, ErrProject> {
+	public query ({ caller }) func get_project(id : ProjectID) : async Result.Result<ProjectPublic, ErrProject> {
 		switch (projects.get(id)) {
 			case (null) {
 				return #err(#ProjectNotFound(true));
@@ -249,6 +249,7 @@ actor class Creator(username_registry : Principal) = this {
 			case (?project) {
 				let project_public : ProjectPublic = {
 					project with
+					is_owner = Principal.equal(caller, project.owner);
 					owner = null;
 				};
 
@@ -301,6 +302,7 @@ actor class Creator(username_registry : Principal) = this {
 
 				let project_public : ProjectPublic = {
 					project with
+					is_owner = true;
 					owner = null;
 				};
 
@@ -340,6 +342,7 @@ actor class Creator(username_registry : Principal) = this {
 
 						let project_public : ProjectPublic = {
 							project_updated with
+							is_owner = true;
 							owner = null;
 						};
 
@@ -375,12 +378,10 @@ actor class Creator(username_registry : Principal) = this {
 							}
 						);
 
-                        //NOTE: for now all files are deleted in UI but that can be done in separate canister that has authority within FS to delete
+						//NOTE: for now all files are deleted in UI but that can be done in separate canister that has authority within FS to delete
 						//TODO: delete all the snaps from the project
 
 						projects.delete(id);
-
-
 
 						let profile_updated : Profile = {
 							profile with
@@ -398,7 +399,7 @@ actor class Creator(username_registry : Principal) = this {
 
 	// Create Feedback Topic
 	// TODO: skip until I fix everthing we have in UI
-	public shared ({ caller }) func create_feedback_topic() : async Result.Result<Text, Text> {
+	public shared ({}) func create_feedback_topic() : async Result.Result<Text, Text> {
 		return #ok("");
 	};
 

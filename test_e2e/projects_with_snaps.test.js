@@ -123,6 +123,8 @@ describe('Projects With Snaps', () => {
 			description: ['first project']
 		});
 
+		console.log('project: ', project);
+
 		nikola_project_a = project;
 
 		expect(project).toBeTruthy();

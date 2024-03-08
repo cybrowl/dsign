@@ -34,6 +34,4 @@ module {
 
 		return isValidUsername;
 	};
-
-	func isEq(a : Nat8, b : Nat8) : Bool { a == b };
 };

@@ -66,9 +66,9 @@
 
 	// ------------------------- Nav -------------------------
 	function go_to_project(e) {
-		project = get(e, 'detail');
+		const project = get(e, 'detail');
 
-		projects_update.update_project(project);
+		//TODO: maybe some cashing if we are coming from goto?
 
 		goto(`/project/${project.id}?canister_id=${project.canister_id}`);
 	}
