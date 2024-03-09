@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { get, isEmpty, last } from 'lodash';
+	import { get, isEmpty } from 'lodash';
 
 	import Login from '$components_ref/Login.svelte';
 	import {
@@ -18,7 +18,7 @@
 	} from 'dsign-components';
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
-	import { actor_creator, actor_username_registry } from '$stores_ref/actors';
+	import { actor_creator } from '$stores_ref/actors';
 
 	// Auth
 	import { auth, init_auth } from '$stores_ref/auth_client';
@@ -103,24 +103,10 @@
 		}
 	}
 
-	async function handleAddToFavorites(e) {
+	async function add_project_to_favs(e) {
 		const project_liked = e.detail;
 
-		const project_ref = {
-			canister_id: project_liked.canister_id,
-			id: project_liked.id
-		};
-
-		const creator_logged_in = false;
-		if (creator_logged_in) {
-			try {
-				// TODO: save project to favorites
-			} catch (error) {
-				console.log('error: call', error);
-			}
-		} else {
-			navigate_to_home_with_notification();
-		}
+		//TODO: add project to favs
 	}
 </script>
 
@@ -157,7 +143,7 @@
 	{#if isEmpty($project_store.project) === false}
 		<!-- Project Info Header -->
 		<div class="project_info_layout">
-			<ProjectInfo project={$project_store.project} on:saveToFavorites={handleAddToFavorites} />
+			<ProjectInfo project={$project_store.project} on:saveToFavorites={add_project_to_favs} />
 		</div>
 
 		<!-- ProjectsTabs & ProjectEditActionsBar -->

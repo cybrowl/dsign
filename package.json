@@ -22,8 +22,7 @@
 		"dotenv": "^16.0.3",
 		"dsign-components": "^1.9.16",
 		"lodash": "^4.17.21",
-		"luxon": "^3.2.1",
-		"svelte-local-storage-store": "0.6.0"
+		"luxon": "^3.2.1"
 	},
 	"devDependencies": {
 		"@dfinity/agent": "0.15.6",
