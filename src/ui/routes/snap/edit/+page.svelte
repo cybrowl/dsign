@@ -22,6 +22,9 @@
 	import { modal_visible } from '$stores_ref/modal';
 
 	let images = [];
+	let is_publishing = false;
+	const snap_cid = get($snap_upsert_store, 'snap.canister_id', '');
+	const snap_id = get($snap_upsert_store, 'snap.id', '');
 
 	snap_upsert_store.subscribe((store) => {
 		images = store.snap.images.filter((image) => image.status !== 'removed');
@@ -54,6 +57,21 @@
 		let image = get(event, 'detail', {});
 
 		snap_actions.remove_image_from_snap(image.id);
+
+		await auth.creator(snap_cid);
+
+		if ($actor_creator.loggedIn) {
+			is_publishing = true;
+
+			const { ok: removed_img } = await $actor_creator.actor.remove_image_from_snap(
+				snap_id,
+				image.id
+			);
+
+			console.log('removed_img: ', removed_img);
+
+			is_publishing = false;
+		}
 	}
 
 	function attach_file(event) {
@@ -75,31 +93,31 @@
 
 		let image_cover_location = $snap_upsert_store.snap.images.findIndex((img) => img.id === id);
 
-		console.log('image_cover_location: ', image_cover_location);
-
 		snap_actions.select_cover_image(image_cover_location);
 
-		//TODO: edit mode
+		await auth.creator(snap_cid);
+
+		if ($actor_creator.loggedIn) {
+			is_publishing = true;
+
+			const update_args = {
+				id: snap_id,
+				name: [],
+				design_file: [],
+				image_cover_location: [image_cover_location],
+				tags: []
+			};
+
+			const { ok: updated_snap } = await $actor_creator.actor.update_snap(update_args);
+
+			console.log('updated_snap: ', updated_snap);
+
+			is_publishing = false;
+		}
 	}
 
 	async function publish() {
 		console.log('snap_upsert_store: ', $snap_upsert_store.snap);
-
-		//TODO: remove images from snap for creator
-		//TODO: add images to snap for creator
-		//TODO: update `snap.name` and `tags`
-
-		//TODO: upload everything at the same time in parallel
-		// Upload Images in Parallel
-		// const results = await Promise.all(
-		// 	filePaths.map(async (filePath) => {
-		// 		const fileObject = createFileObject(filePath);
-		// 		return file_storage_actor_lib.nikola.store(fileObject.content, {
-		// 			filename: fileObject.name,
-		// 			content_type: fileObject.type
-		// 		});
-		// 	})
-		// );
 	}
 </script>
 
@@ -140,7 +158,8 @@
 			on:publish={publish}
 			on:removeFile={remove_file}
 			snap={$snap_upsert_store.snap}
-			is_publishing={false}
+			{is_publishing}
+			is_edit_mode={true}
 			is_uploading_design_file={false}
 		/>
 	</div>

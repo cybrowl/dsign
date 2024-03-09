@@ -491,14 +491,12 @@ actor class Creator(username_registry : Principal) = this {
 							case (null) { snap.tags };
 							case (?tags) { tags };
 						};
+
 						let updated_design_file = switch (args.design_file) {
 							case (null) { snap.design_file };
 							case (?design_file) { ?design_file };
 						};
-						let updated_images = switch (args.images) {
-							case (null) { snap.images };
-							case (?images) { images };
-						};
+
 						let updated_image_cover_location = switch (args.image_cover_location) {
 							case (null) { snap.image_cover_location };
 							case (?location) { location };
@@ -517,7 +515,7 @@ actor class Creator(username_registry : Principal) = this {
 							owner = snap.owner;
 							design_file = updated_design_file;
 							image_cover_location = updated_image_cover_location;
-							images = updated_images;
+							images = snap.images;
 							metrics = snap.metrics;
 						};
 
@@ -532,6 +530,64 @@ actor class Creator(username_registry : Principal) = this {
 						return #ok(snap_public);
 					};
 				};
+			};
+		};
+	};
+
+	// Remove Image
+	public shared ({ caller }) func remove_image_from_snap(snap_id : SnapID, image_id : FileAssetID) : async Result.Result<Bool, ErrSnap> {
+		switch (snaps.get(snap_id)) {
+			case (null) {
+				return #err(#SnapNotFound(true));
+			};
+			case (?snap) {
+				if (Principal.notEqual(snap.owner, caller)) {
+					return #err(#NotOwner(true));
+				};
+
+				// Filter out the image with the given FileAssetID
+				let remaining_images = Array.filter<FileAsset>(
+					snap.images,
+					func(image : FileAsset) : Bool {
+						image.id != image_id;
+					}
+				);
+
+				// Update the snap with the filtered images list
+				let updated_snap = {
+					snap with
+					images = remaining_images;
+				};
+
+				// Update the snap in the hashmap
+				snaps.put(snap_id, updated_snap);
+
+				return #ok(true);
+			};
+		};
+	};
+
+	// Add Images
+	public shared ({ caller }) func add_images_to_snap(snap_id : SnapID, new_images : [FileAsset]) : async Result.Result<Bool, ErrSnap> {
+		switch (snaps.get(snap_id)) {
+			case (null) {
+				return #err(#SnapNotFound(true));
+			};
+			case (?snap) {
+				if (Principal.notEqual(snap.owner, caller)) {
+					return #err(#NotOwner(true));
+				};
+
+				let updated_images = Arr.append<FileAsset>(snap.images, new_images);
+
+				let updated_snap = {
+					snap with
+					images = updated_images;
+				};
+
+				snaps.put(snap_id, updated_snap);
+
+				return #ok(true);
 			};
 		};
 	};

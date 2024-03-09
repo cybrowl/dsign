@@ -185,7 +185,6 @@ module {
 		name : ?Text;
 		tags : ?[Text];
 		design_file : ?FileAsset;
-		images : ?[FileAsset];
 		image_cover_location : ?Nat8;
 	};
 
