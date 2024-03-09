@@ -1,21 +1,18 @@
 <script>
-	import { page } from '$app/stores';
+	import { get, isEmpty } from 'lodash';
 	import { goto } from '$app/navigation';
 	import { onDestroy, onMount } from 'svelte';
-	import { get, findIndex, isEmpty } from 'lodash';
 
-	import Login from '$components_ref/Login.svelte';
 	import { ImagesEmpty, Images, PageNavigation, SnapUpsertActions } from 'dsign-components';
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
+	import Login from '$components_ref/Login.svelte';
 
 	import { FileStorage } from '$utils/file_storage';
-	import { extractImages } from '$utils/images';
 
 	import {
 		actor_creator,
 		actor_file_scaling_manager,
-		actor_file_storage,
-		actor_username_registry
+		actor_file_storage
 	} from '$stores_ref/actors';
 	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { snap_upsert_store, snap_project_store, snap_actions } from '$stores_ref/data_snap';
@@ -30,6 +27,8 @@
 	});
 
 	onMount(async () => {
+		await init_auth();
+
 		//TODO: something
 		if (isEmpty($snap_project_store.project)) {
 			goto(`/`);
