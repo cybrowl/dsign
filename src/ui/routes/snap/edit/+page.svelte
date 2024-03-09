@@ -63,7 +63,7 @@
 		if ($actor_creator.loggedIn) {
 			is_publishing = true;
 
-			const { ok: removed_img } = await $actor_creator.actor.remove_image_from_snap(
+			const { ok: removed_img } = await $actor_creator.actor.delete_image_from_snap(
 				snap_id,
 				image.id
 			);

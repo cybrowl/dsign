@@ -363,6 +363,7 @@ actor class Creator(username_registry : Principal) = this {
 
 						//NOTE: for now all files are deleted in UI but that can be done in separate canister that has authority within FS to delete
 						//TODO: delete all the snaps from the project
+						//TODO: delete all the assets from snaps
 
 						projects.delete(id);
 
@@ -534,8 +535,8 @@ actor class Creator(username_registry : Principal) = this {
 		};
 	};
 
-	// Remove Image
-	public shared ({ caller }) func remove_image_from_snap(snap_id : SnapID, image_id : FileAssetID) : async Result.Result<Bool, ErrSnap> {
+	// Delete Image
+	public shared ({ caller }) func delete_image_from_snap(snap_id : SnapID, image_id : FileAssetID) : async Result.Result<Bool, ErrSnap> {
 		switch (snaps.get(snap_id)) {
 			case (null) {
 				return #err(#SnapNotFound(true));
