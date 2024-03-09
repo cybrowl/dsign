@@ -29,6 +29,54 @@ export const fetching = function () {
 	});
 };
 
+export const deselect_snaps = function () {
+	project_store.update(({ isFetching, project }) => {
+		const snaps = get(project, 'snaps', []).map((snap) => ({
+			...snap,
+			isSelected: false
+		}));
+
+		return {
+			isFetching,
+			project: {
+				...project,
+				snaps
+			}
+		};
+	});
+};
+
+export const get_selected_snap_ids = () => {
+	let selectedSnapIds = [];
+
+	project_store.subscribe(({ project }) => {
+		const snaps = get(project, 'snaps', []);
+
+		// Filter for snaps that are selected and map to their IDs
+		selectedSnapIds = snaps.filter((snap) => snap.isSelected).map((snap) => snap.id);
+	});
+
+	return selectedSnapIds;
+};
+
+export const remove_selected_snaps = () => {
+	project_store.update(({ isFetching, project }) => {
+		const selectedSnapIds = project.snaps.filter((snap) => snap.isSelected).map((snap) => snap.id);
+		const filteredSnaps = project.snaps.filter((snap) => !selectedSnapIds.includes(snap.id));
+
+		return {
+			isFetching,
+			project: {
+				...project,
+				snaps: filteredSnaps
+			}
+		};
+	});
+};
+
 export const project_actions = {
-	fetching
+	fetching,
+	deselect_snaps,
+	get_selected_snap_ids,
+	remove_selected_snaps
 };

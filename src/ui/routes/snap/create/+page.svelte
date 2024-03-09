@@ -23,6 +23,7 @@
 	import { modal_visible } from '$stores_ref/modal';
 
 	let images = [];
+	let is_publishing = false;
 
 	snap_upsert_store.subscribe((store) => {
 		images = store.snap.images.filter((image) => image.status !== 'removed');
@@ -83,6 +84,8 @@
 		const file = get(snap, 'design_file[0]', null);
 		const images = get(snap, 'images', []);
 
+		is_publishing = true;
+
 		const storage_canister_id_alloc =
 			await $actor_file_scaling_manager.actor.get_current_canister_id();
 		await auth.file_storage(storage_canister_id_alloc);
@@ -134,11 +137,13 @@
 			images: images_arr
 		};
 
-		console.log('snap_args: ', snap_args);
-
 		const { ok: profile, err: err_profile } = await $actor_creator.actor.create_snap(snap_args);
 
-		console.log('profile: ', profile);
+		if (profile) {
+			cancel();
+		}
+
+		is_publishing = false;
 	}
 </script>
 
@@ -179,7 +184,7 @@
 			on:publish={publish}
 			on:removeFile={remove_file}
 			snap={$snap_upsert_store.snap}
-			is_publishing={false}
+			{is_publishing}
 			is_uploading_design_file={false}
 		/>
 	</div>

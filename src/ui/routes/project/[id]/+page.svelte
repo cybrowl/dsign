@@ -20,22 +20,20 @@
 
 	import { actor_creator, actor_username_registry } from '$stores_ref/actors';
 
-	// Reactive Store
+	// Auth
+	import { auth, init_auth } from '$stores_ref/auth_client';
+
+	// User Data
 	import { project_store, is_edit_active, project_actions } from '$stores_ref/data_project';
 	import { snap_project_store, snap_preview_store, snap_actions } from '$stores_ref/data_snap';
+	import { ls_my_profile } from '$stores_ref/local_storage';
 
-	import { project_store_fetching, projects_update } from '$stores_ref/fetch_store';
-	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation, navigate_to_home_with_notification } from '$stores_ref/page_navigation';
-	import { disable_project_store_reset, projectTabsState } from '$stores_ref/page_state';
+	import { projectTabsState } from '$stores_ref/page_state';
 
-	// projects_update.deselect_snaps_from_project();
+	project_actions.deselect_snaps();
 	is_edit_active.set(false);
-
-	// if ($disable_project_store_reset === false) {
-	// 	project_store_fetching();
-	// }
 
 	onMount(async () => {
 		await init_auth();
@@ -64,7 +62,7 @@
 	function toggle_edit_mode(e) {
 		is_edit_active.set(get(e, 'detail', false));
 
-		// projects_update.deselect_snaps_from_project();
+		project_actions.deselect_snaps();
 	}
 
 	// ------------------------- Nav -------------------------
@@ -86,30 +84,20 @@
 	}
 
 	// ------------------------- API -------------------------
-	async function handleDeleteSnaps() {
-		const snaps = get($project_store.project, 'snaps', []);
-		const project_id = get($project_store, 'project.id', 'x');
-		const project_canister_id = get($project_store, 'project.canister_id', 'x');
+	async function delete_snaps() {
+		const selected_snap_ids = project_actions.get_selected_snap_ids();
 
-		const selected_snaps = snaps.filter((snap) => snap.isSelected === true);
-		const selected_snaps_ids = selected_snaps.map((snap) => snap.id);
+		project_actions.remove_selected_snaps();
+		is_edit_active.set(false);
 
-		if (selected_snaps_ids.length === 0) {
-			//TODO: Notification
-			return 'Nothing to Delete';
-		}
+		await auth.creator(get($ls_my_profile, 'canister_id', ''));
 
-		toggle_edit_mode({ detail: false });
+		if ($actor_creator.loggedIn) {
+			const { ok: deleted_snaps, err: err_profile } =
+				await $actor_creator.actor.delete_snaps(selected_snap_ids);
 
-		const snaps_kept = snaps.filter((snap) => snap.isSelected === false);
-
-		projects_update.delete_snaps_from_project(snaps_kept);
-
-		const creator_logged_in = false;
-		if (creator_logged_in) {
-			// TODO: delete snaps
-
-			projects_update.update_project(project);
+			console.log('deleted: ', deleted_snaps);
+			console.log('err_profile: ', err_profile);
 		} else {
 			navigate_to_home_with_notification();
 		}
@@ -183,7 +171,7 @@
 				<ProjectEditActionsBar
 					isEditActive={$is_edit_active}
 					on:toggleEditMode={toggle_edit_mode}
-					on:clickRemove={handleDeleteSnaps}
+					on:clickRemove={delete_snaps}
 				/>
 			{/if}
 		</div>
@@ -205,7 +193,7 @@
 
 				<!-- Snaps -->
 				{#if $project_store.project.snaps && $project_store.project.snaps.length > 0}
-					{#each $project_store.project.snaps as snap}
+					{#each $project_store.project.snaps as snap (snap.id)}
 						<SnapCard {snap} showEditMode={$is_edit_active} on:clickCard={goto_snap_preview} />
 					{/each}
 					{#if get($project_store, 'project.is_owner', false)}
