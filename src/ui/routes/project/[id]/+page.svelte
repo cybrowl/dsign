@@ -19,17 +19,15 @@
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
 	import { actor_creator, actor_username_registry } from '$stores_ref/actors';
+
+	// Reactive Store
 	import { project_store, is_edit_active, project_actions } from '$stores_ref/data_project';
-	import { snap_project_store, snap_preview_store } from '$stores_ref/data_snap';
+	import { snap_project_store, snap_preview_store, snap_actions } from '$stores_ref/data_snap';
 
 	import { project_store_fetching, projects_update } from '$stores_ref/fetch_store';
 	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { modal_visible } from '$stores_ref/modal';
-	import {
-		snap_preview,
-		page_navigation,
-		navigate_to_home_with_notification
-	} from '$stores_ref/page_navigation';
+	import { page_navigation, navigate_to_home_with_notification } from '$stores_ref/page_navigation';
 	import { disable_project_store_reset, projectTabsState } from '$stores_ref/page_state';
 
 	// projects_update.deselect_snaps_from_project();
@@ -81,6 +79,8 @@
 
 	function goto_snap_create() {
 		snap_project_store.set({ isFetching: false, mode: 'create', project: $project_store.project });
+
+		snap_actions.set_empty_snap();
 
 		goto(`/snap/create`);
 	}

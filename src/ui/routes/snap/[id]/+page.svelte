@@ -12,7 +12,8 @@
 	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation } from '$stores_ref/page_navigation';
-	import { snap_project_store, snap_preview_store } from '$stores_ref/data_snap';
+
+	import { snap_preview_store, snap_project_store, snap_upsert_store } from '$stores_ref/data_snap';
 
 	onMount(async () => {
 		await init_auth();
@@ -41,6 +42,8 @@
 	}
 
 	function goto_edit_snap() {
+		snap_upsert_store.set({ isFetching: false, mode: 'edit', snap: $snap_preview_store.snap });
+
 		goto(`/snap/edit`);
 	}
 </script>

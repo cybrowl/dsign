@@ -38,6 +38,15 @@ export const snap_preview_store = writable({
 // Writable store for snap project
 export const snap_project_store = writable({ isFetching: false, project: empty_project });
 
+export const set_empty_snap = function () {
+	snap_upsert_store.update((store) => {
+		return {
+			...store,
+			snap: empty_snap
+		};
+	});
+};
+
 export const add_images_to_snap = function (newImages) {
 	snap_upsert_store.update((store) => {
 		// Map over newImages to add a status of 'new'
@@ -108,6 +117,7 @@ export const select_cover_image = function (imageIndex) {
 
 // Object to export the functions for manipulating the snap
 export const snap_actions = {
+	set_empty_snap,
 	add_images_to_snap,
 	remove_image_from_snap,
 	add_design_file,
