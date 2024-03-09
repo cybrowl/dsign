@@ -388,7 +388,7 @@ actor class Creator(username_registry : Principal) = this {
 
 	// ------------------------- Snaps -------------------------
 	// Get Snap
-	public query func get_snap(id : SnapID) : async Result.Result<SnapPublic, ErrSnap> {
+	public query ({ caller }) func get_snap(id : SnapID) : async Result.Result<SnapPublic, ErrSnap> {
 		switch (snaps.get(id)) {
 			case (null) {
 				return #err(#SnapNotFound(true));
@@ -399,6 +399,7 @@ actor class Creator(username_registry : Principal) = this {
 				let snap_public : SnapPublic = {
 					snap with
 					owner = null;
+					is_owner = Principal.equal(caller, snap.owner);
 				};
 
 				return #ok(snap_public);
@@ -459,6 +460,7 @@ actor class Creator(username_registry : Principal) = this {
 						let snap_public : SnapPublic = {
 							snap with
 							owner = null;
+							is_owner = true;
 						};
 
 						return #ok(snap_public);
@@ -524,6 +526,7 @@ actor class Creator(username_registry : Principal) = this {
 						let snap_public : SnapPublic = {
 							updated_snap with
 							owner = ?caller;
+							is_owner = true;
 						};
 
 						return #ok(snap_public);

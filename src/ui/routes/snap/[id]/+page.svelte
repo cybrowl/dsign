@@ -10,21 +10,15 @@
 
 	import {} from '$stores_ref/actors';
 	import { auth, init_auth } from '$stores_ref/auth_client';
-	import { disable_project_store_reset } from '$stores_ref/page_state';
 	import { modal_visible } from '$stores_ref/modal';
-	import { page_navigation, snap_creation } from '$stores_ref/page_navigation';
+	import { page_navigation } from '$stores_ref/page_navigation';
 	import { snap_project_store, snap_preview_store } from '$stores_ref/data_snap';
-
-	disable_project_store_reset.set(true);
-
-	let is_owner = false;
 
 	onMount(async () => {
 		const canister_id = $page.url.searchParams.get('canister_id');
 		const snap_id = last(get($page, 'url.pathname', '').split('/'));
 
 		await init_auth();
-		await Promise.all([]);
 
 		try {
 			const creator_logged_in = false;
@@ -80,7 +74,7 @@
 			<SnapInfo
 				snap={$snap_preview_store.snap}
 				project_name={get($snap_project_store, 'project.name', '')}
-				{is_owner}
+				is_owner={get($snap_preview_store, 'snap.is_owner', '')}
 				on:edit={goto_edit_snap}
 			/>
 		</div>

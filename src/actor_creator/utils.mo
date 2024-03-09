@@ -28,6 +28,7 @@ module {
 						let snap_public : SnapPublic = {
 							snap with
 							owner = null;
+							is_owner = Principal.equal(caller, snap.owner);
 						};
 
 						return ?snap_public;
@@ -64,7 +65,11 @@ module {
 								switch (snaps.get(snap_id)) {
 									case (null) { return null };
 									case (?snap) {
-										let snap_public : SnapPublic = { snap with owner = null };
+										let snap_public : SnapPublic = {
+											snap with
+											owner = null;
+											is_owner = Principal.equal(caller, snap.owner);
+										};
 
 										return ?snap_public;
 									};

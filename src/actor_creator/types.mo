@@ -215,6 +215,7 @@ module {
 		tags : [Text];
 		username : Username;
 		owner : ?UserPrincipal;
+		is_owner : Bool;
 		design_file : ?FileAsset;
 		image_cover_location : Nat8;
 		images : [FileAsset];
