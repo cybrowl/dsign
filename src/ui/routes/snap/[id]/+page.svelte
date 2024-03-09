@@ -79,7 +79,7 @@
 		<div class="snap_info_layout">
 			<SnapInfo
 				snap={$snap_preview_store.snap}
-				project_name={$snap_preview_store.snap.project_name}
+				project_name={get($snap_project_store, 'project.name', '')}
 				{is_owner}
 				on:edit={goto_edit_snap}
 			/>

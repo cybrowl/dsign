@@ -394,6 +394,8 @@ actor class Creator(username_registry : Principal) = this {
 				return #err(#SnapNotFound(true));
 			};
 			case (?snap) {
+				//TODO: add project_name as part of the snap public
+
 				let snap_public : SnapPublic = {
 					snap with
 					owner = null;
