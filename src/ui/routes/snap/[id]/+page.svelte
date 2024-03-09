@@ -8,23 +8,28 @@
 	import { SnapActionsBar, PageNavigation, SnapInfo } from 'dsign-components';
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
-	import {} from '$stores_ref/actors';
 	import { auth, init_auth } from '$stores_ref/auth_client';
+	import { actor_creator } from '$stores_ref/actors';
+	import { snap_preview_store, snap_project_store, snap_upsert_store } from '$stores_ref/data_snap';
+
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation } from '$stores_ref/page_navigation';
-
-	import { snap_preview_store, snap_project_store, snap_upsert_store } from '$stores_ref/data_snap';
 
 	onMount(async () => {
 		await init_auth();
 
 		try {
-			const canister_id = $page.url.searchParams.get('canister_id');
+			const canister_id = $page.url.searchParams.get('cid');
 			const snap_id = $page.url.pathname.split('/').pop();
-			const creator_logged_in = false;
 
-			if (creator_logged_in) {
-				//TODO: get snap
+			await auth.creator(canister_id);
+
+			if ($actor_creator.loggedIn) {
+				const { ok: snap, err: error } = await $actor_creator.actor.get_snap(snap_id);
+
+				console.log('snap: ', snap);
+
+				snap_preview_store.set({ isFetching: false, snap });
 			}
 		} catch (error) {
 			console.log('error snap preview: ', error);

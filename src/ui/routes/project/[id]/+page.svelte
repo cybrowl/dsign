@@ -72,7 +72,7 @@
 		snap_project_store.set({ isFetching: false, mode: 'preview', project: $project_store.project });
 		snap_preview_store.set({ isFetching: false, snap: snap });
 
-		goto('/snap/' + snap.id + '?canister_id=' + snap.canister_id);
+		goto('/snap/' + snap.id + '?cid=' + snap.canister_id);
 	}
 
 	function goto_snap_create() {
