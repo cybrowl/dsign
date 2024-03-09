@@ -6,10 +6,11 @@
 
 	import { actor_creator } from '$stores_ref/actors';
 	import { auth } from '$stores_ref/auth_client';
+	import { profile_actions } from '$stores_ref/data_profile';
+	import { ls_my_profile } from '$stores_ref/local_storage';
+
 	import { navigate_to_home_with_notification } from '$stores_ref/page_navigation';
 	import modal_update, { modal_mode } from '$stores_ref/modal';
-	import { ls_my_profile } from '$stores_ref/local_storage';
-	import { profile_actions } from '$stores_ref/data_profile';
 
 	const project = get($modal_mode, 'project', '');
 

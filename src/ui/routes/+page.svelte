@@ -9,7 +9,7 @@
 
 	import { actor_explore } from '$stores_ref/actors.js';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
-	import { explore_store, projects_update } from '$stores_ref/fetch_store.js';
+	import { explore_store } from '$stores_ref/data_explore.js';
 	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
 	import { page_navigation } from '$stores_ref/page_navigation';
@@ -41,7 +41,7 @@
 		let project = get(e, 'detail');
 		console.log('project: ', project);
 
-		projects_update.update_project(project);
+		// projects_update.update_project(project);
 
 		goto(`/project/${project.id}?canister_id=${project.canister_id}`);
 	}
@@ -49,7 +49,7 @@
 	function handleUsernameClick(e) {
 		let project = get(e, 'detail');
 
-		projects_update.update_project(project);
+		// projects_update.update_project(project);
 
 		goto(`/${project.username}`);
 	}

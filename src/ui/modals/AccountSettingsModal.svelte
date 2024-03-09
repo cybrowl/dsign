@@ -12,7 +12,7 @@
 	import { auth, auth_client, auth_logout_all } from '$stores_ref/auth_client';
 	import { ls_my_profile, local_storage_remove_all } from '$stores_ref/local_storage';
 	import modal_update from '$stores_ref/modal';
-	import { profile_store, profile_actions } from '$stores_ref/data_profile';
+	import { profile_actions } from '$stores_ref/data_profile';
 
 	import { FileStorage } from '$utils/file_storage';
 
