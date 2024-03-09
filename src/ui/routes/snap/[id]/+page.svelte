@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { get, last, isEmpty } from 'lodash';
+	import { get, isEmpty } from 'lodash';
 
 	import Login from '$components_ref/Login.svelte';
 	import { SnapActionsBar, PageNavigation, SnapInfo } from 'dsign-components';
@@ -15,17 +15,15 @@
 	import { snap_project_store, snap_preview_store } from '$stores_ref/data_snap';
 
 	onMount(async () => {
-		const canister_id = $page.url.searchParams.get('canister_id');
-		const snap_id = last(get($page, 'url.pathname', '').split('/'));
-
 		await init_auth();
 
 		try {
+			const canister_id = $page.url.searchParams.get('canister_id');
+			const snap_id = $page.url.pathname.split('/').pop();
 			const creator_logged_in = false;
 
 			if (creator_logged_in) {
 				//TODO: get snap
-				//TODO: get profile
 			}
 		} catch (error) {
 			console.log('error snap preview: ', error);
