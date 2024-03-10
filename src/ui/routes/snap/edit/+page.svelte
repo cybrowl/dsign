@@ -51,6 +51,8 @@
 		let { imageData } = get(event, 'detail', []);
 
 		snap_actions.add_images_to_snap(imageData);
+
+		//TODO: API call to add images
 	}
 
 	async function remove_image(event) {
@@ -117,6 +119,8 @@
 	}
 
 	async function publish() {
+		//TODO: expose name change function
+		//TODO: expose tag name function
 		console.log('snap_upsert_store: ', $snap_upsert_store.snap);
 	}
 </script>
