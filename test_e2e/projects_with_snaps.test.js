@@ -224,7 +224,7 @@ describe('Projects With Snaps', () => {
 		}
 	});
 
-	test('Creator[nikola].update_snap(): with images & image_cover_location => #ok - SnapPublic', async () => {
+	test('Creator[nikola].add_images_to_snap(): with images => #ok - SnapPublic', async () => {
 		const filePaths = [
 			path.join(__dirname, 'images', 'size', '3mb_japan.jpg'),
 			path.join(__dirname, 'images', 'size', '1mb_motoko.png')
@@ -249,22 +249,22 @@ describe('Projects With Snaps', () => {
 			expect(file).toBeDefined();
 		});
 
-		const { ok: snap } = await creator_actor_nikola.update_snap({
-			id: nikola_snap_a.id,
-			name: [],
-			design_file: [],
-			image_cover_location: [1],
-			tags: [['ocean']],
-			images: [files]
-		});
+		const { ok: added_images } = await creator_actor_nikola.add_images_to_snap(
+			nikola_snap_a.id,
+			files
+		);
+
+		expect(added_images).toBe(true);
+
+		const { ok: snap } = await creator_actor_nikola.get_snap(nikola_snap_a.id);
 
 		if (snap) {
 			nikola_snap_a = snap;
 
 			expect(snap.name).toBe('First Snap Updated');
 			expect(snap.tags).toEqual(['ocean']);
-			expect(snap.images).toHaveLength(2);
-			expect(snap.image_cover_location).toBe(1);
+			expect(snap.images).toHaveLength(3);
+			expect(snap.image_cover_location).toBe(0);
 		}
 	});
 
@@ -286,7 +286,7 @@ describe('Projects With Snaps', () => {
 
 				expect(snap.name).toBe('First Snap Updated');
 				expect(snap.tags).toEqual(['ocean']);
-				expect(snap.images).toHaveLength(1);
+				expect(snap.images).toHaveLength(2);
 				expect(snap.design_file).toHaveLength(0);
 			}
 		}
@@ -304,16 +304,13 @@ describe('Projects With Snaps', () => {
 			name: [],
 			design_file: [file],
 			image_cover_location: [],
-			tags: [],
-			images: []
+			tags: []
 		});
-
-		console.log('snap: ', snap);
 
 		if (snap) {
 			expect(snap.name).toBe('First Snap Updated');
 			expect(snap.tags).toEqual(['ocean']);
-			expect(snap.images).toHaveLength(1);
+			expect(snap.images).toHaveLength(2);
 			expect(snap.design_file).toHaveLength(1);
 
 			// Assertions for the uploaded image and HTTP response

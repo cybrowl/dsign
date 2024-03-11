@@ -17,9 +17,11 @@ import Arr "../libs/array";
 actor class Creator(username_registry : Principal) = this {
 	type ArgsCreateProject = Types.ArgsCreateProject;
 	type ArgsCreateSnap = Types.ArgsCreateSnap;
+	type ArgsCreateTopic = Types.ArgsCreateTopic;
 	type ArgsUpdateProfile = Types.ArgsUpdateProfile;
 	type ArgsUpdateProject = Types.ArgsUpdateProject;
 	type ArgsUpdateSnap = Types.ArgsUpdateSnap;
+	type ArgsUpdateTopic = Types.ArgsUpdateTopic;
 	type ErrProfile = Types.ErrProfile;
 	type ErrProject = Types.ErrProject;
 	type ErrSnap = Types.ErrSnap;
@@ -327,7 +329,7 @@ actor class Creator(username_registry : Principal) = this {
 
 						projects.put(args.id, project_updated);
 
-						let project_public = Utils.project_to_public(project, snaps, caller);
+						let project_public = Utils.project_to_public(project_updated, snaps, caller);
 
 						return #ok(project_public);
 					};
@@ -384,13 +386,37 @@ actor class Creator(username_registry : Principal) = this {
 	// Create Feedback Topic
 	// TODO: skip until I fix everthing we have in UI
 	// NOTE: this is called from `snap_view`, and redirects them to `feedback` with topic selected
-	public shared ({}) func create_feedback_topic(id : SnapID) : async Result.Result<Text, Text> {
+	public shared ({}) func create_feedback_topic(args : ArgsCreateTopic) : async Result.Result<Text, Text> {
 		// Notes:
 		// needs to check to see if that topic already exists
 		// the topic id is assign the snapid since there can only ever be one topic per snap, so there are no conflicts
 		// however, it needs to check that the topic doesn't exist by checking if the snap_id is there for the topic
 		// if the topic id doesn't exist then it should create the topic with the snap_id as the id
 
+		return #ok("");
+	};
+
+	public shared ({}) func delete_feedback_topic(id : ProjectID) : async Result.Result<Text, Text> {
+		// TODO: needs to delete the feedback topic from the project
+
+		return #ok("");
+	};
+
+	public shared ({}) func add_message_to_topic(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
+		//TODO: this should create a new message into the topic from this user
+		return #ok("");
+	};
+
+	public shared ({}) func reject_change_from_topic(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
+		//TODO: this should delete the design_file from the topic
+		return #ok("");
+	};
+
+	public shared ({}) func accept_change_from_topic(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
+		//TODO: this is probably a bit more complicated and I need to think about
+		//TODO: the file will be owned by the user that uploaded it
+		// it will need to change onwers
+		// M-O needs to have access to not only delete files but alse change owners
 		return #ok("");
 	};
 

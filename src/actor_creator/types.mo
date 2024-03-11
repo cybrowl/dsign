@@ -151,6 +151,18 @@ module {
 	};
 
 	// Project Feedback
+	public type ArgsCreateTopic = {
+		project_id : ProjectID;
+		snap_id : SnapID;
+	};
+
+	public type ArgsUpdateTopic = {
+		project_id : ProjectID;
+		snap_id : SnapID;
+		message : ?Message;
+		design_file : ?FileAsset;
+	};
+
 	type Message = {
 		created : Time;
 		content : Text;
@@ -160,7 +172,6 @@ module {
 	public type Topic = {
 		id : Text;
 		snap_name : Text;
-		name : Text;
 		design_file : ?FileAsset;
 		messages : [Message];
 	};
