@@ -51,6 +51,16 @@
 
 		goto(`/snap/edit`);
 	}
+
+	function goto_feedback(event) {
+		const project = get($snap_project_store, 'project', '');
+
+		//TODO: create a new feedback topic
+
+		console.log('feedback', event);
+
+		goto(`/project/${project.name}?id=${project.id}&cid=${project.canister_id}&tab=feedback`);
+	}
 </script>
 
 <svelte:head>
@@ -92,7 +102,12 @@
 		</div>
 
 		<div class="actions_bar_layout">
-			<SnapActionsBar snap={$snap_preview_store.snap} on:clickBack={go_back_history} />
+			<SnapActionsBar
+				snap={$snap_preview_store.snap}
+				is_authenticated={$actor_creator.loggedIn}
+				on:clickBack={go_back_history}
+				on:clickFeedback={goto_feedback}
+			/>
 		</div>
 	{/if}
 </main>

@@ -35,11 +35,12 @@
 	project_actions.deselect_snaps();
 	is_edit_active.set(false);
 
+	const project_id = $page.url.searchParams.get('id');
+	const canister_id = $page.url.searchParams.get('cid');
+	let project_tab = $page.url.searchParams.get('tab') || 'snaps';
+
 	onMount(async () => {
 		await init_auth();
-
-		const project_id = $page.url.searchParams.get('id');
-		const canister_id = $page.url.searchParams.get('cid');
 
 		await auth.creator(canister_id);
 
@@ -137,6 +138,15 @@
 	function download_file(event) {
 		console.log('download_file: ', event);
 	}
+
+	function tab_change(event) {
+		project_tab = event.detail.selected_tab;
+
+		goto(`?id=${project_id}&cid=${canister_id}&tab=${project_tab}`, {
+			replaceState: true,
+			noscroll: true
+		});
+	}
 </script>
 
 <svelte:head>
@@ -177,12 +187,9 @@
 
 		<!-- ProjectsTabs & ProjectEditActionsBar -->
 		<div class="project_tabs_layout">
-			<ProjectTabs
-				selectedTabState={$projectTabsState}
-				on:selectSnapsTab={(e) => projectTabsState.set(e.detail)}
-				on:selectFeedbackTab={(e) => projectTabsState.set(e.detail)}
-			/>
-			{#if $projectTabsState.isSnapsSelected && get($project_store, 'project.is_owner', false)}
+			<ProjectTabs selected_tab={project_tab} on:tabSelected={tab_change} />
+
+			{#if project_tab === 'snaps' && get($project_store, 'project.is_owner', false)}
 				<ProjectEditActionsBar
 					isEditActive={$is_edit_active}
 					on:toggleEditMode={toggle_edit_mode}
@@ -192,7 +199,7 @@
 		</div>
 
 		<div class="snaps_layout">
-			{#if $projectTabsState.isSnapsSelected}
+			{#if project_tab === 'snaps'}
 				<!-- No Snaps Found -->
 				{#if isEmpty($project_store.project.snaps) && $project_store.isFetching === false}
 					{#if get($project_store, 'project.is_owner', false)}
@@ -219,7 +226,7 @@
 		</div>
 
 		<div class="feedback_layout">
-			{#if $projectTabsState.isFeedbackSelected}
+			{#if project_tab === 'feedback'}
 				<Feedback
 					project={$project_store.project}
 					on:accept_change={accept_change}
