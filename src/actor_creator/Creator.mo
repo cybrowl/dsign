@@ -535,11 +535,8 @@ actor class Creator(username_registry : Principal) = this {
 					case (?topic) {
 						switch (topic.design_file) {
 							case (null) {
-								return #err(#DesignFileExists(true));
-							};
-							case (?design_file) {
 								let topic_updated = {
-									topic with design_file = ?design_file;
+									topic with design_file = args.design_file;
 								};
 
 								let topic_index : ?Nat = Arr.findIndex<Topic>(
@@ -557,6 +554,10 @@ actor class Creator(username_registry : Principal) = this {
 								projects.put(project.id, project_updated);
 
 								return #ok(topic_updated);
+
+							};
+							case (?design_file) {
+								return #err(#DesignFileExists(true));
 							};
 						};
 					};
