@@ -10,6 +10,8 @@ import Time "mo:base/Time";
 import Logger "canister:logger";
 
 import Types "./types";
+import UsernameRegistryTypes "../actor_username_registry/types";
+
 import UUID "../libs/uuid";
 import Utils "./utils";
 import Arr "../libs/array";
@@ -42,6 +44,8 @@ actor class Creator(username_registry : Principal) = this {
 	type TopicMessage = Types.TopicMessage;
 	type Username = Types.Username;
 	type UserPrincipal = Types.UserPrincipal;
+
+	type UsernameRegistryActor = UsernameRegistryTypes.UsernameRegistryActor;
 
 	//NOTE: This canister will only hold 100 users, each using 20MB each around 2GB
 	// Once 100 users is reached it will create another instace of itself.
@@ -458,22 +462,27 @@ actor class Creator(username_registry : Principal) = this {
 					func(t) : Bool { t.id == args.snap_id }
 				);
 
-				let topic_index : ?Nat = Arr.findIndex<Topic>(
-					topics,
-					func(t) : Bool { t.id == args.snap_id }
-				);
-
 				switch (topic_found) {
 					case (null) {
 						return #err(#TopicNotFound(true));
 					};
 					case (?topic) {
-						// let username =  await UsernameRegistry.get_username_by_principal(caller);
+						let username_registry_actor : UsernameRegistryActor = actor (Principal.toText(username_registry));
+
+						var username = "";
+						switch (await username_registry_actor.get_username_by_principal(caller)) {
+							case (#err err) {
+								return #err(#UsernameNotFound(true));
+							};
+							case (#ok username_) {
+								username := username_;
+							};
+						};
 
 						let new_message : TopicMessage = {
 							created = Time.now();
 							content = Option.get(args.message, "");
-							username = "username";
+							username = username;
 						};
 
 						let messages_udpated = Arr.append<TopicMessage>(topic.messages, [new_message]);
@@ -481,6 +490,11 @@ actor class Creator(username_registry : Principal) = this {
 						let topic_updated = {
 							topic with messages = messages_udpated;
 						};
+
+						let topic_index : ?Nat = Arr.findIndex<Topic>(
+							topics,
+							func(t) : Bool { t.id == args.snap_id }
+						);
 
 						let topics_updated = Arr.replace<Topic>(topics, Option.get(topic_index, 0), topic_updated);
 

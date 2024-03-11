@@ -180,6 +180,7 @@ module {
 		#ProjectNotFound : Bool;
 		#TopicExists : Bool;
 		#TopicNotFound : Bool;
+		#UsernameNotFound : Bool;
 	};
 
 	public type Feedback = {

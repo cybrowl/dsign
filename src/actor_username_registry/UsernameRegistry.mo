@@ -10,6 +10,7 @@ import Creator "../actor_creator/Creator";
 import Logger "canister:logger";
 
 import Utils "./utils";
+import Types "./types";
 
 import { IS_PROD; ENV } "../env/env";
 
@@ -19,19 +20,9 @@ actor UsernameRegistry = {
 	// Manages Usernames & the CanisterId Associated with that Username
 	// Source of Truth to Principal ownership of Username
 
-	type Username = Text;
-	type UsernameInfo = {
-		canister_id : Text;
-		username : Text;
-	};
-	type ErrUsername = {
-		#CallerAnonymous : Bool;
-		#UsernameInvalid : Bool;
-		#UsernameTaken : Bool;
-		#UserPrincipalNotFound : Bool;
-		#UsernameNotFound : Bool;
-		#ErrorCall : Text;
-	};
+	type Username = Types.Username;
+	type UsernameInfo = Types.UsernameInfo;
+	type ErrUsername = Types.ErrUsername;
 
 	type CreatorActor = CreatorTypes.CreatorActor;
 
