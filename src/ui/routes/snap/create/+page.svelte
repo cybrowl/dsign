@@ -51,7 +51,7 @@
 		snap_actions.add_images_to_snap(imageData);
 	}
 
-	async function remove_image(event) {
+	function remove_image(event) {
 		let image = get(event, 'detail', {});
 
 		snap_actions.remove_image_from_snap(image.id);
@@ -60,11 +60,19 @@
 	function attach_file(event) {
 		let file = get(event, 'detail', {});
 
+		console.log('$snap_upsert_store.snap: ', $snap_upsert_store.snap);
+
 		snap_actions.add_design_file(file);
+
+		console.log('$snap_upsert_store.snap: ', $snap_upsert_store.snap);
 	}
 
-	async function remove_file() {
+	function remove_file() {
+		console.log('$snap_upsert_store.snap: ', $snap_upsert_store.snap);
+
 		snap_actions.remove_design_file();
+
+		console.log('$snap_upsert_store.snap: ', $snap_upsert_store.snap);
 	}
 
 	async function select_cover_image(event) {

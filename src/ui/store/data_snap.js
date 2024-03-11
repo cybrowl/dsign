@@ -69,7 +69,9 @@ export const remove_image_from_snap = function (imageId) {
 };
 
 // Function to add the design file in the snap
-export const add_design_file = function (newDesignFile) {
+export const add_design_file = (newDesignFile) => {
+	console.log('newDesignFile: ', newDesignFile);
+
 	snap_upsert_store.update(({ isFetching, mode, snap }) => {
 		return {
 			isFetching,

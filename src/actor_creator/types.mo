@@ -34,7 +34,7 @@ module {
 		content_size : Nat;
 		content_type : Text;
 		created : Int;
-		filename : Text;
+		name : Text;
 		url : Text;
 	};
 
