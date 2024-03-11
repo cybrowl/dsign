@@ -396,27 +396,32 @@ actor class Creator(username_registry : Principal) = this {
 		return #ok("");
 	};
 
-	public shared ({}) func delete_feedback_topic(id : ProjectID) : async Result.Result<Text, Text> {
-		// TODO: needs to delete the feedback topic from the project
-
-		return #ok("");
-	};
-
 	public shared ({}) func add_message_to_topic(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
 		//TODO: this should create a new message into the topic from this user
 		return #ok("");
 	};
 
-	public shared ({}) func reject_change_from_topic(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
+	public shared ({}) func add_file_to_topic(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
+		//TODO: add design_file to topic
+		return #ok("");
+	};
+
+	public shared ({}) func remove_file_from_topic(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
 		//TODO: this should delete the design_file from the topic
 		return #ok("");
 	};
 
-	public shared ({}) func accept_change_from_topic(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
+	public shared ({}) func update_snap_with_file_change(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
 		//TODO: this is probably a bit more complicated and I need to think about
 		//TODO: the file will be owned by the user that uploaded it
 		// it will need to change onwers
 		// M-O needs to have access to not only delete files but alse change owners
+		return #ok("");
+	};
+
+	public shared ({}) func delete_feedback_topic(id : ProjectID) : async Result.Result<Text, Text> {
+		// TODO: needs to delete the feedback topic from the project
+
 		return #ok("");
 	};
 
