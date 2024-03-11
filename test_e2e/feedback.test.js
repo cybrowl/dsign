@@ -247,93 +247,66 @@ describe('Feedback', () => {
 		expect(topic.messages[1].username).toBe('jt');
 	});
 
-	test.skip('Creator[jt].remove_file_from_topic(): with valid owner of topic => #ok - Bool', async () => {
-		const { ok: topic } = await creator_actor_jt.remove_file_from_topic({
+	test('Creator[jt].remove_file_from_topic(): with valid owner of topic => #ok - Bool', async () => {
+		const { ok: deleted_topic } = await creator_actor_jt.remove_file_from_topic({
 			project_id: jt_project_a.id,
 			snap_id: jt_snap_a.id,
 			message: [], // No message being added
 			design_file: [] // No file being added
 		});
 
-		expect(topic).toBeTruthy();
+		expect(deleted_topic).toBeTruthy();
 	});
 
-	test.skip('Update snap with file change', async () => {
-		const response = await creator_actor_jt.update_snap_with_file_change({
+	test('Creator[jt].get_project(): verify file was deleted', async () => {
+		const { ok: project } = await creator_actor_jt.get_project(jt_project_a.id);
+
+		expect(project).toBeTruthy();
+		expect(project.id).toBe(jt_project_a.id);
+		expect(project.name).toBe('Project One');
+		expect(project.description).toEqual(['first project']);
+		expect(project.snaps).toBeInstanceOf(Array);
+
+		expect(project.feedback).toBeTruthy();
+		expect(project.feedback.topics).toBeInstanceOf(Array);
+
+		project.feedback.topics.forEach((topicArray) => {
+			topicArray.forEach((topic) => {
+				expect(topic.design_file).toBeInstanceOf(Array);
+				expect(topic.design_file.length).toBe(0);
+			});
+		});
+	});
+
+	test('Creator[jt].delete_feedback_topic(): with valid id => #ok - Bool', async () => {
+		const { ok: deleted_topic } = await creator_actor_jt.delete_feedback_topic({
 			project_id: jt_project_a.id,
-			snap_id: jt_snap_a.id
+			snap_id: jt_snap_a.id,
+			message: [], // No message being added
+			design_file: [] // No file being added
 		});
 
-		expect(response.ok).toBeTruthy();
+		expect(deleted_topic).toBeTruthy();
 	});
 
-	test.skip('Creator[jt].update_snap(): with file => #ok - SnapPublic', async () => {
-		const fileObject = createFileObject(path.join(__dirname, 'figma_files', '5mb_components.fig'));
-		const { ok: file } = await file_storage_actor_lib.jt.store(fileObject.content, {
-			filename: fileObject.name,
-			content_type: fileObject.type
-		});
+	test('Creator[jt].get_project(): verify a specific topic was deleted', async () => {
+		const { ok: project } = await creator_actor_jt.get_project(jt_project_a.id);
 
-		const { ok: snap } = await creator_actor_jt.update_snap({
-			id: jt_snap_a.id,
-			name: [],
-			design_file: [file],
-			image_cover_location: [],
-			tags: []
-		});
+		expect(project).toBeTruthy();
+		expect(project.id).toBe(jt_project_a.id);
+		expect(project.name).toBe('Project One');
+		expect(project.description).toEqual(['first project']);
+		expect(project.snaps).toBeInstanceOf(Array);
 
-		if (snap) {
-			expect(snap.name).toBe('First Snap');
-			expect(snap.tags).toEqual(['ocean']);
-			expect(snap.images).toHaveLength(2);
-			expect(snap.design_file).toHaveLength(1);
+		expect(project.feedback).toBeTruthy();
+		expect(project.feedback.topics).toBeInstanceOf(Array);
 
-			// Assertions for the uploaded image and HTTP response
-			const uploaded_file = snap.design_file[0];
-			const img_http_response = await requestResource(uploaded_file.url);
+		const deletedTopicId = jt_snap_a.id;
 
-			expect(img_http_response.statusCode).toBe(200);
-			expect(uploaded_file.filename).toBe('5mb_components.fig');
-			expect(uploaded_file.content_type).toBe('application/octet-stream');
-			expect(uploaded_file.content_size).toBe(4473449n);
-		}
-	});
+		const isDeletedTopicPresent = project.feedback.topics.some((topicArray) =>
+			topicArray.some((topic) => topic.id === deletedTopicId)
+		);
 
-	test.skip('Creator[jt].delete_snap_design_file(): with invalid SnapID => #err - SnapNotFound', async () => {
-		const { err: error } =
-			await creator_actor_jt.delete_snap_design_file('337EF5E0EF5CEAB33510XXX');
-
-		expect(error).toEqual({ SnapNotFound: true });
-	});
-
-	test.skip('Creator[wilson].delete_snap_design_file(): with invalid caller => #err - NotOwner', async () => {
-		const { err: error } = await creator_actor_wilson.delete_snap_design_file(jt_snap_a.id);
-
-		expect(error).toEqual({ NotOwner: true });
-	});
-
-	test.skip('Creator[jt].delete_snap_design_file(): with valid args => #ok - Bool', async () => {
-		const { ok: deleted_file } = await creator_actor_jt.delete_snap_design_file(jt_snap_a.id);
-
-		expect(deleted_file).toBe(true);
-
-		const { ok: snap } = await creator_actor_jt.get_snap(jt_snap_a.id);
-		if (snap) {
-			expect(snap.design_file).toHaveLength(0);
-		}
-	});
-
-	test.skip('Creator[jt].delete_snaps(): with valid args => #ok - Bool', async () => {
-		const { ok: deleted_snap } = await creator_actor_jt.delete_snaps([jt_snap_a.id]);
-		expect(deleted_snap).toBe(true);
-
-		const { err: error } = await creator_actor_jt.get_snap(jt_snap_a.id);
-		expect(error).toEqual({ SnapNotFound: true });
-	});
-
-	test.skip('Creator[jt].get_project(): with valid args => #ok - ProjectPublic', async () => {
-		const { ok: project } = await creator_actor_jt.get_project(jt_snap_a.project_id);
-
-		expect(project.snaps).toHaveLength(0);
+		expect(isDeletedTopicPresent).toBeFalsy();
 	});
 });
