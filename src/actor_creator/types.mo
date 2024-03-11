@@ -159,11 +159,11 @@ module {
 	public type ArgsUpdateTopic = {
 		project_id : ProjectID;
 		snap_id : SnapID;
-		message : ?Message;
+		message : ?Text;
 		design_file : ?FileAsset;
 	};
 
-	type Message = {
+	public type TopicMessage = {
 		created : Time;
 		content : Text;
 		username : Text;
@@ -173,12 +173,13 @@ module {
 		id : Text;
 		snap_name : Text;
 		design_file : ?FileAsset;
-		messages : [Message];
+		messages : [TopicMessage];
 	};
 
 	public type ErrTopic = {
 		#ProjectNotFound : Bool;
 		#TopicExists : Bool;
+		#TopicNotFound : Bool;
 	};
 
 	public type Feedback = {

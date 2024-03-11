@@ -23,4 +23,24 @@ module {
 			};
 		};
 	};
+
+	public func replace<X>(array : [X], index : Nat, new_element : X) : [X] {
+		var result : [var X] = Array.thaw(array);
+
+		result[index] := new_element;
+
+		return Array.freeze(result);
+	};
+
+	public func findIndex<X>(array : [X], predicate : X -> Bool) : ?Nat {
+		let size = Array.size(array);
+
+		for (index in Array.keys(array)) {
+			if (predicate(array[index])) {
+				return ?index;
+			};
+		};
+
+		return null;
+	};
 };

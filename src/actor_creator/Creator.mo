@@ -39,6 +39,7 @@ actor class Creator(username_registry : Principal) = this {
 	type SnapID = Types.SnapID;
 	type SnapPublic = Types.SnapPublic;
 	type Topic = Types.Topic;
+	type TopicMessage = Types.TopicMessage;
 	type Username = Types.Username;
 	type UserPrincipal = Types.UserPrincipal;
 
@@ -389,10 +390,6 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Create Feedback Topic
-	// TODO: skip until I fix everthing we have in UI
-	// NOTE: this is called from `snap_view`, and redirects them to `feedback` with topic selected
-	// Inside the Creator actor class
-
 	public shared func create_feedback_topic(args : ArgsCreateTopic) : async Result.Result<Topic, ErrTopic> {
 		switch (projects.get(args.project_id)) {
 			case (null) {
@@ -437,16 +434,69 @@ actor class Creator(username_registry : Principal) = this {
 					feedback = feedback_udapted;
 				};
 
+				projects.put(project.id, project_updated);
+
 				return #ok(topic);
 			};
 		};
 	};
 
-	public shared ({}) func add_message_to_topic(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
-		//TODO: this should create a new message into the topic from this user
-		return #ok("");
+	// Add Message to Topic
+	public shared ({ caller }) func add_message_to_topic(args : ArgsUpdateTopic) : async Result.Result<Topic, ErrTopic> {
+		switch (projects.get(args.project_id)) {
+			case (null) {
+				return #err(#ProjectNotFound(true));
+			};
+			case (?project) {
+				let topics : [Topic] = switch (project.feedback.topics) {
+					case (null) { [] };
+					case (?topics) { topics };
+				};
+
+				let topic_found : ?Topic = Array.find<Topic>(
+					topics,
+					func(t) : Bool { t.id == args.snap_id }
+				);
+
+				let topic_index : ?Nat = Arr.findIndex<Topic>(
+					topics,
+					func(t) : Bool { t.id == args.snap_id }
+				);
+
+				switch (topic_found) {
+					case (null) {
+						return #err(#TopicNotFound(true));
+					};
+					case (?topic) {
+						// let username =  await UsernameRegistry.get_username_by_principal(caller);
+
+						let new_message : TopicMessage = {
+							created = Time.now();
+							content = Option.get(args.message, "");
+							username = "username";
+						};
+
+						let messages_udpated = Arr.append<TopicMessage>(topic.messages, [new_message]);
+
+						let topic_updated = {
+							topic with messages = messages_udpated;
+						};
+
+						let topics_updated = Arr.replace<Topic>(topics, Option.get(topic_index, 0), topic_updated);
+
+						let feedback_updated : Feedback = { topics = ?topics_updated };
+						let project_updated : Project = { project with feedback = feedback_updated };
+
+						projects.put(project.id, project_updated);
+
+						return #ok(topic_updated);
+					};
+				};
+			};
+		};
 	};
 
+	// Add File to Topic
 	public shared ({}) func add_file_to_topic(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
 		//TODO: add design_file to topic
 		return #ok("");

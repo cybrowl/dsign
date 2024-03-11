@@ -70,6 +70,18 @@ actor UsernameRegistry = {
 		};
 	};
 
+	// Get Username
+	public query func get_username_by_principal(creator : Principal) : async Result.Result<Username, ErrUsername> {
+		switch (usernames.get(creator)) {
+			case (?username) {
+				#ok(username);
+			};
+			case (_) {
+				#err(#UserPrincipalNotFound(true));
+			};
+		};
+	};
+
 	// Get Info
 	public query ({ caller }) func get_info() : async Result.Result<UsernameInfo, ErrUsername> {
 		switch (usernames.get(caller)) {
