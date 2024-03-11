@@ -121,7 +121,7 @@ module {
 		username : Text;
 		owner : UserPrincipal;
 		snaps : [SnapID];
-		feedback : ?Feedback;
+		feedback : Feedback;
 		metrics : Metrics;
 	};
 
@@ -135,7 +135,7 @@ module {
 		owner : ?UserPrincipal;
 		is_owner : Bool;
 		snaps : [SnapPublic];
-		feedback : ?Feedback;
+		feedback : Feedback;
 		metrics : Metrics;
 	};
 
@@ -178,10 +178,11 @@ module {
 
 	public type ErrTopic = {
 		#ProjectNotFound : Bool;
+		#TopicExists : Bool;
 	};
 
 	public type Feedback = {
-		topics : [Topic];
+		topics : ?[Topic];
 	};
 
 	// Snap

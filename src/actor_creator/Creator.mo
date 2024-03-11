@@ -269,7 +269,9 @@ actor class Creator(username_registry : Principal) = this {
 					username = profile.username;
 					owner = caller;
 					snaps = [];
-					feedback = null;
+					feedback = {
+						topics = null;
+					};
 					metrics = {
 						likes = 0;
 						views = 0;
@@ -392,25 +394,29 @@ actor class Creator(username_registry : Principal) = this {
 	// Inside the Creator actor class
 
 	public shared func create_feedback_topic(args : ArgsCreateTopic) : async Result.Result<Topic, ErrTopic> {
-
 		switch (projects.get(args.project_id)) {
 			case (null) {
 				return #err(#ProjectNotFound(true));
 			};
 			case (?project) {
 
-				let feedback : Feedback = switch (project.feedback) {
-					case (null) { { topics = [] } };
-					case (?feedback) { feedback };
+				let topics : [Topic] = switch (project.feedback.topics) {
+					case (null) { [] };
+					case (?topics) { topics };
 				};
 
-				let topic_exists = Array.find<Topic>(
-					feedback.topics,
-					func(t) : Bool {
-						t.id == args.snap_id;
+				let topic_exists = Arr.exists<Topic>(
+					topics,
+					func(topic) : Bool {
+						topic.id == args.snap_id;
 					}
 				);
 
+				if (topic_exists) {
+					return #err(#TopicExists(true));
+				};
+
+				// Create A Topic
 				let topic : Topic = {
 					id = args.snap_id;
 					snap_name = "";
@@ -420,6 +426,15 @@ actor class Creator(username_registry : Principal) = this {
 						content = "Give feedback, ask a question, or just leave a note.";
 						username = "Jinx-Bot";
 					}];
+				};
+
+				let feedback_udapted : Feedback = {
+					topics = ?[topic];
+				};
+
+				let project_updated : Project = {
+					project with
+					feedback = feedback_udapted;
 				};
 
 				return #ok(topic);

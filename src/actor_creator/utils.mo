@@ -41,6 +41,9 @@ module {
 			project with
 			is_owner = Principal.equal(caller, project.owner);
 			owner = null;
+			feedback = {
+				topics = null;
+			};
 			snaps = snaps_public;
 		};
 
@@ -80,6 +83,9 @@ module {
 						let project_public : ProjectPublic = {
 							project with is_owner = Principal.equal(caller, project.owner);
 							owner = null;
+							feedback = {
+								topics = null;
+							};
 							snaps = snaps_public;
 						};
 
