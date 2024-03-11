@@ -418,10 +418,15 @@ actor class Creator(username_registry : Principal) = this {
 					return #err(#TopicExists(true));
 				};
 
+				let snap_name : Text = switch (snaps.get(args.snap_id)) {
+					case (null) { "" };
+					case (?snap) { snap.name };
+				};
+
 				// Create A Topic
 				let topic : Topic = {
 					id = args.snap_id;
-					snap_name = "";
+					snap_name = snap_name;
 					design_file = null;
 					messages = [{
 						created = Time.now();

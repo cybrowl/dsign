@@ -164,8 +164,9 @@ describe('Feedback', () => {
 		expect(response.ok).toBeTruthy();
 
 		const topic = response.ok;
+
 		expect(topic).toHaveProperty('id', jt_snap_a.id);
-		expect(topic).toHaveProperty('snap_name', '');
+		expect(topic).toHaveProperty('snap_name', 'First Snap');
 		expect(topic).toHaveProperty('design_file', []);
 		expect(topic.messages).toHaveLength(1);
 		expect(topic.messages[0]).toMatchObject({
@@ -195,30 +196,66 @@ describe('Feedback', () => {
 		);
 	});
 
-	test.skip('Creator[jt].add_file_to_topic(): with valid file => #ok - Topic', async () => {
-		//TODO: create the file
+	test('Creator[jt].get_project(): with valid id => #ok - ProjectPublic', async () => {
+		const { ok: project } = await creator_actor_jt.get_project(jt_project_a.id);
 
-		const fileAsset = {};
+		expect(project).toBeTruthy();
+		expect(project.id).toBe(jt_project_a.id);
+		expect(project.name).toBe('Project One');
+		expect(project.description).toEqual(['first project']);
+		expect(project.snaps).toBeInstanceOf(Array);
 
-		const response = await creator_actor_jt.add_file_to_topic({
+		expect(project.feedback).toBeTruthy();
+		expect(project.feedback.topics).toBeInstanceOf(Array);
+		expect(project.feedback.topics.length).toBeGreaterThan(0);
+
+		expect(project.feedback.topics[0][0]).toMatchObject({
+			snap_name: expect.any(String)
+		});
+	});
+
+	test('Creator[jt].add_file_to_topic(): with valid file => #ok - Topic', async () => {
+		const fileObject = createFileObject(path.join(__dirname, 'figma_files', '5mb_components.fig'));
+		const { ok: file } = await file_storage_actor_lib.jt.store(fileObject.content, {
+			filename: fileObject.name,
+			content_type: fileObject.type
+		});
+
+		const { ok: topic } = await creator_actor_jt.add_file_to_topic({
 			project_id: jt_project_a.id,
 			snap_id: jt_snap_a.id,
 			message: [],
-			design_file: [fileAsset]
+			design_file: [file]
 		});
 
-		expect(response.ok).toBeTruthy();
+		expect(topic).toBeTruthy();
+
+		expect(topic.design_file).toHaveLength(1);
+		const designFile = topic.design_file[0];
+
+		expect(typeof designFile.created).toBe('bigint');
+		expect(typeof designFile.chunks_size).toBe('bigint');
+		expect(typeof designFile.content_size).toBe('bigint');
+		expect(designFile.content_type).toBe('application/octet-stream');
+		expect(designFile.filename).toBe('5mb_components.fig');
+		expect(designFile.content_encoding).toBeInstanceOf(Object);
+
+		expect(topic.messages).toHaveLength(2);
+		expect(topic.messages[0].content).toBe('Give feedback, ask a question, or just leave a note.');
+		expect(topic.messages[0].username).toBe('Jinx-Bot');
+		expect(topic.messages[1].content).toBe('Great work on this design!');
+		expect(topic.messages[1].username).toBe('jt');
 	});
 
 	test.skip('Creator[jt].remove_file_from_topic(): with valid owner of topic => #ok - Bool', async () => {
-		const response = await creator_actor_jt.remove_file_from_topic({
+		const { ok: topic } = await creator_actor_jt.remove_file_from_topic({
 			project_id: jt_project_a.id,
 			snap_id: jt_snap_a.id,
 			message: [], // No message being added
 			design_file: [] // No file being added
 		});
 
-		expect(response.ok).toBeTruthy();
+		expect(topic).toBeTruthy();
 	});
 
 	test.skip('Update snap with file change', async () => {
