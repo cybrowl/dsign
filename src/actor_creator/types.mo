@@ -181,6 +181,8 @@ module {
 		#TopicExists : Bool;
 		#TopicNotFound : Bool;
 		#UsernameNotFound : Bool;
+		#DesignFileExists : Bool;
+		#NotOwner : Bool;
 	};
 
 	public type Feedback = {

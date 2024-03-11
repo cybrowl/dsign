@@ -393,6 +393,7 @@ actor class Creator(username_registry : Principal) = this {
 		};
 	};
 
+	// ------------------------- Projects / Feedback -------------------------
 	// Create Feedback Topic
 	public shared func create_feedback_topic(args : ArgsCreateTopic) : async Result.Result<Topic, ErrTopic> {
 		switch (projects.get(args.project_id)) {
@@ -511,16 +512,118 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Add File to Topic
-	public shared ({}) func add_file_to_topic(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
-		//TODO: add design_file to topic
-		return #ok("");
+	public shared func add_file_to_topic(args : ArgsUpdateTopic) : async Result.Result<Topic, ErrTopic> {
+		switch (projects.get(args.project_id)) {
+			case (null) {
+				return #err(#ProjectNotFound(true));
+			};
+			case (?project) {
+				let topics : [Topic] = switch (project.feedback.topics) {
+					case (null) { [] };
+					case (?topics) { topics };
+				};
+
+				let topic_found : ?Topic = Array.find<Topic>(
+					topics,
+					func(t) : Bool { t.id == args.snap_id }
+				);
+
+				switch (topic_found) {
+					case (null) {
+						return #err(#TopicNotFound(true));
+					};
+					case (?topic) {
+						switch (topic.design_file) {
+							case (null) {
+								return #err(#DesignFileExists(true));
+							};
+							case (?design_file) {
+								let topic_updated = {
+									topic with design_file = ?design_file;
+								};
+
+								let topic_index : ?Nat = Arr.findIndex<Topic>(
+									topics,
+									func(t) : Bool { t.id == args.snap_id }
+								);
+
+								let topics_updated = Arr.replace<Topic>(topics, Option.get(topic_index, 0), topic_updated);
+
+								let feedback_updated : Feedback = { topics = ?topics_updated };
+								let project_updated : Project = {
+									project with feedback = feedback_updated
+								};
+
+								projects.put(project.id, project_updated);
+
+								return #ok(topic_updated);
+							};
+						};
+					};
+				};
+			};
+		};
 	};
 
-	public shared ({}) func remove_file_from_topic(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
-		//TODO: this should delete the design_file from the topic
-		return #ok("");
+	// Remove File from Topic [Owner]
+	public shared ({ caller }) func remove_file_from_topic(args : ArgsUpdateTopic) : async Result.Result<Topic, ErrTopic> {
+		switch (projects.get(args.project_id)) {
+			case (null) {
+				return #err(#ProjectNotFound(true));
+			};
+			case (?project) {
+				if (Principal.notEqual(project.owner, caller)) {
+					return #err(#NotOwner(true));
+				};
+
+				let topics : [Topic] = switch (project.feedback.topics) {
+					case (null) { [] };
+					case (?topics) { topics };
+				};
+
+				let topic_found : ?Topic = Array.find<Topic>(
+					topics,
+					func(t) : Bool { t.id == args.snap_id }
+				);
+
+				switch (topic_found) {
+					case (null) {
+						return #err(#TopicNotFound(true));
+					};
+					case (?topic) {
+						switch (topic.design_file) {
+							case (null) {
+								return #err(#DesignFileExists(true));
+							};
+							case (?design_file) {
+								let topic_updated = {
+									topic with design_file = null;
+								};
+
+								let topic_index : ?Nat = Arr.findIndex<Topic>(
+									topics,
+									func(t) : Bool { t.id == args.snap_id }
+								);
+
+								let topics_updated = Arr.replace<Topic>(topics, Option.get(topic_index, 0), topic_updated);
+
+								let feedback_updated : Feedback = { topics = ?topics_updated };
+								let project_updated : Project = {
+									project with feedback = feedback_updated
+								};
+
+								projects.put(project.id, project_updated);
+
+								return #ok(topic_updated);
+							};
+						};
+					};
+				};
+			};
+		};
 	};
 
+	// Update Snap with new File Change [Owner]
 	public shared ({}) func update_snap_with_file_change(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
 		//TODO: this is probably a bit more complicated and I need to think about
 		//TODO: the file will be owned by the user that uploaded it
@@ -529,6 +632,7 @@ actor class Creator(username_registry : Principal) = this {
 		return #ok("");
 	};
 
+	// Delete Feedback Topic [Owner]
 	public shared ({}) func delete_feedback_topic(id : ProjectID) : async Result.Result<Text, Text> {
 		// TODO: needs to delete the feedback topic from the project
 
