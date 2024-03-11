@@ -176,6 +176,10 @@ module {
 		messages : [Message];
 	};
 
+	public type ErrTopic = {
+		#ProjectNotFound : Bool;
+	};
+
 	public type Feedback = {
 		topics : [Topic];
 	};

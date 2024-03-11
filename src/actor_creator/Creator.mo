@@ -25,6 +25,8 @@ actor class Creator(username_registry : Principal) = this {
 	type ErrProfile = Types.ErrProfile;
 	type ErrProject = Types.ErrProject;
 	type ErrSnap = Types.ErrSnap;
+	type ErrTopic = Types.ErrTopic;
+	type Feedback = Types.Feedback;
 	type FavoriteID = Types.FavoriteID;
 	type FileAsset = Types.FileAsset;
 	type FileAssetID = Types.FileAssetID;
@@ -36,6 +38,7 @@ actor class Creator(username_registry : Principal) = this {
 	type Snap = Types.Snap;
 	type SnapID = Types.SnapID;
 	type SnapPublic = Types.SnapPublic;
+	type Topic = Types.Topic;
 	type Username = Types.Username;
 	type UserPrincipal = Types.UserPrincipal;
 
@@ -386,14 +389,42 @@ actor class Creator(username_registry : Principal) = this {
 	// Create Feedback Topic
 	// TODO: skip until I fix everthing we have in UI
 	// NOTE: this is called from `snap_view`, and redirects them to `feedback` with topic selected
-	public shared ({}) func create_feedback_topic(args : ArgsCreateTopic) : async Result.Result<Text, Text> {
-		// Notes:
-		// needs to check to see if that topic already exists
-		// the topic id is assign the snapid since there can only ever be one topic per snap, so there are no conflicts
-		// however, it needs to check that the topic doesn't exist by checking if the snap_id is there for the topic
-		// if the topic id doesn't exist then it should create the topic with the snap_id as the id
+	// Inside the Creator actor class
 
-		return #ok("");
+	public shared func create_feedback_topic(args : ArgsCreateTopic) : async Result.Result<Topic, ErrTopic> {
+
+		switch (projects.get(args.project_id)) {
+			case (null) {
+				return #err(#ProjectNotFound(true));
+			};
+			case (?project) {
+
+				let feedback : Feedback = switch (project.feedback) {
+					case (null) { { topics = [] } };
+					case (?feedback) { feedback };
+				};
+
+				let topic_exists = Array.find<Topic>(
+					feedback.topics,
+					func(t) : Bool {
+						t.id == args.snap_id;
+					}
+				);
+
+				let topic : Topic = {
+					id = args.snap_id;
+					snap_name = "";
+					design_file = null;
+					messages = [{
+						created = Time.now();
+						content = "Give feedback, ask a question, or just leave a note.";
+						username = "Jinx-Bot";
+					}];
+				};
+
+				return #ok(topic);
+			};
+		};
 	};
 
 	public shared ({}) func add_message_to_topic(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
