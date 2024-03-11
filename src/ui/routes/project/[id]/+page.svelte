@@ -7,14 +7,14 @@
 	import Login from '$components_ref/Login.svelte';
 	import {
 		CardEmpty,
-		ComingSoon,
-		SpinnerCircle,
+		Feedback,
 		PageNavigation,
 		ProjectEditActionsBar,
 		ProjectInfo,
 		ProjectTabs,
 		SnapCard,
-		SnapCardCreate
+		SnapCardCreate,
+		SpinnerCircle
 	} from 'dsign-components';
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
@@ -108,6 +108,35 @@
 
 		//TODO: add project to favs
 	}
+
+	// ------------------------- Feedback -------------------------
+	function accept_change(event) {
+		console.log('accept_change: ', event.detail);
+	}
+
+	function reject_change(event) {
+		console.log('reject_change: ', event.detail);
+	}
+
+	function remove_topic(event) {
+		console.log('remove_topic: ', event.detail);
+	}
+
+	function select_topic(event) {
+		console.log('select_topic: ', event.detail);
+	}
+
+	function send_message(event) {
+		console.log('send_message: ', event.detail);
+	}
+
+	function select_file(event) {
+		console.log('select_file: ', event.detail);
+	}
+
+	function download_file(event) {
+		console.log('download_file: ', event);
+	}
 </script>
 
 <svelte:head>
@@ -162,7 +191,7 @@
 			{/if}
 		</div>
 
-		<div class="content_layout">
+		<div class="snaps_layout">
 			{#if $projectTabsState.isSnapsSelected}
 				<!-- No Snaps Found -->
 				{#if isEmpty($project_store.project.snaps) && $project_store.isFetching === false}
@@ -187,17 +216,20 @@
 					{/if}
 				{/if}
 			{/if}
+		</div>
 
+		<div class="feedback_layout">
 			{#if $projectTabsState.isFeedbackSelected}
-				<div class="coming_soon_layout">
-					<ComingSoon />
-				</div>
-			{/if}
-
-			{#if $projectTabsState.isChangesSelected}
-				<div class="coming_soon_layout">
-					<ComingSoon />
-				</div>
+				<Feedback
+					project={$project_store.project}
+					on:accept_change={accept_change}
+					on:download_file={download_file}
+					on:reject_change={reject_change}
+					on:remove_topic={remove_topic}
+					on:select_file={select_file}
+					on:select_topic={select_topic}
+					on:send_message={send_message}
+				/>
 			{/if}
 		</div>
 	{/if}
@@ -228,11 +260,14 @@
 	.project_tabs_layout {
 		@apply row-start-3 row-end-auto col-start-1 col-end-13 items-center justify-between mt-12 mb-6;
 	}
-	.content_layout {
+	.snaps_layout {
 		@apply row-start-4 row-end-auto hidden lg:grid  grid-cols-4 col-start-1 col-end-13 gap-x-6 gap-y-12 mb-16;
 	}
-	.coming_soon_layout {
+	/* .coming_soon_layout {
 		@apply row-start-4 row-end-auto grid col-start-3 col-end-13;
+	} */
+	.feedback_layout {
+		@apply row-start-4 row-end-auto hidden lg:grid grid-cols-12 col-start-1 col-end-13 gap-x-6 gap-y-12 mb-16;
 	}
 	.not_supported {
 		display: grid;

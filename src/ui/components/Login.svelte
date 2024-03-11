@@ -64,7 +64,7 @@
 	function login() {
 		const identityProviderUrl = isProd
 			? 'https://identity.ic0.app/#authorize'
-			: 'http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:8080/';
+			: 'http://bd3sg-teaaa-aaaaa-qaaba-cai.localhost:8080/';
 		$auth_client.login({
 			identityProvider: identityProviderUrl,
 			maxTimeToLive: BigInt(30 * 24 * 60 * 60 * 1000 * 1000 * 1000 * 1000),

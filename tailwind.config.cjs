@@ -23,11 +23,14 @@ module.exports = {
 				'cloud-purple': '#EBE9FF',
 				'primary-purple': '#7A71DE',
 				'foggy-purple': '#A099F4',
-				'light-purple': '#6259C8',
 				'bubble-purple': '#B6AFFC',
 				'lilalic-purple': '#968CFF',
+				'spring-leaf-green': '#5BC859',
 				'error-red': '#FC3030',
-				'mute-red': '#F0627C'
+				'reject-red': '#FFA1B2',
+				'mute-red': '#F0627C',
+				'warning-yellow': '#FFF0A1',
+				'ghost-white': '#FEFEFF'
 			},
 			boxShadow: {
 				gray: '0 10px 15px -3px rgba(58, 58, 80, 0.5), 0 4px 6px -2px rgba(58, 58, 80, 0.3)'

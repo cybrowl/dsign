@@ -159,7 +159,6 @@ module {
 
 	public type Topic = {
 		id : Text;
-		snap_ref : SnapRef;
 		snap_name : Text;
 		name : Text;
 		design_file : ?FileAsset;
@@ -219,11 +218,6 @@ module {
 		image_cover_location : Nat8;
 		images : [FileAsset];
 		metrics : Metrics;
-	};
-
-	public type SnapRef = {
-		id : SnapID;
-		canister_id : CanisterID;
 	};
 
 	public type ErrSnap = {

@@ -383,7 +383,14 @@ actor class Creator(username_registry : Principal) = this {
 
 	// Create Feedback Topic
 	// TODO: skip until I fix everthing we have in UI
-	public shared ({}) func create_feedback_topic() : async Result.Result<Text, Text> {
+	// NOTE: this is called from `snap_view`, and redirects them to `feedback` with topic selected
+	public shared ({}) func create_feedback_topic(id : SnapID) : async Result.Result<Text, Text> {
+		// Notes:
+		// needs to check to see if that topic already exists
+		// the topic id is assign the snapid since there can only ever be one topic per snap, so there are no conflicts
+		// however, it needs to check that the topic doesn't exist by checking if the snap_id is there for the topic
+		// if the topic id doesn't exist then it should create the topic with the snap_id as the id
+
 		return #ok("");
 	};
 
