@@ -108,15 +108,20 @@
 		}
 
 		// Add image upload promises to the array
-		images.forEach((image) => {
-			const imageUploadPromise = file_storage
-				.store(image.uint8Array, {
-					filename: image.fileName,
-					content_type: image.mimeType
-				})
-				.then((uploadResult) => ({ ...uploadResult, isDesignFile: false }));
-			uploadPromises.push(imageUploadPromise);
-		});
+		images
+			.filter((image) => image.status !== 'removed')
+			.forEach((image) => {
+				console.log('image: ', image);
+
+				const imageUploadPromise = file_storage
+					.store(image.uint8Array, {
+						filename: image.fileName,
+						content_type: image.mimeType
+					})
+					.then((uploadResult) => ({ ...uploadResult, isDesignFile: false }));
+
+				uploadPromises.push(imageUploadPromise);
+			});
 
 		// Perform all uploads in parallel
 		const uploadResults = await Promise.all(uploadPromises);
