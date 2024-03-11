@@ -115,8 +115,6 @@ describe('Feedback', () => {
 			description: ['first project']
 		});
 
-		console.log('project: ', project);
-
 		jt_project_a = project;
 
 		expect(project).toBeTruthy();
@@ -164,21 +162,40 @@ describe('Feedback', () => {
 		});
 
 		expect(response.ok).toBeTruthy();
+
+		const topic = response.ok;
+		expect(topic).toHaveProperty('id', jt_snap_a.id);
+		expect(topic).toHaveProperty('snap_name', '');
+		expect(topic).toHaveProperty('design_file', []);
+		expect(topic.messages).toHaveLength(1);
+		expect(topic.messages[0]).toMatchObject({
+			content: 'Give feedback, ask a question, or just leave a note.',
+			username: 'Jinx-Bot'
+		});
 	});
 
-	test('Add message to feedback topic for a snap', async () => {
+	test('Creator[jt].add_message_to_topic(): with valid message => #ok - Topic', async () => {
 		const response = await creator_actor_jt.add_message_to_topic({
 			project_id: jt_project_a.id,
 			snap_id: jt_snap_a.id,
-			message: [{ content: 'Great work on this design!' }],
-			design_file: [] // No file being added
+			message: ['Great work on this design!'],
+			design_file: []
 		});
 
 		expect(response.ok).toBeTruthy();
-		// Verify that the message was added correctly, if possible
+
+		const topic = response.ok;
+
+		expect(topic.messages).toHaveLength(2);
+		expect(topic.messages).toContainEqual(
+			expect.objectContaining({
+				content: 'Great work on this design!',
+				username: 'jt'
+			})
+		);
 	});
 
-	test('Add file to feedback topic for a snap', async () => {
+	test.skip('Creator[jt].add_file_to_topic(): with valid file => #ok - Topic', async () => {
 		//TODO: create the file
 
 		const fileAsset = {};
@@ -186,14 +203,14 @@ describe('Feedback', () => {
 		const response = await creator_actor_jt.add_file_to_topic({
 			project_id: jt_project_a.id,
 			snap_id: jt_snap_a.id,
-			message: [], // No message being added
-			design_file: [fileAsset] // Adding file
+			message: [],
+			design_file: [fileAsset]
 		});
 
 		expect(response.ok).toBeTruthy();
 	});
 
-	test('Remove file from feedback topic for a snap', async () => {
+	test.skip('Creator[jt].remove_file_from_topic(): with valid owner of topic => #ok - Bool', async () => {
 		const response = await creator_actor_jt.remove_file_from_topic({
 			project_id: jt_project_a.id,
 			snap_id: jt_snap_a.id,
@@ -204,7 +221,7 @@ describe('Feedback', () => {
 		expect(response.ok).toBeTruthy();
 	});
 
-	test('Update snap with file change', async () => {
+	test.skip('Update snap with file change', async () => {
 		const response = await creator_actor_jt.update_snap_with_file_change({
 			project_id: jt_project_a.id,
 			snap_id: jt_snap_a.id

@@ -624,15 +624,6 @@ actor class Creator(username_registry : Principal) = this {
 		};
 	};
 
-	// Update Snap with new File Change [Owner]
-	public shared ({}) func update_snap_with_file_change(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
-		//TODO: this is probably a bit more complicated and I need to think about
-		//TODO: the file will be owned by the user that uploaded it
-		// it will need to change onwers
-		// M-O needs to have access to not only delete files but alse change owners
-		return #ok("");
-	};
-
 	// Delete Feedback Topic [Owner]
 	public shared ({ caller }) func delete_feedback_topic(args : ArgsUpdateTopic) : async Result.Result<Bool, ErrTopic> {
 		switch (projects.get(args.project_id)) {
@@ -678,6 +669,15 @@ actor class Creator(username_registry : Principal) = this {
 				};
 			};
 		};
+	};
+
+	// Update Snap with new File Change [Owner]
+	public shared ({}) func update_snap_with_file_change(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
+		//TODO: this is probably a bit more complicated and I need to think about
+		//TODO: the file will be owned by the user that uploaded it
+		// it will need to change onwers
+		// M-O needs to have access to not only delete files but alse change owners
+		return #ok("");
 	};
 
 	// ------------------------- Snaps -------------------------
