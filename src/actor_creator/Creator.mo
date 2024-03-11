@@ -634,10 +634,50 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	// Delete Feedback Topic [Owner]
-	public shared ({}) func delete_feedback_topic(id : ProjectID) : async Result.Result<Text, Text> {
-		// TODO: needs to delete the feedback topic from the project
+	public shared ({ caller }) func delete_feedback_topic(args : ArgsUpdateTopic) : async Result.Result<Bool, ErrTopic> {
+		switch (projects.get(args.project_id)) {
+			case (null) {
+				return #err(#ProjectNotFound(true));
+			};
+			case (?project) {
+				if (Principal.notEqual(project.owner, caller)) {
+					return #err(#NotOwner(true));
+				};
 
-		return #ok("");
+				let topics : [Topic] = switch (project.feedback.topics) {
+					case (null) { [] };
+					case (?topics) { topics };
+				};
+
+				let topic_found : ?Topic = Array.find<Topic>(
+					topics,
+					func(t) : Bool { t.id == args.snap_id }
+				);
+
+				switch (topic_found) {
+					case (null) {
+						return #err(#TopicNotFound(true));
+					};
+					case (?topic) {
+						let topics_updated = Array.filter<Topic>(
+							topics,
+							func(t : Topic) : Bool {
+								return t.id != args.snap_id;
+							}
+						);
+
+						let feedback_updated : Feedback = { topics = ?topics_updated };
+						let project_updated : Project = {
+							project with feedback = feedback_updated
+						};
+
+						projects.put(project.id, project_updated);
+
+						return #ok(true);
+					};
+				};
+			};
+		};
 	};
 
 	// ------------------------- Snaps -------------------------
