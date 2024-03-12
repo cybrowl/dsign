@@ -149,9 +149,6 @@
 	async function add_file_to_topic(event) {
 		const { file, selected_topic } = event.detail;
 
-		console.log('file: ', file);
-		console.log('selected_topic: ', selected_topic);
-
 		const storage_canister_id_alloc =
 			await $actor_file_scaling_manager.actor.get_current_canister_id();
 		await auth.file_storage(storage_canister_id_alloc);
@@ -184,24 +181,34 @@
 				// TODO: log err
 			}
 		}
-
-		//TODO: store the file in storage
-		//TODO: send that file to `creator.add_file_to_topic`
 	}
 
-	function remove_file_from_topic(event) {
-		const file = event.detail;
+	async function remove_file_from_topic(event) {
+		const selected_topic = event.detail;
 
-		//TODO: store the file in storage
-		//TODO: send that file to `creator.remove_file_from_topic`
+		await auth.creator(canister_id);
+		if ($actor_creator.loggedIn) {
+			try {
+				const { ok: topic, err: err_topic } = await $actor_creator.actor.remove_file_from_topic({
+					project_id: project_id,
+					snap_id: selected_topic.id,
+					message: [],
+					design_file: []
+				});
+
+				project_actions.fetching();
+
+				const { ok: project } = await $actor_creator.actor.get_project(project_id);
+
+				project_actions.update_project(project);
+			} catch (error) {
+				// TODO: log err
+			}
+		}
 	}
 
-	function remove_topic(event) {
-		console.log('remove_topic: ', event.detail);
-	}
-
-	function reject_change(event) {
-		console.log('reject_change: ', event.detail);
+	function delete_feedback_topic(event) {
+		console.log('delete_feedback_topic: ', event.detail);
 	}
 
 	function accept_change(event) {
@@ -301,8 +308,8 @@
 					project={$project_store.project}
 					selected_topic_id={$selected_topic_id}
 					on:accept_change={accept_change}
-					on:reject_change={reject_change}
-					on:remove_topic={remove_topic}
+					on:reject_change={remove_file_from_topic}
+					on:remove_topic={delete_feedback_topic}
 					on:select_file={add_file_to_topic}
 					on:send_message={send_message}
 				/>
