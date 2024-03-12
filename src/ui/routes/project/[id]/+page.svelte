@@ -113,21 +113,6 @@
 	}
 
 	// ------------------------- Feedback -------------------------
-	function accept_change(event) {
-		console.log('accept_change: ', event.detail);
-	}
-
-	function reject_change(event) {
-		console.log('reject_change: ', event.detail);
-	}
-
-	function remove_topic(event) {
-		console.log('remove_topic: ', event.detail);
-	}
-
-	function select_topic(event) {
-		console.log('select_topic: ', event.detail);
-	}
 
 	async function send_message(event) {
 		const { content, selected_topic } = event.detail;
@@ -155,16 +140,31 @@
 		}
 	}
 
-	function select_file(event) {
-		const { selected_topic } = event.detail;
+	function add_file_to_topic(event) {
+		const file = event.detail;
 
-		console.log('selected_topic: ', selected_topic);
-
-		selected_topic_id.set(selected_topic.id);
+		//TODO: store the file in storage
+		//TODO: send that file to `creator.add_file_to_topic`
 	}
 
-	function download_file(event) {
-		console.log('download_file: ', event);
+	function remove_file_from_topic(event) {
+		const file = event.detail;
+
+		//TODO: store the file in storage
+		//TODO: send that file to `creator.remove_file_from_topic`
+	}
+
+	function remove_topic(event) {
+		console.log('remove_topic: ', event.detail);
+	}
+
+	function reject_change(event) {
+		console.log('reject_change: ', event.detail);
+	}
+
+	function accept_change(event) {
+		//TODO: this might not get done in time
+		console.log('accept_change: ', event.detail);
 	}
 
 	function tab_change(event) {
@@ -259,11 +259,9 @@
 					project={$project_store.project}
 					selected_topic_id={$selected_topic_id}
 					on:accept_change={accept_change}
-					on:download_file={download_file}
 					on:reject_change={reject_change}
 					on:remove_topic={remove_topic}
-					on:select_file={select_file}
-					on:select_topic={select_topic}
+					on:select_file={add_file_to_topic}
 					on:send_message={send_message}
 				/>
 			{/if}
