@@ -15,22 +15,16 @@
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation } from '$stores_ref/page_navigation';
 
+	const snap_cid = $page.url.searchParams.get('cid');
+	const snap_id = $page.url.pathname.split('/').pop();
+
 	onMount(async () => {
-		await init_auth();
-
 		try {
-			const canister_id = $page.url.searchParams.get('cid');
-			const snap_id = $page.url.pathname.split('/').pop();
+			await init_auth();
+			await auth.creator(snap_cid);
+			const { ok: snap, err: error } = await $actor_creator.actor.get_snap(snap_id);
 
-			await auth.creator(canister_id);
-
-			if ($actor_creator.loggedIn) {
-				const { ok: snap, err: error } = await $actor_creator.actor.get_snap(snap_id);
-
-				console.log('snap: ', snap);
-
-				snap_preview_store.set({ isFetching: false, snap });
-			}
+			snap_preview_store.set({ isFetching: false, snap });
 		} catch (error) {
 			console.log('error snap preview: ', error);
 		}
@@ -52,14 +46,23 @@
 		goto(`/snap/edit`);
 	}
 
-	function goto_feedback(event) {
-		const project = get($snap_project_store, 'project', '');
+	async function goto_feedback(event) {
+		await auth.creator(snap_cid);
 
-		//TODO: create a new feedback topic
+		if ($actor_creator.loggedIn) {
+			const project_id = get($snap_preview_store, 'snap.project_id', '');
 
-		console.log('feedback', event);
+			const { ok: topic, err: error } = await $actor_creator.actor.create_feedback_topic({
+				project_id: project_id,
+				snap_id: snap_id
+			});
 
-		goto(`/project/${project.name}?id=${project.id}&cid=${project.canister_id}&tab=feedback`);
+			console.log('topic: ', topic);
+
+			debugger;
+
+			// goto(`/project/${project.name}?id=${project.id}&cid=${project.canister_id}&tab=feedback`);
+		}
 	}
 </script>
 

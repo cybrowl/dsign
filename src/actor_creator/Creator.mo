@@ -423,8 +423,7 @@ actor class Creator(username_registry : Principal) = this {
 					case (?snap) { snap.name };
 				};
 
-				// Create A Topic
-				let topic : Topic = {
+				let default_topic : Topic = {
 					id = args.snap_id;
 					snap_name = snap_name;
 					design_file = null;
@@ -435,8 +434,10 @@ actor class Creator(username_registry : Principal) = this {
 					}];
 				};
 
-				let feedback_udapted : Feedback = {
-					topics = ?[topic];
+				let all_topics = Arr.append([default_topic], topics);
+
+				var feedback_udapted : Feedback = {
+					topics = ?all_topics;
 				};
 
 				let project_updated : Project = {
@@ -446,7 +447,7 @@ actor class Creator(username_registry : Principal) = this {
 
 				projects.put(project.id, project_updated);
 
-				return #ok(topic);
+				return #ok(default_topic);
 			};
 		};
 	};
@@ -518,6 +519,8 @@ actor class Creator(username_registry : Principal) = this {
 
 	// Add File to Topic
 	public shared func add_file_to_topic(args : ArgsUpdateTopic) : async Result.Result<Topic, ErrTopic> {
+		//TODO: make sure the caller owns the file that it wants to commit
+
 		switch (projects.get(args.project_id)) {
 			case (null) {
 				return #err(#ProjectNotFound(true));

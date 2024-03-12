@@ -27,6 +27,7 @@ let creator_actor_wilson = {};
 
 let jt_project_a = {};
 let jt_snap_a = {};
+let jt_snap_b = {};
 
 // Helper function to mimic the File Web API object in Node.js
 
@@ -148,7 +149,40 @@ describe('Feedback', () => {
 
 			// Assertions for the uploaded image
 			const uploadedImage = snap.images[0];
-			expect(uploadedImage.filename).toBe('3mb_japan.jpg');
+			expect(uploadedImage.name).toBe('3mb_japan.jpg');
+			expect(uploadedImage.content_type).toBe('image/jpeg');
+			expect(uploadedImage.content_size).toBeGreaterThan(0);
+			expect(uploadedImage.url.startsWith('http://')).toBe(true);
+		}
+	});
+
+	test('Creator[jt].create_snap(): with valid project_id, name, images, and img_location => #ok - SnapPublic', async () => {
+		const fileObject = createFileObject(path.join(__dirname, 'images', 'size', '3mb_japan.jpg'));
+		const { ok: file } = await file_storage_actor_lib.jt.store(fileObject.content, {
+			filename: fileObject.name,
+			content_type: fileObject.type
+		});
+
+		const { ok: snap } = await creator_actor_jt.create_snap({
+			project_id: jt_project_a.id,
+			name: 'Second Snap',
+			tags: [],
+			design_file: [],
+			image_cover_location: 0,
+			images: [file]
+		});
+
+		if (snap) {
+			jt_snap_b = snap;
+
+			// Assertions for snap properties
+			expect(snap.name).toBe('Second Snap');
+			expect(snap.tags).toEqual([]);
+			expect(snap.images).toHaveLength(1);
+
+			// Assertions for the uploaded image
+			const uploadedImage = snap.images[0];
+			expect(uploadedImage.name).toBe('3mb_japan.jpg');
 			expect(uploadedImage.content_type).toBe('image/jpeg');
 			expect(uploadedImage.content_size).toBeGreaterThan(0);
 			expect(uploadedImage.url.startsWith('http://')).toBe(true);
@@ -173,6 +207,34 @@ describe('Feedback', () => {
 			content: 'Give feedback, ask a question, or just leave a note.',
 			username: 'Jinx-Bot'
 		});
+	});
+
+	test('Creator[jt].create_feedback_topic(): with valid args => #ok - Topic', async () => {
+		const response = await creator_actor_jt.create_feedback_topic({
+			project_id: jt_project_a.id,
+			snap_id: jt_snap_b.id
+		});
+
+		expect(response.ok).toBeTruthy();
+
+		const topic = response.ok;
+
+		expect(topic).toHaveProperty('id', jt_snap_b.id);
+		expect(topic).toHaveProperty('snap_name', 'Second Snap');
+		expect(topic).toHaveProperty('design_file', []);
+		expect(topic.messages).toHaveLength(1);
+		expect(topic.messages[0]).toMatchObject({
+			content: 'Give feedback, ask a question, or just leave a note.',
+			username: 'Jinx-Bot'
+		});
+	});
+
+	test('Creator[jt].get_project(): with valid id => #ok - ProjectPublic', async () => {
+		const { ok: project } = await creator_actor_jt.get_project(jt_project_a.id);
+
+		expect(project.feedback).toBeTruthy();
+		expect(project.feedback.topics).toBeInstanceOf(Array);
+		expect(project.feedback.topics[0].length).toBeGreaterThan(1);
 	});
 
 	test('Creator[jt].add_message_to_topic(): with valid message => #ok - Topic', async () => {
@@ -207,7 +269,7 @@ describe('Feedback', () => {
 
 		expect(project.feedback).toBeTruthy();
 		expect(project.feedback.topics).toBeInstanceOf(Array);
-		expect(project.feedback.topics.length).toBeGreaterThan(0);
+		expect(project.feedback.topics[0].length).toBeGreaterThan(0);
 
 		expect(project.feedback.topics[0][0]).toMatchObject({
 			snap_name: expect.any(String)
@@ -237,7 +299,7 @@ describe('Feedback', () => {
 		expect(typeof designFile.chunks_size).toBe('bigint');
 		expect(typeof designFile.content_size).toBe('bigint');
 		expect(designFile.content_type).toBe('application/octet-stream');
-		expect(designFile.filename).toBe('5mb_components.fig');
+		expect(designFile.name).toBe('5mb_components.fig');
 		expect(designFile.content_encoding).toBeInstanceOf(Object);
 
 		expect(topic.messages).toHaveLength(2);
@@ -268,7 +330,7 @@ describe('Feedback', () => {
 		expect(project.snaps).toBeInstanceOf(Array);
 
 		expect(project.feedback).toBeTruthy();
-		expect(project.feedback.topics).toBeInstanceOf(Array);
+		expect(project.feedback.topics[0]).toBeInstanceOf(Array);
 
 		project.feedback.topics.forEach((topicArray) => {
 			topicArray.forEach((topic) => {
@@ -299,7 +361,7 @@ describe('Feedback', () => {
 		expect(project.snaps).toBeInstanceOf(Array);
 
 		expect(project.feedback).toBeTruthy();
-		expect(project.feedback.topics).toBeInstanceOf(Array);
+		expect(project.feedback.topics[0]).toBeInstanceOf(Array);
 
 		const deletedTopicId = jt_snap_a.id;
 

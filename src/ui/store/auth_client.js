@@ -33,6 +33,15 @@ const authenticate_actor = async (actor_name, actor, authClient, canister_id) =>
 				identity: authClient.getIdentity()
 			})
 		}));
+	} else {
+		actor.update(() => ({
+			loggedIn: false,
+			actor: createActor({
+				actor_name,
+				canister_id,
+				identity: authClient.getIdentity()
+			})
+		}));
 	}
 };
 
