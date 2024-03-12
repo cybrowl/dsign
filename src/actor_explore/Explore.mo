@@ -1,7 +1,6 @@
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
-import Result "mo:base/Result";
 import Text "mo:base/Text";
 
 import CreatorTypes "../actor_creator/types";
@@ -16,6 +15,7 @@ actor class Explore(username_registry : Principal) = this {
 	let VERSION = 1;
 
 	// ------------------------- Storage Data -------------------------
+	// Projects
 	var projects : HashMap.HashMap<ProjectID, ProjectPublic> = HashMap.HashMap(0, Text.equal, Text.hash);
 	stable var projects_stable_storage : [(ProjectID, ProjectPublic)] = [];
 
@@ -25,28 +25,38 @@ actor class Explore(username_registry : Principal) = this {
 		Principal.equal,
 		Principal.hash
 	);
+	stable var canister_registry_creator_stable_storage : [(Principal, CanisterInfo)] = [];
 
+	// ------------------------- Explore -------------------------
 	// Save Canister Info from Creator
-	public shared ({ caller }) func save_canister_info_from_creator() : async Result.Result<Text, Text> {
+	public shared ({ caller }) func save_canister_info_from_creator(info : CanisterInfo) : async Bool {
 		if (Principal.equal(caller, username_registry)) {
-			return #ok("save info");
+			canister_registry_creator.put(Principal.fromText(info.id), info);
+
+			return true;
 		};
 
-		return #ok("");
+		return false;
 	};
 
 	// Save Project
-	public shared ({ caller }) func save_project() : async Result.Result<Text, Text> {
+	public shared ({ caller }) func save_project(project : ProjectPublic) : async Bool {
 		let is_authorized : Bool = switch (canister_registry_creator.get(caller)) {
 			case (null) { false };
 			case (?info) { true };
 		};
 
-		return #ok("");
+		if (is_authorized) {
+			projects.put(project.id, project);
+
+			return true;
+		} else {
+			return false;
+		};
 	};
 
 	// Delete Projects
-	public shared ({ caller }) func delete_projects(project_ids : [ProjectID]) : async () {
+	public shared ({ caller }) func delete_projects(project_ids : [ProjectID]) : async Bool {
 		let is_authorized : Bool = switch (canister_registry_creator.get(caller)) {
 			case (null) { false };
 			case (?info) { true };
@@ -61,6 +71,10 @@ actor class Explore(username_registry : Principal) = this {
 					};
 				};
 			};
+
+			return true;
+		} else {
+			return false;
 		};
 	};
 
@@ -71,5 +85,30 @@ actor class Explore(username_registry : Principal) = this {
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	// ------------------------- System Methods -------------------------
+	system func preupgrade() {
+		projects_stable_storage := Iter.toArray(projects.entries());
+
+		canister_registry_creator_stable_storage := Iter.toArray(canister_registry_creator.entries());
+	};
+
+	system func postupgrade() {
+		projects := HashMap.fromIter<ProjectID, ProjectPublic>(
+			projects_stable_storage.vals(),
+			0,
+			Text.equal,
+			Text.hash
+		);
+		projects_stable_storage := [];
+
+		canister_registry_creator := HashMap.fromIter<Principal, CanisterInfo>(
+			canister_registry_creator_stable_storage.vals(),
+			0,
+			Principal.equal,
+			Principal.hash
+		);
+		canister_registry_creator_stable_storage := [];
 	};
 };
