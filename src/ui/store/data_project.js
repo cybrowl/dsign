@@ -17,6 +17,7 @@ const empty_project = {
 	snaps: []
 };
 
+export const selected_topic_id = writable('');
 export const project_store = writable({ isFetching: false, project: empty_project });
 export const is_edit_active = writable(false);
 

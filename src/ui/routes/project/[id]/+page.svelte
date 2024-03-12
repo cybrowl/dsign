@@ -24,7 +24,12 @@
 	import { auth, init_auth } from '$stores_ref/auth_client';
 
 	// User Data
-	import { project_store, is_edit_active, project_actions } from '$stores_ref/data_project';
+	import {
+		is_edit_active,
+		project_actions,
+		project_store,
+		selected_topic_id
+	} from '$stores_ref/data_project';
 	import { snap_project_store, snap_preview_store, snap_actions } from '$stores_ref/data_snap';
 	import { ls_my_profile } from '$stores_ref/local_storage';
 
@@ -144,12 +149,18 @@
 
 			const { ok: project } = await $actor_creator.actor.get_project(project_id);
 
+			selected_topic_id.set(selected_topic.id);
+
 			project_actions.update_project(project);
 		}
 	}
 
 	function select_file(event) {
-		console.log('select_file: ', event.detail);
+		const { selected_topic } = event.detail;
+
+		console.log('selected_topic: ', selected_topic);
+
+		selected_topic_id.set(selected_topic.id);
 	}
 
 	function download_file(event) {
@@ -243,9 +254,10 @@
 		</div>
 
 		<div class="feedback_layout">
-			{#if ($project_store.isFetching === false) & (project_tab === 'feedback')}
+			{#if ($project_store.isFetching === false || $selected_topic_id) & (project_tab === 'feedback')}
 				<Feedback
 					project={$project_store.project}
+					selected_topic_id={$selected_topic_id}
 					on:accept_change={accept_change}
 					on:download_file={download_file}
 					on:reject_change={reject_change}
