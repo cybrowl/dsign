@@ -11,7 +11,7 @@ dfx deploy internet_identity
 
 # Username Registry
 dfx deploy username_registry
-dfx canister call username_registry init # init
+
 
 export USERNAME_REGISTRY_PRINCIPAL=$(dfx canister id username_registry)
 
@@ -25,6 +25,7 @@ export EXPLORE_CANISTER_ID=$(dfx canister id explore)
 
 # Set Explore CID in Username Registry
 dfx canister call username_registry set_explore_canister_id '("'${EXPLORE_CANISTER_ID}'")'
+dfx canister call username_registry init # init
 
 # File Storage
 dfx deploy file_storage --argument='(false, "8080")'

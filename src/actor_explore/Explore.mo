@@ -78,8 +78,14 @@ actor class Explore(username_registry : Principal) = self {
 		};
 	};
 
+	// Get Projects
 	public query func get_all_projects() : async [ProjectPublic] {
 		return Iter.toArray(projects.vals());
+	};
+
+	// Get Registry
+	public query func get_registry() : async [CanisterInfo] {
+		return Iter.toArray(canister_registry_creator.vals());
 	};
 
 	// ------------------------- Canister Management -------------------------
