@@ -18,6 +18,14 @@ module {
 		#ErrorCall : Text;
 	};
 
+	public type CanisterInfo = {
+		created : Int;
+		id : Text;
+		name : Text;
+		parent_name : Text;
+		isProd : Bool;
+	};
+
 	public type UsernameRegistryActor = actor {
 		get_username_by_principal : shared (Principal) -> async Result.Result<Username, ErrUsername>;
 	};

@@ -3,6 +3,7 @@ import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
+import Time "mo:base/Time";
 
 import CreatorTypes "../actor_creator/types";
 
@@ -20,9 +21,10 @@ actor UsernameRegistry = {
 	// Manages Usernames & the CanisterId Associated with that Username
 	// Source of Truth to Principal ownership of Username
 
+	type CanisterInfo = Types.CanisterInfo;
+	type ErrUsername = Types.ErrUsername;
 	type Username = Types.Username;
 	type UsernameInfo = Types.UsernameInfo;
-	type ErrUsername = Types.ErrUsername;
 
 	type CreatorActor = CreatorTypes.CreatorActor;
 
@@ -43,6 +45,13 @@ actor UsernameRegistry = {
 
 	// Username
 	var usernames : HashMap.HashMap<Principal, Username> = HashMap.HashMap(
+		0,
+		Principal.equal,
+		Principal.hash
+	);
+
+	// Canister Registry for Creator
+	var canister_registry_creator : HashMap.HashMap<Principal, CanisterInfo> = HashMap.HashMap(
 		0,
 		Principal.equal,
 		Principal.hash
@@ -202,7 +211,17 @@ actor UsernameRegistry = {
 
 		creator_canister_id := Principal.toText(principal);
 
-		//TODO: save canister info to `canister_registry`
+		let canister_info : CanisterInfo = {
+			created = Time.now();
+			id = Principal.toText(principal);
+			name = "Creator";
+			parent_name = ACTOR_NAME;
+			isProd = is_prod;
+		};
+
+		canister_registry_creator.put(principal, canister_info);
+
+		//TODO: send `canister_info` to `Explore`
 	};
 
 	public shared (msg) func init() : async Text {

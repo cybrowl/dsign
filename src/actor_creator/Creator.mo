@@ -8,6 +8,7 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import Logger "canister:logger";
+import Explore "canister:explore";
 
 import Types "./types";
 import UsernameRegistryTypes "../actor_username_registry/types";

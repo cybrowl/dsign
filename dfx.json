@@ -34,7 +34,7 @@
 		"creator": {
 			"main": "src/actor_creator/Creator.mo",
 			"type": "motoko",
-			"dependencies": ["logger"]
+			"dependencies": ["logger", "explore"]
 		},
 		"username_registry": {
 			"main": "src/actor_username_registry/UsernameRegistry.mo",
