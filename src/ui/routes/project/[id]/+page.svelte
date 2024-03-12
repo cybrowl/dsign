@@ -30,7 +30,6 @@
 
 	import { modal_visible } from '$stores_ref/modal';
 	import { page_navigation, navigate_to_home_with_notification } from '$stores_ref/page_navigation';
-	import { projectTabsState } from '$stores_ref/page_state';
 
 	project_actions.deselect_snaps();
 	is_edit_active.set(false);
@@ -125,8 +124,28 @@
 		console.log('select_topic: ', event.detail);
 	}
 
-	function send_message(event) {
-		console.log('send_message: ', event.detail);
+	async function send_message(event) {
+		const { content, selected_topic } = event.detail;
+
+		console.log('content: ', content);
+		console.log('selected_topic: ', selected_topic);
+
+		await auth.creator(canister_id);
+
+		if ($actor_creator.loggedIn) {
+			const { ok: topic, err: err_topic } = await $actor_creator.actor.add_message_to_topic({
+				project_id: project_id,
+				snap_id: selected_topic.id,
+				message: [content],
+				design_file: []
+			});
+
+			project_actions.fetching();
+
+			const { ok: project } = await $actor_creator.actor.get_project(project_id);
+
+			project_actions.update_project(project);
+		}
 	}
 
 	function select_file(event) {
@@ -224,7 +243,7 @@
 		</div>
 
 		<div class="feedback_layout">
-			{#if project_tab === 'feedback'}
+			{#if ($project_store.isFetching === false) & (project_tab === 'feedback')}
 				<Feedback
 					project={$project_store.project}
 					on:accept_change={accept_change}

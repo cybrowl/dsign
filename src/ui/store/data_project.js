@@ -74,9 +74,19 @@ export const remove_selected_snaps = () => {
 	});
 };
 
+export const update_project = (updatedProject) => {
+	project_store.update(() => {
+		return {
+			isFetching: false,
+			project: updatedProject
+		};
+	});
+};
+
 export const project_actions = {
 	fetching,
 	deselect_snaps,
 	get_selected_snap_ids,
-	remove_selected_snaps
+	remove_selected_snaps,
+	update_project
 };

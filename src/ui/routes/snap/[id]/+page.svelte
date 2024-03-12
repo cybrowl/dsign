@@ -47,6 +47,8 @@
 	}
 
 	async function goto_feedback(event) {
+		const project = get($snap_project_store, 'project', '');
+
 		await auth.creator(snap_cid);
 
 		if ($actor_creator.loggedIn) {
@@ -56,13 +58,9 @@
 				project_id: project_id,
 				snap_id: snap_id
 			});
-
-			console.log('topic: ', topic);
-
-			debugger;
-
-			// goto(`/project/${project.name}?id=${project.id}&cid=${project.canister_id}&tab=feedback`);
 		}
+
+		goto(`/project/${project.name}?id=${project.id}&cid=${project.canister_id}&tab=feedback`);
 	}
 </script>
 
