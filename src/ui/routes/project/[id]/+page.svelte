@@ -18,7 +18,13 @@
 	} from 'dsign-components';
 	import AccountSettingsModal from '$modals_ref/AccountSettingsModal.svelte';
 
-	import { actor_creator } from '$stores_ref/actors';
+	import { FileStorage } from '$utils/file_storage';
+
+	import {
+		actor_creator,
+		actor_file_scaling_manager,
+		actor_file_storage
+	} from '$stores_ref/actors';
 
 	// Auth
 	import { auth, init_auth } from '$stores_ref/auth_client';
@@ -140,8 +146,44 @@
 		}
 	}
 
-	function add_file_to_topic(event) {
-		const file = event.detail;
+	async function add_file_to_topic(event) {
+		const { file, selected_topic } = event.detail;
+
+		console.log('file: ', file);
+		console.log('selected_topic: ', selected_topic);
+
+		const storage_canister_id_alloc =
+			await $actor_file_scaling_manager.actor.get_current_canister_id();
+		await auth.file_storage(storage_canister_id_alloc);
+		await auth.creator(canister_id);
+
+		if (file && $actor_creator.loggedIn) {
+			try {
+				const file_storage = new FileStorage($actor_file_storage.actor);
+
+				const file_uint8 = new Uint8Array(await file.arrayBuffer());
+
+				const { ok: file_public } = await file_storage.store(file_uint8, {
+					filename: file.name,
+					content_type: file.type
+				});
+
+				const { ok: topic, err: err_topic } = await $actor_creator.actor.add_file_to_topic({
+					project_id: project_id,
+					snap_id: selected_topic.id,
+					message: [],
+					design_file: [file_public]
+				});
+
+				project_actions.fetching();
+
+				const { ok: project } = await $actor_creator.actor.get_project(project_id);
+
+				project_actions.update_project(project);
+			} catch (error) {
+				// TODO: log err
+			}
+		}
 
 		//TODO: store the file in storage
 		//TODO: send that file to `creator.add_file_to_topic`

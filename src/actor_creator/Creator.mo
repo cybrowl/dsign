@@ -520,6 +520,7 @@ actor class Creator(username_registry : Principal) = this {
 	// Add File to Topic
 	public shared func add_file_to_topic(args : ArgsUpdateTopic) : async Result.Result<Topic, ErrTopic> {
 		//TODO: make sure the caller owns the file that it wants to commit
+		//TODO: make sure the file is from the caller that opened the topic
 
 		switch (projects.get(args.project_id)) {
 			case (null) {

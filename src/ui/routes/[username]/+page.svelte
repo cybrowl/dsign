@@ -127,7 +127,7 @@
 	async function update_profile_banner(event) {
 		let file = event.detail;
 
-		const file_unit8 = new Uint8Array(await file.arrayBuffer());
+		const file_uint8 = new Uint8Array(await file.arrayBuffer());
 
 		//TODO: rename to say something about storage canister id and about it being empty
 		const storage_canister_id_alloc =
@@ -138,7 +138,7 @@
 
 		const file_storage = new FileStorage($actor_file_storage.actor);
 
-		const { ok: file_public } = await file_storage.store(file_unit8, {
+		const { ok: file_public } = await file_storage.store(file_uint8, {
 			filename: file.name,
 			content_type: file.type
 		});
