@@ -207,8 +207,29 @@
 		}
 	}
 
-	function delete_feedback_topic(event) {
-		console.log('delete_feedback_topic: ', event.detail);
+	async function delete_feedback_topic(event) {
+		const { topic_id } = event.detail;
+
+		await auth.creator(canister_id);
+		if ($actor_creator.loggedIn) {
+			try {
+				const { ok: deleted_topic, err: err_topic } =
+					await $actor_creator.actor.delete_feedback_topic({
+						project_id: project_id,
+						snap_id: topic_id,
+						message: [],
+						design_file: []
+					});
+
+				project_actions.fetching();
+
+				const { ok: project } = await $actor_creator.actor.get_project(project_id);
+
+				project_actions.update_project(project);
+			} catch (error) {
+				// TODO: log err
+			}
+		}
 	}
 
 	function accept_change(event) {
