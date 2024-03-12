@@ -28,5 +28,6 @@ module {
 
 	public type UsernameRegistryActor = actor {
 		get_username_by_principal : shared (Principal) -> async Result.Result<Username, ErrUsername>;
+		set_explore_canister_id : shared (Text) -> async ();
 	};
 };

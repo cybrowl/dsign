@@ -6,7 +6,7 @@ import Text "mo:base/Text";
 import CreatorTypes "../actor_creator/types";
 import UsernameRegistryTypes "../actor_username_registry/types";
 
-actor class Explore(username_registry : Principal) = this {
+actor class Explore(username_registry : Principal) = self {
 	type ProjectID = CreatorTypes.ProjectID;
 	type ProjectPublic = CreatorTypes.ProjectPublic;
 	type CanisterInfo = UsernameRegistryTypes.CanisterInfo;

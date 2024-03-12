@@ -6,6 +6,7 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import CreatorTypes "../actor_creator/types";
+import ExploreTypes "../actor_explore/types";
 
 import Creator "../actor_creator/Creator";
 import Logger "canister:logger";
@@ -27,6 +28,7 @@ actor UsernameRegistry = {
 	type UsernameInfo = Types.UsernameInfo;
 
 	type CreatorActor = CreatorTypes.CreatorActor;
+	type ExploreActor = ExploreTypes.ExploreActor;
 
 	// ------------------------- Variables -------------------------
 	let VERSION : Nat = 1; // The Version in Production
@@ -34,7 +36,8 @@ actor UsernameRegistry = {
 	let ACTOR_NAME : Text = "UsernameRegistry";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
 
-	var creator_canister_id = "";
+	stable var creator_canister_id = "";
+	stable var explore_canister_id = "";
 
 	// Username Info
 	var usernames_info : HashMap.HashMap<Username, UsernameInfo> = HashMap.HashMap(
@@ -221,7 +224,9 @@ actor UsernameRegistry = {
 
 		canister_registry_creator.put(principal, canister_info);
 
-		//TODO: send `canister_info` to `Explore`
+		// Save Canister Info in Explore Actor
+		let explore_actor : ExploreActor = actor (explore_canister_id);
+		ignore explore_actor.save_canister_info_from_creator(canister_info);
 	};
 
 	public shared (msg) func init() : async Text {
@@ -237,6 +242,14 @@ actor UsernameRegistry = {
 			ignore Logger.log_event(tags, "created creator_canister_id: " # creator_canister_id);
 
 			return creator_canister_id;
+		};
+	};
+
+	public shared (msg) func set_explore_canister_id(explore_cid : Text) : async () {
+		//TODO: deprecate once I find a better way
+
+		if (explore_canister_id.size() == 0) {
+			explore_canister_id := explore_cid;
 		};
 	};
 };
