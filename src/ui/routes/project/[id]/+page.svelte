@@ -44,18 +44,16 @@
 
 		await auth.creator(canister_id);
 
-		if ($actor_creator.loggedIn) {
-			try {
-				project_actions.fetching();
+		try {
+			project_actions.fetching();
 
-				const { ok: project, err: error } = await $actor_creator.actor.get_project(project_id);
+			const { ok: project, err: error } = await $actor_creator.actor.get_project(project_id);
 
-				console.log('project: ', project);
+			console.log('project: ', project);
 
-				project_store.set({ isFetching: false, project });
-			} catch (error) {
-				console.log('error: ', error);
-			}
+			project_store.set({ isFetching: false, project });
+		} catch (error) {
+			console.log('error: ', error);
 		}
 	});
 
