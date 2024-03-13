@@ -2,17 +2,19 @@ import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
+import Option "mo:base/Option";
 
 import CreatorTypes "../actor_creator/types";
 import UsernameRegistryTypes "../actor_username_registry/types";
 
-actor class Explore(username_registry : Principal) = self {
+actor Explore {
 	type ProjectID = CreatorTypes.ProjectID;
 	type ProjectPublic = CreatorTypes.ProjectPublic;
 	type CanisterInfo = UsernameRegistryTypes.CanisterInfo;
 
 	// ------------------------- Variables -------------------------
 	let VERSION = 1;
+	stable var username_registry : ?Principal = null;
 
 	// ------------------------- Storage Data -------------------------
 	// Projects
@@ -30,13 +32,20 @@ actor class Explore(username_registry : Principal) = self {
 	// ------------------------- Explore -------------------------
 	// Save Canister Info from Creator
 	public shared ({ caller }) func save_canister_info_from_creator(info : CanisterInfo) : async Bool {
-		if (Principal.equal(caller, username_registry)) {
-			canister_registry_creator.put(Principal.fromText(info.id), info);
+		switch (username_registry) {
+			case (null) {
+				return false;
+			};
+			case (?username_registry_) {
+				if (Principal.equal(caller, username_registry_)) {
+					canister_registry_creator.put(Principal.fromText(info.id), info);
 
-			return true;
+					return true;
+				} else {
+					return false;
+				};
+			};
 		};
-
-		return false;
 	};
 
 	// Save Project
@@ -91,6 +100,16 @@ actor class Explore(username_registry : Principal) = self {
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	public shared ({}) func init(username_registry_principal : Principal) : async Bool {
+		if (username_registry == null) {
+			username_registry := ?username_registry_principal;
+
+			return true;
+		} else {
+			return false;
+		};
 	};
 
 	// ------------------------- System Methods -------------------------

@@ -39,7 +39,7 @@
 		"username_registry": {
 			"main": "src/actor_username_registry/UsernameRegistry.mo",
 			"type": "motoko",
-			"dependencies": ["logger"]
+			"dependencies": ["logger", "explore"]
 		},
 		"file_storage": {
 			"main": "src/actor_file_storage/FileStorage.mo",

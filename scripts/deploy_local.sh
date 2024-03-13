@@ -11,31 +11,30 @@ dfx deploy internet_identity
 
 # Username Registry
 dfx deploy username_registry
-
-
-export USERNAME_REGISTRY_PRINCIPAL=$(dfx canister id username_registry)
-
-# Creator
-dfx deploy creator --argument='(principal "'${USERNAME_REGISTRY_PRINCIPAL}'")'
+export USERNAME_REGISTRY_CANISTER_ID=$(dfx canister id username_registry)
 
 # Explore
-dfx deploy explore --argument='(principal "'${USERNAME_REGISTRY_PRINCIPAL}'")'
-
+dfx deploy explore
 export EXPLORE_CANISTER_ID=$(dfx canister id explore)
 
-# Set Explore CID in Username Registry
-dfx canister call username_registry set_explore_canister_id '("'${EXPLORE_CANISTER_ID}'")'
-dfx canister call username_registry init # init
+# Creator
+dfx deploy creator --argument='(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")'
 
 # File Storage
 dfx deploy file_storage --argument='(false, "8080")'
 
 # File Scaling
 dfx deploy file_scaling_manager --argument='(false, "8080")'
-dfx canister call file_scaling_manager init  # init
 
 # Logger
 dfx deploy logger
+
+### Initialize Canisters
+dfx canister call username_registry init # init
+dfx canister call creator init # init
+dfx canister call file_scaling_manager init  # init
+dfx canister call explore init '(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")'
+
 
 # Test All
 # npm run test

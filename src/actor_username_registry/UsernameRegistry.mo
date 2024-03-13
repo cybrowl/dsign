@@ -11,6 +11,7 @@ import ExploreTypes "../actor_explore/types";
 
 import Creator "../actor_creator/Creator";
 import Logger "canister:logger";
+import Explore "canister:explore";
 
 import Utils "./utils";
 import Types "./types";
@@ -234,8 +235,10 @@ actor UsernameRegistry = {
 		canister_registry_creator.put(principal, canister_info);
 
 		// Save Canister Info in Explore Actor
-		let explore_actor : ExploreActor = actor (explore_canister_id);
-		ignore explore_actor.save_canister_info_from_creator(canister_info);
+		// let explore_actor : ExploreActor = actor (explore_canister_id);
+		// ignore explore_actor.save_canister_info_from_creator(canister_info);
+
+		ignore Explore.save_canister_info_from_creator(canister_info);
 	};
 
 	public shared (msg) func init() : async Text {
@@ -251,14 +254,6 @@ actor UsernameRegistry = {
 			ignore Logger.log_event(tags, "created creator_canister_id: " # creator_canister_id);
 
 			return creator_canister_id;
-		};
-	};
-
-	public shared (msg) func set_explore_canister_id(explore_cid : Text) : async () {
-		//TODO: deprecate once I find a better way
-
-		if (explore_canister_id.size() == 0) {
-			explore_canister_id := explore_cid;
 		};
 	};
 

@@ -16,7 +16,7 @@ import UUID "../libs/uuid";
 import Utils "./utils";
 import Arr "../libs/array";
 
-actor class Creator(username_registry : Principal) = this {
+actor class Creator(username_registry : Principal) = self {
 	type ArgsCreateProject = Types.ArgsCreateProject;
 	type ArgsCreateSnap = Types.ArgsCreateSnap;
 	type ArgsCreateTopic = Types.ArgsCreateTopic;
@@ -340,6 +340,8 @@ actor class Creator(username_registry : Principal) = this {
 						projects.put(args.id, project_updated);
 
 						let project_public = Utils.project_to_public(project_updated, snaps, caller);
+
+						//TODO: save project to Explore
 
 						return #ok(project_public);
 					};
@@ -1063,7 +1065,7 @@ actor class Creator(username_registry : Principal) = this {
 	};
 
 	public shared func init() : async () {
-		creator_canister_id := Principal.toText(Principal.fromActor(this));
+		creator_canister_id := Principal.toText(Principal.fromActor(self));
 
 		return ();
 	};
