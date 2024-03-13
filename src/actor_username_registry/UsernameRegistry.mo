@@ -12,6 +12,7 @@ import ExploreTypes "../actor_explore/types";
 import Creator "../actor_creator/Creator";
 import Logger "canister:logger";
 import Explore "canister:explore";
+import Mo "canister:mo";
 
 import Utils "./utils";
 import Types "./types";
@@ -235,11 +236,8 @@ actor UsernameRegistry = {
 
 		canister_registry_creator.put(principal, canister_info);
 
-		// Save Canister Info in Explore Actor
-		// let explore_actor : ExploreActor = actor (explore_canister_id);
-		// ignore explore_actor.save_canister_info_from_creator(canister_info);
-
 		ignore Explore.save_canister_info_from_creator(canister_info);
+		ignore Mo.save_canister_info_from_creator(canister_info);
 	};
 
 	public shared (msg) func init() : async Text {
