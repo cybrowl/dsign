@@ -7,6 +7,7 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
+import Explore "canister:explore";
 import Logger "canister:logger";
 
 import Types "./types";
@@ -341,7 +342,9 @@ actor class Creator(username_registry : Principal) = self {
 
 						let project_public = Utils.project_to_public(project_updated, snaps, caller);
 
-						//TODO: save project to Explore
+						if (project_updated.snaps.size() > 0) {
+							ignore Explore.update_project(project.id, project.canister_id);
+						};
 
 						return #ok(project_public);
 					};
@@ -378,6 +381,7 @@ actor class Creator(username_registry : Principal) = self {
 						//NOTE: for now all files are deleted in UI but that can be done in separate canister that has authority within FS to delete
 						//TODO: delete all the snaps from the project
 						//TODO: delete all the assets from snaps
+						//TODO: should it delete for Favorites too since the owner deleted the files?
 
 						projects.delete(id);
 
@@ -768,6 +772,8 @@ actor class Creator(username_registry : Principal) = self {
 							is_owner = true;
 						};
 
+						ignore Explore.update_project(project.id, project.canister_id);
+
 						return #ok(snap_public);
 					};
 				};
@@ -832,6 +838,8 @@ actor class Creator(username_registry : Principal) = self {
 							is_owner = true;
 						};
 
+						ignore Explore.update_project(snap.project_id, snap.canister_id);
+
 						return #ok(snap_public);
 					};
 				};
@@ -867,6 +875,8 @@ actor class Creator(username_registry : Principal) = self {
 				// Update the snap in the hashmap
 				snaps.put(snap_id, updated_snap);
 
+				ignore Explore.update_project(snap.project_id, snap.canister_id);
+
 				return #ok(true);
 			};
 		};
@@ -891,6 +901,8 @@ actor class Creator(username_registry : Principal) = self {
 				};
 
 				snaps.put(snap_id, updated_snap);
+
+				ignore Explore.update_project(snap.project_id, snap.canister_id);
 
 				return #ok(true);
 			};
@@ -925,6 +937,8 @@ actor class Creator(username_registry : Principal) = self {
 							};
 
 							projects.put(snap.project_id, project_updated);
+
+							ignore Explore.update_project(snap.project_id, snap.canister_id);
 						};
 					};
 				};
@@ -966,6 +980,8 @@ actor class Creator(username_registry : Principal) = self {
 				};
 
 				snaps.put(snap_id, snap_updated);
+
+				ignore Explore.update_project(snap.project_id, snap.canister_id);
 
 				return #ok(true);
 			};

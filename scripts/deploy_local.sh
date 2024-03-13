@@ -30,10 +30,12 @@ dfx deploy file_scaling_manager --argument='(false, "8080")'
 dfx deploy logger
 
 ### Initialize Canisters
+dfx canister call explore init '(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")' # Must be called before anything else
+
 dfx canister call username_registry init # init
 dfx canister call creator init # init
 dfx canister call file_scaling_manager init  # init
-dfx canister call explore init '(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")'
+
 
 
 # Test All

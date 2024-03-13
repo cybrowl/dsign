@@ -12,6 +12,8 @@ actor Explore {
 	type ProjectPublic = CreatorTypes.ProjectPublic;
 	type CanisterInfo = UsernameRegistryTypes.CanisterInfo;
 
+	type CreatorActor = CreatorTypes.CreatorActor;
+
 	// ------------------------- Variables -------------------------
 	let VERSION = 1;
 	stable var username_registry : ?Principal = null;
@@ -59,6 +61,31 @@ actor Explore {
 			projects.put(project.id, project);
 
 			return true;
+		} else {
+			return false;
+		};
+	};
+
+	// Update Project
+	public shared ({ caller }) func update_project(project_id : ProjectID, canister_id : Text) : async Bool {
+		let is_authorized : Bool = switch (canister_registry_creator.get(caller)) {
+			case (null) { false };
+			case (?info) { true };
+		};
+
+		if (is_authorized) {
+			let creator_actor : CreatorActor = actor (canister_id);
+
+			switch (await creator_actor.get_project(project_id)) {
+				case (#err err) {
+					return false;
+				};
+				case (#ok project) {
+					projects.put(project.id, project);
+
+					return true;
+				};
+			};
 		} else {
 			return false;
 		};

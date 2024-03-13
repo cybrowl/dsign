@@ -250,5 +250,6 @@ module {
 	// Actor Interface
 	public type CreatorActor = actor {
 		create_profile : shared (Username, UserPrincipal) -> async Result.Result<Username, ErrProfile>;
+		get_project : shared (ProjectID) -> async Result.Result<ProjectPublic, ErrProject>;
 	};
 };

@@ -9,7 +9,7 @@
 
 	import { actor_explore } from '$stores_ref/actors.js';
 	import { disable_project_store_reset } from '$stores_ref/page_state';
-	import { explore_store } from '$stores_ref/data_explore.js';
+	import { explore_store } from '$stores_ref/data_explore';
 	import { modal_visible } from '$stores_ref/modal';
 	import { notification_visible, notification } from '$stores_ref/notification';
 	import { page_navigation } from '$stores_ref/page_navigation';
@@ -17,36 +17,31 @@
 
 	disable_project_store_reset.set(true);
 
-	// onMount(async () => {
-	// 	try {
-	// 		await init_auth();
+	onMount(async () => {
+		try {
+			await init_auth();
 
-	// 		// const all_projects = await $actor_explore.actor.get_all_projects();
+			const projects = await $actor_explore.actor.get_all_projects();
 
-	// 		// if (all_projects) {
-	// 		// 	explore_store.update(({ project }) => {
-	// 		// 		return {
-	// 		// 			isFetching: false,
-	// 		// 			projects: all_projects,
-	// 		// 			project: project
-	// 		// 		};
-	// 		// 	});
-	// 		// }
-	// 	} catch (error) {
-	// 		console.error('error: call', error);
-	// 	}
-	// });
+			console.log('projects: ', projects);
 
-	function handleProjectClick(e) {
+			if (projects) {
+				explore_store.set({ isFetching: false, projects });
+			}
+		} catch (error) {
+			console.error('error: call', error);
+		}
+	});
+
+	function goto_project(e) {
 		let project = get(e, 'detail');
-		console.log('project: ', project);
 
 		// projects_update.update_project(project);
 
-		goto(`/project/${project.id}?canister_id=${project.canister_id}`);
+		goto(`/project/${project.name}?id=${project.id}&cid=${project.canister_id}`);
 	}
 
-	function handleUsernameClick(e) {
+	function goto_username(e) {
 		let project = get(e, 'detail');
 
 		// projects_update.update_project(project);
@@ -95,8 +90,8 @@
 					hideSnapsCount={true}
 					showUsername={true}
 					showOptionsPopover={false}
-					on:clickProject={handleProjectClick}
-					on:clickUsername={handleUsernameClick}
+					on:clickProject={goto_project}
+					on:clickUsername={goto_username}
 				/>
 			{/each}
 		</div>
