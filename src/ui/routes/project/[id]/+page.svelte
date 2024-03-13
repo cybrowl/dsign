@@ -271,9 +271,9 @@
 	<!-- Fetching Project -->
 	{#if $project_store.isFetching === true}
 		<!-- Fetching Project -->
-		<div class="loading_layout">
+		<!-- <div class="loading_layout">
 			<SpinnerCircle />
-		</div>
+		</div> -->
 	{/if}
 
 	<!-- Project -->
