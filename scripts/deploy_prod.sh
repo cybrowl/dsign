@@ -49,6 +49,7 @@ dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} logger
 ### Initialize Canisters
 # Must be called before anything else
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call explore init '(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")' 
+dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call mo init '(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")' 
 
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call username_registry init 
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call creator init 
