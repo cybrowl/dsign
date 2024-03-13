@@ -1,6 +1,9 @@
 # DSign
 
-Welcome to **DSign** - the Collaborative Product Design Innovation Hub. A platform where creativity meets technology, enabling designers to bring their innovative ideas to life.
+Welcome to **DSign** - the Collaborative Product Design Innovation Hub.
+A platform where creativity meets technology, enabling designers to bring their innovative ideas to life.
+
+![Showcse Image](./showcase.png)
 
 ## Quick Links
 
@@ -26,7 +29,7 @@ To set up your environment and start contributing to DSign, follow these steps:
 
 To ensure your contributions are solid and reliable, please run the canister tests:
 
-npm run test
+`npm run test`
 
 ## Environment Configuration
 
@@ -56,3 +59,22 @@ DOMINIC_IDENTITY=b381e711f4e9cea57368b71b485f99bfa8e4a5b535e2808c4f022c5156f8748
 NIKOLA_IDENTITY=c43e4c8bdfdf0399805fe3c6f96a16f282d249b54618db6e22374d62a009f936d4a1df58e5612d1bb474e8c93af3f7378fc1ff0bedabd3624b0f34016263e823
 LINKY_IDENTITY=65716aeecdf8f586fa5d2a82963019d34113156b1f6297b02ada8f663bc1891a65d9a57974e299f00fe28c4d4901eeea870187c207dc9353546a75e7884a239c
 ```
+
+## Roadmap
+
+### MVP
+
+- [x] Create a Project
+- [x] Create a Snap
+- [x] Give and get Feedback
+- [x] Explore Projects
+
+### Future
+
+- [ ] Multiple Project Owners
+- [ ] Inbox
+- [ ] Bounties
+
+## License
+
+This project is licensed under the MIT license, see LICENSE.md for details.
