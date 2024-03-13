@@ -158,7 +158,7 @@ describe('Profile Images Tests', () => {
 		expect(file.chunks_size).toBe(2n);
 		expect(file.content_size).toBe(3628429n);
 		expect(file.content_type).toBe('image/jpeg');
-		expect(file.filename).toBe('3mb_japan.jpg');
+		expect(file.name).toBe('3mb_japan.jpg');
 		expect(file.content_encoding).toEqual({ Identity: null });
 	}, 10000);
 

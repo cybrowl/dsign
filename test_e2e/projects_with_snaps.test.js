@@ -158,7 +158,7 @@ describe('Projects With Snaps', () => {
 
 			// Assertions for the uploaded image
 			const uploadedImage = snap.images[0];
-			expect(uploadedImage.filename).toBe('3mb_japan.jpg');
+			expect(uploadedImage.name).toBe('3mb_japan.jpg');
 			expect(uploadedImage.content_type).toBe('image/jpeg');
 			expect(uploadedImage.content_size).toBeGreaterThan(0);
 			expect(uploadedImage.url.startsWith('http://')).toBe(true);
@@ -179,7 +179,7 @@ describe('Projects With Snaps', () => {
 			const img_http_response = await requestResource(uploadedImage.url);
 
 			expect(img_http_response.statusCode).toBe(200);
-			expect(uploadedImage.filename).toBe('3mb_japan.jpg');
+			expect(uploadedImage.name).toBe('3mb_japan.jpg');
 			expect(uploadedImage.content_type).toBe('image/jpeg');
 			expect(uploadedImage.content_size).toBeGreaterThan(0); // Adjust if it's BigInt and ensure compatibility
 			expect(uploadedImage.url.startsWith('http://')).toBe(true);
@@ -318,7 +318,7 @@ describe('Projects With Snaps', () => {
 			const img_http_response = await requestResource(uploaded_file.url);
 
 			expect(img_http_response.statusCode).toBe(200);
-			expect(uploaded_file.filename).toBe('5mb_components.fig');
+			expect(uploaded_file.name).toBe('5mb_components.fig');
 			expect(uploaded_file.content_type).toBe('application/octet-stream');
 			expect(uploaded_file.content_size).toBe(4473449n);
 		}
