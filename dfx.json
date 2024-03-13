@@ -36,6 +36,11 @@
 			"type": "motoko",
 			"dependencies": ["logger", "explore"]
 		},
+		"mo": {
+			"main": "src/actor_mo/MO.mo",
+			"type": "motoko",
+			"dependencies": ["logger"]
+		},
 		"username_registry": {
 			"main": "src/actor_username_registry/UsernameRegistry.mo",
 			"type": "motoko",
@@ -44,7 +49,7 @@
 		"file_storage": {
 			"main": "src/actor_file_storage/FileStorage.mo",
 			"type": "motoko",
-			"dependencies": ["logger"]
+			"dependencies": ["logger", "mo"]
 		},
 		"file_scaling_manager": {
 			"main": "src/actor_file_storage/FileScalingManager.mo",

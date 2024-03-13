@@ -10,6 +10,7 @@ import Time "mo:base/Time";
 
 import Explore "canister:explore";
 import Logger "canister:logger";
+import MO "canister:mo";
 
 import Types "./types";
 import UsernameRegistryTypes "../actor_username_registry/types";
@@ -384,8 +385,9 @@ actor class Creator(username_registry : Principal) = self {
 						);
 
 						//NOTE: for now all files are deleted in UI but that can be done in separate canister that has authority within FS to delete
-						//TODO: delete all the snaps from the project
-						//TODO: delete all the assets from snaps
+						let file_assets : [FileAsset] = Utils.get_file_assets_from_project(project, snaps);
+						ignore MO.delete_files(file_assets);
+
 						//TODO: should it delete for Favorites too since the owner deleted the files?
 
 						projects.delete(id);
@@ -587,6 +589,7 @@ actor class Creator(username_registry : Principal) = self {
 	};
 
 	// Remove File from Topic [Owner]
+	// TODO: needs to be renamed to `delete`
 	public shared ({ caller }) func remove_file_from_topic(args : ArgsUpdateTopic) : async Result.Result<Topic, ErrTopic> {
 		switch (projects.get(args.project_id)) {
 			case (null) {

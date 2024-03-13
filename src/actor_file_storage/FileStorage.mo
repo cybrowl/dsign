@@ -15,6 +15,8 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Timer "mo:base/Timer";
 
+import MO "canister:mo";
+
 import { ofBlob } "./CRC32";
 
 import Types "./types";
@@ -174,9 +176,11 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	};
 
 	public shared ({ caller }) func delete_file(id : File_ID) : async Result.Result<Text, ErrDeleteFile> {
+		let mo_actor = Principal.fromActor(MO);
+
 		switch (Map.get(files, thash, id)) {
 			case (?file) {
-				if (file.owner == Principal.toText(caller)) {
+				if (file.owner == Principal.toText(caller) or (Principal.equal(mo_actor, caller))) {
 					Map.delete(files, thash, id);
 
 					return #ok("Deleted File");

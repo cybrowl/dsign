@@ -5,6 +5,8 @@ import Principal "mo:base/Principal";
 import Types "./types";
 
 module {
+	type FileAsset = Types.FileAsset;
+	type FileAssetID = Types.FileAssetID;
 	type Project = Types.Project;
 	type ProjectID = Types.ProjectID;
 	type ProjectPublic = Types.ProjectPublic;
@@ -88,5 +90,31 @@ module {
 				};
 			}
 		);
+	};
+
+	public func get_file_assets_from_project(
+		project : Project,
+		snaps : HashMap.HashMap<SnapID, Snap>
+	) : [FileAsset] {
+		let snap_file_assets : [[FileAsset]] = Array.map<SnapID, [FileAsset]>(
+			project.snaps,
+			func(snap_id : SnapID) : [FileAsset] {
+				switch (snaps.get(snap_id)) {
+					case (null) { return [] };
+					case (?snap) {
+						let design_file : [FileAsset] = switch (snap.design_file) {
+							case (null) { [] };
+							case (?file_asset) { [file_asset] };
+						};
+
+						let images : [FileAsset] = snap.images;
+
+						return Array.flatten<FileAsset>([design_file, images]);
+					};
+				};
+			}
+		);
+
+		return Array.flatten<FileAsset>(snap_file_assets);
 	};
 };

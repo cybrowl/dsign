@@ -129,5 +129,6 @@ module {
 	public type FileStorageActor = actor {
 		is_full : shared () -> async Bool;
 		get_status : query () -> async Status;
+		delete_file : shared (File_ID) -> async Result.Result<Text, ErrDeleteFile>;
 	};
 };
