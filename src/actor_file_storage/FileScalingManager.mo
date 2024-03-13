@@ -27,11 +27,11 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	let ACTOR_NAME : Text = "FileScalingManager";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
 	let VERSION : Nat = 1;
-	var file_storage_canister_id : Text = "";
+	stable var file_storage_canister_id : Text = "";
 
 	// ------------------------- Storage Data -------------------------
 	private var file_storage_registry = Map.new<Text, FileStorageInfo>();
-	// stable var file_storage_registry_stable_storage : [(Text, FileStorageInfo)] = [];
+	stable var file_storage_registry_stable_storage : [(Text, FileStorageInfo)] = [];
 
 	// ------------------------- Actor -------------------------
 	private let management_actor : ManagementActor = actor "aaaaa-aa";
@@ -138,15 +138,12 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
-		// file_storage_registry_stable_storage := Iter.toArray(Map.entries(file_storage_registry));
+		file_storage_registry_stable_storage := Iter.toArray(Map.entries(file_storage_registry));
 	};
 
 	system func postupgrade() {
-		// file_storage_registry := Map.fromIter<Text, FileStorageInfo>(file_storage_registry_stable_storage.vals(), thash);
+		file_storage_registry := Map.fromIter<Text, FileStorageInfo>(file_storage_registry_stable_storage.vals(), thash);
 
-		// ignore Timer.recurringTimer(#seconds(60), check_canister_is_full);
-		// ignore Timer.recurringTimer(#seconds(60), update_health);
-
-		// file_storage_registry_stable_storage := [];
+		file_storage_registry_stable_storage := [];
 	};
 };

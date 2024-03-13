@@ -374,9 +374,12 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 
 	system func postupgrade() {
 		files := Map.fromIter<File_ID, File>(files_stable_storage.vals(), thash);
+		files_stable_storage := [];
+
+		chunks := Map.fromIter<Chunk_ID, FileChunk>(chunks_stable_storage.vals(), nhash);
+		chunks_stable_storage := [];
 
 		ignore Timer.recurringTimer(#seconds(300), clear_expired_chunks);
 
-		files_stable_storage := [];
 	};
 };

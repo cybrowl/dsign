@@ -41,6 +41,7 @@ actor UsernameRegistry = {
 	stable var creator_canister_id = "";
 	stable var explore_canister_id = "";
 
+	// ------------------------- Storage Data -------------------------
 	// Username Info
 	var usernames_info : HashMap.HashMap<Username, UsernameInfo> = HashMap.HashMap(
 		0,
