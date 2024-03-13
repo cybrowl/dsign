@@ -309,8 +309,8 @@ describe('Feedback', () => {
 		expect(topic.messages[1].username).toBe('jt');
 	});
 
-	test('Creator[jt].remove_file_from_topic(): with valid owner of topic => #ok - Bool', async () => {
-		const { ok: deleted_topic } = await creator_actor_jt.remove_file_from_topic({
+	test('Creator[jt].delete_file_from_topic(): with valid owner of topic => #ok - Bool', async () => {
+		const { ok: deleted_topic } = await creator_actor_jt.delete_file_from_topic({
 			project_id: jt_project_a.id,
 			snap_id: jt_snap_a.id,
 			message: [], // No message being added

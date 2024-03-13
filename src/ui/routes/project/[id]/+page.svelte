@@ -183,13 +183,13 @@
 		}
 	}
 
-	async function remove_file_from_topic(event) {
+	async function delete_file_from_topic(event) {
 		const selected_topic = event.detail;
 
 		await auth.creator(canister_id);
 		if ($actor_creator.loggedIn) {
 			try {
-				const { ok: topic, err: err_topic } = await $actor_creator.actor.remove_file_from_topic({
+				const { ok: topic, err: err_topic } = await $actor_creator.actor.delete_file_from_topic({
 					project_id: project_id,
 					snap_id: selected_topic.id,
 					message: [],
@@ -329,7 +329,7 @@
 					project={$project_store.project}
 					selected_topic_id={$selected_topic_id}
 					on:accept_change={accept_change}
-					on:reject_change={remove_file_from_topic}
+					on:reject_change={delete_file_from_topic}
 					on:remove_topic={delete_feedback_topic}
 					on:select_file={add_file_to_topic}
 					on:send_message={send_message}

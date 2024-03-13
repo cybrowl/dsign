@@ -13,6 +13,7 @@ module {
 	type Snap = Types.Snap;
 	type SnapID = Types.SnapID;
 	type SnapPublic = Types.SnapPublic;
+	type Topic = Types.Topic;
 
 	public func project_to_public(
 		project : Project,
@@ -116,5 +117,33 @@ module {
 		);
 
 		return Array.flatten<FileAsset>(snap_file_assets);
+	};
+
+	public func get_file_assets_from_topic(
+		topic : Topic
+	) : [FileAsset] {
+		let file_assets : [FileAsset] = [];
+
+		switch (topic.design_file) {
+			case (null) {
+				return [];
+			};
+			case (?file_asset) {
+				return [file_asset];
+			};
+		};
+	};
+
+	public func get_file_assets_from_snap(
+		snap : Snap
+	) : [FileAsset] {
+		let design_file : [FileAsset] = switch (snap.design_file) {
+			case (null) { [] };
+			case (?file_asset) { [file_asset] };
+		};
+
+		let images : [FileAsset] = snap.images;
+
+		return Array.flatten<FileAsset>([design_file, images]);
 	};
 };

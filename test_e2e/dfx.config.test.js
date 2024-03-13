@@ -12,6 +12,7 @@ describe.concurrent('DFX Config', () => {
 			$IDLui: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/ui/service.did.js',
 			$IDLexplore: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/explore/service.did.js',
 			$IDLlogger: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/logger/service.did.js',
+			$IDLmo: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/mo/service.did.js',
 			$IDLcreator: '/Users/cyberowl/Projects/dsign/.dfx/local/canisters/creator/service.did.js',
 			$IDLusername_registry:
 				'/Users/cyberowl/Projects/dsign/.dfx/local/canisters/username_registry/service.did.js',

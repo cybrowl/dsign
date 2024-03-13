@@ -34,7 +34,7 @@
 		"creator": {
 			"main": "src/actor_creator/Creator.mo",
 			"type": "motoko",
-			"dependencies": ["logger", "explore"]
+			"dependencies": ["logger", "explore", "mo"]
 		},
 		"mo": {
 			"main": "src/actor_mo/MO.mo",
@@ -54,7 +54,7 @@
 		"file_scaling_manager": {
 			"main": "src/actor_file_storage/FileScalingManager.mo",
 			"type": "motoko",
-			"dependencies": ["logger"]
+			"dependencies": ["logger", "mo"]
 		}
 	},
 	"defaults": {

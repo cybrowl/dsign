@@ -384,7 +384,7 @@ actor class Creator(username_registry : Principal) = self {
 							}
 						);
 
-						//NOTE: for now all files are deleted in UI but that can be done in separate canister that has authority within FS to delete
+						// Delete files
 						let file_assets : [FileAsset] = Utils.get_file_assets_from_project(project, snaps);
 						ignore MO.delete_files(file_assets);
 
@@ -589,8 +589,7 @@ actor class Creator(username_registry : Principal) = self {
 	};
 
 	// Remove File from Topic [Owner]
-	// TODO: needs to be renamed to `delete`
-	public shared ({ caller }) func remove_file_from_topic(args : ArgsUpdateTopic) : async Result.Result<Topic, ErrTopic> {
+	public shared ({ caller }) func delete_file_from_topic(args : ArgsUpdateTopic) : async Result.Result<Topic, ErrTopic> {
 		switch (projects.get(args.project_id)) {
 			case (null) {
 				return #err(#ProjectNotFound(true));
@@ -637,6 +636,8 @@ actor class Creator(username_registry : Principal) = self {
 								};
 
 								projects.put(project.id, project_updated);
+
+								ignore MO.delete_files([design_file]);
 
 								return #ok(topic_updated);
 							};
@@ -686,6 +687,9 @@ actor class Creator(username_registry : Principal) = self {
 						};
 
 						projects.put(project.id, project_updated);
+
+						let file_assets : [FileAsset] = Utils.get_file_assets_from_topic(topic);
+						ignore MO.delete_files(file_assets);
 
 						return #ok(true);
 					};
@@ -855,41 +859,6 @@ actor class Creator(username_registry : Principal) = self {
 		};
 	};
 
-	// Delete Image
-	public shared ({ caller }) func delete_image_from_snap(snap_id : SnapID, image_id : FileAssetID) : async Result.Result<Bool, ErrSnap> {
-		switch (snaps.get(snap_id)) {
-			case (null) {
-				return #err(#SnapNotFound(true));
-			};
-			case (?snap) {
-				if (Principal.notEqual(snap.owner, caller)) {
-					return #err(#NotOwner(true));
-				};
-
-				// Filter out the image with the given FileAssetID
-				let remaining_images = Array.filter<FileAsset>(
-					snap.images,
-					func(image : FileAsset) : Bool {
-						image.id != image_id;
-					}
-				);
-
-				// Update the snap with the filtered images list
-				let updated_snap = {
-					snap with
-					images = remaining_images;
-				};
-
-				// Update the snap in the hashmap
-				snaps.put(snap_id, updated_snap);
-
-				ignore Explore.update_project(snap.project_id, snap.canister_id);
-
-				return #ok(true);
-			};
-		};
-	};
-
 	// Add Images
 	public shared ({ caller }) func add_images_to_snap(snap_id : SnapID, new_images : [FileAsset]) : async Result.Result<Bool, ErrSnap> {
 		switch (snaps.get(snap_id)) {
@@ -911,6 +880,50 @@ actor class Creator(username_registry : Principal) = self {
 				snaps.put(snap_id, updated_snap);
 
 				ignore Explore.update_project(snap.project_id, snap.canister_id);
+
+				return #ok(true);
+			};
+		};
+	};
+
+	// Delete Image
+	public shared ({ caller }) func delete_image_from_snap(snap_id : SnapID, image_id : FileAssetID) : async Result.Result<Bool, ErrSnap> {
+		switch (snaps.get(snap_id)) {
+			case (null) {
+				return #err(#SnapNotFound(true));
+			};
+			case (?snap) {
+				if (Principal.notEqual(snap.owner, caller)) {
+					return #err(#NotOwner(true));
+				};
+
+				// Filter out the image with the given FileAssetID
+				let remaining_images = Array.filter<FileAsset>(
+					snap.images,
+					func(image : FileAsset) : Bool {
+						image.id != image_id;
+					}
+				);
+
+				let image_to_delete = Array.filter<FileAsset>(
+					snap.images,
+					func(image : FileAsset) : Bool {
+						image.id == image_id;
+					}
+				);
+
+				// Update the snap with the filtered images list
+				let updated_snap = {
+					snap with
+					images = remaining_images;
+				};
+
+				// Update the snap in the hashmap
+				snaps.put(snap_id, updated_snap);
+
+				ignore Explore.update_project(snap.project_id, snap.canister_id);
+
+				ignore MO.delete_files(image_to_delete);
 
 				return #ok(true);
 			};
@@ -947,6 +960,9 @@ actor class Creator(username_registry : Principal) = self {
 							projects.put(snap.project_id, project_updated);
 
 							ignore Explore.update_project(snap.project_id, snap.canister_id);
+
+							let file_assets = Utils.get_file_assets_from_snap(snap);
+							ignore MO.delete_files(file_assets);
 						};
 					};
 				};
@@ -957,6 +973,7 @@ actor class Creator(username_registry : Principal) = self {
 	};
 
 	// Delete Snap Images
+	// NOTE: this isn't being USED?
 	public shared ({ caller }) func delete_snap_images(snap_id : SnapID, ids : [FileAssetID]) : async Result.Result<Bool, ErrSnap> {
 		switch (snaps.get(snap_id)) {
 			case (null) {
@@ -1007,12 +1024,19 @@ actor class Creator(username_registry : Principal) = self {
 					return #err(#NotOwner(true));
 				};
 
+				let design_file_deletion : [FileAsset] = switch (snap.design_file) {
+					case (null) { [] };
+					case (?file) { [file] };
+				};
+
 				let snap_updated = {
 					snap with
 					design_file = null;
 				};
 
 				snaps.put(id, snap_updated);
+
+				ignore MO.delete_files(design_file_deletion);
 
 				return #ok(true);
 			};
