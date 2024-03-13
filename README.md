@@ -75,6 +75,7 @@ LINKY_IDENTITY=65716aeecdf8f586fa5d2a82963019d34113156b1f6297b02ada8f663bc1891a6
 - [ ] Multiple Project Owners
 - [ ] Inbox
 - [ ] Bounties
+- [ ] Showcase your NFT's
 
 ## License
 
