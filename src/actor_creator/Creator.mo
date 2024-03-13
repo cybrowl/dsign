@@ -388,6 +388,8 @@ actor class Creator(username_registry : Principal) = self {
 						let file_assets : [FileAsset] = Utils.get_file_assets_from_project(project, snaps);
 						ignore MO.delete_files(file_assets);
 
+						ignore Explore.delete_projects([id]);
+
 						//TODO: should it delete for Favorites too since the owner deleted the files?
 
 						projects.delete(id);
