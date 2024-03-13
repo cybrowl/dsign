@@ -33,6 +33,7 @@ npm run test
 1. Create a .env file at the root of the project.
 2. Add the following environment variables for deployment and identity management:
 
+```
 DEPLOY_ENV=local
 
 # Profile Creation Identities
@@ -54,3 +55,4 @@ DOMINIC_IDENTITY=b381e711f4e9cea57368b71b485f99bfa8e4a5b535e2808c4f022c5156f8748
 
 NIKOLA_IDENTITY=c43e4c8bdfdf0399805fe3c6f96a16f282d249b54618db6e22374d62a009f936d4a1df58e5612d1bb474e8c93af3f7378fc1ff0bedabd3624b0f34016263e823
 LINKY_IDENTITY=65716aeecdf8f586fa5d2a82963019d34113156b1f6297b02ada8f663bc1891a65d9a57974e299f00fe28c4d4901eeea870187c207dc9353546a75e7884a239c
+```
