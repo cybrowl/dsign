@@ -1,6 +1,7 @@
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
@@ -68,6 +69,7 @@ actor class Creator(username_registry : Principal) = self {
 		Principal.equal,
 		Principal.hash
 	);
+	stable var profiles_stable_storage : [(UserPrincipal, Profile)] = [];
 
 	// username to principal ref
 	var usernames : HashMap.HashMap<Username, UserPrincipal> = HashMap.HashMap(
@@ -75,6 +77,7 @@ actor class Creator(username_registry : Principal) = self {
 		Text.equal,
 		Text.hash
 	);
+	stable var usernames_stable_storage : [(Username, UserPrincipal)] = [];
 
 	// favorites (only lives within profile)
 	// NOTE: the data is cached, cron job runs every N time
@@ -86,9 +89,11 @@ actor class Creator(username_registry : Principal) = self {
 
 	// projects
 	var projects : HashMap.HashMap<ProjectID, Project> = HashMap.HashMap(0, Text.equal, Text.hash);
+	stable var projects_stable_storage : [(ProjectID, Project)] = [];
 
 	// snaps
 	var snaps : HashMap.HashMap<SnapID, Snap> = HashMap.HashMap(0, Text.equal, Text.hash);
+	stable var snaps_stable_storage : [(SnapID, Snap)] = [];
 
 	// ------------------------- Profile -------------------------
 	// Get Number Of Users
@@ -1091,6 +1096,46 @@ actor class Creator(username_registry : Principal) = self {
 		return creator_canister_id;
 	};
 
-	// Post Upgrade
-	system func postupgrade() {};
+	// ------------------------- System Methods -------------------------
+	system func preupgrade() {
+		profiles_stable_storage := Iter.toArray(profiles.entries());
+		usernames_stable_storage := Iter.toArray(usernames.entries());
+		projects_stable_storage := Iter.toArray(projects.entries());
+		snaps_stable_storage := Iter.toArray(snaps.entries());
+
+	};
+
+	system func postupgrade() {
+		profiles := HashMap.fromIter<UserPrincipal, Profile>(
+			profiles_stable_storage.vals(),
+			0,
+			Principal.equal,
+			Principal.hash
+		);
+		profiles_stable_storage := [];
+
+		usernames := HashMap.fromIter<Username, UserPrincipal>(
+			usernames_stable_storage.vals(),
+			0,
+			Text.equal,
+			Text.hash
+		);
+		usernames_stable_storage := [];
+
+		projects := HashMap.fromIter<ProjectID, Project>(
+			projects_stable_storage.vals(),
+			0,
+			Text.equal,
+			Text.hash
+		);
+		projects_stable_storage := [];
+
+		snaps := HashMap.fromIter<SnapID, Snap>(
+			snaps_stable_storage.vals(),
+			0,
+			Text.equal,
+			Text.hash
+		);
+		snaps_stable_storage := [];
+	};
 };
