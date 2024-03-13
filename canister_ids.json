@@ -1,23 +1,29 @@
 {
 	"creator": {
-		"ic": "g5iz5-syaaa-aaaag-ahk6a-cai"
+		"staging": "p3wjb-eaaaa-aaaag-ak2oa-cai"
 	},
 	"explore": {
-		"ic": "72zia-7aaaa-aaaag-aa37a-cai",
-		"staging": "ga2sh-2yaaa-aaaag-abqjq-cai"
+		"staging": "phstq-taaaa-aaaag-ak2ma-cai"
 	},
-	"internet_identity": {
-		"staging": "7cyr3-vaaaa-aaaag-acjpa-cai"
+	"file_scaling_manager": {
+		"staging": "pvuej-7qaaa-aaaag-ak2pa-cai"
 	},
+	"file_storage": {
+		"staging": "p4xpv-jyaaa-aaaag-ak2oq-cai"
+	},
+	"internet_identity": {},
 	"logger": {
 		"ic": "jaypp-oiaaa-aaaag-aaa6q-cai",
-		"staging": "goy7p-biaaa-aaaag-abqiq-cai"
+		"staging": "patve-6yaaa-aaaag-ak2mq-cai"
+	},
+	"mo": {
+		"staging": "pjq6y-iqaaa-aaaag-ak2na-cai"
 	},
 	"ui": {
 		"ic": "kqlfj-siaaa-aaaag-aaawq-cai",
 		"staging": "crpmm-6yaaa-aaaag-abqrq-cai"
 	},
 	"username_registry": {
-		"ic": "gipiq-tqaaa-aaaag-ahk5q-cai"
+		"staging": "porym-fiaaa-aaaag-ak2nq-cai"
 	}
 }

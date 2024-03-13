@@ -8,6 +8,7 @@ import Time "mo:base/Time";
 
 import CreatorTypes "../actor_creator/types";
 import ExploreTypes "../actor_explore/types";
+import ICTypes "../c_types/ic";
 
 import Creator "../actor_creator/Creator";
 import Logger "canister:logger";
@@ -32,12 +33,14 @@ actor UsernameRegistry = {
 
 	type CreatorActor = CreatorTypes.CreatorActor;
 	type ExploreActor = ExploreTypes.ExploreActor;
+	type ICManagementActor = ICTypes.Self;
 
 	// ------------------------- Variables -------------------------
 	let VERSION : Nat = 1; // The Version in Production
 	let MAX_USERS : Nat = 100;
 	let ACTOR_NAME : Text = "UsernameRegistry";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
+	private let ic_management_actor : ICManagementActor = actor "aaaaa-aa";
 
 	stable var creator_canister_id = "";
 	stable var explore_canister_id = "";

@@ -9,7 +9,7 @@ import Timer "mo:base/Timer";
 import FileStorage "FileStorage";
 
 import Types "./types";
-import TypesIC "../c_types/ic";
+import ICTypes "../c_types/ic";
 
 import Utils "./utils";
 
@@ -19,7 +19,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	type ErrInit = Types.ErrInit;
 
 	type FileStorageActor = Types.FileStorageActor;
-	type ManagementActor = TypesIC.Self;
+	type ICManagementActor = ICTypes.Self;
 
 	let { thash } = Map;
 
@@ -34,7 +34,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	stable var file_storage_registry_stable_storage : [(Text, FileStorageInfo)] = [];
 
 	// ------------------------- Actor -------------------------
-	private let management_actor : ManagementActor = actor "aaaaa-aa";
+	private let ic_management_actor : ICManagementActor = actor "aaaaa-aa";
 
 	// ------------------------- File Storage Registry -------------------------
 	public query func get_file_storage_registry() : async [FileStorageInfo] {

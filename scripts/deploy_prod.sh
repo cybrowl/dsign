@@ -26,7 +26,7 @@ fi
 
 # Username Registry
 dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} username_registry
-export USERNAME_REGISTRY_CANISTER_ID=$(dfx canister id username_registry)
+export USERNAME_REGISTRY_CANISTER_ID=$(dfx canister ${DEPLOY_NETWORK} id username_registry)
 
 # Explore
 dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} explore
