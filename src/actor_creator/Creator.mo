@@ -57,8 +57,8 @@ actor class Creator(username_registry : Principal) = this {
 	// let USERNAME_REGISTRY_ID : Text = Principal.toText(username_registry);
 	let VERSION : Nat = 1; // The Version in Production
 
-	var users : Nat = 0;
-	var creator_canister_id = "";
+	stable var users : Nat = 0;
+	stable var creator_canister_id = "";
 
 	// ------------------------- Storage Data -------------------------
 	// profiles

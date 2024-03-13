@@ -1,5 +1,6 @@
 import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
@@ -45,6 +46,7 @@ actor UsernameRegistry = {
 		Text.equal,
 		Text.hash
 	);
+	stable var usernames_info_stable_storage : [(Username, UsernameInfo)] = [];
 
 	// Username
 	var usernames : HashMap.HashMap<Principal, Username> = HashMap.HashMap(
@@ -52,6 +54,7 @@ actor UsernameRegistry = {
 		Principal.equal,
 		Principal.hash
 	);
+	stable var usernames_stable_storage : [(Principal, Username)] = [];
 
 	// Canister Registry for Creator
 	var canister_registry_creator : HashMap.HashMap<Principal, CanisterInfo> = HashMap.HashMap(
@@ -59,6 +62,7 @@ actor UsernameRegistry = {
 		Principal.equal,
 		Principal.hash
 	);
+	stable var canister_registry_creator_stable_storage : [(Principal, CanisterInfo)] = [];
 
 	// ------------------------- Username -------------------------
 	// Get Username
@@ -203,6 +207,11 @@ actor UsernameRegistry = {
 		return VERSION;
 	};
 
+	// Get Registry
+	public query func get_registry() : async [CanisterInfo] {
+		return Iter.toArray(canister_registry_creator.vals());
+	};
+
 	private func create_creator_canister(is_prod : Bool) : async () {
 		let username_registry_principal = Principal.fromActor(UsernameRegistry);
 
@@ -251,5 +260,38 @@ actor UsernameRegistry = {
 		if (explore_canister_id.size() == 0) {
 			explore_canister_id := explore_cid;
 		};
+	};
+
+	// ------------------------- System Methods -------------------------
+	system func preupgrade() {
+		usernames_info_stable_storage := Iter.toArray(usernames_info.entries());
+		usernames_stable_storage := Iter.toArray(usernames.entries());
+		canister_registry_creator_stable_storage := Iter.toArray(canister_registry_creator.entries());
+	};
+
+	system func postupgrade() {
+		usernames_info := HashMap.fromIter<Username, UsernameInfo>(
+			usernames_info_stable_storage.vals(),
+			0,
+			Text.equal,
+			Text.hash
+		);
+		usernames_info_stable_storage := [];
+
+		usernames := HashMap.fromIter<Principal, Username>(
+			usernames_stable_storage.vals(),
+			0,
+			Principal.equal,
+			Principal.hash
+		);
+		usernames_stable_storage := [];
+
+		canister_registry_creator := HashMap.fromIter<Principal, CanisterInfo>(
+			canister_registry_creator_stable_storage.vals(),
+			0,
+			Principal.equal,
+			Principal.hash
+		);
+		canister_registry_creator_stable_storage := [];
 	};
 };
