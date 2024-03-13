@@ -15,7 +15,9 @@ export USERNAME_REGISTRY_CANISTER_ID=$(dfx canister id username_registry)
 
 # Explore
 dfx deploy explore
-export EXPLORE_CANISTER_ID=$(dfx canister id explore)
+
+# M-O
+dfx deploy mo
 
 # Creator
 dfx deploy creator --argument='(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")'
@@ -32,6 +34,7 @@ dfx deploy logger
 ### Initialize Canisters
 # Must be called before anything else
 dfx canister call explore init '(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")' 
+dfx canister call mo init '(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")' 
 
 dfx canister call username_registry init
 dfx canister call creator init

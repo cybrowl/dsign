@@ -68,6 +68,11 @@ actor MO = {
 		};
 	};
 
+	// Get Registry
+	public query func get_registry() : async [CanisterInfo] {
+		return Iter.toArray(canister_registry_creator.vals());
+	};
+
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;

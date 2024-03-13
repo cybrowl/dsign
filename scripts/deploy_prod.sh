@@ -30,7 +30,9 @@ export USERNAME_REGISTRY_CANISTER_ID=$(dfx canister id username_registry)
 
 # Explore
 dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} explore
-export EXPLORE_CANISTER_ID=$(dfx canister id explore)
+
+# M-O
+dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} mo
 
 # Creator
 dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} creator --argument='(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")'
