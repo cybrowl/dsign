@@ -57,7 +57,6 @@ actor class Creator(username_registry : Principal) = self {
 
 	// ------------------------- Variables -------------------------
 	let MAX_USERS : Nat = 100;
-	// let USERNAME_REGISTRY_ID : Text = Principal.toText(username_registry);
 	let VERSION : Nat = 1; // The Version in Production
 
 	stable var users : Nat = 0;
@@ -195,6 +194,18 @@ actor class Creator(username_registry : Principal) = self {
 			};
 
 			case (?profile) {
+				let avatar_delete : FileAsset = {
+					id = args.id;
+					canister_id = args.canister_id;
+					chunks_size = 1;
+					content_encoding = #Identity;
+					content_size = 1;
+					content_type = "image";
+					created = 1;
+					name = "NA";
+					url = args.url;
+				};
+
 				let avatar_updated = {
 					id = args.id;
 					canister_id = args.canister_id;
@@ -207,6 +218,8 @@ actor class Creator(username_registry : Principal) = self {
 				};
 
 				profiles.put(caller, profile_updated);
+
+				ignore MO.delete_files([avatar_delete]);
 
 				return #ok(profile_updated.avatar.url);
 			};
@@ -221,6 +234,18 @@ actor class Creator(username_registry : Principal) = self {
 			};
 
 			case (?profile) {
+				let banner_delete : FileAsset = {
+					id = args.id;
+					canister_id = args.canister_id;
+					chunks_size = 1;
+					content_encoding = #Identity;
+					content_size = 1;
+					content_type = "image";
+					created = 1;
+					name = "NA";
+					url = args.url;
+				};
+
 				let banner_updated = {
 					id = args.id;
 					canister_id = args.canister_id;
@@ -233,6 +258,8 @@ actor class Creator(username_registry : Principal) = self {
 				};
 
 				profiles.put(caller, profile_updated);
+
+				ignore MO.delete_files([banner_delete]);
 
 				return #ok(profile_updated.banner.url);
 			};
