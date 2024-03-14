@@ -9,9 +9,6 @@
 # svelte
 .svelte-kit
 
-# vessel
-.vessel
-
 # env
 .env
 
@@ -28,5 +25,5 @@ package-lock.json
 # debug
 npm-debug.log*
 
-
+# mops
 .mops
