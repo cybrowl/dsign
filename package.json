@@ -11,6 +11,7 @@
 		"logs": "npm run idl_for_testing && tape test-utils/debug/debug.test.cjs",
 		"boot": "sh ./scripts/deploy_local.sh",
 		"deploy": "sh ./scripts/deploy_prod.sh",
+		"deploy:children": "node ./scripts/deploy_children.js",
 		"test": "vitest run",
 		"test:config": "vitest test_e2e/dfx.config.test.js",
 		"test:profile_create": "vitest test_e2e/profile_creation.test.js",

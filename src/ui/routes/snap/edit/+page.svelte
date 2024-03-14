@@ -78,40 +78,64 @@
 	async function attach_file(event) {
 		let file = get(event, 'detail', {});
 
-		const storage_canister_id_alloc =
-			await $actor_file_scaling_manager.actor.get_current_canister_id();
+		if (
+			!file ||
+			typeof file.name !== 'string' ||
+			typeof file.type !== 'string' ||
+			!file.arrayBuffer
+		) {
+			console.error('Invalid file details.');
+			throw new Error('Invalid file provided.');
+		}
 
-		await auth.file_storage(storage_canister_id_alloc);
-		await auth.creator(snap_cid);
+		try {
+			const storage_canister_id_alloc =
+				await $actor_file_scaling_manager.actor.get_current_canister_id();
+			await auth.file_storage(storage_canister_id_alloc);
+			await auth.creator(snap_cid);
+		} catch (error) {
+			console.error('Error during authorization or canister ID retrieval:', error);
+			throw new Error('Authorization or canister ID retrieval failed.');
+		}
 
 		const file_storage = new FileStorage($actor_file_storage.actor);
 
-		if (file) {
-			snap_actions.add_design_file(file);
-
+		try {
 			const file_uint8 = new Uint8Array(await file.arrayBuffer());
 
-			try {
-				const { ok: file_uploaded } = await file_storage.store(file_uint8, {
-					filename: file.name,
-					content_type: file.type
-				});
+			const { ok: file_uploaded } = await file_storage.store(file_uint8, {
+				filename: file.name,
+				content_type: file.type
+			});
 
-				const snap_args = {
-					id: snap_id,
-					name: [],
-					tags: [],
-					design_file: [file_uploaded],
-					image_cover_location: []
-				};
-
-				const { ok: snap_public, err: err_profile } =
-					await $actor_creator.actor.update_snap(snap_args);
-			} catch (error) {
-				console.error('Error uploading file:', error);
-				// Handle the error case, e.g., show an error message to the user
+			if (!file_uploaded) {
+				console.error('File upload failed.');
+				throw new Error('File upload was not successful.');
 			}
+
+			const snap_args = {
+				id: snap_id,
+				name: [],
+				tags: [],
+				design_file: [file_uploaded],
+				image_cover_location: []
+			};
+
+			const { ok: snap_public, err: err_profile } =
+				await $actor_creator.actor.update_snap(snap_args);
+
+			console.log('snap_public: ', snap_public);
+
+			if (!snap_public || err_profile) {
+				console.error('Error updating snap:', err_profile);
+				throw new Error('Failed to update snap.');
+			}
+		} catch (error) {
+			console.error('Error uploading file or updating snap:', error);
+			throw error;
 		}
+
+		return { success: true };
 	}
 
 	async function remove_file() {

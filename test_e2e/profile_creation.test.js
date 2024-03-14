@@ -136,8 +136,6 @@ describe('Profile Creation Tests', () => {
 		const { ok: profile, err: errProfile } =
 			await creator_actor.get_profile_by_username(validUsername);
 
-		console.log('profile: ', profile);
-
 		expect(profile).toBeTruthy();
 		expect(profile.username).toEqual(validUsername);
 		expect(profile.is_owner).toBe(true);

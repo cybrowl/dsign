@@ -1,4 +1,6 @@
-import canisterIds from '../.dfx/local/canister_ids.json';
+const canisterIds = await import('../.dfx/local/canister_ids.json', {
+	assert: { type: 'json' }
+});
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -16,7 +18,7 @@ const canisterNames = [
 
 // Synchronously load canister IDs
 export const canister_ids = canisterNames.reduce((acc, name) => {
-	acc[`${name}`] = canisterIds[name].local;
+	acc[`${name}`] = canisterIds.default[name].local;
 	return acc;
 }, {});
 
