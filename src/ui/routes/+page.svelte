@@ -23,8 +23,6 @@
 
 			const projects = await $actor_explore.actor.get_all_projects();
 
-			console.log('projects: ', projects);
-
 			if (projects) {
 				explore_store.set({ isFetching: false, projects });
 			}

@@ -59,8 +59,6 @@
 
 			const { ok: project, err: error } = await $actor_creator.actor.get_project(project_id);
 
-			console.log('project: ', project);
-
 			project_store.set({ isFetching: false, project });
 		} catch (error) {
 			console.log('error: ', error);
@@ -104,9 +102,6 @@
 		if ($actor_creator.loggedIn) {
 			const { ok: deleted_snaps, err: err_profile } =
 				await $actor_creator.actor.delete_snaps(selected_snap_ids);
-
-			console.log('deleted: ', deleted_snaps);
-			console.log('err_profile: ', err_profile);
 		} else {
 			navigate_to_home_with_notification();
 		}
@@ -122,9 +117,6 @@
 
 	async function send_message(event) {
 		const { content, selected_topic } = event.detail;
-
-		console.log('content: ', content);
-		console.log('selected_topic: ', selected_topic);
 
 		await auth.creator(canister_id);
 

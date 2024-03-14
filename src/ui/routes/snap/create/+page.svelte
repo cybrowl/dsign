@@ -60,19 +60,11 @@
 	function attach_file(event) {
 		let file = get(event, 'detail', {});
 
-		console.log('$snap_upsert_store.snap: ', $snap_upsert_store.snap);
-
 		snap_actions.add_design_file(file);
-
-		console.log('$snap_upsert_store.snap: ', $snap_upsert_store.snap);
 	}
 
 	function remove_file() {
-		console.log('$snap_upsert_store.snap: ', $snap_upsert_store.snap);
-
 		snap_actions.remove_design_file();
-
-		console.log('$snap_upsert_store.snap: ', $snap_upsert_store.snap);
 	}
 
 	async function select_cover_image(event) {
@@ -119,8 +111,6 @@
 		images
 			.filter((image) => image.status !== 'removed')
 			.forEach((image) => {
-				console.log('image: ', image);
-
 				const imageUploadPromise = file_storage
 					.store(image.uint8Array, {
 						filename: image.fileName,
@@ -149,9 +139,9 @@
 			images: images_arr
 		};
 
-		const { ok: profile, err: err_profile } = await $actor_creator.actor.create_snap(snap_args);
+		const { ok: snap_public, err: err_snap } = await $actor_creator.actor.create_snap(snap_args);
 
-		if (profile) {
+		if (snap_public) {
 			cancel();
 		}
 

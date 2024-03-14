@@ -52,5 +52,4 @@ dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call explore init '(principal "'
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call mo init '(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")' 
 
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call username_registry init 
-dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call creator init 
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call file_scaling_manager init  

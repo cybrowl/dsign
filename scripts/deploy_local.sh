@@ -37,7 +37,6 @@ dfx canister call explore init '(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")
 dfx canister call mo init '(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")' 
 
 dfx canister call username_registry init
-dfx canister call creator init
 dfx canister call file_scaling_manager init
 
 # Test All

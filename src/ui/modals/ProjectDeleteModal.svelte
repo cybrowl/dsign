@@ -23,10 +23,6 @@
 
 		if ($actor_creator.loggedIn) {
 			try {
-				//TODO: delete images & files assoc with snaps
-
-				console.log('project: ', project);
-
 				const { ok: deleted } = await $actor_creator.actor.delete_project(project.id);
 
 				profile_actions.delete_project(project.id);

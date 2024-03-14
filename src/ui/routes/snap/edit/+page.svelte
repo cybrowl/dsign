@@ -31,7 +31,8 @@
 	});
 
 	onMount(async () => {
-		//TODO: something
+		await init_auth();
+
 		if (isEmpty($snap_project_store.project)) {
 			goto(`/`);
 		}
@@ -70,18 +71,47 @@
 				image.id
 			);
 
-			console.log('removed_img: ', removed_img);
-
 			is_publishing = false;
 		}
 	}
 
-	function attach_file(event) {
+	async function attach_file(event) {
 		let file = get(event, 'detail', {});
 
-		snap_actions.add_design_file(file);
+		const storage_canister_id_alloc =
+			await $actor_file_scaling_manager.actor.get_current_canister_id();
 
-		//TODO: API call to add
+		await auth.file_storage(storage_canister_id_alloc);
+		await auth.creator(snap_cid);
+
+		const file_storage = new FileStorage($actor_file_storage.actor);
+
+		if (file) {
+			snap_actions.add_design_file(file);
+
+			const file_uint8 = new Uint8Array(await file.arrayBuffer());
+
+			try {
+				const { ok: file_uploaded } = await file_storage.store(file_uint8, {
+					filename: file.name,
+					content_type: file.type
+				});
+
+				const snap_args = {
+					id: snap_id,
+					name: [],
+					tags: [],
+					design_file: [file_uploaded],
+					image_cover_location: []
+				};
+
+				const { ok: snap_public, err: err_profile } =
+					await $actor_creator.actor.update_snap(snap_args);
+			} catch (error) {
+				console.error('Error uploading file:', error);
+				// Handle the error case, e.g., show an error message to the user
+			}
+		}
 	}
 
 	async function remove_file() {
@@ -111,8 +141,6 @@
 			};
 
 			const { ok: updated_snap } = await $actor_creator.actor.update_snap(update_args);
-
-			console.log('updated_snap: ', updated_snap);
 
 			is_publishing = false;
 		}

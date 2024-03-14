@@ -69,8 +69,6 @@
 	function go_to_project(e) {
 		const project = get(e, 'detail');
 
-		console.log('project: ', project);
-
 		project_store.set({ isFetching: false, project });
 
 		goto(`/project/${project.name}?id=${project.id}&cid=${project.canister_id}`);
