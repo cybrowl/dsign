@@ -1145,6 +1145,7 @@ actor class Creator(username_registry : Principal) = self {
 		return VERSION;
 	};
 
+	// Init
 	public shared func init() : async () {
 		creator_canister_id := Principal.toText(Principal.fromActor(self));
 

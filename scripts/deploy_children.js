@@ -122,15 +122,14 @@ const init = async () => {
 				[IDL.Principal],
 				[Principal.fromText(config.username_registry_cid)]
 			);
-			console.log('canister: ', canister);
 
-			// const response = await username_registry_actor.install_code(
-			// 	Principal.fromText(canister.id),
-			// 	[...encoded_args],
-			// 	wasm_module
-			// );
+			const response = await username_registry_actor.install_code(
+				Principal.fromText(canister.id),
+				[...encoded_args],
+				wasm_module
+			);
 
-			// console.log(`Deployed ${canister.canister_id} =>`, response);
+			console.log(`Deployed ${canister.id} =>`, response);
 		}
 	} catch (err) {
 		console.error(err);

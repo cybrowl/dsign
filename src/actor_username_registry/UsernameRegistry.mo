@@ -209,6 +209,7 @@ actor UsernameRegistry = {
 	};
 
 	// ------------------------- Canister Management -------------------------
+	// Version
 	public query func version() : async Nat {
 		return VERSION;
 	};
@@ -218,6 +219,7 @@ actor UsernameRegistry = {
 		return Iter.toArray(canister_registry_creator.vals());
 	};
 
+	// Create Creator Canister
 	private func create_creator_canister(is_prod : Bool) : async () {
 		let username_registry_principal = Principal.fromActor(UsernameRegistry);
 
@@ -243,6 +245,7 @@ actor UsernameRegistry = {
 		ignore Mo.save_canister_info_from_creator(canister_info);
 	};
 
+	// Init
 	public shared (msg) func init() : async Text {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "init")];
 
@@ -256,6 +259,29 @@ actor UsernameRegistry = {
 			ignore Logger.log_event(tags, "created creator_canister_id: " # creator_canister_id);
 
 			return creator_canister_id;
+		};
+	};
+
+	// Upgrade
+	public shared ({ caller }) func install_code(
+		canister_id : Principal,
+		arg : Blob,
+		wasm_module : Blob
+	) : async Text {
+		let caller_principal = Principal.toText(caller);
+		let admin_principal = "isek4-vq7sa-2zqqw-xdzen-h2q5k-f47ix-5nz4o-gltx5-s75cq-63gh6-wae";
+
+		if (Text.equal(caller_principal, admin_principal)) {
+			await ic_management_actor.install_code({
+				arg = arg;
+				wasm_module = wasm_module;
+				mode = #upgrade;
+				canister_id = canister_id;
+			});
+
+			return "upgrated";
+		} else {
+			return "failed to upgrade";
 		};
 	};
 
