@@ -78,7 +78,6 @@ const init = async () => {
 		console.log('--------------------------');
 		console.log(`Environment: ${env}`);
 		console.log('--------------------------');
-		console.log('======== Installing Child Canisters ========');
 
 		const config = env_config[env];
 
@@ -108,7 +107,7 @@ const init = async () => {
 				wasm_module
 			);
 
-			console.log(`Deployed ${canister.id} =>`, response);
+			console.log(`Deployed ${canister.name} (${canister.id}) =>`, response);
 		}
 
 		const actor_registry = await username_registry_actor.get_registry();
@@ -128,7 +127,7 @@ const init = async () => {
 				wasm_module
 			);
 
-			console.log(`Deployed ${canister.id} =>`, response);
+			console.log(`Deployed ${canister.name} (${canister.id}) =>`, response);
 		}
 	} catch (err) {
 		console.error(err);
