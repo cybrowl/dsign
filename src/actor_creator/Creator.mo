@@ -31,8 +31,8 @@ actor class Creator(username_registry : Principal) = self {
 	type ErrProject = Types.ErrProject;
 	type ErrSnap = Types.ErrSnap;
 	type ErrTopic = Types.ErrTopic;
-	type Feedback = Types.Feedback;
 	type FavoriteID = Types.FavoriteID;
+	type Feedback = Types.Feedback;
 	type FileAsset = Types.FileAsset;
 	type FileAssetID = Types.FileAssetID;
 	type Profile = Types.Profile;
@@ -59,7 +59,6 @@ actor class Creator(username_registry : Principal) = self {
 	let MAX_USERS : Nat = 100;
 	let VERSION : Nat = 2; // The Version in Production
 
-	stable var users : Nat = 0;
 	stable var creator_canister_id = "";
 
 	// ------------------------- Storage Data -------------------------
@@ -96,9 +95,14 @@ actor class Creator(username_registry : Principal) = self {
 	stable var snaps_stable_storage : [(SnapID, Snap)] = [];
 
 	// ------------------------- Profile -------------------------
-	// Get Number Of Users
-	public query func total_users() : async Nat {
+	// Get Number Of Profiles
+	public query func total_profiles() : async Nat {
 		return profiles.size();
+	};
+
+	// Get Number Of Usernames
+	public query func total_usernames() : async Nat {
+		return usernames.size();
 	};
 
 	// Get Profile by Username
@@ -154,7 +158,7 @@ actor class Creator(username_registry : Principal) = self {
 			return #err(#NotAuthorizedCaller);
 		};
 
-		if (users > MAX_USERS) {
+		if (usernames.size() > MAX_USERS) {
 			return #err(#MaxUsersExceeded);
 		};
 

@@ -111,7 +111,7 @@ describe('Profile Creation Tests', () => {
 		expect(err_profile).toEqual({ UsernameTaken: true });
 	});
 
-	test('Creator[mishicat].total_users(): => #ok - NumberOfUsers', async () => {
+	test('Creator[mishicat].total_profiles(): => #ok - NumberOfUsers', async () => {
 		const { ok: username_info } =
 			await username_registry_actor.mishicat.get_info_by_username('mishicat');
 		const creator_actor_mishicat = await getActor(
@@ -119,7 +119,7 @@ describe('Profile Creation Tests', () => {
 			interfaces.creator,
 			mishicat_identity
 		);
-		const users_total = await creator_actor_mishicat.total_users();
+		const users_total = await creator_actor_mishicat.total_profiles();
 
 		expect(users_total).toBeGreaterThan(0);
 	});

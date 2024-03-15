@@ -66,12 +66,12 @@ describe('Projects Without Snaps Tests', async () => {
 		expect(username.length).toBeGreaterThan(2);
 	});
 
-	test('Creator[owl].total_users(): => #ok - NumberOfUsers', async () => {
+	test('Creator[owl].total_profiles(): => #ok - NumberOfUsers', async () => {
 		const { ok: username_info } = await username_registry_actor.owl.get_info_by_username('owl');
 
 		creator_actor_owl = await getActor(username_info.canister_id, interfaces.creator, owl_identity);
 
-		const users_total = await creator_actor_owl.total_users();
+		const users_total = await creator_actor_owl.total_profiles();
 
 		expect(users_total).toBeGreaterThan(0);
 	});
