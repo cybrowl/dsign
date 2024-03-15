@@ -23,6 +23,7 @@
 
 	let images = [];
 	let is_publishing = false;
+	let is_uploading_design_file = false;
 	const snap_cid = get($snap_upsert_store, 'snap.canister_id', '');
 	const snap_id = get($snap_upsert_store, 'snap.id', '');
 
@@ -78,6 +79,8 @@
 	async function attach_file(event) {
 		let file = get(event, 'detail', {});
 
+		is_uploading_design_file = true;
+
 		if (
 			!file ||
 			typeof file.name !== 'string' ||
@@ -85,6 +88,9 @@
 			!file.arrayBuffer
 		) {
 			console.error('Invalid file details.');
+
+			is_uploading_design_file = false;
+
 			throw new Error('Invalid file provided.');
 		}
 
@@ -133,15 +139,30 @@
 		} catch (error) {
 			console.error('Error uploading file or updating snap:', error);
 			throw error;
+		} finally {
+			is_uploading_design_file = false;
 		}
 
 		return { success: true };
 	}
 
-	async function remove_file() {
+	async function delete_snap_design_file() {
 		snap_actions.remove_design_file();
 
-		//TODO: API call to remove
+		is_publishing = true;
+
+		await auth.creator(snap_cid);
+
+		if ($actor_creator.loggedIn) {
+			try {
+				const { ok: file_deleted, err: err_delete_file } =
+					await $actor_creator.actor.delete_snap_design_file(snap_id);
+			} catch (error) {
+				console.error('Error removing file:', error);
+			} finally {
+				is_publishing = false;
+			}
+		}
 	}
 
 	async function select_cover_image(event) {
@@ -212,11 +233,11 @@
 			on:attachFile={attach_file}
 			on:cancel={cancel}
 			on:publish={publish}
-			on:removeFile={remove_file}
+			on:removeFile={delete_snap_design_file}
 			snap={$snap_upsert_store.snap}
 			{is_publishing}
+			{is_uploading_design_file}
 			is_edit_mode={true}
-			is_uploading_design_file={false}
 		/>
 	</div>
 </main>

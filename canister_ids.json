@@ -3,6 +3,11 @@
 		"ic": "kskcj-oaaaa-aaaag-ak2sa-cai",
 		"staging": "p3wjb-eaaaa-aaaag-ak2oa-cai"
 	},
+	"file_storage": {
+		"ic": "kvle5-dyaaa-aaaag-ak2sq-cai",
+		"staging": "p4xpv-jyaaa-aaaag-ak2oq-cai"
+	},
+	"internet_identity": {},
 	"explore": {
 		"ic": "kjp6m-uyaaa-aaaag-ak2qq-cai",
 		"staging": "phstq-taaaa-aaaag-ak2ma-cai"
@@ -11,11 +16,6 @@
 		"ic": "k4ipb-vqaaa-aaaag-ak2ta-cai",
 		"staging": "pvuej-7qaaa-aaaag-ak2pa-cai"
 	},
-	"file_storage": {
-		"ic": "kvle5-dyaaa-aaaag-ak2sq-cai",
-		"staging": "p4xpv-jyaaa-aaaag-ak2oq-cai"
-	},
-	"internet_identity": {},
 	"logger": {
 		"ic": "jaypp-oiaaa-aaaag-aaa6q-cai",
 		"staging": "patve-6yaaa-aaaag-ak2mq-cai"

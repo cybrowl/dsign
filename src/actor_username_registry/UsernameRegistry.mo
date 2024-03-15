@@ -36,7 +36,7 @@ actor UsernameRegistry = {
 	type ICManagementActor = ICTypes.Self;
 
 	// ------------------------- Variables -------------------------
-	let VERSION : Nat = 1; // The Version in Production
+	let VERSION : Nat = 2; // The Version in Production
 	let MAX_USERS : Nat = 100;
 	let ACTOR_NAME : Text = "UsernameRegistry";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
