@@ -6,14 +6,19 @@ source .env
 DEPLOY_ENV=${1:-$DEPLOY_ENV}
 
 if [ "$DEPLOY_ENV" == "prod" ]; then
+    echo "------------------------------"
     echo "env: prod"
+    echo "------------------------------"
     cp ./src/env/env_ic.mo ./src/env/env.mo
 
     DEPLOY_NETWORK="--network ic"
     DEPLOY_WALLET="--wallet=l2eht-qyaaa-aaaag-aaarq-cai"
 
 elif [ "$DEPLOY_ENV" == "staging" ]; then
+    echo "------------------------------"
     echo "env: staging"
+    echo "------------------------------"
+
     cp ./src/env/env_staging.mo ./src/env/env.mo
 
     DEPLOY_NETWORK="--network staging"
