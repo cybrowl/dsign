@@ -49,12 +49,48 @@
 		goto(`/project/${project.name}?id=${project.id}&cid=${project.canister_id}`);
 	}
 
-	function add_images(event) {
+	async function add_images(event) {
 		let { imageData } = get(event, 'detail', []);
 
 		snap_actions.add_images_to_snap(imageData);
 
-		//TODO: API call to add images
+		is_publishing = true;
+
+		const storage_canister_id_alloc =
+			await $actor_file_scaling_manager.actor.get_current_canister_id();
+		await auth.file_storage(storage_canister_id_alloc);
+		await auth.creator(snap_cid);
+
+		const file_storage = new FileStorage($actor_file_storage.actor);
+
+		const uploadPromises = [];
+
+		if ($actor_file_storage.loggedIn & $actor_creator.loggedIn) {
+			imageData.forEach((image) => {
+				const imageUploadPromise = file_storage
+					.store(image.uint8Array, {
+						filename: image.fileName,
+						content_type: image.mimeType
+					})
+					.then((uploadResult) => ({ ...uploadResult, isDesignFile: false }));
+
+				uploadPromises.push(imageUploadPromise);
+			});
+
+			// Perform all uploads in parallel
+			const uploadResults = await Promise.all(uploadPromises);
+
+			const images_arr = uploadResults
+				.filter((result) => !result.isDesignFile)
+				.map((result) => result.ok);
+
+			const { ok: added_images } = await $actor_creator.actor.add_images_to_snap(
+				snap_id,
+				images_arr
+			);
+
+			is_publishing = false;
+		}
 	}
 
 	async function remove_image(event) {
