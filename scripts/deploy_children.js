@@ -101,15 +101,14 @@ const init = async () => {
 			const wasm_module = get_wasm_module(canister.name, config.wasm_path);
 
 			const encoded_args = IDL.encode([IDL.Bool, IDL.Text], [config.is_prod, '8080']);
-			console.log('canister: ', canister);
 
-			// const response = await file_scaling_manager_actor.install_code(
-			// 	Principal.fromText(canister.id),
-			// 	[...encoded_args],
-			// 	wasm_module
-			// );
+			const response = await file_scaling_manager_actor.install_code(
+				Principal.fromText(canister.id),
+				[...encoded_args],
+				wasm_module
+			);
 
-			// console.log(`Deployed ${canister.canister_id} =>`, response);
+			console.log(`Deployed ${canister.id} =>`, response);
 		}
 
 		const actor_registry = await username_registry_actor.get_registry();

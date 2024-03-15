@@ -3,6 +3,7 @@ import Iter "mo:base/Iter";
 import Map "mo:map/Map";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
+import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Timer "mo:base/Timer";
 
@@ -26,7 +27,8 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "FileScalingManager";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 1;
+	let VERSION : Nat = 2;
+
 	stable var file_storage_canister_id : Text = "";
 
 	// ------------------------- Storage Data -------------------------
@@ -61,10 +63,12 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	};
 
 	// ------------------------- Canister Management -------------------------
+	// Version
 	public query func version() : async Nat {
 		return VERSION;
 	};
 
+	// Init
 	public shared ({ caller }) func init() : async Text {
 		if (file_storage_canister_id.size() > 3) {
 			return file_storage_canister_id;
@@ -72,6 +76,29 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 			await create_file_storage_canister();
 
 			return file_storage_canister_id;
+		};
+	};
+
+	// Upgrade
+	public shared ({ caller }) func install_code(
+		canister_id : Principal,
+		arg : Blob,
+		wasm_module : Blob
+	) : async Text {
+		let caller_principal = Principal.toText(caller);
+		let admin_principal = "isek4-vq7sa-2zqqw-xdzen-h2q5k-f47ix-5nz4o-gltx5-s75cq-63gh6-wae";
+
+		if (Text.equal(caller_principal, admin_principal)) {
+			await ic_management_actor.install_code({
+				arg = arg;
+				wasm_module = wasm_module;
+				mode = #upgrade;
+				canister_id = canister_id;
+			});
+
+			return "upgrated";
+		} else {
+			return "failed to upgrade";
 		};
 	};
 
