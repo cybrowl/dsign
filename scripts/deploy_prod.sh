@@ -53,3 +53,9 @@ dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call mo init '(principal "'${USE
 
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call username_registry init 
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call file_scaling_manager init  
+
+### Deploy Children
+npm run deploy:children
+
+# UI
+dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} ui
