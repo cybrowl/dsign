@@ -36,6 +36,4 @@ dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call file_scaling_manager get_fi
 
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call explore get_registry
 
-dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call username_registry send_all_canister_info_to_mo
-
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call mo get_registry
