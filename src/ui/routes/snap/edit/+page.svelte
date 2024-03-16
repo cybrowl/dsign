@@ -252,10 +252,30 @@
 		}
 	}
 
-	async function publish() {
-		//TODO: expose name change function
-		//TODO: expose tag name function
-		console.log('snap_upsert_store: ', $snap_upsert_store.snap);
+	async function snap_name_change(event) {
+		const { snap_name } = get(event, 'detail', []);
+
+		is_publishing = true;
+
+		await auth.creator(snap_cid);
+
+		if ($actor_creator.loggedIn) {
+			try {
+				const update_args = {
+					id: snap_id,
+					name: [snap_name],
+					design_file: [],
+					image_cover_location: [],
+					tags: []
+				};
+
+				const { ok: updated_snap } = await $actor_creator.actor.update_snap(update_args);
+			} catch (error) {
+				console.error('Error removing file:', error);
+			} finally {
+				is_publishing = false;
+			}
+		}
 	}
 </script>
 
@@ -294,7 +314,7 @@
 			on:attachFile={attach_file}
 			on:cancel={cancel}
 			on:update_tags={update_tags}
-			on:publish={publish}
+			on:snap_name_change={snap_name_change}
 			on:removeFile={delete_snap_design_file}
 			snap={$snap_upsert_store.snap}
 			{is_publishing}
