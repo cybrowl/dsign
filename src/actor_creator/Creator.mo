@@ -199,15 +199,15 @@ actor class Creator(username_registry : Principal) = self {
 
 			case (?profile) {
 				let avatar_delete : FileAsset = {
-					id = args.id;
-					canister_id = args.canister_id;
+					id = profile.avatar.id;
+					canister_id = profile.avatar.canister_id;
 					chunks_size = 1;
 					content_encoding = #Identity;
 					content_size = 1;
 					content_type = "image";
 					created = 1;
 					name = "NA";
-					url = args.url;
+					url = profile.avatar.url;
 				};
 
 				let avatar_updated = {
@@ -239,15 +239,15 @@ actor class Creator(username_registry : Principal) = self {
 
 			case (?profile) {
 				let banner_delete : FileAsset = {
-					id = args.id;
-					canister_id = args.canister_id;
+					id = profile.banner.id;
+					canister_id = profile.banner.canister_id;
 					chunks_size = 1;
 					content_encoding = #Identity;
 					content_size = 1;
 					content_type = "image";
 					created = 1;
 					name = "NA";
-					url = args.url;
+					url = profile.banner.url;
 				};
 
 				let banner_updated = {
