@@ -23,7 +23,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "FileScalingManager";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 2;
+	let VERSION : Nat = 3;
 
 	stable var file_storage_canister_id : Text = "";
 

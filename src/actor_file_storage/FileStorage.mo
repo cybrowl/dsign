@@ -46,7 +46,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 
 	// ------------------------- Variables -------------------------
 	// let ACTOR_NAME : Text = "FileStorage";
-	let VERSION : Nat = 1;
+	let VERSION : Nat = 2;
 	private var chunk_id_count : Chunk_ID = 0;
 
 	// ------------------------- Storage Data -------------------------

@@ -57,7 +57,7 @@ actor class Creator(username_registry : Principal) = self {
 
 	// ------------------------- Variables -------------------------
 	let MAX_USERS : Nat = 100;
-	let VERSION : Nat = 2; // The Version in Production
+	let VERSION : Nat = 3; // The Version in Production
 
 	stable var creator_canister_id = "";
 

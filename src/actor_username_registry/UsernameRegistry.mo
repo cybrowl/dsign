@@ -36,7 +36,7 @@ actor UsernameRegistry = {
 	type ICManagementActor = ICTypes.Self;
 
 	// ------------------------- Variables -------------------------
-	let VERSION : Nat = 2; // The Version in Production
+	let VERSION : Nat = 3; // The Version in Production
 	let ACTOR_NAME : Text = "UsernameRegistry";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
 	private let ic_management_actor : ICManagementActor = actor "aaaaa-aa";
@@ -280,6 +280,13 @@ actor UsernameRegistry = {
 			return "upgrated";
 		} else {
 			return "failed to upgrade";
+		};
+	};
+
+	// Temporary Func & To be removed
+	public shared func send_all_canister_info_to_mo() : async () {
+		for ((principal, canisterInfo) in canister_registry_creator.entries()) {
+			ignore Mo.save_canister_info_from_creator(canisterInfo);
 		};
 	};
 

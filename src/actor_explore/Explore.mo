@@ -14,7 +14,7 @@ actor Explore {
 	type CreatorActor = CreatorTypes.CreatorActor;
 
 	// ------------------------- Variables -------------------------
-	let VERSION = 1;
+	let VERSION = 2;
 	stable var username_registry : ?Principal = null;
 
 	// ------------------------- Storage Data -------------------------
@@ -118,17 +118,14 @@ actor Explore {
 		return Iter.toArray(projects.vals());
 	};
 
-	// Get Registry
-	public query func get_registry() : async [CanisterInfo] {
-		return Iter.toArray(canister_registry_creator.vals());
-	};
-
 	// ------------------------- Canister Management -------------------------
+	// Version
 	public query func version() : async Nat {
 		return VERSION;
 	};
 
-	public shared ({}) func init(username_registry_principal : Principal) : async Bool {
+	// Init
+	public shared func init(username_registry_principal : Principal) : async Bool {
 		if (username_registry == null) {
 			username_registry := ?username_registry_principal;
 
@@ -136,6 +133,11 @@ actor Explore {
 		} else {
 			return false;
 		};
+	};
+
+	// Get Registry
+	public query func get_registry() : async [CanisterInfo] {
+		return Iter.toArray(canister_registry_creator.vals());
 	};
 
 	// ------------------------- System Methods -------------------------

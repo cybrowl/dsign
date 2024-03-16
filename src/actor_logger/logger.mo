@@ -31,7 +31,7 @@ actor Logger {
 	var logs_pending = Buffer<LogEvent>(0);
 	stable var logs_pending_stable_storage : [LogEvent] = [];
 
-	let VERSION : Nat = 5;
+	let VERSION : Nat = 6;
 	let ACTOR_NAME : Text = "Logger";
 
 	stable var authorized : ?Principal = null;

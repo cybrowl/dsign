@@ -17,7 +17,7 @@ actor MO = {
 
 	// ------------------------- Variables -------------------------
 	// The Version in Production
-	let VERSION : Nat = 1;
+	let VERSION : Nat = 2;
 	stable var username_registry : ?Principal = null;
 
 	// Canister Registry for Creator
@@ -66,11 +66,6 @@ actor MO = {
 		};
 	};
 
-	// Get Registry
-	public query func get_registry() : async [CanisterInfo] {
-		return Iter.toArray(canister_registry_creator.vals());
-	};
-
 	// ------------------------- Canister Management -------------------------
 	// Version
 	public query func version() : async Nat {
@@ -86,6 +81,11 @@ actor MO = {
 		} else {
 			return false;
 		};
+	};
+
+	// Get Registry
+	public query func get_registry() : async [CanisterInfo] {
+		return Iter.toArray(canister_registry_creator.vals());
 	};
 
 	// ------------------------- System Methods -------------------------
