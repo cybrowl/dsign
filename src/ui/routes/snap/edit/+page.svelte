@@ -226,6 +226,32 @@
 		}
 	}
 
+	async function update_tags(event) {
+		const snap_tags = get(event, 'detail', []);
+
+		is_publishing = true;
+
+		await auth.creator(snap_cid);
+
+		if ($actor_creator.loggedIn) {
+			try {
+				const update_args = {
+					id: snap_id,
+					name: [],
+					design_file: [],
+					image_cover_location: [],
+					tags: [snap_tags]
+				};
+
+				const { ok: updated_snap } = await $actor_creator.actor.update_snap(update_args);
+			} catch (error) {
+				console.error('Error removing file:', error);
+			} finally {
+				is_publishing = false;
+			}
+		}
+	}
+
 	async function publish() {
 		//TODO: expose name change function
 		//TODO: expose tag name function
@@ -267,6 +293,7 @@
 			on:addImages={add_images}
 			on:attachFile={attach_file}
 			on:cancel={cancel}
+			on:update_tags={update_tags}
 			on:publish={publish}
 			on:removeFile={delete_snap_design_file}
 			snap={$snap_upsert_store.snap}
