@@ -18,7 +18,7 @@ import Mo "canister:mo";
 import Utils "./utils";
 import Types "./types";
 
-import { IS_PROD; ENV } "../env/env";
+import { IS_PROD } "../env/env";
 
 actor UsernameRegistry = {
 	// NOTE:
@@ -139,10 +139,10 @@ actor UsernameRegistry = {
 	// Create Profile
 	public shared ({ caller }) func create_profile(username : Username) : async Result.Result<Username, ErrUsername> {
 
-		let tags = [
-			("name", ACTOR_NAME),
-			("method", "create_profile")
-		];
+		// let tags = [
+		//     ("name", ACTOR_NAME),
+		//     ("method", "create_profile")
+		// ];
 
 		if (Principal.isAnonymous(caller)) {
 			return #err(#CallerAnonymous(true));

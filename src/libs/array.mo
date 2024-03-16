@@ -33,8 +33,6 @@ module {
 	};
 
 	public func findIndex<X>(array : [X], predicate : X -> Bool) : ?Nat {
-		let size = Array.size(array);
-
 		for (index in Array.keys(array)) {
 			if (predicate(array[index])) {
 				return ?index;

@@ -2,17 +2,13 @@ import Cycles "mo:base/ExperimentalCycles";
 import Iter "mo:base/Iter";
 import Map "mo:map/Map";
 import Principal "mo:base/Principal";
-import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
-import Timer "mo:base/Timer";
 
 import FileStorage "FileStorage";
 
 import Types "./types";
 import ICTypes "../c_types/ic";
-
-import Utils "./utils";
 
 actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	type FileStorageInfo = Types.FileStorageInfo;
@@ -69,7 +65,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	};
 
 	// Init
-	public shared ({ caller }) func init() : async Text {
+	public shared func init() : async Text {
 		if (file_storage_canister_id.size() > 3) {
 			return file_storage_canister_id;
 		} else {
@@ -119,48 +115,6 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 		};
 
 		ignore Map.add(file_storage_registry, thash, file_storage_canister_id, canister_child);
-	};
-
-	private func check_canister_is_full() : async () {
-		let file_storage_actor = actor (file_storage_canister_id) : FileStorageActor;
-
-		switch (await file_storage_actor.is_full()) {
-			case true {
-				await create_file_storage_canister();
-
-				return ();
-			};
-			case false {
-				return ();
-			};
-		};
-	};
-
-	private func update_health() : async () {
-		for ((canister_id, canister) in Map.entries(file_storage_registry)) {
-			let file_storage_actor = actor (canister_id) : FileStorageActor;
-
-			switch (await file_storage_actor.get_status()) {
-				case (status) {
-
-					let status_updated : Status = {
-						cycles = status.cycles;
-						memory_mb = status.memory_mb;
-						heap_mb = status.heap_mb;
-						files_size = status.files_size;
-					};
-
-					let info_updated : FileStorageInfo = {
-						canister with
-						status = ?status_updated;
-					};
-
-					ignore Map.put(file_storage_registry, thash, canister_id, info_updated);
-				};
-			};
-		};
-
-		return ();
 	};
 
 	// ------------------------- System Methods -------------------------

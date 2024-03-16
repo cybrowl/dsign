@@ -122,8 +122,6 @@ module {
 	public func get_file_assets_from_topic(
 		topic : Topic
 	) : [FileAsset] {
-		let file_assets : [FileAsset] = [];
-
 		switch (topic.design_file) {
 			case (null) {
 				return [];

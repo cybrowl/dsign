@@ -50,7 +50,7 @@ actor Logger {
 		};
 	};
 
-	public shared ({ caller }) func log_event(tags : Tags, message : Message) : async () {
+	public shared func log_event(tags : Tags, message : Message) : async () {
 		//TODO: gate this func with some auth
 
 		let logger_principal = Principal.fromActor(Logger);

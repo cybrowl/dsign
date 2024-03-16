@@ -1,17 +1,6 @@
-import { Buffer; toArray } "mo:base/Buffer";
-import Debug "mo:base/Debug";
-import Float "mo:base/Float";
-import Hash "mo:base/Hash";
-import Int "mo:base/Int";
 import Iter "mo:base/Iter";
-import Map "mo:map/Map";
-import Nat "mo:base/Nat";
-import Nat32 "mo:base/Nat32";
-import Option "mo:base/Option";
 import Order "mo:base/Order";
-import Prim "mo:⛔";
 import Text "mo:base/Text";
-import Time "mo:base/Time";
 
 import Types "./types";
 
@@ -24,8 +13,6 @@ module {
 		is_prod : Bool;
 		port : Text;
 	};
-
-	let { hashNat } = Map;
 
 	public func get_file_id(url : Text) : Text {
 		let urlSplitByPath : [Text] = Iter.toArray(Text.tokens(url, #char '/'));

@@ -1,5 +1,5 @@
-import Blob "mo:base/Blob";
 import { Buffer; toArray } "mo:base/Buffer";
+import Blob "mo:base/Blob";
 import Error "mo:base/Error";
 import Float "mo:base/Float";
 import Iter "mo:base/Iter";
@@ -7,7 +7,6 @@ import Map "mo:map/Map";
 import Nat "mo:base/Nat";
 import Nat32 "mo:base/Nat32";
 import Option "mo:base/Option";
-import Order "mo:base/Order";
 import Prim "mo:prim";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
@@ -46,9 +45,8 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	type StreamingStrategy = Types.StreamingStrategy;
 
 	// ------------------------- Variables -------------------------
-	let ACTOR_NAME : Text = "FileStorage";
+	// let ACTOR_NAME : Text = "FileStorage";
 	let VERSION : Nat = 1;
-	stable var timer_id : Nat = 0;
 	private var chunk_id_count : Chunk_ID = 0;
 
 	// ------------------------- Storage Data -------------------------
@@ -253,7 +251,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	};
 
 	// ------------------------- Get File HTTP -------------------------
-	public shared query ({ caller }) func http_request(request : HttpRequest) : async HttpResponse {
+	public shared query func http_request(request : HttpRequest) : async HttpResponse {
 		let NOT_FOUND : [Nat8] = Blob.toArray(Text.encodeUtf8("File Not Found"));
 
 		let file_id = Utils.get_file_id(request.url);
@@ -321,7 +319,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		};
 	};
 
-	public shared query ({ caller }) func http_request_streaming_callback(
+	public shared query func http_request_streaming_callback(
 		st : StreamingCallbackToken
 	) : async StreamingCallbackHttpResponse {
 		switch (Map.get(files, thash, st.file_id)) {
