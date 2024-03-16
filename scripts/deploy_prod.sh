@@ -61,7 +61,7 @@ dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call file_scaling_manager init
 
 ### Wait before deploying children
 echo "Waiting for canisters to stabilize..."
-sleep 15
+sleep 20
 
 ### Deploy Children
 npm run deploy:children
