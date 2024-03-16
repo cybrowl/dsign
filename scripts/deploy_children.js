@@ -58,7 +58,7 @@ const init = async () => {
 			prod: {
 				file_scaling_manager_cid: canister_ids_config.default['file_scaling_manager'].ic,
 				username_registry_cid: canister_ids_config.default['username_registry'].ic,
-				wasm_path: `.dfx/${env}/canisters`,
+				wasm_path: `.dfx/ic/canisters`,
 				is_prod: true
 			},
 			staging: {
