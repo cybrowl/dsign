@@ -39,5 +39,9 @@ dfx canister call mo init '(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")'
 dfx canister call username_registry init
 dfx canister call file_scaling_manager init
 
+### Wait before deploying children
+echo "Waiting for canisters to stabilize..."
+sleep 15
+
 ### Deploy Children
 npm run deploy:children
