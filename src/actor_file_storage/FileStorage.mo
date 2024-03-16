@@ -348,7 +348,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	};
 
 	// ------------------------- Private Methods -------------------------
-	private func clear_expired_chunks() : async () {
+	private func clear_expired_chunks<system>() : async () {
 		let current_time = Time.now();
 		let five_minutes = 5 * 60 * 1000000000; // Convert 5 minutes to nanoseconds
 
@@ -381,7 +381,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		chunks := Map.fromIter<Chunk_ID, FileChunk>(chunks_stable_storage.vals(), nhash);
 		chunks_stable_storage := [];
 
-		ignore Timer.recurringTimer(#seconds(300), clear_expired_chunks);
+		ignore Timer.recurringTimer<system>(#seconds(300), clear_expired_chunks);
 
 	};
 };

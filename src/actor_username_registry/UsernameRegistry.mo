@@ -218,10 +218,10 @@ actor UsernameRegistry = {
 	};
 
 	// Create Creator Canister
-	private func create_creator_canister(is_prod : Bool) : async () {
+	private func create_creator_canister<system>(is_prod : Bool) : async () {
 		let username_registry_principal = Principal.fromActor(UsernameRegistry);
 
-		Cycles.add(CYCLE_AMOUNT);
+		Cycles.add<system>(CYCLE_AMOUNT);
 		let creator_actor = await Creator.Creator(username_registry_principal);
 		let principal = Principal.fromActor(creator_actor);
 

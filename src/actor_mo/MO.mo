@@ -72,11 +72,13 @@ actor MO = {
 	};
 
 	// ------------------------- Canister Management -------------------------
+	// Version
 	public query func version() : async Nat {
 		return VERSION;
 	};
 
-	public shared ({}) func init(username_registry_principal : Principal) : async Bool {
+	// Init
+	public shared func init(username_registry_principal : Principal) : async Bool {
 		if (username_registry == null) {
 			username_registry := ?username_registry_principal;
 

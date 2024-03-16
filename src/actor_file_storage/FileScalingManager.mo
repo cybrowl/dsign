@@ -99,8 +99,8 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	};
 
 	// ------------------------- Private Methods -------------------------
-	private func create_file_storage_canister() : async () {
-		Cycles.add(CYCLE_AMOUNT);
+	private func create_file_storage_canister<system>() : async () {
+		Cycles.add<system>(CYCLE_AMOUNT);
 		let file_storage_actor = await FileStorage.FileStorage(is_prod, port);
 
 		let principal = Principal.fromActor(file_storage_actor);
