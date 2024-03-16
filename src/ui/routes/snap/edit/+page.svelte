@@ -1,8 +1,7 @@
 <script>
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onDestroy, onMount } from 'svelte';
-	import { get, findIndex, isEmpty } from 'lodash';
+	import { get, isEmpty } from 'lodash';
 
 	import Login from '$components_ref/Login.svelte';
 	import { ImagesEmpty, Images, PageNavigation, SnapUpsertActions } from 'dsign-components';

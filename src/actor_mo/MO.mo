@@ -1,8 +1,6 @@
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
-import Option "mo:base/Option";
 import Principal "mo:base/Principal";
-import Text "mo:base/Text";
 
 import CreatorTypes "../actor_creator/types";
 import FileStorageTypes "../actor_file_storage/types";
@@ -86,5 +84,20 @@ actor MO = {
 		} else {
 			return false;
 		};
+	};
+
+	// ------------------------- System Methods -------------------------
+	system func preupgrade() {
+		canister_registry_creator_stable_storage := Iter.toArray(canister_registry_creator.entries());
+	};
+
+	system func postupgrade() {
+		canister_registry_creator := HashMap.fromIter<Principal, CanisterInfo>(
+			canister_registry_creator_stable_storage.vals(),
+			0,
+			Principal.equal,
+			Principal.hash
+		);
+		canister_registry_creator_stable_storage := [];
 	};
 };

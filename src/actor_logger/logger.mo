@@ -1,15 +1,9 @@
-import Array "mo:base/Array";
-import Blob "mo:base/Blob";
 import { Buffer; toArray; fromArray } "mo:base/Buffer";
-import Cycles "mo:base/ExperimentalCycles";
 import Int "mo:base/Int";
-import Iter "mo:base/Iter";
-import List "mo:base/List";
 import Principal "mo:base/Principal";
+import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
-import Timer "mo:base/Timer";
-import Result "mo:base/Result";
 
 import Types "./types";
 
@@ -110,7 +104,7 @@ actor Logger {
 		};
 	};
 
-	public query ({ caller }) func size() : async Nat {
+	public query ({}) func size() : async Nat {
 		return logs_pending.size();
 	};
 

@@ -621,7 +621,7 @@ actor class Creator(username_registry : Principal) = self {
 		};
 	};
 
-	// Remove File from Topic [Owner]
+	// Delete File from Topic [Owner]
 	public shared ({ caller }) func delete_file_from_topic(args : ArgsUpdateTopic) : async Result.Result<Topic, ErrTopic> {
 		switch (projects.get(args.project_id)) {
 			case (null) {

@@ -2,7 +2,6 @@ import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
-import Option "mo:base/Option";
 
 import CreatorTypes "../actor_creator/types";
 import UsernameRegistryTypes "../actor_username_registry/types";

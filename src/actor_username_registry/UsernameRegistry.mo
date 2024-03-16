@@ -37,13 +37,11 @@ actor UsernameRegistry = {
 
 	// ------------------------- Variables -------------------------
 	let VERSION : Nat = 2; // The Version in Production
-	let MAX_USERS : Nat = 100;
 	let ACTOR_NAME : Text = "UsernameRegistry";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
 	private let ic_management_actor : ICManagementActor = actor "aaaaa-aa";
 
 	stable var creator_canister_id = "";
-	stable var explore_canister_id = "";
 
 	// ------------------------- Storage Data -------------------------
 	// Username Info
@@ -115,7 +113,7 @@ actor UsernameRegistry = {
 	};
 
 	// Get Info by Username
-	public query ({ caller }) func get_info_by_username(username : Username) : async Result.Result<UsernameInfo, ErrUsername> {
+	public query ({}) func get_info_by_username(username : Username) : async Result.Result<UsernameInfo, ErrUsername> {
 		switch (usernames_info.get(username)) {
 			case (?info) {
 				#ok(info);
@@ -246,7 +244,7 @@ actor UsernameRegistry = {
 	};
 
 	// Init
-	public shared (msg) func init() : async Text {
+	public shared func init() : async Text {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "init")];
 
 		if (creator_canister_id.size() > 1) {

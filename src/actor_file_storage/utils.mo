@@ -1,6 +1,5 @@
 import { Buffer; toArray } "mo:base/Buffer";
 import Debug "mo:base/Debug";
-import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Float "mo:base/Float";
 import Hash "mo:base/Hash";
 import Int "mo:base/Int";
