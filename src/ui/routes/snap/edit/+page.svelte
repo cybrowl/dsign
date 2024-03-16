@@ -12,8 +12,7 @@
 	import {
 		actor_creator,
 		actor_file_scaling_manager,
-		actor_file_storage,
-		actor_username_registry
+		actor_file_storage
 	} from '$stores_ref/actors';
 	import { auth, init_auth } from '$stores_ref/auth_client';
 	import { snap_upsert_store, snap_project_store, snap_actions } from '$stores_ref/data_snap';
@@ -245,7 +244,7 @@
 
 				const { ok: updated_snap } = await $actor_creator.actor.update_snap(update_args);
 			} catch (error) {
-				console.error('Error removing file:', error);
+				console.error('Error updating tags:', error);
 			} finally {
 				is_publishing = false;
 			}
@@ -271,7 +270,7 @@
 
 				const { ok: updated_snap } = await $actor_creator.actor.update_snap(update_args);
 			} catch (error) {
-				console.error('Error removing file:', error);
+				console.error('Error changing name:', error);
 			} finally {
 				is_publishing = false;
 			}
@@ -280,7 +279,7 @@
 </script>
 
 <svelte:head>
-	<title>Snap Upsert</title>
+	<title>Snap Edit</title>
 </svelte:head>
 
 <main class="grid_layout">
