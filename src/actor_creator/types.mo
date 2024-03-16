@@ -1,8 +1,6 @@
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 
-// import ICInterfaceTypes "../types/ic.types";
-
 module {
 	public type CanisterID = Text;
 	public type FavoriteID = Text;
@@ -12,8 +10,6 @@ module {
 	public type Time = Int;
 	public type Username = Text;
 	public type UserPrincipal = Principal;
-
-	// public type ICInterface = ICInterfaceTypes.Self;
 
 	public type Metrics = {
 		likes : Nat;
@@ -93,10 +89,13 @@ module {
 	};
 
 	public type ErrProfile = {
-		#NotAuthorizedCaller;
-		#MaxUsersExceeded;
-		#ProfileNotFound : Bool;
+		#FavoriteNotFound : Bool;
 		#InvalidProfileArguments : Bool;
+		#MaxUsersExceeded;
+		#NotAuthorizedCaller;
+		#ProfileNotFound : Bool;
+		#ProjectExists : Bool;
+		#ProjectNotFound : Bool;
 		#UsernamePrincipalNotFound;
 	};
 

@@ -27,6 +27,7 @@ actor class Creator(username_registry : Principal) = self {
 	type ArgsUpdateProject = Types.ArgsUpdateProject;
 	type ArgsUpdateSnap = Types.ArgsUpdateSnap;
 	type ArgsUpdateTopic = Types.ArgsUpdateTopic;
+	type CanisterID = Types.CanisterID;
 	type ErrProfile = Types.ErrProfile;
 	type ErrProject = Types.ErrProject;
 	type ErrSnap = Types.ErrSnap;
@@ -48,6 +49,7 @@ actor class Creator(username_registry : Principal) = self {
 	type Username = Types.Username;
 	type UserPrincipal = Types.UserPrincipal;
 
+	type CreatorActor = Types.CreatorActor;
 	type UsernameRegistryActor = UsernameRegistryTypes.UsernameRegistryActor;
 
 	//NOTE: This canister will only hold 100 users, each using 20MB each around 2GB
@@ -78,13 +80,13 @@ actor class Creator(username_registry : Principal) = self {
 	);
 	stable var usernames_stable_storage : [(Username, UserPrincipal)] = [];
 
-	// favorites (only lives within profile)
 	// NOTE: the data is cached, cron job runs every N time
-	// var favorites : HashMap.HashMap<FavoriteID, Project> = HashMap.HashMap(
-	//     0,
-	//     Text.equal,
-	//     Text.hash
-	// );
+	var favorites : HashMap.HashMap<ProjectID, ProjectPublic> = HashMap.HashMap(
+		0,
+		Text.equal,
+		Text.hash
+	);
+	stable var favorites_stable_storage : [(ProjectID, ProjectPublic)] = [];
 
 	// projects
 	var projects : HashMap.HashMap<ProjectID, Project> = HashMap.HashMap(0, Text.equal, Text.hash);
@@ -1078,34 +1080,42 @@ actor class Creator(username_registry : Principal) = self {
 
 	// ------------------------- Favorites -------------------------
 	// Get Number of Favorites
-	// public query func total_favorites() : async Nat {
-	//     return favorites.size();
-	// };
+	public query func total_favorites() : async Nat {
+		return favorites.size();
+	};
 
 	// Save Project as Favorite
-	public shared ({ caller }) func save_project_as_fav(project_id : ProjectID) : async Result.Result<Bool, ErrProfile> {
+	public shared ({ caller }) func save_project_as_fav(project_id : ProjectID, canister_id : CanisterID) : async Result.Result<Bool, ErrProfile> {
+
+		// NOTE: the favorite can be in a different canister id
 		switch (profiles.get(caller)) {
 			case (null) {
 				return #err(#ProfileNotFound(true));
 			};
 			case (?profile) {
-				if (projects.get(project_id) == null) {
-					return #err(#ProfileNotFound(true));
-				};
+				let creator_actor : CreatorActor = actor (canister_id);
 
-				if (Array.find<FavoriteID>(profile.favorites, func(id) { id == project_id }) != null) {
-					return #ok(false);
-				} else {
+				switch (await creator_actor.get_project(project_id)) {
+					case (#ok(project)) {
+						if (Array.find<ProjectID>(profile.favorites, func(id) { id == project_id }) != null) {
+							return #err(#ProjectExists(true));
+						} else {
+							let favorites_updated = Arr.append<ProjectID>(profile.favorites, [project_id]);
 
-					let favorites_updated = Arr.append<FavoriteID>(profile.favorites, [project_id]);
-					let profile_updated = {
-						profile with
-						favorites = favorites_updated
+							let profile_updated = {
+								profile with
+								favorites = favorites_updated
+							};
+
+							profiles.put(caller, profile_updated);
+							favorites.put(project_id, project);
+
+							return #ok(true);
+						};
 					};
-
-					profiles.put(caller, profile_updated);
-
-					return #ok(true);
+					case (#err(error)) {
+						return #err(#ProjectNotFound(true));
+					};
 				};
 			};
 		};
@@ -1118,13 +1128,10 @@ actor class Creator(username_registry : Principal) = self {
 				return #err(#ProfileNotFound(true));
 			};
 			case (?profile) {
-				if (Array.find<FavoriteID>(profile.favorites, func(id) { id == project_id }) == null) {
-					return #err(#ProfileNotFound(true));
-				} else {
-					let favorites_updated = Array.filter<FavoriteID>(
-						profile.favorites,
-						func(id) { id != project_id }
-					);
+				let is_favorite_exists = Arr.exists<FavoriteID>(profile.favorites, func(id) : Bool { id == project_id });
+
+				if (is_favorite_exists) {
+					let favorites_updated = Array.filter<FavoriteID>(profile.favorites, func(id) : Bool { id != project_id });
 
 					let profile_updated = {
 						profile with
@@ -1134,6 +1141,8 @@ actor class Creator(username_registry : Principal) = self {
 					profiles.put(caller, profile_updated);
 
 					return #ok(true);
+				} else {
+					return #err(#FavoriteNotFound(true));
 				};
 			};
 		};
@@ -1163,7 +1172,7 @@ actor class Creator(username_registry : Principal) = self {
 		usernames_stable_storage := Iter.toArray(usernames.entries());
 		projects_stable_storage := Iter.toArray(projects.entries());
 		snaps_stable_storage := Iter.toArray(snaps.entries());
-
+		favorites_stable_storage := Iter.toArray(favorites.entries());
 	};
 
 	system func postupgrade() {
@@ -1198,5 +1207,13 @@ actor class Creator(username_registry : Principal) = self {
 			Text.hash
 		);
 		snaps_stable_storage := [];
+
+		favorites := HashMap.fromIter<ProjectID, ProjectPublic>(
+			favorites_stable_storage.vals(),
+			0,
+			Text.equal,
+			Text.hash
+		);
+		favorites_stable_storage := [];
 	};
 };
