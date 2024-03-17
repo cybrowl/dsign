@@ -64,34 +64,79 @@ describe('Feedback', async () => {
 
 		actor_username_registry.setIdentity(link);
 		await actor_username_registry.delete_profile();
+
+		const creator_canister_id = await actor_username_registry.init();
+		const creator_principal = Principal.fromText(creator_canister_id);
+		actor_creator = pic.createActor(idlFactoryCreator, creator_principal);
+
+		await actor_creator.init();
 	});
 
 	test('UsernameRegistry[link].version(): => #ok - Version Number', async () => {
 		const version_num = await actor_username_registry.version();
-		await actor_username_registry.init();
 
 		expect(version_num).toBe(4n);
 	});
 
-	test('UsernameRegistry[alice].create_profile(): with valid username => #ok - Username', async () => {
+	test('UsernameRegistry[alice].create_profile(): with valid username => #ok - Username and Info', async () => {
 		actor_username_registry.setIdentity(alice);
+
 		const { ok: username, err: error } = await actor_username_registry.create_profile('alice');
+		expect(error).toBeUndefined();
+		expect(username).toBeDefined();
 
-		const { ok: username_info } = await actor_username_registry.get_info_by_username(username);
+		const { ok: username_info, err: info_error } =
+			await actor_username_registry.get_info_by_username(username);
+		expect(info_error).toBeUndefined();
+		expect(username_info).toBeDefined();
+		expect(username_info.username).toBe('alice');
+	});
 
-		const creator_principal = Principal.fromText(username_info.canister_id);
+	test('UsernameRegistry[link].create_profile(): with valid username => #ok - Username and Info', async () => {
+		actor_username_registry.setIdentity(link);
 
-		actor_creator = pic.createActor(idlFactoryCreator, creator_principal);
+		const { ok: username, err: error } = await actor_username_registry.create_profile('link');
+		expect(error).toBeUndefined();
+		expect(username).toBeDefined();
 
-		expect(username.length).toBeGreaterThan(1);
+		const { ok: username_info, err: info_error } =
+			await actor_username_registry.get_info_by_username(username);
+		expect(info_error).toBeUndefined();
+		expect(username_info).toBeDefined();
+		expect(username_info.username).toBe('link');
 	});
 
 	test('Creator[alice].version(): => #ok - Version Number', async () => {
 		actor_creator.setIdentity(alice);
 
 		const version_num = await actor_creator.version();
-		await actor_creator.init();
 
 		expect(version_num).toBe(3n);
+	});
+
+	test('Creator[alice].create_project(): with valid args => #ok - Project for Alice', async () => {
+		const { ok: project, err: projectError } = await actor_creator.create_project({
+			name: 'Alice Project',
+			description: ['Project for Alice']
+		});
+
+		expect(projectError).toBeUndefined();
+		expect(project).toBeTruthy();
+		expect(project.name).toBe('Alice Project');
+		expect(project.description).toEqual(['Project for Alice']);
+	});
+
+	test('Creator[link].create_project(): with valid args => #ok - ProjectPublic', async () => {
+		actor_creator.setIdentity(link);
+
+		const { ok: project, err: projectError } = await actor_creator.create_project({
+			name: 'Project Link',
+			description: ['link project']
+		});
+
+		expect(projectError).toBeUndefined();
+		expect(project).toBeTruthy();
+		expect(project.name).toBe('Project Link');
+		expect(project.description).toEqual(['link project']);
 	});
 });
