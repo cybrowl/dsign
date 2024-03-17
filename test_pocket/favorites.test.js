@@ -1,18 +1,15 @@
 import { Principal } from '@dfinity/principal';
-import { Actor, PocketIc, createIdentity } from '@hadronous/pic';
-import { IDL } from '@dfinity/candid';
+import { PocketIc, createIdentity } from '@hadronous/pic';
 import { resolve } from 'node:path';
 import { describe, test, expect, beforeAll } from 'vitest';
 import {
 	_SERVICE,
-	idlFactory as idlFactoryUsernameRegistry,
-	init
+	idlFactory as idlFactoryUsernameRegistry
 } from '../.dfx/local/canisters/username_registry/service.did.js';
 
 import {
 	_SERVICE,
-	idlFactory as idlFactoryCreator,
-	init as initCreator
+	idlFactory as idlFactoryCreator
 } from '../.dfx/local/canisters/creator/service.did.js';
 
 const WASM_PATH_USERNAME_REGISTRY = resolve(
@@ -25,18 +22,6 @@ const WASM_PATH_USERNAME_REGISTRY = resolve(
 	'canisters',
 	'username_registry',
 	'username_registry.wasm'
-);
-
-const WASM_PATH_CREATOR = resolve(
-	__dirname,
-	'..',
-	'..',
-	'dsign',
-	'.dfx',
-	'local',
-	'canisters',
-	'creator',
-	'creator.wasm'
 );
 
 describe('Feedback', async () => {
