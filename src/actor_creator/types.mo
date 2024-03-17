@@ -84,7 +84,7 @@ module {
 		username : Username;
 		is_owner : Bool;
 		projects : [ProjectPublic];
-		favorites : [Project];
+		favorites : [ProjectPublic];
 		storage_metrics : ?StorageMetrics;
 	};
 

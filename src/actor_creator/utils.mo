@@ -5,6 +5,7 @@ import Principal "mo:base/Principal";
 import Types "./types";
 
 module {
+	type FavoriteID = Types.FavoriteID;
 	type FileAsset = Types.FileAsset;
 	type FileAssetID = Types.FileAssetID;
 	type Project = Types.Project;
@@ -87,6 +88,25 @@ module {
 						};
 
 						return ?project_public;
+					};
+				};
+			}
+		);
+	};
+
+	public func favorites_to_public(
+		favorite_ids : [FavoriteID],
+		favorites : HashMap.HashMap<FavoriteID, ProjectPublic>
+	) : [ProjectPublic] {
+		return Array.mapFilter<FavoriteID, ProjectPublic>(
+			favorite_ids,
+			func(id : FavoriteID) : ?ProjectPublic {
+				switch (favorites.get(id)) {
+					case (null) {
+						return null;
+					};
+					case (?project) {
+						return ?project;
 					};
 				};
 			}

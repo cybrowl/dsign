@@ -119,21 +119,8 @@ actor class Creator(username_registry : Principal) = self {
 						return #err(#ProfileNotFound(true));
 					};
 					case (?profile) {
-						let projects_public = Utils.projects_to_public(profile.projects, projects, snaps, caller);
-
-						let favorites_public : [Project] = Array.mapFilter<FavoriteID, Project>(
-							profile.favorites,
-							func(id : FavoriteID) : ?Project {
-								switch (projects.get(id)) {
-									case (null) {
-										return null;
-									};
-									case (?project) {
-										return ?project;
-									};
-								};
-							}
-						);
+						let projects_public : [ProjectPublic] = Utils.projects_to_public(profile.projects, projects, snaps, caller);
+						let favorites_public : [ProjectPublic] = Utils.favorites_to_public(profile.favorites, favorites);
 
 						return #ok({
 							avatar = profile.avatar;
