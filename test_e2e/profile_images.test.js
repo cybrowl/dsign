@@ -74,12 +74,12 @@ describe('Profile Images Tests', () => {
 	// Example Test: Check version number of UsernameRegistry[nova]
 	test('UsernameRegistry[nova].version(): => #ok - Version Number', async () => {
 		const version_num = await username_registry_actor.nova.version();
-		expect(version_num).toBe(1n);
+		expect(version_num).toBe(4n);
 	});
 
 	test('FileScalingManager[nova].version(): => #ok - Version Number', async () => {
 		const version_num = await file_scaling_manager_actor.nova.version();
-		expect(version_num).toBe(1n);
+		expect(version_num).toBe(3n);
 	});
 
 	test('FileScalingManager[nova].init(): => #ok - CanisterId', async () => {
@@ -140,7 +140,7 @@ describe('Profile Images Tests', () => {
 		const file_storage = new FileStorage(file_storage_actor);
 
 		const version_num = await file_storage.version();
-		expect(version_num).toBe(1n);
+		expect(version_num).toBe(2n);
 	});
 
 	test('FileStorage[nova].create_chunk & create_file_from_chunks(): => #ok - File Stored', async () => {

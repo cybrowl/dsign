@@ -42,7 +42,7 @@ describe('Profile Creation Tests', () => {
 
 	test('UsernameRegistry[mishicat].version(): => #ok - Version Number', async () => {
 		const version_num = await username_registry_actor.mishicat.version();
-		expect(version_num).toBe(1n);
+		expect(version_num).toBe(4n);
 	});
 
 	test('UsernameRegistry[mishicat].init(): => #ok - CanisterId', async () => {

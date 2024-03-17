@@ -82,7 +82,7 @@ describe('Feedback', () => {
 	// Example Test: Check version number of UsernameRegistry[jt]
 	test('UsernameRegistry[jt].version(): => #ok - Version Number', async () => {
 		const version_num = await username_registry_actor.jt.version();
-		expect(version_num).toBe(1n);
+		expect(version_num).toBe(4n);
 	});
 
 	test('UsernameRegistry[jt].create_profile(): with valid username => #ok - Username', async () => {
