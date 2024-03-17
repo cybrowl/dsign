@@ -82,7 +82,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 		wasm_module : Blob
 	) : async Text {
 		let caller_principal = Principal.toText(caller);
-		let admin_principal = "isek4-vq7sa-2zqqw-xdzen-h2q5k-f47ix-5nz4o-gltx5-s75cq-63gh6-wae";
+		let admin_principal = "pimnv-hjnlu-go5zn-6wkn3-xb7l5-al2yp-udeku-genyx-aqgd2-qy4xn-nae";
 
 		if (Text.equal(caller_principal, admin_principal)) {
 			await ic_management_actor.install_code({
