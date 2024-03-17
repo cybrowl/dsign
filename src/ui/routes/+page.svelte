@@ -34,15 +34,11 @@
 	function goto_project(e) {
 		let project = get(e, 'detail');
 
-		// projects_update.update_project(project);
-
 		goto(`/project/${project.name}?id=${project.id}&cid=${project.canister_id}`);
 	}
 
 	function goto_username(e) {
 		let project = get(e, 'detail');
-
-		// projects_update.update_project(project);
 
 		goto(`/${project.username}`);
 	}

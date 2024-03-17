@@ -13,19 +13,10 @@
 
 	const isProd = ['ic', 'staging'].includes(environment()['DFX_NETWORK']);
 
-	onMount(() => {
-		initialize_authentication_and_fetch_profile();
+	onMount(async () => {
+		await init_auth();
+		await auth.username_registry();
 	});
-
-	async function initialize_authentication_and_fetch_profile() {
-		try {
-			await init_auth();
-			await fetch_and_set_profile();
-		} catch (error) {
-			console.error('Initialization or Profile Fetch Failed: ', error);
-			goto('/');
-		}
-	}
 
 	async function fetch_and_set_profile() {
 		await auth.username_registry();

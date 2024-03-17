@@ -29,11 +29,11 @@
 		"luxon": "^3.2.1"
 	},
 	"devDependencies": {
-		"@dfinity/agent": "0.15.6",
-		"@dfinity/auth-client": "0.15.6",
-		"@dfinity/candid": "0.15.6",
-		"@dfinity/identity": "0.15.6",
-		"@dfinity/principal": "0.15.6",
+		"@dfinity/agent": "1.0.1",
+		"@dfinity/auth-client": "1.0.1",
+		"@dfinity/candid": "1.0.1",
+		"@dfinity/identity": "1.0.1",
+		"@dfinity/principal": "1.0.1",
 		"@sveltejs/adapter-static": "3.0.1",
 		"@sveltejs/kit": "2.4.3",
 		"autoprefixer": "10.4.17",

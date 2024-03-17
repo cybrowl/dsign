@@ -30,7 +30,7 @@
 	import { profile_store, profile_actions } from '$stores_ref/data_profile';
 	import { project_store } from '$stores_ref/data_project';
 
-	import { profileTabsState, disable_project_store_reset } from '$stores_ref/page_state';
+	import { profileTabsState } from '$stores_ref/page_state';
 	import modal_update, { modal_visible, modal_mode } from '$stores_ref/modal';
 	import { page_navigation } from '$stores_ref/page_navigation';
 	import { ls_my_profile } from '$stores_ref/local_storage';
@@ -105,17 +105,22 @@
 	async function get_profile() {
 		try {
 			await auth.username_registry();
-			const { ok: username_info } = await $actor_username_registry.actor.get_info_by_username(
-				$page.params.username
-			);
 
-			await auth.creator(username_info.canister_id);
-			const { ok: profile, err: err_profile } = await $actor_creator.actor.get_profile_by_username(
-				$page.params.username
-			);
+			if ($actor_username_registry.loggedIn) {
+				const { ok: username_info } = await $actor_username_registry.actor.get_info_by_username(
+					$page.params.username
+				);
 
-			// TODO: if there is an err
-			profile_store.set({ isFetching: false, profile: profile });
+				await auth.creator(username_info.canister_id);
+
+				if ($actor_creator.loggedIn) {
+					const { ok: profile, err: err_profile } =
+						await $actor_creator.actor.get_profile_by_username($page.params.username);
+
+					// TODO: if there is an err
+					profile_store.set({ isFetching: false, profile: profile });
+				}
+			}
 		} catch (error) {
 			// TODO: log somwhere & error message
 			console.log('error call profile: ', error);
