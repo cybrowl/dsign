@@ -248,6 +248,26 @@ describe('Feedback Integration Tests', async () => {
 		expect(designFile.content_encoding).toBeInstanceOf(Object);
 	});
 
+	test('Creator[james].get_project(): with valid project_id => #ok - ProjectPublic with design file in topics', async () => {
+		actor_creator.setIdentity(james);
+
+		const { ok: projectPublic, err: error } = await actor_creator.get_project(
+			james_projects.one.id
+		);
+
+		expect(error).toBeUndefined();
+		expect(projectPublic).toBeDefined();
+		expect(projectPublic.name).toBe('James Project');
+		expect(projectPublic.description).toEqual(['Project for James']);
+
+		// Check that the design file is included in the topics
+		expect(projectPublic.feedback.topics).toHaveLength(1);
+		expect(projectPublic.feedback.topics[0]).toBeInstanceOf(Array);
+
+		expect(projectPublic.feedback.topics[0][0].design_file).toHaveLength(1);
+		expect(projectPublic.feedback.topics[0][0].design_file[0].name).toBe('5mb_components.fig');
+	});
+
 	test('Creator[james].update_snap_with_file_change(): with valid snap_id and file change => #ok - Updated SnapPublic', async () => {
 		actor_creator.setIdentity(james);
 
@@ -275,7 +295,7 @@ describe('Feedback Integration Tests', async () => {
 		);
 	});
 
-	test('Creator.get_snap(): with valid snap_id => #ok - SnapPublic', async () => {
+	test('Creator[james].get_snap(): with valid snap_id => #ok - SnapPublic', async () => {
 		actor_creator.setIdentity(james);
 
 		const { ok: snap, err: error } = await actor_creator.get_snap(james_snaps.one.id);
@@ -291,5 +311,22 @@ describe('Feedback Integration Tests', async () => {
 		const designFile = snap.design_file[0];
 		expect(designFile.name).toMatch(/\.fig$/);
 		expect(designFile.content_type).toBe('application/octet-stream');
+	});
+
+	test('Creator[james].get_project(): with valid project_id => #ok - ProjectPublic without design file in topics', async () => {
+		actor_creator.setIdentity(james);
+
+		const { ok: projectPublic, err: error } = await actor_creator.get_project(
+			james_projects.one.id
+		);
+
+		expect(error).toBeUndefined();
+		expect(projectPublic).toBeDefined();
+		expect(projectPublic.name).toBe('James Project');
+		expect(projectPublic.description).toEqual(['Project for James']);
+
+		// Check that the design file is not included in the topics
+		expect(projectPublic.feedback.topics).toHaveLength(1);
+		expect(projectPublic.feedback.topics[0]).toEqual([]);
 	});
 });
