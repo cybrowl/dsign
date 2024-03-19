@@ -101,11 +101,27 @@ const delete_project = function (projectId) {
 	});
 };
 
+const delete_favorite_project = function (projectId) {
+	profile_store.update(({ isFetching, profile }) => {
+		const filteredFavorites = profile.favorites.filter((favorite) => favorite.id !== projectId);
+
+		console.log('filteredFavorites: ', filteredFavorites);
+		return {
+			isFetching,
+			profile: {
+				...profile,
+				favorites: filteredFavorites
+			}
+		};
+	});
+};
+
 export const profile_actions = {
 	fetching,
 	update_profile_banner,
 	update_profile_avatar,
 	update_project,
 	add_project,
-	delete_project
+	delete_project,
+	delete_favorite_project
 };

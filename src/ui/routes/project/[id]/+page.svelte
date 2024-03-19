@@ -107,10 +107,7 @@
 		}
 	}
 
-	async function add_project_to_favs(e) {
-		const project_liked = e.detail;
-		console.log('project_liked: ', project_liked);
-
+	async function add_project_to_favs() {
 		await auth.creator(get($ls_my_profile, 'canister_id', ''));
 
 		if ($actor_creator.loggedIn) {
@@ -118,9 +115,8 @@
 				project_id,
 				canister_id
 			);
-			if (fav_added) {
-				console.log('Project added to favorites successfully');
-			} else if (err_profile) {
+
+			if (err_profile) {
 				console.error('Error adding project to favorites:', err_profile);
 			}
 		} else {

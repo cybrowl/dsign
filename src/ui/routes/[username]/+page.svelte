@@ -165,7 +165,24 @@
 	async function delete_project_from_favs(e) {
 		const selected_project = get(e, 'detail');
 
-		//TODO: delete project from favs
+		profile_actions.delete_favorite_project(selected_project.id);
+
+		await auth.creator(get($ls_my_profile, 'canister_id', ''));
+
+		if ($actor_creator.loggedIn) {
+			const { ok: fav_added, err: err_favs } = await $actor_creator.actor.delete_project_from_favs(
+				selected_project.id
+			);
+
+			const username = get($ls_my_profile, 'username', '');
+			const { ok: profile } = await $actor_creator.actor.get_profile_by_username(username);
+
+			if (profile) {
+				profile_store.set({ isFetching: false, profile: profile });
+			}
+		} else {
+			navigate_to_home_with_notification();
+		}
 	}
 </script>
 
@@ -290,7 +307,7 @@
 			{/if}
 
 			<!-- Favorites -->
-			{#if $profile_store.profile.favorites > 0}
+			{#if $profile_store.profile.favorites.length > 0}
 				{#each $profile_store.profile.favorites as project}
 					<ProjectCard
 						{project}
