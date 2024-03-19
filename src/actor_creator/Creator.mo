@@ -721,13 +721,76 @@ actor class Creator(username_registry : Principal) = self {
 	};
 
 	// Update Snap with new File Change [Owner]
-	// public shared ({}) func update_snap_with_file_change(args : ArgsUpdateTopic) : async Result.Result<Text, Text> {
-	//     //TODO: this is probably a bit more complicated and I need to think about
-	//     //TODO: the file will be owned by the user that uploaded it
-	//     // it will need to change onwers
-	//     // M-O needs to have access to not only delete files but alse change owners
-	//     return #ok("");
-	// };
+	public shared ({ caller }) func update_snap_with_file_change(snap_id : SnapID) : async Result.Result<SnapPublic, ErrSnap> {
+		switch (snaps.get(snap_id)) {
+			case (null) {
+				return #err(#SnapNotFound(true));
+			};
+			case (?snap) {
+				if (Principal.notEqual(snap.owner, caller)) {
+					return #err(#NotOwner(true));
+				};
+
+				switch (projects.get(snap.project_id)) {
+					case (null) {
+						return #err(#ProjectNotFound(true));
+					};
+					case (?project) {
+						let topics = switch (project.feedback.topics) {
+							case (null) { [] };
+							case (?topics) { topics };
+						};
+
+						let topic_found = Array.find<Topic>(topics, func(t) : Bool { t.id == snap_id });
+						switch (topic_found) {
+							case (null) {
+								return #err(#TopicNotFound(true));
+							};
+							case (?topic) {
+								let updated_design_file = switch (topic.design_file) {
+									case (null) { snap.design_file };
+									case (?design_file) { ?design_file };
+								};
+
+								let updated_snap : Snap = {
+									snap with
+									updated = Time.now();
+									design_file = updated_design_file;
+								};
+
+								snaps.put(snap.id, updated_snap);
+
+								let snap_public : SnapPublic = {
+									updated_snap with
+									owner = null;
+									is_owner = true;
+								};
+
+								//TODO: ignore Explore.update_file_ownership(snap.project_id, snap.canister_id);
+
+								// Delete Feedback Topic
+								let topics_updated = Array.filter<Topic>(
+									topics,
+									func(t : Topic) : Bool {
+										return t.id != snap_id;
+									}
+								);
+
+								let feedback_updated : Feedback = { topics = ?topics_updated };
+								let project_updated : Project = {
+									project with feedback = feedback_updated
+								};
+
+								projects.put(project.id, project_updated);
+
+								return #ok(snap_public);
+							};
+						};
+					};
+				};
+			};
+		};
+	};
 
 	// ------------------------- Snaps -------------------------
 	// Get Snap
@@ -817,66 +880,52 @@ actor class Creator(username_registry : Principal) = self {
 
 	// Update Snap
 	public shared ({ caller }) func update_snap(args : ArgsUpdateSnap) : async Result.Result<SnapPublic, ErrSnap> {
-		switch (profiles.get(caller)) {
+		switch (snaps.get(args.id)) {
 			case (null) {
-				return #err(#ProfileNotFound(true));
+				return #err(#SnapNotFound(true));
 			};
-			case (?profile) {
-				switch (snaps.get(args.id)) {
-					case (null) {
-						return #err(#ProjectNotFound(true));
-					};
-					case (?snap) {
-						if (Principal.notEqual(snap.owner, caller)) {
-							return #err(#NotOwner(true));
-						};
-
-						// Update the optional fields only if they are provided
-						let updated_tags = switch (args.tags) {
-							case (null) { snap.tags };
-							case (?tags) { tags };
-						};
-
-						let updated_design_file = switch (args.design_file) {
-							case (null) { snap.design_file };
-							case (?design_file) { ?design_file };
-						};
-
-						let updated_image_cover_location = switch (args.image_cover_location) {
-							case (null) { snap.image_cover_location };
-							case (?location) { location };
-						};
-
-						// Update snap
-						let updated_snap : Snap = {
-							id = snap.id;
-							project_id = snap.project_id;
-							canister_id = snap.canister_id;
-							created = snap.created;
-							updated = Time.now();
-							name = Option.get(args.name, snap.name);
-							tags = updated_tags;
-							username = snap.username;
-							owner = snap.owner;
-							design_file = updated_design_file;
-							image_cover_location = updated_image_cover_location;
-							images = snap.images;
-							metrics = snap.metrics;
-						};
-
-						snaps.put(snap.id, updated_snap);
-
-						let snap_public : SnapPublic = {
-							updated_snap with
-							owner = ?caller;
-							is_owner = true;
-						};
-
-						ignore Explore.update_project(snap.project_id, snap.canister_id);
-
-						return #ok(snap_public);
-					};
+			case (?snap) {
+				if (Principal.notEqual(snap.owner, caller)) {
+					return #err(#NotOwner(true));
 				};
+
+				// Update the optional fields only if they are provided
+				let updated_tags = switch (args.tags) {
+					case (null) { snap.tags };
+					case (?tags) { tags };
+				};
+
+				let updated_design_file = switch (args.design_file) {
+					case (null) { snap.design_file };
+					case (?design_file) { ?design_file };
+				};
+
+				let updated_image_cover_location = switch (args.image_cover_location) {
+					case (null) { snap.image_cover_location };
+					case (?location) { location };
+				};
+
+				// Update snap
+				let updated_snap : Snap = {
+					snap with
+					updated = Time.now();
+					name = Option.get(args.name, snap.name);
+					tags = updated_tags;
+					design_file = updated_design_file;
+					image_cover_location = updated_image_cover_location;
+				};
+
+				snaps.put(snap.id, updated_snap);
+
+				let snap_public : SnapPublic = {
+					updated_snap with
+					owner = ?caller;
+					is_owner = true;
+				};
+
+				ignore Explore.update_project(snap.project_id, snap.canister_id);
+
+				return #ok(snap_public);
 			};
 		};
 	};

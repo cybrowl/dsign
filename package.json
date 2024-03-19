@@ -19,7 +19,7 @@
 		"test:profile_images": "vitest test_e2e/profile_images.test.js",
 		"test:projects_with_snaps": "vitest test_e2e/projects_with_snaps.test.js",
 		"test:projects_without_snaps": "vitest test_e2e/projects_without_snaps.test.js",
-		"test:feedback": "vitest test_e2e/feedback.test.js",
+		"test:feedback": "vitest test_pocket/feedback.test.js",
 		"test:favorites": "vitest test_pocket/favorites.test.js"
 	},
 	"dependencies": {

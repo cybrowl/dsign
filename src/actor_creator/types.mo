@@ -244,6 +244,7 @@ module {
 		#ProfileNotFound : Bool;
 		#ProjectNotFound : Bool;
 		#SnapNotFound : Bool;
+		#TopicNotFound : Bool;
 		#NotOwner : Bool;
 	};
 
