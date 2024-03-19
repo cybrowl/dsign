@@ -235,9 +235,24 @@
 		}
 	}
 
-	function accept_change(event) {
-		//TODO: this might not get done in time
-		console.log('accept_change: ', event.detail);
+	async function accept_change(event) {
+		const topic = event.detail;
+
+		await auth.creator(canister_id);
+		if ($actor_creator.loggedIn) {
+			try {
+				const { ok: topic_updated, err: err_topic } =
+					await $actor_creator.actor.update_snap_with_file_change(topic.id);
+
+				project_actions.fetching();
+
+				const { ok: project } = await $actor_creator.actor.get_project(project_id);
+
+				project_actions.update_project(project);
+			} catch (error) {
+				// TODO: log err
+			}
+		}
 	}
 
 	function tab_change(event) {
