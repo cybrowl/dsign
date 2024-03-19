@@ -1,7 +1,12 @@
 import { Principal } from '@dfinity/principal';
 import { PocketIc, createIdentity } from '@hadronous/pic';
 import { resolve } from 'node:path';
+import path from 'path';
 import { describe, test, expect, beforeAll } from 'vitest';
+import { createFileObject } from '../test_e2e/libs/file.js';
+import { FileStorage } from '../src/ui/utils/file_storage.js';
+import { IDL } from '@dfinity/candid';
+
 import {
 	_SERVICE,
 	idlFactory as idlFactoryUsernameRegistry
@@ -11,6 +16,18 @@ import {
 	_SERVICE,
 	idlFactory as idlFactoryCreator
 } from '../.dfx/local/canisters/creator/service.did.js';
+
+import {
+	_SERVICE,
+	idlFactory as idlFactoryFSManager,
+	init as initFSM
+} from '../.dfx/local/canisters/file_scaling_manager/service.did.js';
+
+import {
+	_SERVICE,
+	idlFactory as idlFactoryFileStorage,
+	init as initFileStorage
+} from '../.dfx/local/canisters/file_storage/service.did.js';
 
 const WASM_PATH_USERNAME_REGISTRY = resolve(
 	__dirname,
@@ -24,14 +41,31 @@ const WASM_PATH_USERNAME_REGISTRY = resolve(
 	'username_registry.wasm'
 );
 
+const WASM_PATH_FS_MANAGER = resolve(
+	__dirname,
+	'..',
+	'..',
+	'dsign',
+	'.dfx',
+	'local',
+	'canisters',
+	'file_scaling_manager',
+	'file_scaling_manager.wasm'
+);
+
 describe('Feedback', async () => {
 	const pic = await PocketIc.create();
 
 	let actor_username_registry = {};
 	let actor_creator = {};
+	let actor_file_scaling_manager = {};
+	let file_storage_actor_lib = {};
 
 	const alice = createIdentity('alice_pass');
 	const link = createIdentity('link_pass');
+
+	let alice_projects = {};
+	let alice_snaps = {};
 
 	beforeAll(async () => {
 		const setup_args_username_registry = {
@@ -39,9 +73,17 @@ describe('Feedback', async () => {
 			wasm: WASM_PATH_USERNAME_REGISTRY
 		};
 
+		const setup_args_file_scaling_manager = {
+			idlFactory: idlFactoryFSManager,
+			wasm: WASM_PATH_FS_MANAGER,
+			arg: IDL.encode(initFSM({ IDL }), [true, '8080'])
+		};
+
 		const fixture_username_registry = await pic.setupCanister(setup_args_username_registry);
+		const fixture_file_scaling_manager = await pic.setupCanister(setup_args_file_scaling_manager);
 
 		actor_username_registry = fixture_username_registry.actor;
+		actor_file_scaling_manager = fixture_file_scaling_manager.actor;
 
 		//DELETE PROFILES TO BE USED
 		actor_username_registry.setIdentity(alice);
@@ -50,11 +92,20 @@ describe('Feedback', async () => {
 		actor_username_registry.setIdentity(link);
 		await actor_username_registry.delete_profile();
 
-		const creator_canister_id = await actor_username_registry.init();
-		const creator_principal = Principal.fromText(creator_canister_id);
+		const creator_cid = await actor_username_registry.init();
+		const file_storage_cid = await actor_file_scaling_manager.init();
+
+		const creator_principal = Principal.fromText(creator_cid);
 		actor_creator = pic.createActor(idlFactoryCreator, creator_principal);
 
 		await actor_creator.init();
+
+		const file_storage_actor = pic.createActor(
+			idlFactoryFileStorage,
+			Principal.fromText(file_storage_cid)
+		);
+
+		file_storage_actor_lib.alice = new FileStorage(file_storage_actor);
 	});
 
 	test('UsernameRegistry[link].version(): => #ok - Version Number', async () => {
@@ -105,10 +156,56 @@ describe('Feedback', async () => {
 			description: ['Project for Alice']
 		});
 
+		alice_projects.one = project;
+
 		expect(projectError).toBeUndefined();
 		expect(project).toBeTruthy();
 		expect(project.name).toBe('Alice Project');
 		expect(project.description).toEqual(['Project for Alice']);
+	});
+
+	test('Creator[alice].get_project(): with existing project => #ok - Retrieve Project', async () => {
+		actor_creator.setIdentity(alice);
+
+		const projectId = alice_projects.one.id;
+
+		const { ok: project, err: projectError } = await actor_creator.get_project(projectId);
+
+		expect(projectError).toBeUndefined();
+		expect(project).toBeTruthy();
+		expect(project.name).toBe('Alice Project');
+		expect(project.description).toEqual(['Project for Alice']);
+	});
+
+	test('Creator[alice].create_snap(): with valid project_id, name, images, and img_location => #ok - SnapPublic', async () => {
+		const fileObject = createFileObject(path.join(__dirname, 'images', 'size', '3mb_japan.jpg'));
+		const { ok: file } = await file_storage_actor_lib.alice.store(fileObject.content, {
+			filename: fileObject.name,
+			content_type: fileObject.type
+		});
+
+		const { ok: snap } = await actor_creator.create_snap({
+			project_id: alice_projects.one.id,
+			name: 'First Snap',
+			tags: [],
+			design_file: [],
+			image_cover_location: 0,
+			images: [file]
+		});
+
+		alice_snaps.one = snap;
+
+		// Assertions for snap properties
+		expect(snap.name).toBe('First Snap');
+		expect(snap.tags).toEqual([]);
+		expect(snap.images).toHaveLength(1);
+
+		// Assertions for the uploaded image
+		const uploadedImage = snap.images[0];
+		expect(uploadedImage.name).toBe('3mb_japan.jpg');
+		expect(uploadedImage.content_type).toBe('image/jpeg');
+		expect(uploadedImage.content_size).toBeGreaterThan(0);
+		expect(uploadedImage.url.startsWith('https://')).toBe(true);
 	});
 
 	test('Creator[link].create_project(): with valid args => #ok - ProjectPublic', async () => {
