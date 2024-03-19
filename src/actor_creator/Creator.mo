@@ -1073,13 +1073,15 @@ actor class Creator(username_registry : Principal) = self {
 
 	// Save Project as Favorite
 	public shared ({ caller }) func save_project_as_fav(project_id : ProjectID, canister_id : CanisterID) : async Result.Result<Bool, ErrProfile> {
-
-		// NOTE: the favorite can be in a different canister id
 		switch (profiles.get(caller)) {
 			case (null) {
 				return #err(#ProfileNotFound(true));
 			};
 			case (?profile) {
+				if (Principal.notEqual(caller, profile.owner)) {
+					return #err(#NotOwner(true));
+				};
+
 				let creator_actor : CreatorActor = actor (canister_id);
 
 				switch (await creator_actor.get_project(project_id)) {
@@ -1115,6 +1117,10 @@ actor class Creator(username_registry : Principal) = self {
 				return #err(#ProfileNotFound(true));
 			};
 			case (?profile) {
+				if (Principal.notEqual(caller, profile.owner)) {
+					return #err(#NotOwner(true));
+				};
+
 				let is_favorite_exists = Arr.exists<FavoriteID>(profile.favorites, func(id) : Bool { id == project_id });
 
 				if (is_favorite_exists) {

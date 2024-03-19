@@ -93,6 +93,7 @@ module {
 		#InvalidProfileArguments : Bool;
 		#MaxUsersExceeded;
 		#NotAuthorizedCaller;
+		#NotOwner : Bool;
 		#ProfileNotFound : Bool;
 		#ProjectExists : Bool;
 		#ProjectNotFound : Bool;
