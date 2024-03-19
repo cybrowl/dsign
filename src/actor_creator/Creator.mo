@@ -111,7 +111,7 @@ actor class Creator(username_registry : Principal) = self {
 	public query ({ caller }) func get_profile_by_username(username : Username) : async Result.Result<ProfilePublic, ErrProfile> {
 		switch (usernames.get(username)) {
 			case (null) {
-				return #err(#ProfileNotFound(true));
+				return #err(#UsernamePrincipalNotFound(true));
 			};
 			case (?creator_principal) {
 				switch (profiles.get(creator_principal)) {

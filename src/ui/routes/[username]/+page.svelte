@@ -104,22 +104,19 @@
 	// ------------------------- API -------------------------
 	async function get_profile() {
 		try {
-			await auth.username_registry();
+			const username = $page.params.username;
 
-			if ($actor_username_registry.loggedIn) {
-				const { ok: username_info } = await $actor_username_registry.actor.get_info_by_username(
-					$page.params.username
-				);
+			const { ok: username_info } = await $actor_username_registry.actor.get_info_by_username(
+				$page.params.username
+			);
 
-				await auth.creator(username_info.canister_id);
+			await auth.creator(username_info.canister_id);
 
-				if ($actor_creator.loggedIn) {
-					const { ok: profile, err: err_profile } =
-						await $actor_creator.actor.get_profile_by_username($page.params.username);
+			const { ok: profile, err: err_profile } =
+				await $actor_creator.actor.get_profile_by_username(username);
 
-					// TODO: if there is an err
-					profile_store.set({ isFetching: false, profile: profile });
-				}
+			if (profile) {
+				profile_store.set({ isFetching: false, profile: profile });
 			}
 		} catch (error) {
 			// TODO: log somwhere & error message

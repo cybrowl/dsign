@@ -97,7 +97,7 @@ module {
 		#ProfileNotFound : Bool;
 		#ProjectExists : Bool;
 		#ProjectNotFound : Bool;
-		#UsernamePrincipalNotFound;
+		#UsernamePrincipalNotFound : Bool;
 	};
 
 	// Project
