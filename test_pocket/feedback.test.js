@@ -218,4 +218,78 @@ describe('Feedback Integration Tests', async () => {
 		expect(feedbackTopic.messages[0].username).toBe('Jinx-Bot');
 		expect(feedbackTopic.snap_name).toBe('First Snap');
 	});
+
+	test('Creator[daphne].add_file_to_topic(): with valid file => #ok - Topic', async () => {
+		actor_creator.setIdentity(daphne);
+
+		const fileObject = createFileObject(path.join(__dirname, 'figma_files', '5mb_components.fig'));
+		const { ok: file } = await file_storage_actor_lib.store(fileObject.content, {
+			filename: fileObject.name,
+			content_type: fileObject.type
+		});
+
+		const { ok: topic, err: topicError } = await actor_creator.add_file_to_topic({
+			project_id: james_projects.one.id,
+			snap_id: james_snaps.one.id,
+			message: [],
+			design_file: [file]
+		});
+
+		expect(topic).toBeDefined();
+		expect(topicError).toBeUndefined();
+		expect(topic.design_file).toBeInstanceOf(Array);
+		expect(topic.design_file).toHaveLength(1);
+
+		const designFile = topic.design_file[0];
+		expect(designFile.name).toBe('5mb_components.fig');
+		expect(designFile.chunks_size).toBe(3n);
+		expect(designFile.content_size).toBe(4473449n);
+		expect(designFile.content_type).toBe('application/octet-stream');
+		expect(designFile.content_encoding).toBeInstanceOf(Object);
+	});
+
+	test('Creator[james].update_snap_with_file_change(): with valid snap_id and file change => #ok - Updated SnapPublic', async () => {
+		actor_creator.setIdentity(james);
+
+		const { ok: updatedSnap, err: updateError } = await actor_creator.update_snap_with_file_change(
+			james_snaps.one.id
+		);
+
+		expect(updateError).toBeUndefined();
+		expect(updatedSnap).toBeDefined();
+		expect(updatedSnap.images).toHaveLength(james_snaps.one.images.length);
+		expect(updatedSnap.images[0]).toEqual(
+			expect.objectContaining({
+				name: '3mb_japan.jpg',
+				content_type: 'image/jpeg',
+				content_size: 3628429n
+			})
+		);
+		expect(updatedSnap.design_file).toHaveLength(1);
+		expect(updatedSnap.design_file[0]).toEqual(
+			expect.objectContaining({
+				name: '5mb_components.fig',
+				content_type: 'application/octet-stream',
+				content_size: 4473449n
+			})
+		);
+	});
+
+	test('Creator.get_snap(): with valid snap_id => #ok - SnapPublic', async () => {
+		actor_creator.setIdentity(james);
+
+		const { ok: snap, err: error } = await actor_creator.get_snap(james_snaps.one.id);
+
+		expect(error).toBeUndefined();
+		expect(snap).toBeDefined();
+		expect(snap.id).toBe(james_snaps.one.id);
+		expect(snap.name).toBe('First Snap');
+
+		expect(error).toBeUndefined();
+		expect(snap).toBeDefined();
+		expect(snap.design_file).toHaveLength(1);
+		const designFile = snap.design_file[0];
+		expect(designFile.name).toMatch(/\.fig$/);
+		expect(designFile.content_type).toBe('application/octet-stream');
+	});
 });
