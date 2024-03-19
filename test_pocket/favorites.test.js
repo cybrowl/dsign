@@ -291,4 +291,65 @@ describe('Feedback', async () => {
 			snaps: expect.any(Array)
 		});
 	});
+
+	test('Creator[link].save_project_as_fav(): adding the same project again should not duplicate it in favorites', async () => {
+		actor_creator.setIdentity(link);
+
+		const project_id = alice_projects.one.id;
+		const creator_canister_id = alice_projects.one.canister_id;
+
+		// Attempt to favorite the project a second time
+		const { ok: is_favorited_again, err: error_again } = await actor_creator.save_project_as_fav(
+			project_id,
+			creator_canister_id
+		);
+
+		expect(error_again).toEqual({ ProjectExists: true });
+		expect(is_favorited_again).toBeUndefined();
+
+		// Retrieve the profile to verify the project is not duplicated in favorites
+		const username = 'link';
+		const { ok: profile_result_after, err: error_after } =
+			await actor_creator.get_profile_by_username(username);
+
+		expect(error_after).toBeUndefined();
+		expect(profile_result_after).toBeDefined();
+
+		// Count how many times the project appears in the favorites
+		const favoriteCount = profile_result_after.favorites.reduce((count, favorite) => {
+			return favorite.id === project_id && favorite.canister_id === creator_canister_id
+				? count + 1
+				: count;
+		}, 0);
+
+		// The project should only appear once in the favorites
+		expect(favoriteCount).toBe(1);
+	});
+
+	test('Creator[link].delete_project_from_favs(): removing a project from favorites => #ok - Project Removed from Favorites', async () => {
+		actor_creator.setIdentity(link);
+
+		const project_id = alice_projects.one.id;
+
+		// Remove the project from favorites
+		const { ok: is_removed, err: remove_error } =
+			await actor_creator.delete_project_from_favs(project_id);
+
+		expect(remove_error).toBeUndefined();
+		expect(is_removed).toBe(true);
+
+		// Retrieve the profile to verify the project is removed from favorites
+		const username = 'link';
+		const { ok: profile_result_after_removal, err: error_after_removal } =
+			await actor_creator.get_profile_by_username(username);
+
+		expect(error_after_removal).toBeUndefined();
+		expect(profile_result_after_removal).toBeDefined();
+
+		// Verify the project is not present in the favorites after removal
+		const favoriteExists = profile_result_after_removal.favorites.some(
+			(favorite) => favorite.id === project_id
+		);
+		expect(favoriteExists).toBe(false);
+	});
 });
