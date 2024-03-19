@@ -21,15 +21,25 @@
 	async function fetch_and_set_profile() {
 		await auth.username_registry();
 
-		if (!$actor_username_registry.loggedIn) return;
+		if (!$actor_username_registry.loggedIn) {
+			goto('/account_creation');
+			return false; // Indicate failure to fetch profile
+		}
 
 		const { ok: username_info, err: err_username } =
 			await $actor_username_registry.actor.get_info();
-		if (!username_info) return goto('/account_creation');
+
+		if (!username_info || err_username) {
+			goto('/account_creation');
+			return false; // Indicate failure to fetch profile
+		}
 
 		await auth.creator(username_info.canister_id);
 
-		if (!$actor_creator.loggedIn) return;
+		if (!$actor_creator.loggedIn) {
+			goto('/account_creation');
+			return false; // Indicate failure to fetch profile
+		}
 
 		const { ok: profile, err: err_profile } = await $actor_creator.actor.get_profile_by_username(
 			username_info.username
@@ -37,18 +47,26 @@
 
 		if (profile) {
 			ls_my_profile.set(profile);
-		} else if (err_profile && err_profile['ProfileNotFound']) {
+			return true; // Indicate successful profile fetch
+		} else {
+			if (err_profile && err_profile['ProfileNotFound']) {
+				//TODO: log error
+			}
 			goto('/account_creation');
+			return false; // Indicate failure to fetch profile
 		}
 	}
 
 	async function handle_auth() {
 		try {
-			await fetch_and_set_profile();
-			goto(`/${get($ls_my_profile, 'username', '')}`);
+			const profileFetched = await fetch_and_set_profile();
+			if (profileFetched) {
+				goto(`/${get($ls_my_profile, 'username', '')}`);
+			}
+			// If fetch_and_set_profile() has navigated away, nothing more is done.
 		} catch (error) {
 			console.error('Auth Handle Error: ', error);
-			goto('/account_creation');
+			goto('/account_creation'); // Navigate to account creation on error
 		}
 	}
 
