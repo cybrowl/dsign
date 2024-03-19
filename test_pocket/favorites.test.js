@@ -221,4 +221,74 @@ describe('Feedback', async () => {
 		expect(project.name).toBe('Project Link');
 		expect(project.description).toEqual(['link project']);
 	});
+
+	test('Creator[alice].get_project(): verify project contains the snap', async () => {
+		actor_creator.setIdentity(alice);
+
+		const projectId = alice_projects.one.id;
+		const snapId = alice_snaps.one.id;
+
+		const { ok: project, err: projectError } = await actor_creator.get_project(projectId);
+
+		expect(projectError).toBeUndefined();
+		expect(project).toBeTruthy();
+
+		const snapExists = project.snaps.some((snap) => snap.id === snapId);
+
+		expect(snapExists).toBe(true);
+	});
+
+	test('Creator[link].get_profile_by_username(): verify profile before adding favorite', async () => {
+		actor_creator.setIdentity(link);
+
+		const username = 'link';
+		const { ok: initial_profile_result, err: initial_error } =
+			await actor_creator.get_profile_by_username(username);
+
+		expect(initial_error).toBeUndefined();
+		expect(initial_profile_result).toBeDefined();
+		expect(initial_profile_result.favorites).not.toContainEqual({
+			project_id: alice_projects.one.id,
+			canister_id: alice_projects.one.canister_id
+		});
+	});
+
+	test('Creator[link].save_project_as_fav(): with valid project_id and canister_id => #ok - Project Saved as Favorite', async () => {
+		actor_creator.setIdentity(link);
+
+		const project_id = alice_projects.one.id;
+		const creator_canister_id = alice_projects.one.canister_id;
+
+		const { ok: is_favorited, err: error } = await actor_creator.save_project_as_fav(
+			project_id,
+			creator_canister_id
+		);
+
+		expect(error).toBeUndefined();
+		expect(is_favorited).toBe(true);
+	});
+
+	test('Creator[link].get_profile_by_username(): verify favorite is there', async () => {
+		actor_creator.setIdentity(link);
+
+		const username = 'link';
+		const { ok: profile_result, err: error } =
+			await actor_creator.get_profile_by_username(username);
+
+		expect(error).toBeUndefined();
+		expect(profile_result).toBeDefined();
+		expect(profile_result.favorites).toContainEqual({
+			id: alice_projects.one.id,
+			created: alice_projects.one.created,
+			username: 'alice',
+			metrics: expect.any(Object),
+			owner: expect.any(Array),
+			name: 'Alice Project',
+			canister_id: alice_projects.one.canister_id,
+			is_owner: false,
+			description: expect.any(Array),
+			feedback: expect.any(Object),
+			snaps: expect.any(Array)
+		});
+	});
 });
