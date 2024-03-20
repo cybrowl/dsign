@@ -241,6 +241,7 @@ module {
 	};
 
 	public type ErrSnap = {
+		#FileUpdateOwnershipFailed : Bool;
 		#ProfileNotFound : Bool;
 		#ProjectNotFound : Bool;
 		#SnapNotFound : Bool;

@@ -72,12 +72,20 @@ actor MO = {
 			case (null) { false };
 			case (?info) { true };
 		};
+
 		if (is_authorized) {
 			let file_storage_actor : FileStorageActor = actor (file.canister_id);
 
-			ignore file_storage_actor.update_file_ownership(file, owner);
+			let file_ownership_update = await file_storage_actor.update_file_ownership(file, owner);
 
-			return true;
+			switch (file_ownership_update) {
+				case (true) {
+					return true;
+				};
+				case (false) {
+					return false;
+				};
+			};
 		} else {
 			return false;
 		};

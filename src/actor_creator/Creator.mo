@@ -768,7 +768,14 @@ actor class Creator(username_registry : Principal) = self {
 
 								switch (topic.design_file) {
 									case (?file_asset) {
-										ignore MO.update_file_ownership(file_asset, snap.owner);
+										let file_ownership_update = await MO.update_file_ownership(file_asset, snap.owner);
+
+										switch (file_ownership_update) {
+											case (true) {};
+											case (false) {
+												return #err(#FileUpdateOwnershipFailed(true));
+											};
+										};
 									};
 									case (null) {};
 								};
