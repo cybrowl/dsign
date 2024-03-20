@@ -176,7 +176,7 @@ describe('Profile Creation Tests', () => {
 		);
 		const { err: errProfile } = await creator_actor.get_profile_by_username(invalidUsername);
 
-		expect(errProfile).toEqual({ ProfileNotFound: true });
+		expect(errProfile).toEqual({ UsernamePrincipalNotFound: true });
 	});
 
 	test('Creator[mishicat].get_canister_id(): => #ok - Canister ID', async () => {

@@ -1,10 +1,15 @@
 import HashMap "mo:base/HashMap";
+import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 
+import Logger "canister:logger";
+
 import CreatorTypes "../actor_creator/types";
 import UsernameRegistryTypes "../actor_username_registry/types";
+
+import Health "../libs/health";
 
 actor Explore {
 	type ProjectID = CreatorTypes.ProjectID;
@@ -14,6 +19,7 @@ actor Explore {
 	type CreatorActor = CreatorTypes.CreatorActor;
 
 	// ------------------------- Variables -------------------------
+	let ACTOR_NAME : Text = "Explore";
 	let VERSION = 2;
 	stable var username_registry : ?Principal = null;
 
@@ -138,6 +144,22 @@ actor Explore {
 	// Get Registry
 	public query func get_registry() : async [CanisterInfo] {
 		return Iter.toArray(canister_registry_creator.vals());
+	};
+
+	public shared func health() : async () {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("projects_size", Int.toText(projects.size())),
+			("cycles_balance", Int.toText(Health.get_cycles_balance())),
+			("memory_in_mb", Int.toText(Health.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(Health.get_heap_in_mb()))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
 	};
 
 	// ------------------------- System Methods -------------------------

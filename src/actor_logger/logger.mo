@@ -104,7 +104,7 @@ actor Logger {
 		};
 	};
 
-	public query ({}) func size() : async Nat {
+	public query func size() : async Nat {
 		return logs_pending.size();
 	};
 
