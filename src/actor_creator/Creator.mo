@@ -766,7 +766,12 @@ actor class Creator(username_registry : Principal) = self {
 									is_owner = true;
 								};
 
-								//TODO: ignore Mo.update_file_ownership(snap.project_id, snap.canister_id);
+								switch (topic.design_file) {
+									case (?file_asset) {
+										ignore MO.update_file_ownership(file_asset, snap.owner);
+									};
+									case (null) {};
+								};
 
 								// Delete Feedback Topic
 								let topics_updated = Array.filter<Topic>(

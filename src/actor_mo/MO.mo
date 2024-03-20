@@ -66,6 +66,23 @@ actor MO = {
 		};
 	};
 
+	// Update File Ownership
+	public shared ({ caller }) func update_file_ownership(file : FileAsset, owner : Principal) : async Bool {
+		let is_authorized : Bool = switch (canister_registry_creator.get(caller)) {
+			case (null) { false };
+			case (?info) { true };
+		};
+		if (is_authorized) {
+			let file_storage_actor : FileStorageActor = actor (file.canister_id);
+
+			ignore file_storage_actor.update_file_ownership(file, owner);
+
+			return true;
+		} else {
+			return false;
+		};
+	};
+
 	// ------------------------- Canister Management -------------------------
 	// Version
 	public query func version() : async Nat {

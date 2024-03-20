@@ -130,5 +130,6 @@ module {
 		is_full : shared () -> async Bool;
 		get_status : query () -> async Status;
 		delete_file : shared (File_ID) -> async Result.Result<Text, ErrDeleteFile>;
+		update_file_ownership : shared (file_asset : FilePublic, owner : Principal) -> async Bool;
 	};
 };

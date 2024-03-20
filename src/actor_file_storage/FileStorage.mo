@@ -192,6 +192,29 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 		};
 	};
 
+	public shared ({ caller }) func update_file_ownership(file_asset : FilePublic, owner : Principal) : async Bool {
+		let mo_actor = Principal.fromActor(MO);
+
+		if (Principal.equal(mo_actor, caller)) {
+			switch (Map.get(files, thash, file_asset.id)) {
+				case (?file) {
+					let file_updated : File = {
+						file with owner = Principal.toText(owner);
+					};
+
+					ignore Map.put(files, thash, file.id, file_updated);
+
+					return true;
+				};
+				case (_) {
+					return false;
+				};
+			};
+		} else {
+			return false;
+		};
+	};
+
 	public query func get_all_files() : async [File] {
 		var files_updated = Buffer<File>(0);
 
