@@ -55,18 +55,18 @@ actor Logger {
 
 		let logger_principal = Principal.fromActor(Logger);
 
-		var env = "dev";
+		var env = "local";
 
 		// Note: change me to your canister id
 		switch (Principal.toText(logger_principal)) {
 			case ("jaypp-oiaaa-aaaag-aaa6q-cai") {
 				env := "prod";
 			};
-			case ("goy7p-biaaa-aaaag-abqiq-cai") {
+			case ("patve-6yaaa-aaaag-ak2mq-cai") {
 				env := "staging";
 			};
 			case _ {
-				env := "dev";
+				env := "local";
 			};
 		};
 

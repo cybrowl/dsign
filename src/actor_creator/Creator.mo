@@ -827,6 +827,8 @@ actor class Creator(username_registry : Principal) = self {
 
 	// Create Snap
 	public shared ({ caller }) func create_snap(args : ArgsCreateSnap) : async Result.Result<SnapPublic, ErrSnap> {
+		let tags = [("canister_id", creator_canister_id), ("method", "create_snap")];
+
 		switch (profiles.get(caller)) {
 			case (null) {
 				return #err(#ProfileNotFound(true));
@@ -882,6 +884,8 @@ actor class Creator(username_registry : Principal) = self {
 						};
 
 						ignore Explore.update_project(project.id, project.canister_id);
+
+						ignore Logger.log_event(tags, "snap_created");
 
 						return #ok(snap_public);
 					};
