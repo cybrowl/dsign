@@ -62,7 +62,7 @@ actor class Creator(username_registry : Principal) = self {
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "Creator";
 	let MAX_USERS : Nat = 100;
-	let VERSION : Nat = 4; // The Version in Production
+	let VERSION : Nat = 5; // The Version in Production
 
 	stable var creator_canister_id = "";
 
@@ -1233,6 +1233,7 @@ actor class Creator(username_registry : Principal) = self {
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
 			("version", Int.toText(VERSION)),
+			("canister_id", Principal.toText(Principal.fromActor(self))),
 			("profiles_size", Int.toText(profiles.size())),
 			("usernames_size", Int.toText(usernames.size())),
 			("favorites_size", Int.toText(favorites.size())),

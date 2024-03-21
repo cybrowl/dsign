@@ -48,7 +48,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "FileStorage";
-	let VERSION : Nat = 3;
+	let VERSION : Nat = 4;
 	private var chunk_id_count : Chunk_ID = 0;
 
 	// ------------------------- Storage Data -------------------------
@@ -379,6 +379,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
 			("version", Int.toText(VERSION)),
+			("canister_id", Principal.toText(Principal.fromActor(this))),
 			("files_size", Int.toText(files.size())),
 			("chunks_size", Int.toText(chunks.size())),
 			("cycles_balance", Int.toText(Health.get_cycles_balance())),
