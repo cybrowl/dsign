@@ -1,40 +1,42 @@
 import { Buffer; toArray; fromArray } "mo:base/Buffer";
 import Int "mo:base/Int";
+import Iter "mo:base/Iter";
+import Map "mo:map/Map";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
+import Timer "mo:base/Timer";
 
 import Types "./types";
 
 import Health "../libs/health";
 
 actor Logger {
-	public type Tags = [(Text, Text)];
-	public type Message = Text;
-	type CanisterInfo = Types.CanisterInfo;
+	let { thash } = Map;
 
 	type AuthorizationError = { #NotAuthorized : Bool };
+	type CanisterInfo = Types.CanisterInfo;
+	type LogEvent = Types.LogEvent;
+	type Message = Types.Message;
+	type Tags = Types.Tags;
 
-	public type LogEvent = {
-		hostname : Text;
-		logtype : Text;
-		env : Text;
-		message : Text;
-		tags : Tags;
-		time : Int;
-	};
+	type CanisterActor = Types.CanisterActor;
 
+	// ------------------------- Variables -------------------------
+	let VERSION : Nat = 6;
+	let ACTOR_NAME : Text = "Logger";
+	stable var authorized : ?Principal = null;
+
+	// ------------------------- Storage Data -------------------------
 	var logs_storage = Buffer<LogEvent>(0);
 	stable var logs_storage_stable_storage : [LogEvent] = [];
 
 	var logs_pending = Buffer<LogEvent>(0);
 	stable var logs_pending_stable_storage : [LogEvent] = [];
 
-	let VERSION : Nat = 6;
-	let ACTOR_NAME : Text = "Logger";
-
-	stable var authorized : ?Principal = null;
+	private var canister_registry = Map.new<Text, CanisterInfo>();
+	stable var canister_registry_stable_storage : [(Text, CanisterInfo)] = [];
 
 	public shared ({ caller }) func authorize() : async Bool {
 		switch (authorized) {
@@ -96,6 +98,10 @@ actor Logger {
 		};
 	};
 
+	public shared ({ caller }) func add_canister_to_registry() : async Result.Result<Text, Text> {
+		return #ok("");
+	};
+
 	public query ({ caller }) func get_logs() : async Result.Result<[LogEvent], AuthorizationError> {
 		if (authorized == ?caller) {
 			return #ok(toArray(logs_pending));
@@ -141,14 +147,34 @@ actor Logger {
 		return Health.get_cycles_low();
 	};
 
+	private func log_canisters_health() : async () {
+		for (canister in Map.vals(canister_registry)) {
+			let canister_actor = actor (canister.id) : CanisterActor;
+
+			ignore canister_actor.health();
+		};
+
+		return ();
+	};
+
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		logs_storage_stable_storage := toArray(logs_storage);
 		logs_pending_stable_storage := toArray(logs_pending);
+
+		canister_registry_stable_storage := Iter.toArray(Map.entries(canister_registry));
 	};
 
 	system func postupgrade() {
 		logs_storage := fromArray(logs_storage_stable_storage);
+		logs_storage_stable_storage := [];
+
 		logs_pending := fromArray(logs_pending_stable_storage);
+		logs_pending_stable_storage := [];
+
+		canister_registry := Map.fromIter<Text, CanisterInfo>(canister_registry_stable_storage.vals(), thash);
+		canister_registry_stable_storage := [];
+
+		ignore Timer.recurringTimer<system>(#seconds(60), log_canisters_health);
 	};
 };
