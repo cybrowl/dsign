@@ -42,7 +42,7 @@ actor UsernameRegistry = {
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "UsernameRegistry";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 5; // The Version in Production
+	let VERSION : Nat = 6; // The Version in Production
 
 	stable var creator_canister_id = "";
 
@@ -304,6 +304,7 @@ actor UsernameRegistry = {
 			("method", "health"),
 			("version", Int.toText(VERSION)),
 			("usernames_info_size", Int.toText(usernames_info.size())),
+			("usernames_size", Int.toText(usernames.size())),
 			("cycles_balance", Int.toText(Health.get_cycles_balance())),
 			("memory_in_mb", Int.toText(Health.get_memory_in_mb())),
 			("heap_in_mb", Int.toText(Health.get_heap_in_mb()))
