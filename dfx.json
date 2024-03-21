@@ -27,7 +27,7 @@
 			"dependencies": ["logger"]
 		},
 		"logger": {
-			"main": "src/actor_logger/logger.mo",
+			"main": "src/actor_logger/Logger.mo",
 			"type": "motoko",
 			"dependencies": []
 		},

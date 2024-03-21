@@ -15,7 +15,7 @@ import ICTypes "../c_types/ic";
 import Health "../libs/health";
 
 actor class FileScalingManager(is_prod : Bool, port : Text) = this {
-	type FileStorageInfo = Types.FileStorageInfo;
+	type CanisterInfo = Types.CanisterInfo;
 	type Status = Types.Status;
 	type ErrInit = Types.ErrInit;
 
@@ -32,14 +32,14 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	stable var file_storage_canister_id : Text = "";
 
 	// ------------------------- Storage Data -------------------------
-	private var file_storage_registry = Map.new<Text, FileStorageInfo>();
-	stable var file_storage_registry_stable_storage : [(Text, FileStorageInfo)] = [];
+	private var file_storage_registry = Map.new<Text, CanisterInfo>();
+	stable var file_storage_registry_stable_storage : [(Text, CanisterInfo)] = [];
 
 	// ------------------------- Actor -------------------------
 	private let ic_management_actor : ICManagementActor = actor "aaaaa-aa";
 
 	// ------------------------- File Storage Registry -------------------------
-	public query func get_file_storage_registry() : async [FileStorageInfo] {
+	public query func get_file_storage_registry() : async [CanisterInfo] {
 		return Iter.toArray(Map.vals(file_storage_registry));
 	};
 
@@ -51,7 +51,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 		return file_storage_canister_id;
 	};
 
-	public query func get_current_canister() : async ?FileStorageInfo {
+	public query func get_current_canister() : async ?CanisterInfo {
 		switch (Map.get(file_storage_registry, thash, file_storage_canister_id)) {
 			case (?canister) {
 				return ?canister;
@@ -128,7 +128,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 		let principal = Principal.fromActor(file_storage_actor);
 		file_storage_canister_id := Principal.toText(principal);
 
-		let canister_child : FileStorageInfo = {
+		let canister_child : CanisterInfo = {
 			created = Time.now();
 			id = file_storage_canister_id;
 			name = "file_storage";
@@ -145,7 +145,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	};
 
 	system func postupgrade() {
-		file_storage_registry := Map.fromIter<Text, FileStorageInfo>(file_storage_registry_stable_storage.vals(), thash);
+		file_storage_registry := Map.fromIter<Text, CanisterInfo>(file_storage_registry_stable_storage.vals(), thash);
 
 		file_storage_registry_stable_storage := [];
 	};

@@ -39,9 +39,9 @@ actor UsernameRegistry = {
 	type ICManagementActor = ICTypes.Self;
 
 	// ------------------------- Variables -------------------------
-	let VERSION : Nat = 4; // The Version in Production
 	let ACTOR_NAME : Text = "UsernameRegistry";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
+	let VERSION : Nat = 5; // The Version in Production
 
 	stable var creator_canister_id = "";
 
@@ -118,7 +118,7 @@ actor UsernameRegistry = {
 	};
 
 	// Get Info by Username
-	public query ({}) func get_info_by_username(username : Username) : async Result.Result<UsernameInfo, ErrUsername> {
+	public query func get_info_by_username(username : Username) : async Result.Result<UsernameInfo, ErrUsername> {
 		switch (usernames_info.get(username)) {
 			case (?info) {
 				#ok(info);
