@@ -1,4 +1,5 @@
 import Cycles "mo:base/ExperimentalCycles";
+import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Map "mo:map/Map";
 import Principal "mo:base/Principal";
@@ -6,9 +7,12 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import FileStorage "FileStorage";
+import Logger "canister:logger";
 
 import Types "./types";
 import ICTypes "../c_types/ic";
+
+import Health "../libs/health";
 
 actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	type FileStorageInfo = Types.FileStorageInfo;
@@ -23,7 +27,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "FileScalingManager";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 3;
+	let VERSION : Nat = 4;
 
 	stable var file_storage_canister_id : Text = "";
 
@@ -96,6 +100,24 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 		} else {
 			return "failed to upgrade";
 		};
+	};
+
+	// Health
+	public shared func health() : async () {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("version", Int.toText(VERSION)),
+			("file_storage_registry_size", Int.toText(file_storage_registry.size())),
+			("cycles_balance", Int.toText(Health.get_cycles_balance())),
+			("memory_in_mb", Int.toText(Health.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(Health.get_heap_in_mb()))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
 	};
 
 	// ------------------------- Private Methods -------------------------

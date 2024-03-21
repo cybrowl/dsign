@@ -121,6 +121,7 @@ actor Logger {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
+			("version", Int.toText(VERSION)),
 			("logs_pending_size", Int.toText(logs_pending.size())),
 			("logs_storage_size", Int.toText(logs_storage.size())),
 			("cycles_balance", Int.toText(Health.get_cycles_balance())),

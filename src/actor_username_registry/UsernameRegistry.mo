@@ -1,5 +1,6 @@
 import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
+import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
@@ -11,11 +12,13 @@ import ExploreTypes "../actor_explore/types";
 import ICTypes "../c_types/ic";
 
 import Creator "../actor_creator/Creator";
-import Logger "canister:logger";
 import Explore "canister:explore";
+import Logger "canister:logger";
 import Mo "canister:mo";
 
+import Health "../libs/health";
 import Utils "./utils";
+
 import Types "./types";
 
 import { IS_PROD } "../env/env";
@@ -39,7 +42,6 @@ actor UsernameRegistry = {
 	let VERSION : Nat = 4; // The Version in Production
 	let ACTOR_NAME : Text = "UsernameRegistry";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	private let ic_management_actor : ICManagementActor = actor "aaaaa-aa";
 
 	stable var creator_canister_id = "";
 
@@ -67,6 +69,9 @@ actor UsernameRegistry = {
 		Principal.hash
 	);
 	stable var canister_registry_creator_stable_storage : [(Principal, CanisterInfo)] = [];
+
+	// ------------------------- Actor -------------------------
+	private let ic_management_actor : ICManagementActor = actor "aaaaa-aa";
 
 	// ------------------------- Username -------------------------
 	// Get Username
@@ -281,6 +286,26 @@ actor UsernameRegistry = {
 		} else {
 			return "failed to upgrade";
 		};
+	};
+
+	// Health
+	public shared func health() : async () {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("version", Int.toText(VERSION)),
+			("usernames_info_size", Int.toText(usernames_info.size())),
+			("cycles_balance", Int.toText(Health.get_cycles_balance())),
+			("memory_in_mb", Int.toText(Health.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(Health.get_heap_in_mb()))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
+
+		return ();
 	};
 
 	// ------------------------- System Methods -------------------------

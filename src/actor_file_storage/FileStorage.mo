@@ -2,6 +2,7 @@ import { Buffer; toArray } "mo:base/Buffer";
 import Blob "mo:base/Blob";
 import Error "mo:base/Error";
 import Float "mo:base/Float";
+import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Map "mo:map/Map";
 import Nat "mo:base/Nat";
@@ -15,6 +16,7 @@ import Time "mo:base/Time";
 import Timer "mo:base/Timer";
 
 import MO "canister:mo";
+import Logger "canister:logger";
 
 import { ofBlob } "./CRC32";
 
@@ -45,8 +47,8 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	type StreamingStrategy = Types.StreamingStrategy;
 
 	// ------------------------- Variables -------------------------
-	// let ACTOR_NAME : Text = "FileStorage";
-	let VERSION : Nat = 2;
+	let ACTOR_NAME : Text = "FileStorage";
+	let VERSION : Nat = 3;
 	private var chunk_id_count : Chunk_ID = 0;
 
 	// ------------------------- Storage Data -------------------------
@@ -361,6 +363,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	};
 
 	// ------------------------- Canister Management -------------------------
+	// Version
 	public query func version() : async Nat {
 		return VERSION;
 	};
@@ -368,6 +371,25 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	// Get CanisterId
 	public query func get_canister_id() : async Text {
 		return Principal.toText(Principal.fromActor(this));
+	};
+
+	// Health
+	public shared func health() : async () {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("version", Int.toText(VERSION)),
+			("files_size", Int.toText(files.size())),
+			("chunks_size", Int.toText(chunks.size())),
+			("cycles_balance", Int.toText(Health.get_cycles_balance())),
+			("memory_in_mb", Int.toText(Health.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(Health.get_heap_in_mb()))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
 	};
 
 	// ------------------------- Private Methods -------------------------

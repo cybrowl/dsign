@@ -1,6 +1,7 @@
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
+import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
@@ -15,9 +16,10 @@ import MO "canister:mo";
 import Types "./types";
 import UsernameRegistryTypes "../actor_username_registry/types";
 
-import UUID "../libs/uuid";
-import Utils "./utils";
 import Arr "../libs/array";
+import Health "../libs/health";
+import Utils "./utils";
+import UUID "../libs/uuid";
 
 actor class Creator(username_registry : Principal) = self {
 	type ArgsCreateProject = Types.ArgsCreateProject;
@@ -58,8 +60,9 @@ actor class Creator(username_registry : Principal) = self {
 	// TODO: There needs to be an upgrade method that allows a user to move their data to a 4GB canister
 
 	// ------------------------- Variables -------------------------
+	let ACTOR_NAME : Text = "Creator";
 	let MAX_USERS : Nat = 100;
-	let VERSION : Nat = 3; // The Version in Production
+	let VERSION : Nat = 4; // The Version in Production
 
 	stable var creator_canister_id = "";
 
@@ -1222,6 +1225,28 @@ actor class Creator(username_registry : Principal) = self {
 	// Get CanisterId
 	public query func get_canister_id() : async Text {
 		return creator_canister_id;
+	};
+
+	// Health
+	public shared func health() : async () {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("version", Int.toText(VERSION)),
+			("profiles_size", Int.toText(profiles.size())),
+			("usernames_size", Int.toText(usernames.size())),
+			("favorites_size", Int.toText(favorites.size())),
+			("projects_size", Int.toText(projects.size())),
+			("snaps_size", Int.toText(snaps.size())),
+			("cycles_balance", Int.toText(Health.get_cycles_balance())),
+			("memory_in_mb", Int.toText(Health.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(Health.get_heap_in_mb()))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
 	};
 
 	// ------------------------- System Methods -------------------------

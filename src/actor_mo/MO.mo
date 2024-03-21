@@ -1,10 +1,15 @@
 import HashMap "mo:base/HashMap";
+import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
+
+import Logger "canister:logger";
 
 import CreatorTypes "../actor_creator/types";
 import FileStorageTypes "../actor_file_storage/types";
 import UsernameRegistryTypes "../actor_username_registry/types";
+
+import Health "../libs/health";
 
 actor MO = {
 	type CanisterInfo = UsernameRegistryTypes.CanisterInfo;
@@ -17,10 +22,11 @@ actor MO = {
 
 	// ------------------------- Variables -------------------------
 	// The Version in Production
-	let VERSION : Nat = 2;
+	let ACTOR_NAME : Text = "M-O";
+	let VERSION : Nat = 3;
 	stable var username_registry : ?Principal = null;
 
-	// Canister Registry for Creator
+	// ------------------------- Storage Data -------------------------
 	var canister_registry_creator : HashMap.HashMap<Principal, CanisterInfo> = HashMap.HashMap(
 		0,
 		Principal.equal,
@@ -111,6 +117,26 @@ actor MO = {
 	// Get Registry
 	public query func get_registry() : async [CanisterInfo] {
 		return Iter.toArray(canister_registry_creator.vals());
+	};
+
+	// Health
+	public shared func health() : async () {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "health"),
+			("version", Int.toText(VERSION)),
+			("canister_registry_creator_size", Int.toText(canister_registry_creator.size())),
+			("cycles_balance", Int.toText(Health.get_cycles_balance())),
+			("memory_in_mb", Int.toText(Health.get_memory_in_mb())),
+			("heap_in_mb", Int.toText(Health.get_heap_in_mb()))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"health"
+		);
+
+		return ();
 	};
 
 	// ------------------------- System Methods -------------------------

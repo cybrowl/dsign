@@ -20,7 +20,7 @@ actor Explore {
 
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "Explore";
-	let VERSION = 2;
+	let VERSION = 3; // The Version in Production
 	stable var username_registry : ?Principal = null;
 
 	// ------------------------- Storage Data -------------------------
@@ -150,6 +150,7 @@ actor Explore {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
+			("version", Int.toText(VERSION)),
 			("projects_size", Int.toText(projects.size())),
 			("cycles_balance", Int.toText(Health.get_cycles_balance())),
 			("memory_in_mb", Int.toText(Health.get_memory_in_mb())),
