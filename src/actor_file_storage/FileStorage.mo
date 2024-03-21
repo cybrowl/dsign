@@ -380,8 +380,8 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 			("method", "health"),
 			("version", Int.toText(VERSION)),
 			("canister_id", Principal.toText(Principal.fromActor(this))),
-			("files_size", Int.toText(files.size())),
-			("chunks_size", Int.toText(chunks.size())),
+			("files_size", Int.toText(Map.size(files))),
+			("chunks_size", Int.toText(Map.size(chunks))),
 			("cycles_balance", Int.toText(Health.get_cycles_balance())),
 			("memory_in_mb", Int.toText(Health.get_memory_in_mb())),
 			("heap_in_mb", Int.toText(Health.get_heap_in_mb()))
