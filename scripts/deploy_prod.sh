@@ -58,6 +58,7 @@ dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call mo init '(principal "'${USE
 
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call username_registry init 
 dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call file_scaling_manager init  
+dfx canister ${DEPLOY_NETWORK} ${DEPLOY_WALLET} call logger init  
 
 ### Wait before deploying children
 echo "Waiting for canisters to stabilize..."
