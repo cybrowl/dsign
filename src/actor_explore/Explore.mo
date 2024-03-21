@@ -132,6 +132,9 @@ actor Explore {
 
 	// Init
 	public shared func init(username_registry_principal : Principal) : async Bool {
+		let explore_cid : Text = Principal.toText(Principal.fromActor(Explore));
+		ignore Logger.add_canister_id_to_registry([explore_cid]);
+
 		if (username_registry == null) {
 			username_registry := ?username_registry_principal;
 

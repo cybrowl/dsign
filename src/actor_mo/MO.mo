@@ -105,6 +105,10 @@ actor MO = {
 
 	// Init
 	public shared func init(username_registry_principal : Principal) : async Bool {
+
+		let mo_cid : Text = Principal.toText(Principal.fromActor(MO));
+		ignore Logger.add_canister_id_to_registry([mo_cid]);
+
 		if (username_registry == null) {
 			username_registry := ?username_registry_principal;
 

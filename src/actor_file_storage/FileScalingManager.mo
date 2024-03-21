@@ -70,6 +70,13 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 
 	// Init
 	public shared func init() : async Text {
+
+		let file_storage_cids = Iter.toArray(Map.keys(file_storage_registry));
+		let file_scaling_manager_cid : Text = Principal.toText(Principal.fromActor(this));
+
+		ignore Logger.add_canister_id_to_registry(file_storage_cids);
+		ignore Logger.add_canister_id_to_registry([file_scaling_manager_cid]);
+
 		if (file_storage_canister_id.size() > 3) {
 			return file_storage_canister_id;
 		} else {
@@ -120,7 +127,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 		);
 	};
 
-	// ------------------------- Private Methods -------------------------
+	// Create File Storage Canister
 	private func create_file_storage_canister<system>() : async () {
 		Cycles.add<system>(CYCLE_AMOUNT);
 		let file_storage_actor = await FileStorage.FileStorage(is_prod, port);

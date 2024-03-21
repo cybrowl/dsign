@@ -1,4 +1,5 @@
 import { Buffer; toArray; fromArray } "mo:base/Buffer";
+import Array "mo:base/Array";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Map "mo:map/Map";
@@ -10,6 +11,7 @@ import Timer "mo:base/Timer";
 
 import Types "./types";
 
+import Arr "../libs/array";
 import Health "../libs/health";
 
 actor Logger {
@@ -35,8 +37,8 @@ actor Logger {
 	var logs_pending = Buffer<LogEvent>(0);
 	stable var logs_pending_stable_storage : [LogEvent] = [];
 
-	private var canister_registry = Map.new<Text, CanisterInfo>();
-	stable var canister_registry_stable_storage : [(Text, CanisterInfo)] = [];
+	private var canister_registry = Map.new<Text, Text>();
+	stable var canister_registry_stable_storage : [(Text, Text)] = [];
 
 	public shared ({ caller }) func authorize() : async Bool {
 		switch (authorized) {
@@ -98,8 +100,30 @@ actor Logger {
 		};
 	};
 
-	public shared ({ caller }) func add_canister_to_registry() : async Result.Result<Text, Text> {
-		return #ok("");
+	public shared ({ caller }) func add_canister_id_to_registry(canister_ids : [Text]) : async Bool {
+		let explore : [Text] = ["kjp6m-uyaaa-aaaag-ak2qq-cai", "phstq-taaaa-aaaag-ak2ma-cai"];
+		let file_scaling_manager : [Text] = ["k4ipb-vqaaa-aaaag-ak2ta-cai", "pvuej-7qaaa-aaaag-ak2pa-cai"];
+		let mo : [Text] = ["kamvq-cqaaa-aaaag-ak2ra-cai", "pjq6y-iqaaa-aaaag-ak2na-cai"];
+		let username_registry : [Text] = ["khnte-piaaa-aaaag-ak2rq-cai", "porym-fiaaa-aaaag-ak2nq-cai"];
+
+		let canisters : [Text] = Array.flatten([explore, file_scaling_manager, mo, username_registry]);
+
+		let is_authorized = Arr.exists<Text>(
+			canisters,
+			func(canister_id) : Bool {
+				canister_id == Principal.toText(caller);
+			}
+		);
+
+		if (is_authorized) {
+			for (canister_id in canister_ids.vals()) {
+				ignore Map.put(canister_registry, thash, canister_id, canister_id);
+
+			};
+			return true;
+		};
+
+		return false;
 	};
 
 	public query ({ caller }) func get_logs() : async Result.Result<[LogEvent], AuthorizationError> {
@@ -117,6 +141,13 @@ actor Logger {
 	// ------------------------- Canister Management -------------------------
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	// Init
+	public shared func init() : async () {
+		let logger_cid : Text = Principal.toText(Principal.fromActor(Logger));
+
+		ignore Map.put(canister_registry, thash, logger_cid, logger_cid);
 	};
 
 	public shared ({ caller }) func whoami() : async Text {
@@ -148,8 +179,8 @@ actor Logger {
 	};
 
 	private func log_canisters_health() : async () {
-		for (canister in Map.vals(canister_registry)) {
-			let canister_actor = actor (canister.id) : CanisterActor;
+		for (canister_id in Map.vals(canister_registry)) {
+			let canister_actor = actor (canister_id) : CanisterActor;
 
 			ignore canister_actor.health();
 		};
@@ -172,7 +203,7 @@ actor Logger {
 		logs_pending := fromArray(logs_pending_stable_storage);
 		logs_pending_stable_storage := [];
 
-		canister_registry := Map.fromIter<Text, CanisterInfo>(canister_registry_stable_storage.vals(), thash);
+		canister_registry := Map.fromIter<Text, Text>(canister_registry_stable_storage.vals(), thash);
 		canister_registry_stable_storage := [];
 
 		ignore Timer.recurringTimer<system>(#seconds(60), log_canisters_health);

@@ -17,6 +17,7 @@ import Logger "canister:logger";
 import Mo "canister:mo";
 
 import Health "../libs/health";
+import Registry "../libs/registry";
 import Utils "./utils";
 
 import Types "./types";
@@ -251,6 +252,14 @@ actor UsernameRegistry = {
 	// Init
 	public shared func init() : async Text {
 		let tags = [("actor_name", ACTOR_NAME), ("method", "init")];
+
+		let creator_cids = Iter.toArray(canister_registry_creator.vals());
+
+		let registry_creator : [Text] = Registry.get_canister_ids(creator_cids);
+		let username_registry_id : Text = Principal.toText(Principal.fromActor(UsernameRegistry));
+
+		ignore Logger.add_canister_id_to_registry(registry_creator);
+		ignore Logger.add_canister_id_to_registry([username_registry_id]);
 
 		if (creator_canister_id.size() > 1) {
 			ignore Logger.log_event(tags, "exists creator_canister_id: " # creator_canister_id);
