@@ -168,8 +168,33 @@ actor UsernameRegistry = {
 			case (#err err) {
 				switch (err) {
 					case (#MaxUsersExceeded) {
-						// TODO: create a new `creator` canister and asign the user to that `canister_id`
-						return #err(#ErrorCall(debug_show (err)));
+						await create_creator_canister(IS_PROD);
+
+						let creator_actor : CreatorActor = actor (creator_canister_id);
+
+						switch (await creator_actor.create_profile(username, caller)) {
+							case (#err err) {
+								switch (err) {
+									case (#MaxUsersExceeded) {
+										return #err(#ErrorCall(debug_show (err)));
+									};
+									case _ {
+										return #err(#ErrorCall(debug_show (err)));
+									};
+								};
+							};
+							case (#ok _) {
+								let username_info : UsernameInfo = {
+									canister_id = creator_canister_id;
+									username = username;
+								};
+
+								usernames.put(caller, username);
+								usernames_info.put(username, username_info);
+
+								return #ok(username);
+							};
+						};
 					};
 					case (#NotAuthorizedCaller) {
 						return #err(#ErrorCall(debug_show (err)));
