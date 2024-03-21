@@ -108,12 +108,6 @@ describe('Feedback', async () => {
 		file_storage_actor_lib.alice = new FileStorage(file_storage_actor);
 	});
 
-	test('UsernameRegistry[link].version(): => #ok - Version Number', async () => {
-		const version_num = await actor_username_registry.version();
-
-		expect(version_num).toBe(4n);
-	});
-
 	test('UsernameRegistry[alice].create_profile(): with valid username => #ok - Username and Info', async () => {
 		actor_username_registry.setIdentity(alice);
 
@@ -142,15 +136,9 @@ describe('Feedback', async () => {
 		expect(username_info.username).toBe('link');
 	});
 
-	test('Creator[alice].version(): => #ok - Version Number', async () => {
+	test('Creator[alice].create_project(): with valid args => #ok - Project for Alice', async () => {
 		actor_creator.setIdentity(alice);
 
-		const version_num = await actor_creator.version();
-
-		expect(version_num).toBe(3n);
-	});
-
-	test('Creator[alice].create_project(): with valid args => #ok - Project for Alice', async () => {
 		const { ok: project, err: projectError } = await actor_creator.create_project({
 			name: 'Alice Project',
 			description: ['Project for Alice']

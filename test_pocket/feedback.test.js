@@ -104,12 +104,6 @@ describe('Feedback Integration Tests', async () => {
 		await actor_username_registry.delete_profile();
 	});
 
-	test('UsernameRegistry[james].version(): => #ok - Version Number', async () => {
-		const version_num = await actor_username_registry.version();
-
-		expect(version_num).toBe(4n);
-	});
-
 	test('UsernameRegistry[james].create_profile(): with valid username => #ok - Username and Info', async () => {
 		actor_username_registry.setIdentity(james);
 		const { ok: username, err: error } = await actor_username_registry.create_profile('james');

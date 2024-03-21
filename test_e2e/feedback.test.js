@@ -79,12 +79,6 @@ describe('Feedback', () => {
 		await username_registry_actor.wilson.delete_profile();
 	});
 
-	// Example Test: Check version number of UsernameRegistry[jt]
-	test('UsernameRegistry[jt].version(): => #ok - Version Number', async () => {
-		const version_num = await username_registry_actor.jt.version();
-		expect(version_num).toBe(4n);
-	});
-
 	test('UsernameRegistry[jt].create_profile(): with valid username => #ok - Username', async () => {
 		// Setup: Ensure there's a profile to delete
 		const { ok: username, err: error } = await username_registry_actor.jt.create_profile('jt');

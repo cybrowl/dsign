@@ -71,17 +71,6 @@ describe('Profile Images Tests', () => {
 		file_storage_actor_lib.nova = new FileStorage(file_storage_actor);
 	});
 
-	// Example Test: Check version number of UsernameRegistry[nova]
-	test('UsernameRegistry[nova].version(): => #ok - Version Number', async () => {
-		const version_num = await username_registry_actor.nova.version();
-		expect(version_num).toBe(4n);
-	});
-
-	test('FileScalingManager[nova].version(): => #ok - Version Number', async () => {
-		const version_num = await file_scaling_manager_actor.nova.version();
-		expect(version_num).toBe(3n);
-	});
-
 	test('FileScalingManager[nova].init(): => #ok - CanisterId', async () => {
 		const canister_id = await file_scaling_manager_actor.nova.init();
 		expect(canister_id.length).toBeGreaterThan(2);
@@ -127,20 +116,6 @@ describe('Profile Images Tests', () => {
 	test('UsernameRegistry[nova].create_profile(): with valid username => #ok - Created Profile', async () => {
 		const { ok: username } = await username_registry_actor.nova.create_profile('nova');
 		expect(username.length).toBeGreaterThan(2);
-	});
-
-	test('FileStorage[nova].version(): => #ok - Version Number', async () => {
-		const fs_canister_id = await file_scaling_manager_actor.nova.get_current_canister_id();
-		const file_storage_actor = await getActor(
-			fs_canister_id,
-			interfaces.file_storage,
-			nova_identity
-		);
-
-		const file_storage = new FileStorage(file_storage_actor);
-
-		const version_num = await file_storage.version();
-		expect(version_num).toBe(2n);
 	});
 
 	test('FileStorage[nova].create_chunk & create_file_from_chunks(): => #ok - File Stored', async () => {

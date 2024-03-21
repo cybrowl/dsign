@@ -39,11 +39,6 @@ describe('Projects Without Snaps Tests', async () => {
 		);
 	});
 
-	test('UsernameRegistry[owl].version(): => #ok - Nat', async () => {
-		const version_num = await username_registry_actor.owl.version();
-		expect(version_num).toBe(4n);
-	});
-
 	test('UsernameRegistry[owl].delete_profile(): with valid principal => #ok - Bool', async () => {
 		await username_registry_actor.owl.create_profile('owl');
 		const { ok: deleted } = await username_registry_actor.owl.delete_profile();

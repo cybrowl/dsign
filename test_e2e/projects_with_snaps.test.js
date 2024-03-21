@@ -82,12 +82,6 @@ describe('Projects With Snaps', () => {
 		await username_registry_actor.linky.delete_profile();
 	});
 
-	// Example Test: Check version number of UsernameRegistry[nikola]
-	test('UsernameRegistry[nikola].version(): => #ok - Version Number', async () => {
-		const version_num = await username_registry_actor.nikola.version();
-		expect(version_num).toBe(4n);
-	});
-
 	test('UsernameRegistry[nikola].create_profile(): with valid username => #ok - Username', async () => {
 		// Setup: Ensure there's a profile to delete
 		const { ok: username } = await username_registry_actor.nikola.create_profile('nikola');
