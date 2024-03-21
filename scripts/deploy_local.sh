@@ -38,6 +38,7 @@ dfx canister call mo init '(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")'
 
 dfx canister call username_registry init
 dfx canister call file_scaling_manager init
+dfx canister call logger init
 
 ### Wait before deploying children
 echo "Waiting for canisters to stabilize..."

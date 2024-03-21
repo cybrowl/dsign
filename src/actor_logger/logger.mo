@@ -139,8 +139,14 @@ actor Logger {
 	};
 
 	// ------------------------- Canister Management -------------------------
+	// Version
 	public query func version() : async Nat {
 		return VERSION;
+	};
+
+	// Get Registry
+	public query func get_registry() : async [Text] {
+		return Iter.toArray(Map.vals(canister_registry));
 	};
 
 	// Init
