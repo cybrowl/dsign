@@ -28,7 +28,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text, full_threshold : Int
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "FileScalingManager";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 5;
+	let VERSION : Nat = 6;
 
 	stable var file_storage_canister_id : Text = "";
 
@@ -169,6 +169,17 @@ actor class FileScalingManager(is_prod : Bool, port : Text, full_threshold : Int
 
 	// Check Canister is Full
 	private func check_canister_is_full() : async () {
+		let tags = [
+			("actor_name", ACTOR_NAME),
+			("method", "check_canister_is_full"),
+			("version", Int.toText(VERSION))
+		];
+
+		ignore Logger.log_event(
+			tags,
+			"invoked"
+		);
+
 		let file_storage_actor = actor (file_storage_canister_id) : FileStorageActor;
 
 		switch (await file_storage_actor.is_full()) {
