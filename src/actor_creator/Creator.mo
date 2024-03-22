@@ -62,7 +62,7 @@ actor class Creator(username_registry : Principal) = self {
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "Creator";
 	let MAX_USERS : Nat = 100;
-	let VERSION : Nat = 5; // The Version in Production
+	let VERSION : Nat = 6; // The Version in Production
 
 	stable var creator_canister_id = "";
 
@@ -1248,6 +1248,11 @@ actor class Creator(username_registry : Principal) = self {
 			tags,
 			"health"
 		);
+	};
+
+	// Low Cycles
+	public query func cycles_low() : async Bool {
+		return Health.get_cycles_low();
 	};
 
 	// ------------------------- System Methods -------------------------

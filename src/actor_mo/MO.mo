@@ -21,9 +21,8 @@ actor MO = {
 	type FileStorageActor = FileStorageTypes.FileStorageActor;
 
 	// ------------------------- Variables -------------------------
-	// The Version in Production
 	let ACTOR_NAME : Text = "M-O";
-	let VERSION : Nat = 3;
+	let VERSION : Nat = 4; // The Version in Production
 	stable var username_registry : ?Principal = null;
 
 	// ------------------------- Storage Data -------------------------
@@ -141,6 +140,11 @@ actor MO = {
 		);
 
 		return ();
+	};
+
+	// Low Cycles
+	public query func cycles_low() : async Bool {
+		return Health.get_cycles_low();
 	};
 
 	// ------------------------- System Methods -------------------------

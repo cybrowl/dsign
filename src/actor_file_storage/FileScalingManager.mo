@@ -27,7 +27,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "FileScalingManager";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 4;
+	let VERSION : Nat = 5;
 
 	stable var file_storage_canister_id : Text = "";
 
@@ -144,6 +144,11 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 		};
 
 		ignore Map.add(file_storage_registry, thash, file_storage_canister_id, canister_child);
+	};
+
+	// Low Cycles
+	public query func cycles_low() : async Bool {
+		return Health.get_cycles_low();
 	};
 
 	// ------------------------- System Methods -------------------------

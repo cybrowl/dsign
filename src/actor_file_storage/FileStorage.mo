@@ -48,7 +48,7 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "FileStorage";
-	let VERSION : Nat = 4;
+	let VERSION : Nat = 5;
 	private var chunk_id_count : Chunk_ID = 0;
 
 	// ------------------------- Storage Data -------------------------
@@ -391,6 +391,11 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 			tags,
 			"health"
 		);
+	};
+
+	// Low Cycles
+	public query func cycles_low() : async Bool {
+		return Health.get_cycles_low();
 	};
 
 	// ------------------------- Private Methods -------------------------

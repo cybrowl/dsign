@@ -42,7 +42,7 @@ actor UsernameRegistry = {
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "UsernameRegistry";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 6; // The Version in Production
+	let VERSION : Nat = 7; // The Version in Production
 
 	stable var creator_canister_id = "";
 
@@ -341,6 +341,11 @@ actor UsernameRegistry = {
 		);
 
 		return ();
+	};
+
+	// Low Cycles
+	public query func cycles_low() : async Bool {
+		return Health.get_cycles_low();
 	};
 
 	// ------------------------- System Methods -------------------------

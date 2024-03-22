@@ -20,7 +20,7 @@ actor Explore {
 
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "Explore";
-	let VERSION = 3; // The Version in Production
+	let VERSION = 4; // The Version in Production
 	stable var username_registry : ?Principal = null;
 
 	// ------------------------- Storage Data -------------------------
@@ -149,6 +149,7 @@ actor Explore {
 		return Iter.toArray(canister_registry_creator.vals());
 	};
 
+	// Health
 	public shared func health() : async () {
 		let tags = [
 			("actor_name", ACTOR_NAME),
@@ -164,6 +165,11 @@ actor Explore {
 			tags,
 			"health"
 		);
+	};
+
+	// Low Cycles
+	public query func cycles_low() : async Bool {
+		return Health.get_cycles_low();
 	};
 
 	// ------------------------- System Methods -------------------------

@@ -1,5 +1,6 @@
 import { Buffer; toArray; fromArray } "mo:base/Buffer";
 import Array "mo:base/Array";
+import Cycles "mo:base/ExperimentalCycles";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Map "mo:map/Map";
@@ -9,6 +10,7 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Timer "mo:base/Timer";
 
+import ICTypes "../c_types/ic";
 import Types "./types";
 
 import Arr "../libs/array";
@@ -19,6 +21,7 @@ actor Logger {
 
 	type AuthorizationError = { #NotAuthorized : Bool };
 	type CanisterInfo = Types.CanisterInfo;
+	type ICManagementActor = ICTypes.Self;
 	type LogEvent = Types.LogEvent;
 	type Message = Types.Message;
 	type Tags = Types.Tags;
@@ -26,7 +29,7 @@ actor Logger {
 	type CanisterActor = Types.CanisterActor;
 
 	// ------------------------- Variables -------------------------
-	let VERSION : Nat = 6;
+	let VERSION : Nat = 7;
 	let ACTOR_NAME : Text = "Logger";
 	stable var authorized : ?Principal = null;
 
@@ -40,6 +43,10 @@ actor Logger {
 	private var canister_registry = Map.new<Text, Text>();
 	stable var canister_registry_stable_storage : [(Text, Text)] = [];
 
+	// ------------------------- Actor -------------------------
+	private let ic_management_actor : ICManagementActor = actor "aaaaa-aa";
+
+	// ------------------------- Logger -------------------------
 	public shared ({ caller }) func authorize() : async Bool {
 		switch (authorized) {
 			case (?authorized) {
@@ -194,6 +201,25 @@ actor Logger {
 		return ();
 	};
 
+	private func check_cycles() : async () {
+		for (canister_id in Map.vals(canister_registry)) {
+			let canister_actor = actor (canister_id) : CanisterActor;
+
+			switch (await canister_actor.cycles_low()) {
+				case (true) {
+
+					Cycles.add<system>(1_000_000_000_000);
+					await ic_management_actor.deposit_cycles({
+						canister_id = Principal.fromText(canister_id);
+					});
+				};
+				case (false) {};
+			};
+		};
+
+		return ();
+	};
+
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		logs_storage_stable_storage := toArray(logs_storage);
@@ -213,5 +239,6 @@ actor Logger {
 		canister_registry_stable_storage := [];
 
 		ignore Timer.recurringTimer<system>(#seconds(60), log_canisters_health);
+		ignore Timer.recurringTimer<system>(#seconds(300), check_cycles);
 	};
 };
