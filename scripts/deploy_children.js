@@ -74,7 +74,7 @@ const init = async () => {
 				username_registry_cid: canister_ids['username_registry'],
 				wasm_path: `.dfx/${env}/canisters`,
 				is_prod: false,
-				full_threshold: 20
+				full_threshold: 10
 			}
 		};
 

@@ -74,12 +74,11 @@ describe('Scaling File Storage', async () => {
 		const setup_args_file_scaling_manager = {
 			idlFactory: idlFactoryFSManager,
 			wasm: WASM_PATH_FS_MANAGER,
-			arg: IDL.encode(initFSM({ IDL }), [true, '8080', 20])
+			arg: IDL.encode(initFSM({ IDL }), [true, '8080', 10])
 		};
 
 		const fixture_file_scaling_manager = await pic.setupCanister(setup_args_file_scaling_manager);
 		actor_file_scaling_manager = fixture_file_scaling_manager.actor;
-		await actor_file_scaling_manager.init();
 
 		//DELETE PROFILES TO BE USED
 		actor_username_registry.setIdentity(daphne);
@@ -103,8 +102,11 @@ describe('Scaling File Storage', async () => {
 		expect(username).toEqual('james');
 	});
 
-	test('FileStorage[daphne].store(): storing 2 video files ~ 27MB => #ok - Files', async () => {
+	test('FileStorage[daphne].store(): storing 1 video file 13MB file scaling of 3 file_storage canisters => #ok - File', async () => {
 		const file_storage_cid = await actor_file_scaling_manager.init();
+
+		const registry_size_1 = await actor_file_scaling_manager.get_file_storage_registry_size();
+		expect(registry_size_1).toEqual(1n);
 
 		const actor_file_storage = pic.createActor(
 			idlFactoryFileStorage,
@@ -113,23 +115,38 @@ describe('Scaling File Storage', async () => {
 
 		actor_file_storage.setIdentity(daphne);
 		const file_storage_lib = new FileStorage(actor_file_storage);
+		const fileObject = createFileObject(path.join(__dirname, 'videos', 'delta_city.mp4'));
 
-		const fileObjects = [];
-		for (let i = 0; i < 2; i++) {
-			fileObjects.push(createFileObject(path.join(__dirname, 'videos', 'delta_city.mp4')));
-		}
+		const { ok: file } = await file_storage_lib.store(fileObject.content, {
+			filename: fileObject.name,
+			content_type: fileObject.type
+		});
+		expect(file).toBeDefined();
 
-		const storePromises = fileObjects.map((fileObject) =>
-			file_storage_lib.store(fileObject.content, {
-				filename: fileObject.name,
-				content_type: fileObject.type
-			})
+		await actor_file_scaling_manager.check_canister_is_full_public();
+
+		const registry_size_2 = await actor_file_scaling_manager.get_file_storage_registry_size();
+		expect(registry_size_2).toEqual(2n);
+
+		const registry = await actor_file_scaling_manager.get_file_storage_registry();
+
+		const actor_file_storage_2 = pic.createActor(
+			idlFactoryFileStorage,
+			Principal.fromText(registry[1].id)
 		);
 
-		const results = await Promise.all(storePromises);
-		results.forEach((result, index) => {
-			const { ok: file } = result;
-			expect(file).toBeDefined();
+		actor_file_storage.setIdentity(daphne);
+		const file_storage_lib_2 = new FileStorage(actor_file_storage_2);
+
+		const { ok: file_2 } = await file_storage_lib_2.store(fileObject.content, {
+			filename: fileObject.name,
+			content_type: fileObject.type
 		});
+		expect(file_2).toBeDefined();
+
+		await actor_file_scaling_manager.check_canister_is_full_public();
+
+		const registry_size_3 = await actor_file_scaling_manager.get_file_storage_registry_size();
+		expect(registry_size_3).toEqual(3n);
 	});
 });

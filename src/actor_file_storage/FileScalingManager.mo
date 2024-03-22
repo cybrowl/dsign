@@ -5,6 +5,7 @@ import Map "mo:map/Map";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
+import Timer "mo:base/Timer";
 
 import FileStorage "FileStorage";
 import Logger "canister:logger";
@@ -62,6 +63,21 @@ actor class FileScalingManager(is_prod : Bool, port : Text, full_threshold : Int
 		};
 	};
 
+	public shared func check_canister_is_full_public() : async () {
+		let file_storage_actor = actor (file_storage_canister_id) : FileStorageActor;
+
+		switch (await file_storage_actor.is_full()) {
+			case true {
+				await create_file_storage_canister();
+
+				return ();
+			};
+			case false {
+				return ();
+			};
+		};
+	};
+
 	// ------------------------- Canister Management -------------------------
 	// Version
 	public query func version() : async Nat {
@@ -70,7 +86,6 @@ actor class FileScalingManager(is_prod : Bool, port : Text, full_threshold : Int
 
 	// Init
 	public shared func init() : async Text {
-
 		let file_storage_cids = Iter.toArray(Map.keys(file_storage_registry));
 		let file_scaling_manager_cid : Text = Principal.toText(Principal.fromActor(this));
 
@@ -151,6 +166,22 @@ actor class FileScalingManager(is_prod : Bool, port : Text, full_threshold : Int
 		return Health.get_cycles_low();
 	};
 
+	// Check Canister is Full
+	private func check_canister_is_full() : async () {
+		let file_storage_actor = actor (file_storage_canister_id) : FileStorageActor;
+
+		switch (await file_storage_actor.is_full()) {
+			case true {
+				await create_file_storage_canister();
+
+				return ();
+			};
+			case false {
+				return ();
+			};
+		};
+	};
+
 	// ------------------------- System Methods -------------------------
 	system func preupgrade() {
 		file_storage_registry_stable_storage := Iter.toArray(Map.entries(file_storage_registry));
@@ -160,5 +191,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text, full_threshold : Int
 		file_storage_registry := Map.fromIter<Text, CanisterInfo>(file_storage_registry_stable_storage.vals(), thash);
 
 		file_storage_registry_stable_storage := [];
+
+		ignore Timer.recurringTimer<system>(#seconds(600), check_canister_is_full);
 	};
 };

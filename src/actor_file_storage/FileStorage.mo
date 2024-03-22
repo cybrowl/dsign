@@ -1,14 +1,12 @@
 import { Buffer; toArray } "mo:base/Buffer";
 import Blob "mo:base/Blob";
 import Error "mo:base/Error";
-import Float "mo:base/Float";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Map "mo:map/Map";
 import Nat "mo:base/Nat";
 import Nat32 "mo:base/Nat32";
 import Option "mo:base/Option";
-import Prim "mo:prim";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";

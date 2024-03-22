@@ -23,10 +23,10 @@ dfx deploy mo
 dfx deploy creator --argument='(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")'
 
 # File Storage
-dfx deploy file_storage --argument='(false, "8080", 20)'
+dfx deploy file_storage --argument='(false, "8080", 10)'
 
 # File Scaling
-dfx deploy file_scaling_manager --argument='(false, "8080", 20)'
+dfx deploy file_scaling_manager --argument='(false, "8080", 10)'
 
 # Logger
 dfx deploy logger
