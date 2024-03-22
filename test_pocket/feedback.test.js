@@ -85,7 +85,7 @@ describe('Feedback Integration Tests', async () => {
 		const setup_args_file_scaling_manager = {
 			idlFactory: idlFactoryFSManager,
 			wasm: WASM_PATH_FS_MANAGER,
-			arg: IDL.encode(initFSM({ IDL }), [true, '8080'])
+			arg: IDL.encode(initFSM({ IDL }), [true, '8080', 20])
 		};
 
 		const fixture_file_scaling_manager = await pic.setupCanister(setup_args_file_scaling_manager);

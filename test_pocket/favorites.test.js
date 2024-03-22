@@ -76,7 +76,7 @@ describe('Feedback', async () => {
 		const setup_args_file_scaling_manager = {
 			idlFactory: idlFactoryFSManager,
 			wasm: WASM_PATH_FS_MANAGER,
-			arg: IDL.encode(initFSM({ IDL }), [true, '8080'])
+			arg: IDL.encode(initFSM({ IDL }), [true, '8080', 20])
 		};
 
 		const fixture_username_registry = await pic.setupCanister(setup_args_username_registry);

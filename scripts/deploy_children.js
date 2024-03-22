@@ -59,19 +59,22 @@ const init = async () => {
 				file_scaling_manager_cid: canister_ids_config.default['file_scaling_manager'].ic,
 				username_registry_cid: canister_ids_config.default['username_registry'].ic,
 				wasm_path: `.dfx/ic/canisters`,
-				is_prod: true
+				is_prod: true,
+				full_threshold: 1500
 			},
 			staging: {
 				file_scaling_manager_cid: canister_ids_config.default['file_scaling_manager'].staging,
 				username_registry_cid: canister_ids_config.default['username_registry'].staging,
 				wasm_path: `.dfx/${env}/canisters`,
-				is_prod: true
+				is_prod: true,
+				full_threshold: 1500
 			},
 			local: {
 				file_scaling_manager_cid: canister_ids['file_scaling_manager'],
 				username_registry_cid: canister_ids['username_registry'],
 				wasm_path: `.dfx/${env}/canisters`,
-				is_prod: false
+				is_prod: false,
+				full_threshold: 20
 			}
 		};
 
@@ -99,7 +102,10 @@ const init = async () => {
 		for (const canister of fs_registry) {
 			const wasm_module = get_wasm_module(canister.name, config.wasm_path);
 
-			const encoded_args = IDL.encode([IDL.Bool, IDL.Text], [config.is_prod, '8080']);
+			const encoded_args = IDL.encode(
+				[IDL.Bool, IDL.Text, IDL.Int],
+				[config.is_prod, '8080', config.full_threshold]
+			);
 
 			const response = await file_scaling_manager_actor.install_code(
 				Principal.fromText(canister.id),

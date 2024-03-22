@@ -26,7 +26,7 @@ import Utils "./utils";
 import UUID "../libs/uuid";
 import Health "../libs/health";
 
-actor class FileStorage(is_prod : Bool, port : Text) = this {
+actor class FileStorage(is_prod : Bool, port : Text, full_threshold : Int) = this {
 	let { thash; nhash } = Map;
 
 	type Chunk_ID = Types.Chunk_ID;
@@ -262,13 +262,9 @@ actor class FileStorage(is_prod : Bool, port : Text) = this {
 	};
 
 	public query func is_full() : async Bool {
-		let MAX_SIZE_THRESHOLD_MB : Float = 1500;
+		let memory_in_megabytes = Health.get_memory_in_mb();
 
-		let rts_memory_size : Nat = Prim.rts_memory_size();
-		let mem_size : Float = Float.fromInt(rts_memory_size);
-		let memory_in_megabytes = Float.abs(mem_size * 0.000001);
-
-		if (memory_in_megabytes > MAX_SIZE_THRESHOLD_MB) {
+		if (memory_in_megabytes > full_threshold) {
 			return true;
 		} else {
 			return false;

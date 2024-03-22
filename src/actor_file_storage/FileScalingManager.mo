@@ -14,7 +14,7 @@ import ICTypes "../c_types/ic";
 
 import Health "../libs/health";
 
-actor class FileScalingManager(is_prod : Bool, port : Text) = this {
+actor class FileScalingManager(is_prod : Bool, port : Text, full_threshold : Int) = this {
 	type CanisterInfo = Types.CanisterInfo;
 	type Status = Types.Status;
 	type ErrInit = Types.ErrInit;
@@ -130,7 +130,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text) = this {
 	// Create File Storage Canister
 	private func create_file_storage_canister<system>() : async () {
 		Cycles.add<system>(CYCLE_AMOUNT);
-		let file_storage_actor = await FileStorage.FileStorage(is_prod, port);
+		let file_storage_actor = await FileStorage.FileStorage(is_prod, port, full_threshold);
 
 		let principal = Principal.fromActor(file_storage_actor);
 		file_storage_canister_id := Principal.toText(principal);

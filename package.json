@@ -21,7 +21,8 @@
 		"test:projects_without_snaps": "vitest test_e2e/projects_without_snaps.test.js",
 		"test:feedback": "vitest test_pocket/feedback.test.js",
 		"test:favorites": "vitest test_pocket/favorites.test.js",
-		"test:scaling_creator": "vitest test_pocket/scaling_creator.test.js"
+		"test:scaling_creator": "vitest test_pocket/scaling_creator.test.js",
+		"test:scaling_file_storage": "vitest test_pocket/scaling_file_storage.test.js"
 	},
 	"dependencies": {
 		"crc-32": "^1.2.2",

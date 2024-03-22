@@ -43,10 +43,10 @@ dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} mo
 dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} creator --argument='(principal "'${USERNAME_REGISTRY_CANISTER_ID}'")'
 
 # File Storage
-dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} file_storage --argument='(true, "8080")'
+dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} file_storage --argument='(true, "8080", 1500)'
 
 # File Scaling
-dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} file_scaling_manager --argument='(true, "8080")'
+dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} file_scaling_manager --argument='(true, "8080", 1500)'
 
 # Logger
 dfx deploy ${DEPLOY_NETWORK} ${DEPLOY_WALLET} logger
