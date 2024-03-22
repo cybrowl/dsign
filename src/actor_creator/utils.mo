@@ -1,4 +1,5 @@
 import Array "mo:base/Array";
+import Buffer "mo:base/Buffer";
 import HashMap "mo:base/HashMap";
 import Principal "mo:base/Principal";
 
@@ -163,5 +164,22 @@ module {
 		let images : [FileAsset] = snap.images;
 
 		return Array.flatten<FileAsset>([design_file, images]);
+	};
+
+	public func filter_out_project_id(
+		projects : [ProjectID],
+		id_to_remove : ProjectID
+	) : [ProjectID] {
+		let projects_buffer : Buffer.Buffer<ProjectID> = Buffer.fromArray(projects);
+
+		// Filter out the project ID to be deleted
+		projects_buffer.filterEntries(
+			func(idx : Nat, proj_id : ProjectID) : Bool {
+				return proj_id != id_to_remove;
+			}
+		);
+
+		// Convert the buffer back to an array and return
+		return Buffer.toArray(projects_buffer);
 	};
 };

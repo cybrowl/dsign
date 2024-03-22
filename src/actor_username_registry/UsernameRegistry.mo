@@ -42,7 +42,7 @@ actor UsernameRegistry = {
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "UsernameRegistry";
 	let CYCLE_AMOUNT : Nat = 1_000_000_000_000;
-	let VERSION : Nat = 7; // The Version in Production
+	let VERSION : Nat = 8; // The Version in Production
 
 	stable var creator_canister_id = "";
 
@@ -144,11 +144,10 @@ actor UsernameRegistry = {
 
 	// Create Profile
 	public shared ({ caller }) func create_profile(username : Username) : async Result.Result<Username, ErrUsername> {
-
-		// let tags = [
-		//     ("name", ACTOR_NAME),
-		//     ("method", "create_profile")
-		// ];
+		let tags = [
+			("name", ACTOR_NAME),
+			("method", "create_profile")
+		];
 
 		if (Principal.isAnonymous(caller)) {
 			return #err(#CallerAnonymous(true));
@@ -168,6 +167,11 @@ actor UsernameRegistry = {
 			case (#err err) {
 				switch (err) {
 					case (#MaxUsersExceeded) {
+						ignore Logger.log_event(
+							tags,
+							"MaxUsersExceeded"
+						);
+
 						await create_creator_canister(IS_PROD);
 
 						let creator_actor : CreatorActor = actor (creator_canister_id);
@@ -184,6 +188,11 @@ actor UsernameRegistry = {
 								};
 							};
 							case (#ok _) {
+								ignore Logger.log_event(
+									tags,
+									"added user to new creator canister: " # creator_canister_id
+								);
+
 								let username_info : UsernameInfo = {
 									canister_id = creator_canister_id;
 									username = username;

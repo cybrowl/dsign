@@ -398,30 +398,28 @@ actor class Creator(username_registry : Principal) = self {
 							return #err(#NotOwner(true));
 						};
 
-						let profile_projects : Buffer.Buffer<ProjectID> = Buffer.fromArray(profile.projects);
-
-						// Filter out the project ID to be deleted
-						profile_projects.filterEntries(
-							func(idx : Nat, projId : ProjectID) : Bool {
-								return projId != id;
-							}
-						);
+						let profile_projects = Utils.filter_out_project_id(profile.projects, id);
 
 						// Delete files
 						let file_assets : [FileAsset] = Utils.get_file_assets_from_project(project, snaps);
 						ignore MO.delete_files(file_assets);
 
+						// Delete Project in Explore
 						ignore Explore.delete_projects([id]);
 
-						//TODO: should it delete for Favorites too since the owner deleted the files?
-
-						projects.delete(id);
-
-						let profile_updated : Profile = {
-							profile with
-							projects = Buffer.toArray(profile_projects);
+						// Delete Snaps
+						for (snap_id in project.snaps.vals()) {
+							snaps.delete(snap_id);
 						};
 
+						// Delete Project
+						projects.delete(id);
+
+						// Update Profile With Changes
+						let profile_updated : Profile = {
+							profile with
+							projects = profile_projects;
+						};
 						profiles.put(caller, profile_updated);
 
 						return #ok(true);
