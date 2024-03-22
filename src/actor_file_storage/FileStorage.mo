@@ -374,6 +374,7 @@ actor class FileStorage(is_prod : Bool, port : Text, full_threshold : Int) = thi
 			("method", "health"),
 			("version", Int.toText(VERSION)),
 			("canister_id", Principal.toText(Principal.fromActor(this))),
+			("full_threshold", Int.toText(full_threshold)),
 			("files_size", Int.toText(Map.size(files))),
 			("chunks_size", Int.toText(Map.size(chunks))),
 			("cycles_balance", Int.toText(Health.get_cycles_balance())),

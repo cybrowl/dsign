@@ -130,6 +130,7 @@ actor class FileScalingManager(is_prod : Bool, port : Text, full_threshold : Int
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
 			("version", Int.toText(VERSION)),
+			("full_threshold", Int.toText(full_threshold)),
 			("file_storage_registry_size", Int.toText(file_storage_registry.size())),
 			("cycles_balance", Int.toText(Health.get_cycles_balance())),
 			("memory_in_mb", Int.toText(Health.get_memory_in_mb())),
