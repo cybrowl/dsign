@@ -68,6 +68,6 @@
 			"type": "persistent"
 		}
 	},
-	"dfx": "0.20.1",
+	"dfx": "0.24.0",
 	"version": 1
 }
