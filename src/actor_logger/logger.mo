@@ -29,9 +29,10 @@ actor Logger {
 	type CanisterActor = Types.CanisterActor;
 
 	// ------------------------- Variables -------------------------
-	let VERSION : Nat = 7;
+	let VERSION : Nat = 8;
 	let ACTOR_NAME : Text = "Logger";
 	stable var authorized : ?Principal = null;
+	stable var authorized_temp : Text = "ru737-xk264-4nswf-o6lzb-3juxx-ixp63-objgb-l4io2-yievs-5ezxe-kqe";
 
 	// ------------------------- Storage Data -------------------------
 	var logs_storage = Buffer<LogEvent>(0);
@@ -107,6 +108,20 @@ actor Logger {
 		};
 	};
 
+	public shared ({ caller }) func clear_storage_logs() : async Result.Result<Text, AuthorizationError> {
+		switch (Principal.fromText(authorized_temp) == caller) {
+			case (true) {
+				logs_pending.clear();
+				logs_storage.clear();
+
+				return #ok("Logs cleared");
+			};
+			case (false) {
+				return #err(#NotAuthorized(true));
+			};
+		};
+	};
+
 	public shared ({ caller }) func add_canister_id_to_registry(canister_ids : [Text]) : async Bool {
 		let explore : [Text] = ["kjp6m-uyaaa-aaaag-ak2qq-cai", "phstq-taaaa-aaaag-ak2ma-cai"];
 		let file_scaling_manager : [Text] = ["k4ipb-vqaaa-aaaag-ak2ta-cai", "pvuej-7qaaa-aaaag-ak2pa-cai"];
@@ -167,7 +182,7 @@ actor Logger {
 		return Principal.toText(caller);
 	};
 
-	public shared func health() : async () {
+	public shared func health() : async [(Text, Text)] {
 		let tags = [
 			("actor_name", ACTOR_NAME),
 			("method", "health"),
@@ -184,7 +199,7 @@ actor Logger {
 			"health"
 		);
 
-		return ();
+		return tags;
 	};
 
 	public query func cycles_low() : async Bool {
