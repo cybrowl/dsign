@@ -59,7 +59,7 @@ actor Explore {
 	public shared ({ caller }) func save_project(project : ProjectPublic) : async Bool {
 		let is_authorized : Bool = switch (canister_registry_creator.get(caller)) {
 			case (null) { false };
-			case (?info) { true };
+			case (?_info) { true };
 		};
 
 		if (is_authorized) {
@@ -75,14 +75,14 @@ actor Explore {
 	public shared ({ caller }) func update_project(project_id : ProjectID, canister_id : Text) : async Bool {
 		let is_authorized : Bool = switch (canister_registry_creator.get(caller)) {
 			case (null) { false };
-			case (?info) { true };
+			case (?_info) { true };
 		};
 
 		if (is_authorized) {
 			let creator_actor : CreatorActor = actor (canister_id);
 
 			switch (await creator_actor.get_project(project_id)) {
-				case (#err err) {
+				case (#err _err) {
 					return false;
 				};
 				case (#ok project) {
@@ -100,14 +100,14 @@ actor Explore {
 	public shared ({ caller }) func delete_projects(project_ids : [ProjectID]) : async Bool {
 		let is_authorized : Bool = switch (canister_registry_creator.get(caller)) {
 			case (null) { false };
-			case (?info) { true };
+			case (?_info) { true };
 		};
 
 		if (is_authorized) {
 			for (project_id in project_ids.vals()) {
 				switch (projects.get(project_id)) {
 					case null {};
-					case (?project) {
+					case (?_project) {
 						projects.delete(project_id);
 					};
 				};

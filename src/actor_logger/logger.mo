@@ -253,7 +253,7 @@ actor Logger {
 		canister_registry := Map.fromIter<Text, Text>(canister_registry_stable_storage.vals(), thash);
 		canister_registry_stable_storage := [];
 
-		ignore Timer.recurringTimer<system>(#seconds(60), log_canisters_health);
+		ignore Timer.recurringTimer<system>(#seconds(300), log_canisters_health);
 		ignore Timer.recurringTimer<system>(#seconds(300), check_cycles);
 	};
 };

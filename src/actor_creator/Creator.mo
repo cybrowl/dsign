@@ -346,7 +346,7 @@ actor class Creator(username_registry : Principal) = self {
 			case (null) {
 				return #err(#ProfileNotFound(true));
 			};
-			case (?profile) {
+			case (?_profile) {
 				switch (projects.get(args.id)) {
 					case (null) {
 						return #err(#ProjectNotFound(true));
@@ -514,7 +514,7 @@ actor class Creator(username_registry : Principal) = self {
 
 						var username = "";
 						switch (await username_registry_actor.get_username_by_principal(caller)) {
-							case (#err err) {
+							case (#err _err) {
 								return #err(#UsernameNotFound(true));
 							};
 							case (#ok username_) {
@@ -601,7 +601,7 @@ actor class Creator(username_registry : Principal) = self {
 								return #ok(topic_updated);
 
 							};
-							case (?design_file) {
+							case (?_design_file) {
 								return #err(#DesignFileExists(true));
 							};
 						};
@@ -1168,7 +1168,7 @@ actor class Creator(username_registry : Principal) = self {
 							return #ok(true);
 						};
 					};
-					case (#err(error)) {
+					case (#err(_error)) {
 						return #err(#ProjectNotFound(true));
 					};
 				};

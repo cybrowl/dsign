@@ -56,7 +56,7 @@ actor MO = {
 	public shared ({ caller }) func delete_files(file_assets : [FileAsset]) : async Bool {
 		let is_authorized : Bool = switch (canister_registry_creator.get(caller)) {
 			case (null) { false };
-			case (?info) { true };
+			case (?_info) { true };
 		};
 
 		if (is_authorized) {
@@ -75,7 +75,7 @@ actor MO = {
 	public shared ({ caller }) func update_file_ownership(file : FileAsset, owner : Principal) : async Bool {
 		let is_authorized : Bool = switch (canister_registry_creator.get(caller)) {
 			case (null) { false };
-			case (?info) { true };
+			case (?_info) { true };
 		};
 
 		if (is_authorized) {

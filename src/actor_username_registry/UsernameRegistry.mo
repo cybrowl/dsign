@@ -133,7 +133,7 @@ actor UsernameRegistry = {
 	// ------------------------- Profile Creation -------------------------
 	private func username_available(username : Username) : Bool {
 		switch (usernames_info.get(username)) {
-			case (?owner) {
+			case (?_owner) {
 				return false;
 			};
 			case (_) {
