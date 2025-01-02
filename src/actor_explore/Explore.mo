@@ -3,6 +3,8 @@ import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
+import Time "mo:base/Time";
+import Timer "mo:base/Timer";
 
 import Logger "canister:logger";
 
@@ -14,13 +16,14 @@ import Health "../libs/health";
 actor Explore {
 	type ProjectID = CreatorTypes.ProjectID;
 	type ProjectPublic = CreatorTypes.ProjectPublic;
+	type SnapPublic = CreatorTypes.SnapPublic;
 	type CanisterInfo = UsernameRegistryTypes.CanisterInfo;
 
 	type CreatorActor = CreatorTypes.CreatorActor;
 
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "Explore";
-	let VERSION = 4; // The Version in Production
+	let VERSION = 5; // The Version in Production
 	stable var username_registry : ?Principal = null;
 
 	// ------------------------- Storage Data -------------------------
@@ -124,6 +127,37 @@ actor Explore {
 		return Iter.toArray(projects.vals());
 	};
 
+	func are_all_snaps_older_than_one_week(
+		snaps : [SnapPublic],
+		now : Int,
+		one_week_ns : Int
+	) : Bool {
+		for (snap in snaps.vals()) {
+			if ((now - snap.updated) <= one_week_ns) {
+				return false;
+			};
+		};
+		return true;
+	};
+
+	private func remove_projects_all_snaps_older_than_one_week() : async () {
+		let now = Time.now();
+		let one_week_ns = 1_000_000_000 * 60 * 60 * 24 * 7; // 1 week in nanoseconds
+
+		for (project_id in projects.keys()) {
+			switch (projects.get(project_id)) {
+				case null {};
+				case (?project) {
+					if (are_all_snaps_older_than_one_week(project.snaps, now, one_week_ns)) {
+						projects.delete(project_id);
+					};
+				};
+			};
+		};
+
+		return ();
+	};
+
 	// ------------------------- Canister Management -------------------------
 	// Version
 	public query func version() : async Nat {
@@ -195,5 +229,8 @@ actor Explore {
 			Principal.hash
 		);
 		canister_registry_creator_stable_storage := [];
+
+		ignore Timer.recurringTimer<system>(#seconds(3600), remove_projects_all_snaps_older_than_one_week);
+
 	};
 };
