@@ -23,7 +23,7 @@ actor Explore {
 
 	// ------------------------- Variables -------------------------
 	let ACTOR_NAME : Text = "Explore";
-	let VERSION = 5; // The Version in Production
+	let VERSION = 6; // The Version in Production
 	stable var username_registry : ?Principal = null;
 
 	// ------------------------- Storage Data -------------------------
@@ -143,12 +143,17 @@ actor Explore {
 	private func remove_projects_all_snaps_older_than_one_week() : async () {
 		let now = Time.now();
 		let one_week_ns = 1_000_000_000 * 60 * 60 * 24 * 7; // 1 week in nanoseconds
+		let tags = [("name", ACTOR_NAME), ("method", "remove_projects_all_snaps_older_than_one_week")];
+
+		ignore Logger.log_event(tags, "executed");
 
 		for (project_id in projects.keys()) {
 			switch (projects.get(project_id)) {
 				case null {};
 				case (?project) {
 					if (are_all_snaps_older_than_one_week(project.snaps, now, one_week_ns)) {
+						ignore Logger.log_event(tags, "project_removed");
+
 						projects.delete(project_id);
 					};
 				};
