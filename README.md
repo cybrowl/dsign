@@ -1,10 +1,10 @@
 # DSign
 
-Welcome to **DSign** - the Collaborative Product Design Innovation Hub.
+Welcome to **DSign** – the Collaborative Product Design Innovation Hub.
 
-A platform where creativity meets technology, enabling designers to bring their innovative ideas to life.
+Experience a blend of creativity and technology, empowering designers to transform innovative ideas into reality.
 
-![Showcse Image](./showcase.png)
+![Showcase Image](./showcase.png)
 
 ## Quick Links
 
@@ -12,7 +12,7 @@ A platform where creativity meets technology, enabling designers to bring their 
 
 ## Getting Started
 
-To set up your environment and start contributing to DSign, follow these steps:
+Follow these steps to set up your environment and start contributing to DSign:
 
 1. Start the development server with a clean slate:
 
@@ -28,7 +28,7 @@ To set up your environment and start contributing to DSign, follow these steps:
 
 ## Canister Testing
 
-To ensure your contributions are solid and reliable, please run the canister tests:
+To verify that your contributions are reliable, please run the canister tests:
 
 `npm run test`
 
@@ -62,6 +62,8 @@ LINKY_IDENTITY=
 ```
 
 ## Random Identity
+
+Generate a random identity using:
 
 `echo -n (date +%s%N | tr -d '\n'; head -c 16 /dev/urandom | xxd -p) | openssl dgst -sha256`
 
