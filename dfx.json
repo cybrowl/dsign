@@ -63,6 +63,9 @@
 		}
 	},
 	"networks": {
+		"local": {
+			"bind": "127.0.0.1:8080"
+		},
 		"staging": {
 			"providers": ["https://icp0.io"],
 			"type": "persistent"

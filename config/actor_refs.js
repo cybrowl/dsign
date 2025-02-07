@@ -1,13 +1,17 @@
-const canisterIds = await import('../.dfx/local/canister_ids.json', {
-	assert: { type: 'json' }
-});
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { readFileSync } from 'fs';
 
 // Define __dirname for ES modules
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Canister names
+// Synchronously load and parse the JSON file without using import assertions
+const canisterIds = JSON.parse(
+	readFileSync(path.join(__dirname, '../.dfx/local/canister_ids.json'), 'utf8')
+);
+
+// Canister names to load
 const canisterNames = [
 	'explore',
 	'creator',
@@ -16,13 +20,14 @@ const canisterNames = [
 	'file_scaling_manager'
 ];
 
-// Synchronously load canister IDs
+// Build the canister IDs object from the parsed JSON data
 export const canister_ids = canisterNames.reduce((acc, name) => {
-	acc[`${name}`] = canisterIds.default[name].local;
+	// Adjust the key access as needed based on the JSON structure
+	acc[name] = canisterIds[name].local;
 	return acc;
 }, {});
 
-// Asynchronously load interfaces
+// Asynchronously load interface definitions from the corresponding did files
 async function loadInterfaces() {
 	const interfaces = {};
 	for (const name of canisterNames) {
@@ -32,13 +37,13 @@ async function loadInterfaces() {
 			interfaces[name] = module.idlFactory;
 		} catch (error) {
 			console.error(`Error loading interface for ${name}:`, error);
-			// Handle the error as needed, e.g., skip this module, throw an error, etc.
+			// Handle the error as needed (for example, skip this module)
 		}
 	}
 	return interfaces;
 }
 
-// Export a function that returns a promise of the loaded interfaces
+// Export a function that returns a promise for the loaded interfaces
 export function getInterfaces() {
 	return loadInterfaces();
 }
