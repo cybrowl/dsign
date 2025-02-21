@@ -673,6 +673,10 @@ video {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.grid-cols-\[repeat\(auto-fit\2c minmax\(200px\2c 250px\)\)\] {
+  grid-template-columns: repeat(auto-fit,minmax(200px,250px));
+}
+
 .flex-col {
   flex-direction: column;
 }

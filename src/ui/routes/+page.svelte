@@ -110,9 +110,9 @@
 	.notification_layout {
 		@apply row-start-2 row-end-3 absolute col-start-12 col-end-13 top-0 right-0;
 	}
-	.projects_layout {
-		@apply row-start-2 row-end-auto hidden lg:grid col-start-1 grid-cols-4 col-end-13 gap-x-6 gap-y-12 mb-16;
-	}
+    .projects_layout {
+        @apply row-start-2 row-end-auto hidden lg:grid col-start-1 grid-cols-[repeat(auto-fit,minmax(200px,250px))] col-end-13 gap-x-6 gap-y-12 mb-16;
+    }
 	.not_supported {
 		@apply lg:hidden flex flex-col items-center justify-center w-screen h-screen text-white text-4xl;
 	}
