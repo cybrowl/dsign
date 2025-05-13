@@ -1,10 +1,9 @@
 <svelte:head>
-	<title>Image Display</title>
-	<meta name="description" content="A full-screen image display page" />
+	<title>DSign</title>
+	<meta name="description" content="Dead Project" />
 </svelte:head>
 
 <main class="container">
-	<!-- Image source should be placed in the static folder for SvelteKit projects -->
 	<img
 		src="/dead_project.png"
 		alt="A full-screen display of the Dead Project artwork"
