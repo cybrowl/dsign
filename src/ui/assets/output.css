@@ -544,8 +544,48 @@ video {
   --tw-backdrop-sepia:  ;
 }
 
-.fixed {
-  position: fixed;
+.container {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
+@media (min-width: 2222px) {
+  .container {
+    max-width: 2222px;
+  }
+}
+
+.static {
+  position: static;
 }
 
 .absolute {
@@ -612,10 +652,6 @@ video {
   grid-row-start: 4;
 }
 
-.row-end-3 {
-  grid-row-end: 3;
-}
-
 .row-end-auto {
   grid-row-end: auto;
 }
@@ -653,10 +689,6 @@ video {
   width: 100vw;
 }
 
-.transform {
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-
 .cursor-pointer {
   cursor: pointer;
 }
@@ -671,10 +703,6 @@ video {
 
 .grid-cols-4 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.grid-cols-\[repeat\(auto-fit\2c minmax\(200px\2c 250px\)\)\] {
-  grid-template-columns: repeat(auto-fit,minmax(200px,250px));
 }
 
 .flex-col {
@@ -722,6 +750,15 @@ video {
 
 .self-end {
   align-self: flex-end;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.object-cover {
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 
 .pb-10 {

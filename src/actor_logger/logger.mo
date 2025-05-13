@@ -32,7 +32,7 @@ actor Logger {
 	let VERSION : Nat = 8;
 	let ACTOR_NAME : Text = "Logger";
 	stable var authorized : ?Principal = null;
-	stable var authorized_temp : Text = "ru737-xk264-4nswf-o6lzb-3juxx-ixp63-objgb-l4io2-yievs-5ezxe-kqe";
+	stable var authorized_temp : Text = "mtexc-zqsuk-srwu6-jrmig-jfzcc-kvxyr-wabtq-uegsg-mfb2d-a5rfi-2qe";
 
 	// ------------------------- Storage Data -------------------------
 	var logs_storage = Buffer<LogEvent>(0);

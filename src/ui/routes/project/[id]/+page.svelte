@@ -369,13 +369,6 @@
 	.navigation_main_layout {
 		@apply row-start-1 row-end-auto col-start-1 col-end-13;
 	}
-	.loading_layout {
-		position: fixed;
-		z-index: 30;
-		top: 42%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-	}
 	.project_info_layout {
 		@apply row-start-2 row-end-auto relative col-start-1 col-end-13;
 	}
